@@ -1,0 +1,68 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2020": true },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": ["dist", ".eslintrc.cjs"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "react-refresh",
+    "react",
+    "@typescript-eslint",
+    "eslint-plugin-no-inline-styles"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "react-refresh/only-export-components": [
+      "warn",
+      { "allowConstantExport": true }
+    ],
+    "@typescript-eslint/no-unused-vars": ["warn", {
+      "varsIgnorePattern": "^_"
+    }],
+    "@typescript-eslint/no-unused-expressions": ["warn", {
+      "allowTernary": true
+    }],
+    "eol-last": ["warn", "always"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "eqeqeq": "error",
+    "no-console": "warn",
+    "prefer-arrow-callback": "error",
+    "arrow-parens": ["error", "as-needed"],
+    "jsx-quotes": ["error", "prefer-single"],
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": 0,
+    "react/jsx-no-useless-fragment": "error",
+    "no-inline-styles/no-inline-styles": 2,
+    "react/jsx-pascal-case": "error",
+    "react/destructuring-assignment": ["error", "always"],
+    "no-trailing-spaces": ["error", { "ignoreComments": true }],
+    "no-multi-spaces": ["error", { "ignoreEOLComments": true }],
+    "comma-spacing": ["error", { "before": false, "after": true }],
+    "func-call-spacing": ["error", "never"],
+    "key-spacing": ["error", { "beforeColon": false }],
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-useless-return": "error",
+    "no-unneeded-ternary": "error",
+    "object-curly-spacing": ["error", "always"],
+    "react-hooks/exhaustive-deps": "off"
+  }
+}
