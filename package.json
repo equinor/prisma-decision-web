@@ -10,7 +10,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@equinor/eds-core-react": "^0.44.0",
+		"@equinor/eds-core-react": "^0.45.0",
 		"@equinor/eds-icons": "^0.22.0",
 		"@uidotdev/usehooks": "^2.4.1",
 		"react": "^19.0.0",
