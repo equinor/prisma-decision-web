@@ -1,0 +1,40 @@
+on:
+    pull_request:
+        branches:
+            - main
+        types:
+            - opened
+            - edited
+            - synchronize
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        name: Run eslint
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: lts/*
+            - run: npm ci
+            - run: npm run lint
+    tsc:
+        runs-on: ubuntu-latest
+        name: Run tsc
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: lts/*
+            - run: npm ci
+            - run: npm run tsc
+    prettier:
+        runs-on: ubuntu-latest
+        name: Run prettier
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: lts/*
+            - run: npm ci
+            - run: npm run prettier

@@ -1,0 +1,39 @@
+name: 🚀 Create release
+
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    release-please:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: google-github-actions/release-please-action@v4
+              name: Create Release
+              id: release
+              with:
+                  release-type: node
+
+            - uses: actions/checkout@v4
+              name: Checkout
+              if: ${{ steps.release.outputs.release_created }}
+
+            - uses: actions/setup-node@v4
+              name: Setup Node.js
+              if: ${{ steps.release.outputs.release_created }}
+              with:
+                  node-version: 20
+                  registry-url: 'https://registry.npmjs.org'
+
+            - run: npm ci
+              name: Install dependencies
+              if: ${{ steps.release.outputs.release_created }}
+
+            - run: npm run release:prod
+              name: push to production
+              if: ${{ steps.release.outputs.release_created }}
