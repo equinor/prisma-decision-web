@@ -5,9 +5,16 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
-		"lint": "eslint .",
-		"preview": "vite preview"
+		"build": "tsc && vite build",
+		"build:dev": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode development",
+		"build:prod": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode production",
+		"release:prod": "npm run fetch-tags && git tag -f PROD && npm run push-tags",
+		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"tsc": "tsc",
+		"prettier": "prettier --check ./src",
+		"preview": "vite preview",
+		"fetch-tags": "git fetch origin --tags --force",
+		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
 		"@equinor/eds-core-react": "^0.45.0",
