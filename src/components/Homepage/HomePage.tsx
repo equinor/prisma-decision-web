@@ -24,7 +24,7 @@ export const HomePage = () => {
 							<Button>Open</Button>
 							<Button>Restricted</Button>
 						</Button.Toggle>
-						<Search className='xl:w-[350px]' placeholder='Search for projects' />
+						<Search className='xl:w-[350px]' placeholder='Search projects...' />
 					</div>
 					<div className='flex flex-wrap gap-6'>
 						<ProjectCard />

@@ -1,0 +1,17 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+    name: dot-web
+spec:
+    build:
+    environments:
+        - name: dev
+          build:
+              from: main
+    components:
+        - name: frontend
+          src: .
+          publicPort: http
+          ports:
+              - name: http
+                port: 3000

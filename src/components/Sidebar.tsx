@@ -2,10 +2,12 @@ import { SideBar as EdsSideBar, Menu } from '@equinor/eds-core-react';
 import { add } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { EquinorStar } from './EquinorStar';
+import { useNavigate } from 'react-router';
 
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const navigate = useNavigate();
 	return (
 		<EdsSideBar className='h-[calc(100vh-64px)] !overflow-x-hidden !border-r-0'>
 			<EdsSideBar.Content>
@@ -17,7 +19,9 @@ export const SideBar = () => {
 					icon={add}
 				/>
 				<Menu anchorEl={anchorEl} open={isOpen} onClose={() => setIsOpen(false)}>
-					<Menu.Item>Create new project</Menu.Item>
+					<Menu.Item onClick={() => navigate('/create-project')}>
+						Create new project
+					</Menu.Item>
 					<Menu.Item>Import project</Menu.Item>
 				</Menu>
 			</EdsSideBar.Content>

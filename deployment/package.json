@@ -1,0 +1,19 @@
+{
+	"name": "warp-deployment",
+	"version": "1.0.0",
+	"description": "Warp Deployment",
+	"author": "Fredrik Wold <fmw@equinor.com>",
+	"license": "MIT",
+	"main": "app.js",
+	"type": "module",
+	"keywords": [
+		"sepes",
+		"nodejs",
+		"bootstrap",
+		"express"
+	],
+	"dependencies": {
+		"express": "^4.21.1",
+		"express-rate-limit": "^7.4.0"
+	}
+}
