@@ -17,7 +17,7 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
-		"@equinor/eds-core-react": "^0.45.0",
+		"@equinor/eds-core-react": "^0.45.1",
 		"@equinor/eds-icons": "^0.22.0",
 		"@uidotdev/usehooks": "^2.4.1",
 		"react": "^19.0.0",

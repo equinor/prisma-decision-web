@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 @theme inline {
-	--breakpoint-xl: 88rem;
+	--breakpoint-2xl: 100rem;
 
 	--color-primary: rgba(var(--eds_primary), 1);
 	--color-primary-resting: rgba(var(--eds_primary_resting), 1);
