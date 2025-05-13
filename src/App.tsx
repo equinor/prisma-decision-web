@@ -1,15 +1,15 @@
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router';
-import { Layout } from './components/Layout';
-import { HomePage } from './components/Homepage/HomePage';
 import { CreateProjectPage } from './components/CreateProjectPage/CreateProjectPage';
-import { ProjectIssues } from './components/ProjectIssues';
+import { HomePage } from './components/Homepage/HomePage';
+import { Layout } from './components/Layout';
+import { ProjectPage } from './components/ProjectPage/ProjectPage';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route element={<Layout />}>
 			<Route path='/' element={<HomePage />} />
 			<Route path='/create-project' element={<CreateProjectPage />} />
-			<Route path='/project/:id' element={<ProjectIssues />} />
+			<Route path='/project/:id' element={<ProjectPage />} />
 		</Route>,
 	),
 );
