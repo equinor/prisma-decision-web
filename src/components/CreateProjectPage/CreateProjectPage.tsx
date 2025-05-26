@@ -1,6 +1,6 @@
 import { Button } from '@equinor/eds-core-react';
 import { Link } from 'react-router';
-import { ProjectDetails } from '../ProjectPage/ProjectDetails';
+import { ProjectDetails } from './ProjectDetails';
 
 export const CreateProjectPage = () => {
 	return (
