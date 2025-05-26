@@ -1,7 +1,8 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { share, view_column, view_list } from '@equinor/eds-icons';
+import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, Outlet, useLocation } from 'react-router';
+import { NetworkIcon } from '../common/NetworkIcon';
 
 export type Issue = {
 	name: string;
@@ -39,7 +40,7 @@ export const ProjectPage = () => {
 								<Icon data={view_column} />
 							</Button>
 							<Button>
-								<Icon data={share} />
+								<NetworkIcon />
 							</Button>
 						</Button.Toggle>
 					)}

@@ -23,6 +23,7 @@
 		"@dnd-kit/react": "^0.1.17",
 		"@equinor/eds-core-react": "^0.45.1",
 		"@equinor/eds-icons": "^0.22.0",
+		"@radix-ui/react-collapsible": "^1.1.11",
 		"@uidotdev/usehooks": "^2.4.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
