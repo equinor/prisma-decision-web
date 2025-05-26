@@ -2,17 +2,15 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
 import { Issue } from '../ProjectPage';
 
-export const Uncertainties = ({ issues }: UncertaintiesProps) => {
+export const Facts = ({ issues }: FactsProps) => {
 	return (
 		<div
 			className='bg-background-default shadow-tile flex w-full flex-col
                  items-start gap-6 rounded-sm p-6'
 		>
 			<div>
-				<h2 className='text-2xl font-semibold'>Uncertainties</h2>
-				<p className='text-text-tertiary'>
-					Manage the uncertainties that need to be considered in this project
-				</p>
+				<h2 className='text-2xl font-semibold'>Facts</h2>
+				<p className='text-text-tertiary'>The objective facts about the project</p>
 			</div>
 			<div className='outline-background-medium w-full rounded-sm outline-1'>
 				<Table className='w-full'>
@@ -21,7 +19,6 @@ export const Uncertainties = ({ issues }: UncertaintiesProps) => {
 							<Table.Cell className='w-21 px-0! pl-5!'>Actions</Table.Cell>
 							<Table.Cell>Name</Table.Cell>
 							<Table.Cell>Description</Table.Cell>
-							<Table.Cell>Outcomes</Table.Cell>
 							<Table.Cell>Boundry</Table.Cell>
 							<Table.Cell>Date Added</Table.Cell>
 						</Table.Row>
@@ -41,13 +38,6 @@ export const Uncertainties = ({ issues }: UncertaintiesProps) => {
 								<Table.Cell className='max-w-md py-2!'>
 									{issue.description}
 								</Table.Cell>
-								<Table.Cell>
-									<ul className='flex flex-col gap-2 py-4'>
-										<li>Outcome 1 (25%)</li>
-										<li>Outcome 2 (25%)</li>
-										<li>Outcome 1 (50%)</li>
-									</ul>
-								</Table.Cell>
 								<Table.Cell>Out</Table.Cell>
 								<Table.Cell>2023-05-01</Table.Cell>
 							</Table.Row>
@@ -59,6 +49,6 @@ export const Uncertainties = ({ issues }: UncertaintiesProps) => {
 	);
 };
 
-type UncertaintiesProps = {
+type FactsProps = {
 	issues: Issue[];
 };

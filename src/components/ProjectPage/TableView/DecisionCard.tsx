@@ -2,8 +2,11 @@ import { useSortable } from '@dnd-kit/react/sortable';
 import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { Issue } from '../ProjectPage';
+import { useState } from 'react';
+import { DeleteIssueDialog } from '../DeleteIssueDialog';
 
 export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
+	const [deleteOpen, setDeleteOpen] = useState(false);
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
@@ -47,6 +50,11 @@ export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
 					<li>Option 3</li>
 				</ul>
 			</div>
+			<DeleteIssueDialog
+				issue={issue}
+				onClose={() => setDeleteOpen(false)}
+				open={deleteOpen}
+			/>
 		</div>
 	);
 };

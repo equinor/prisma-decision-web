@@ -1,7 +1,8 @@
 import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
+import { Issue } from '../ProjectPage';
 
-export const Values = () => {
+export const Values = ({ issues }: ValuesProps) => {
 	return (
 		<div
 			className='bg-background-default shadow-tile flex w-full flex-col
@@ -25,42 +26,31 @@ export const Values = () => {
 						</Table.Row>
 					</Table.Head>
 					<Table.Body>
-						<Table.Row>
-							<Table.Cell className='px-0! pl-1!'>
-								<Button variant='ghost_icon'>
-									<Icon data={edit} />
-								</Button>
-								<Button variant='ghost_icon'>
-									<Icon data={delete_forever} />
-								</Button>
-							</Table.Cell>
-							<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-							<Table.Cell className='max-w-md py-2!'>
-								Lorem ipsum dolor sit, amet consectetur adipisicing elit. Hic,
-								voluptatem. Distinctio voluptatibus accusamus atque, veniam facilis
-								nostrum dignissimos, ea, perspiciatis culpa consectetur temporibus
-								deleniti quas vero reiciendis expedita quasi in!
-							</Table.Cell>
-							<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-							<Table.Cell>2023-05-01</Table.Cell>
-						</Table.Row>
-						<Table.Row>
-							<Table.Cell className='px-0! pl-1!'>
-								<Button variant='ghost_icon'>
-									<Icon data={edit} />
-								</Button>
-								<Button variant='ghost_icon'>
-									<Icon data={delete_forever} />
-								</Button>
-							</Table.Cell>
-							<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-							<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-							<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-							<Table.Cell>2023-05-01</Table.Cell>
-						</Table.Row>
+						{issues.map(issue => (
+							<Table.Row key={issue.id}>
+								<Table.Cell className='px-0! pl-1!'>
+									<Button variant='ghost_icon'>
+										<Icon data={edit} />
+									</Button>
+									<Button variant='ghost_icon'>
+										<Icon data={delete_forever} />
+									</Button>
+								</Table.Cell>
+								<Table.Cell>{issue.name}</Table.Cell>
+								<Table.Cell className='max-w-md py-2!'>
+									{issue.description}
+								</Table.Cell>
+								<Table.Cell>Out</Table.Cell>
+								<Table.Cell>2023-05-01</Table.Cell>
+							</Table.Row>
+						))}
 					</Table.Body>
 				</Table>
 			</div>
 		</div>
 	);
+};
+
+type ValuesProps = {
+	issues: Issue[];
 };

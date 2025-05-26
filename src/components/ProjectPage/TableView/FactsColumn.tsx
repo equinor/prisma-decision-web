@@ -4,7 +4,7 @@ import { Issue } from '../ProjectPage';
 import { FactCard } from './FactCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
 
-export const FactsColumn = ({ issues, className, onDeleteIssue }: FactsColumnProps) => {
+export const FactsColumn = ({ issues, className }: FactsColumnProps) => {
 	const { ref } = useDroppable({
 		id: 'fact',
 		type: 'column',
@@ -21,12 +21,7 @@ export const FactsColumn = ({ issues, className, onDeleteIssue }: FactsColumnPro
 			</div>
 			<div ref={ref} className={cn('flex h-full flex-col gap-2 rounded-sm p-2', className)}>
 				{issues.map((issue, index) => (
-					<FactCard
-						key={issue.id}
-						issue={issue}
-						onDeleteIssue={onDeleteIssue}
-						index={index}
-					/>
+					<FactCard key={issue.id} issue={issue} index={index} />
 				))}
 			</div>
 		</div>
@@ -36,5 +31,4 @@ export const FactsColumn = ({ issues, className, onDeleteIssue }: FactsColumnPro
 type FactsColumnProps = {
 	issues: Issue[];
 	className?: string;
-	onDeleteIssue: (issue: Issue) => void;
 };

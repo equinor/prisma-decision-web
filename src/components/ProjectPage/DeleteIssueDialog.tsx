@@ -1,12 +1,7 @@
 import { Button, Dialog, DialogContent } from '@equinor/eds-core-react';
 import { Issue } from './ProjectPage';
 
-export const DeleteIssueDialog = ({
-	issue,
-	onDeleteIssue,
-	open = false,
-	onClose,
-}: DeleteIssueDialogProps) => {
+export const DeleteIssueDialog = ({ issue, open = false, onClose }: DeleteIssueDialogProps) => {
 	return (
 		<Dialog
 			open={open}
@@ -25,7 +20,6 @@ export const DeleteIssueDialog = ({
 						<Button
 							color='danger'
 							onClick={() => {
-								onDeleteIssue(issue);
 								onClose();
 							}}
 						>
@@ -41,6 +35,5 @@ export const DeleteIssueDialog = ({
 type DeleteIssueDialogProps = {
 	issue: Issue;
 	open: boolean;
-	onDeleteIssue: (issue: Issue) => void;
 	onClose: () => void;
 };

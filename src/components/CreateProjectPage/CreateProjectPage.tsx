@@ -1,8 +1,6 @@
 import { Button } from '@equinor/eds-core-react';
-import { OpportunityStatments } from './OpportunityStatments';
-import { ProjectInformation } from './ProjectInformation';
-import { ProjectObjectives } from './ProjectObjectives';
 import { Link } from 'react-router';
+import { ProjectDetails } from '../ProjectPage/ProjectDetails';
 
 export const CreateProjectPage = () => {
 	return (
@@ -14,9 +12,7 @@ export const CreateProjectPage = () => {
 						Fill in the details to create a new decision optimization project
 					</p>
 				</div>
-				<ProjectInformation />
-				<OpportunityStatments />
-				<ProjectObjectives />
+				<ProjectDetails />
 				<div className='-mt-2! flex justify-between'>
 					<Button variant='outlined' color='danger' as={Link} to='/'>
 						Cancel
