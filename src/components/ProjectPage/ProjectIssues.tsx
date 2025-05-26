@@ -1,6 +1,22 @@
 import { Autocomplete, Button, TextField } from '@equinor/eds-core-react';
+import { Issue } from './ProjectPage';
+import { ChangeEvent, useState } from 'react';
 
-export const ProjectIssues = () => {
+const categoryOptions = [
+	{ label: 'Decision', value: 'decision' },
+	{ label: 'Uncertainty', value: 'uncertainty' },
+	{ label: 'Fact', value: 'fact' },
+	{ label: 'Value', value: 'value' },
+	{ label: 'Unassigned', value: 'unassigned' },
+];
+
+export const ProjectIssues = ({ onAddIssue }: ProjectIssuesProps) => {
+	const [issue, setIssue] = useState<Issue>({
+		type: 'decision',
+		name: '',
+		id: crypto.randomUUID(),
+	});
+	const selectedCategory = categoryOptions.find(option => option.value === issue?.type);
 	return (
 		<div className='mx-auto w-[456px] xl:w-[936px] 2xl:w-[1416px]'>
 			<div
@@ -14,12 +30,24 @@ export const ProjectIssues = () => {
 					</p>
 				</div>
 				<div className='grid w-full grid-cols-2 gap-4'>
-					<TextField placeholder='Enter issue name...' label='Issue Name' />
+					<TextField
+						placeholder='Enter issue name...'
+						label='Issue Name'
+						onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+							setIssue(prev => ({ ...prev, name: e.target.value }))
+						}
+						value={issue.name}
+					/>
 					<TextField placeholder='Enter label...' label='Label' />
 					<Autocomplete
 						label='Category'
-						options={['Decision', 'Uncertainty', 'Fact', 'Value', 'Unassgined']}
-						initialSelectedOptions={['Decision']}
+						optionLabel={option => option.label}
+						options={categoryOptions}
+						selectedOptions={selectedCategory ? [selectedCategory] : []}
+						onOptionsChange={({ selectedItems }) => {
+							if (selectedItems.length === 0) return;
+							setIssue(prev => ({ ...prev, type: selectedItems[0].value }));
+						}}
 					/>
 					<Autocomplete
 						label='Boundry'
@@ -34,8 +62,25 @@ export const ProjectIssues = () => {
 						rows={4}
 					/>
 				</div>
-				<Button className='self-end'>Add Issue</Button>
+				<Button
+					className='self-end'
+					onClick={() => {
+						if (issue.name === '') return;
+						onAddIssue(issue);
+						setIssue({
+							type: 'decision',
+							name: '',
+							id: crypto.randomUUID(),
+						});
+					}}
+				>
+					Add Issue
+				</Button>
 			</div>
 		</div>
 	);
+};
+
+type ProjectIssuesProps = {
+	onAddIssue: (issue: Issue) => void;
 };
