@@ -9,7 +9,9 @@ export default defineConfig({
 		react(),
 		tailwindcss(),
 		checker({
-			typescript: true,
+			typescript: {
+				tsconfigPath: './tsconfig.app.json',
+			},
 			eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"' },
 			overlay: { initialIsOpen: false },
 		}),

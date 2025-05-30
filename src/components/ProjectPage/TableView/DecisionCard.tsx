@@ -15,13 +15,14 @@ export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
 		data: {
 			issue,
 		},
+		disabled: index === -1,
 		group: 'decision',
 	});
 	return (
 		<div
 			ref={ref}
 			data-dragging={isDragging && index !== -1}
-			className='bg-background-default shadow-tile outline-primary-resting flex cursor-grab flex-col
+			className='bg-background-default shadow-tile outline-primary-resting flex max-w-[300px] cursor-grab flex-col
             gap-2 rounded-sm p-4 data-[dragging="true"]:cursor-grabbing data-[dragging="true"]:opacity-40 data-[dragging="true"]:outline-1'
 		>
 			<div className='flex items-center justify-between'>

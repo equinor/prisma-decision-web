@@ -1,20 +1,15 @@
-import { Type } from '@dnd-kit/abstract';
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { move } from '@dnd-kit/helpers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
-import { Issue } from '../ProjectPage';
-import { DecisionCard } from './DecisionCard';
-import { DecisionsColumn } from './DecisionsColumn';
-import { FactCard } from './FactCard';
-import { FactsColumn } from './FactsColumn';
-import { UnassignedCard } from './UnassignedCard';
-import { UnassignedColumn } from './UnassignedColumn';
-import { UncertaintieCard } from './UncertaintieCard';
-import { UncertaintiesColumn } from './UncertaintiesColumn';
-import { ValueCard } from './ValueCard';
-import { ValuesColumn } from './ValuesColumn';
-import { CreateProjectIssues } from '../CreateProjectIssue';
 import { useState } from 'react';
+import { CreateProjectIssues } from '../CreateProjectIssue';
+import { Issue } from '../ProjectPage';
+import { DecisionsColumn } from './DecisionsColumn';
+import { FactsColumn } from './FactsColumn';
+import { UnassignedColumn } from './UnassignedColumn';
+import { UncertaintiesColumn } from './UncertaintiesColumn';
+import { ValuesColumn } from './ValuesColumn';
+import { getCardType } from '../../../utils/getCardType';
 
 export const TableView = () => {
 	const [issues, setIssues] = useState(defaultIssues);
@@ -60,22 +55,6 @@ export const TableView = () => {
 			</div>
 		</>
 	);
-};
-
-const getCardType = (type?: Type) => {
-	if (!type) return UnassignedCard;
-	switch (type) {
-		case 'decision':
-			return DecisionCard;
-		case 'uncertainty':
-			return UncertaintieCard;
-		case 'value':
-			return ValueCard;
-		case 'fact':
-			return FactCard;
-		default:
-			return UnassignedCard;
-	}
 };
 
 const defaultIssues: Record<string, Issue[]> = {

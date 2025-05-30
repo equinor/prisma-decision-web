@@ -17,6 +17,7 @@ export const UnassignedCard = ({ issue, index }: UnassignedCardProps) => {
 			issue,
 		},
 		group: 'unassigned',
+		disabled: index === -1,
 	});
 
 	return (

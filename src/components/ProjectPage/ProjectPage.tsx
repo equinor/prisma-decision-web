@@ -9,12 +9,16 @@ export type Issue = {
 	description: string;
 	id: string;
 	type: string;
+	position?: { x: number; y: number };
 };
 
 export const ProjectPage = () => {
 	const location = useLocation();
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
 	const showIssuesView = location.pathname.includes('issues');
+	let activeView = 0;
+	if (issueView === 'table') activeView = 1;
+	if (issueView === 'diagram') activeView = 2;
 
 	return (
 		<div className='mx-auto w-[456px] xl:w-[936px] 2xl:w-[1416px]'>
@@ -32,14 +36,14 @@ export const ProjectPage = () => {
 						</Button>
 					</Button.Toggle>
 					{showIssuesView && (
-						<Button.Toggle selectedIndexes={[issueView === 'list' ? 0 : 1]}>
+						<Button.Toggle selectedIndexes={[activeView]}>
 							<Button onClick={() => setIssuesView('list')}>
 								<Icon data={view_list} />
 							</Button>
 							<Button onClick={() => setIssuesView('table')}>
 								<Icon data={view_column} />
 							</Button>
-							<Button>
+							<Button onClick={() => setIssuesView('diagram')}>
 								<NetworkIcon />
 							</Button>
 						</Button.Toggle>
