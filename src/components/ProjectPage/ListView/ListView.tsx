@@ -5,13 +5,13 @@ import { Facts } from './Facts';
 import { Unassgined } from './Unassigned';
 import { Uncertainties } from './Uncertainties';
 import { Values } from './Values';
-import { CreateProjectIssues } from '../CreateProjectIssue';
+import { CreateIssues } from '../CreateIssue';
 
 export const ListView = () => {
 	const [issues] = useState(defaultIssues);
 	return (
 		<>
-			<CreateProjectIssues />
+			<CreateIssues />
 			<Unassgined issues={issues['unassigned']} />
 			<Decisions issues={issues['decision']} />
 			<Uncertainties issues={issues['uncertainty']} />

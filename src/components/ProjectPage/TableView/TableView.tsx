@@ -2,7 +2,7 @@ import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { move } from '@dnd-kit/helpers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import { useState } from 'react';
-import { CreateProjectIssues } from '../CreateProjectIssue';
+import { CreateIssues } from '../CreateIssue';
 import { Issue } from '../ProjectPage';
 import { DecisionsColumn } from './DecisionsColumn';
 import { FactsColumn } from './FactsColumn';
@@ -15,24 +15,23 @@ export const TableView = () => {
 	const [issues, setIssues] = useState(defaultIssues);
 	return (
 		<>
-			<CreateProjectIssues />
-			<div
-				className='bg-background-default shadow-tile flex w-full flex-col
-        	items-start gap-6 rounded-sm p-6'
+			<CreateIssues />
+			<DragDropProvider
+				onDragOver={event => {
+					if (event.operation?.target?.type === 'column' && event.operation.source) {
+						event.operation.source.data.issue.type = event.operation.target.id;
+					}
+					setIssues(issues => {
+						return move(issues, event);
+					});
+				}}
+				modifiers={[RestrictToElement]}
 			>
-				<h2 className='text-2xl font-semibold'>Issues</h2>
-				<DragDropProvider
-					onDragOver={event => {
-						if (event.operation?.target?.type === 'column' && event.operation.source) {
-							event.operation.source.data.issue.type = event.operation.target.id;
-						}
-						setIssues(issues => {
-							return move(issues, event);
-						});
-					}}
-					modifiers={[RestrictToElement]}
+				<div
+					className='bg-background-default shadow-tile flex w-full flex-col
+        			items-start gap-6 rounded-sm p-6'
 				>
-					<div className='grid w-full grid-cols-[repeat(5,minmax(257px,1fr))] gap-4 overflow-hidden'>
+					<div className='grid w-full grid-cols-[repeat(5,minmax(257px,1fr))] gap-4 overflow-auto'>
 						<UnassignedColumn
 							className='bg-blue-400/20'
 							issues={issues['unassigned']}
@@ -45,14 +44,14 @@ export const TableView = () => {
 						<ValuesColumn className='bg-emerald-400/20' issues={issues['value']} />
 						<FactsColumn className='bg-cyan-400/20' issues={issues['fact']} />
 					</div>
-					<DragOverlay>
-						{source => {
-							const Card = getCardType(source.type);
-							return <Card issue={source.data.issue} index={-1} />;
-						}}
-					</DragOverlay>
-				</DragDropProvider>
-			</div>
+				</div>
+				<DragOverlay>
+					{source => {
+						const Card = getCardType(source.type);
+						return <Card issue={source.data.issue} index={-1} />;
+					}}
+				</DragOverlay>
+			</DragDropProvider>
 		</>
 	);
 };

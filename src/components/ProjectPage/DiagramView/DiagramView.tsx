@@ -25,7 +25,7 @@ import {
 	useNodesState,
 } from '@xyflow/react';
 import { getCardType } from '../../../utils/getCardType';
-import { CreateProjectIssues } from '../CreateProjectIssue';
+import { CreateIssues } from '../CreateIssue';
 import { Issue } from '../ProjectPage';
 
 export const DiagramView = () => {
@@ -53,10 +53,12 @@ export const DiagramView = () => {
 
 	return (
 		<>
-			<CreateProjectIssues />
-			<div className='h-[800px]'>
+			<CreateIssues />
+			<div
+				className='bg-background-light shadow-tile flex h-[800px] w-full flex-col items-start
+        	gap-6 rounded-sm'
+			>
 				<ReactFlow
-					className='outline-background-medium shadow-tile rounded-sm outline-1'
 					nodes={nodes}
 					edges={edges}
 					defaultEdgeOptions={{

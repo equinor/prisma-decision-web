@@ -19,7 +19,7 @@ export const Facts = ({ issues }: FactsProps) => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
-					<div className='outline-background-medium w-full rounded-sm outline-1'>
+					<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
 						<Table className='w-full'>
 							<Table.Head>
 								<Table.Row>
@@ -34,12 +34,14 @@ export const Facts = ({ issues }: FactsProps) => {
 								{issues.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
-											<Button variant='ghost_icon'>
-												<Icon data={edit} />
-											</Button>
-											<Button variant='ghost_icon'>
-												<Icon data={delete_forever} />
-											</Button>
+											<div className='flex'>
+												<Button variant='ghost_icon'>
+													<Icon data={edit} />
+												</Button>
+												<Button variant='ghost_icon'>
+													<Icon data={delete_forever} />
+												</Button>
+											</div>
 										</Table.Cell>
 										<Table.Cell>{issue.name}</Table.Cell>
 										<Table.Cell className='max-w-md py-2!'>

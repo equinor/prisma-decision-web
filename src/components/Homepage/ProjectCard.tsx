@@ -7,7 +7,7 @@ export const ProjectCard = () => {
 		<Link to={'/project/1'}>
 			<div
 				className='bg-background-default outline-background-medium
-			hover:bg-background-light shadow-tile h-[180px] w-[456px]
+			hover:bg-background-light shadow-tile h-[180px]
 			cursor-pointer rounded-sm transition-all duration-1000 hover:outline'
 			>
 				<div className='p-6'>

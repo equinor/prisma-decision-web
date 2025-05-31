@@ -21,7 +21,7 @@ export const ProjectPage = () => {
 	if (issueView === 'diagram') activeView = 2;
 
 	return (
-		<div className='mx-auto w-[456px] xl:w-[936px] 2xl:w-[1416px]'>
+		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-6'>
 				<div className='max-w-[1000px]'>
 					<h1 className='text-3xl font-bold'>The Used Car Buyer Problem</h1>

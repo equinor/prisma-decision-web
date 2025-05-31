@@ -12,7 +12,7 @@ const categoryOptions = [
 	{ label: 'Unassigned', value: 'unassigned' },
 ];
 
-export const CreateProjectIssues = () => {
+export const CreateIssues = () => {
 	const [issue, setIssue] = useState<Issue>({
 		type: 'decision',
 		name: '',
@@ -23,10 +23,7 @@ export const CreateProjectIssues = () => {
 	const selectedCategory = categoryOptions.find(option => option.value === issue?.type);
 	return (
 		<Collapsible open={isOpen} onOpenChange={setIsOpen}>
-			<div
-				className='bg-background-default shadow-tile flex w-[456px]
-                	flex-col items-start gap-6 rounded-sm p-6 xl:w-[936px] 2xl:w-[1416px]'
-			>
+			<div className='bg-background-default shadow-tile flex flex-col items-start gap-6 rounded-sm p-6'>
 				<CollapsibleTrigger asChild>
 					<div className='w-full cursor-pointer'>
 						<h2 className='text-2xl font-semibold'>Create Issue</h2>
@@ -36,7 +33,7 @@ export const CreateProjectIssues = () => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-6'>
-					<div className='grid w-full grid-cols-2 gap-4'>
+					<div className='grid w-full grid-cols-1 gap-4 md:grid-cols-2'>
 						<TextField
 							placeholder='Enter issue name...'
 							label='Issue Name'
@@ -64,12 +61,12 @@ export const CreateProjectIssues = () => {
 						<TextField
 							label='Description'
 							placeholder='Enter description...'
-							className='col-span-2'
+							className='md:col-span-2'
 							multiline
 							rows={4}
 						/>
 					</div>
-					<Button className='self-end'>Add Issue</Button>
+					<Button className='md:self-end'>Add Issue</Button>
 				</CollapsibleContent>
 			</div>
 		</Collapsible>

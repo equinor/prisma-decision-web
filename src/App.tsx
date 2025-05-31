@@ -2,9 +2,9 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 import { CreateProjectPage } from './components/CreateProjectPage/CreateProjectPage';
 import { HomePage } from './components/Homepage/HomePage';
 import { Layout } from './components/Layout';
-import { ProjectDetails } from './components/CreateProjectPage/ProjectDetails';
 import { ProjectPage } from './components/ProjectPage/ProjectPage';
 import { ProjectIssues } from './components/ProjectPage/ProjectIssues';
+import { ProjectDetails } from './components/ProjectPage/ProjectDetails';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(

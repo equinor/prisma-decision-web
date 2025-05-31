@@ -21,7 +21,7 @@ export const OpportunityStatments = () => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-6'>
-					<div className='grid w-full xl:grid-cols-[1fr_auto] xl:gap-4'>
+					<div className='grid w-full md:grid-cols-[1fr_auto] md:gap-4'>
 						<TextField
 							label='Add New Statement'
 							placeholder='Enter opportunity statement...'

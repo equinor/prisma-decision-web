@@ -21,10 +21,10 @@ export const ProjectObjectives = () => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-6'>
-					<div className='grid w-full grid-cols-1 gap-2 xl:grid-cols-[1fr_1fr_auto] xl:gap-4 2xl:grid-cols-[3fr_1fr_1fr_auto]'>
+					<div className='grid w-full grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto] md:gap-4 lg:grid-cols-[3fr_1fr_1fr_auto]'>
 						<TextField
 							label='Add New Statement'
-							className='xl:col-span-3 2xl:col-span-1'
+							className='md:col-span-3 lg:col-span-1'
 							placeholder='Enter opportunity statement...'
 						/>
 						<Autocomplete

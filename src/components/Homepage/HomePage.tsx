@@ -3,7 +3,7 @@ import { ProjectCard } from './ProjectCard';
 
 export const HomePage = () => {
 	return (
-		<div className='mx-auto w-[456px] xl:w-[936px] 2xl:w-[1416px]'>
+		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-12'>
 				<div className='max-w-[1000px]'>
 					<h1 className='text-3xl font-bold'>
@@ -18,15 +18,18 @@ export const HomePage = () => {
 				</div>
 
 				<div className='flex flex-col gap-4'>
-					<div className='flex flex-col justify-between gap-4 xl:flex-row'>
-						<Button.Toggle selectedIndexes={[0]}>
+					<div className='flex flex-col justify-between gap-4 md:flex-row'>
+						<Button.Toggle
+							selectedIndexes={[0]}
+							className='grid! grid-cols-3 md:inline-flex'
+						>
 							<Button>All projects</Button>
 							<Button>Open</Button>
 							<Button>Restricted</Button>
 						</Button.Toggle>
 						<Search className='xl:w-[350px]' placeholder='Search projects...' />
 					</div>
-					<div className='flex flex-wrap gap-6'>
+					<div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
 						<ProjectCard />
 						<ProjectCard />
 						<ProjectCard />
