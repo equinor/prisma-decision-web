@@ -1,6 +1,7 @@
+import { Button, Icon } from '@equinor/eds-core-react';
+import { delete_to_trash } from '@equinor/eds-icons';
 import {
 	addEdge,
-	applyNodeChanges,
 	Background,
 	BaseEdge,
 	Connection,
@@ -8,13 +9,13 @@ import {
 	ConnectionMode,
 	Controls,
 	Edge,
+	EdgeLabelRenderer,
 	EdgeProps,
-	getStraightPath,
+	getSmoothStepPath,
 	Handle,
 	IsValidConnection,
 	MarkerType,
 	Node,
-	NodeChange,
 	NodeProps,
 	OnConnect,
 	Position,
@@ -23,14 +24,16 @@ import {
 	useConnection,
 	useEdgesState,
 	useNodesState,
+	useReactFlow,
 } from '@xyflow/react';
 import { getCardType } from '../../../utils/getCardType';
 import { CreateIssues } from '../CreateIssue';
 import { Issue } from '../ProjectPage';
 
 export const DiagramView = () => {
-	const [nodes, setNodes] = useNodesState(initialNodes);
-	const [edges, setEdges] = useEdgesState([] as Edge[]);
+	const [nodes, _, onNodesChange] = useNodesState(initialNodes);
+	const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
+
 	const onConnect: OnConnect = params => {
 		setEdges(eds => addEdge(params, eds));
 	};
@@ -38,8 +41,6 @@ export const DiagramView = () => {
 	const onReconnect = (oldEdge: Edge, newConnection: Connection) => {
 		setEdges(els => reconnectEdge(oldEdge, newConnection, els));
 	};
-	const onNodesChange = (changes: NodeChange[]) =>
-		setNodes(nds => applyNodeChanges(changes, nds));
 
 	const isValidConnection: IsValidConnection = (connection: Connection | Edge) => {
 		if (connection.source === connection.target) return false;
@@ -56,18 +57,13 @@ export const DiagramView = () => {
 			<CreateIssues />
 			<div
 				className='bg-background-light shadow-tile flex h-[800px] w-full flex-col items-start
-        	gap-6 rounded-sm'
+        	    gap-6 rounded-sm'
 			>
 				<ReactFlow
 					nodes={nodes}
 					edges={edges}
 					defaultEdgeOptions={{
-						style: {
-							strokeWidth: 4,
-							stroke: 'rgba(var(--eds_primary_resting), 1)',
-						},
-						type: 'step',
-						animated: false,
+						type: 'issue',
 						markerEnd: {
 							type: MarkerType.ArrowClosed,
 							color: 'rgba(var(--eds_primary_resting), 1)',
@@ -76,30 +72,73 @@ export const DiagramView = () => {
 					connectionMode={ConnectionMode.Loose}
 					onReconnect={onReconnect}
 					nodeTypes={nodeTypes}
+					edgeTypes={edgeTypes}
 					connectionLineComponent={ConnectionLine}
 					onConnect={onConnect}
 					isValidConnection={isValidConnection}
 					onNodesChange={onNodesChange}
+					onEdgesChange={onEdgesChange}
 					proOptions={{ hideAttribution: true }}
 					fitView
 				>
 					<Background />
-					<Controls className='[&_button]:bg-primary-resting! [&_button]:hover:bg-primary-hover! [&_button_svg]:text-text-white! gap-1 [&_button]:rounded-sm [&_button]:border-0!' />
+					<Controls
+						className='[&_button]:bg-primary-resting! [&_button]:hover:bg-primary-hover!
+                        [&_button_svg]:text-text-white! gap-1 [&_button]:rounded-sm [&_button]:border-0!'
+					/>
 				</ReactFlow>
 			</div>
 		</>
 	);
 };
 
-export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY }: EdgeProps) {
-	const [edgePath] = getStraightPath({
+export default function IssueEdge({
+	id,
+	sourceX,
+	sourceY,
+	targetX,
+	targetY,
+	sourcePosition,
+	targetPosition,
+	markerEnd,
+}: EdgeProps) {
+	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
 		targetX,
 		targetY,
+		sourcePosition,
+		targetPosition,
 	});
 
-	return <BaseEdge id={id} path={edgePath} className='fill-red-800' />;
+	const { setEdges } = useReactFlow();
+
+	const handleDelete = () => {
+		setEdges(eds => eds.filter(edge => edge.id !== id));
+	};
+
+	return (
+		<>
+			<BaseEdge
+				id={id}
+				path={edgePath}
+				markerEnd={markerEnd}
+				className='stroke-primary-resting! stroke-4!'
+			/>
+			<EdgeLabelRenderer>
+				<div
+					className='nodrag nopan pointer-events-auto absolute origin-center'
+					style={{
+						transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+					}}
+				>
+					<Button color='danger' className='p-1!' onClick={handleDelete}>
+						<Icon data={delete_to_trash} />
+					</Button>
+				</div>
+			</EdgeLabelRenderer>
+		</>
+	);
 }
 
 const FlowIssueContainer = ({ data }: NodeProps<Node<{ issue: Issue }>>) => {
@@ -168,6 +207,7 @@ const defaultIssues: Issue[] = [
 ];
 
 const nodeTypes = { issue: FlowIssueContainer };
+const edgeTypes = { issue: IssueEdge };
 
 const initialNodes: Node[] = defaultIssues.map((issue, index) => ({
 	id: issue.id,
