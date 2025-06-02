@@ -17,7 +17,7 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
-		"@dnd-kit/abstract": "^0.1.17",
+		"@dnd-kit/abstract": "^0.1.18",
 		"@dnd-kit/collision": "^0.1.17",
 		"@dnd-kit/helpers": "^0.1.17",
 		"@dnd-kit/react": "^0.1.17",
