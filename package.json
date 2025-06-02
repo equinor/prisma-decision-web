@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"@dnd-kit/abstract": "^0.1.17",
-		"@dnd-kit/collision": "^0.1.17",
+		"@dnd-kit/collision": "^0.1.18",
 		"@dnd-kit/helpers": "^0.1.17",
 		"@dnd-kit/react": "^0.1.17",
 		"@equinor/eds-core-react": "^0.45.1",
