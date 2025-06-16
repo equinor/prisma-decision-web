@@ -25,7 +25,7 @@
 		"@equinor/eds-icons": "^0.22.0",
 		"@radix-ui/react-collapsible": "^1.1.11",
 		"@uidotdev/usehooks": "^2.4.1",
-		"@xyflow/react": "^12.6.4",
+		"@xyflow/react": "^12.7.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-router": "^7.5.2",
