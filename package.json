@@ -17,6 +17,8 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
+		"@azure/msal-browser": "^4.13.2",
+		"@azure/msal-react": "^3.0.13",
 		"@dnd-kit/abstract": "^0.1.17",
 		"@dnd-kit/collision": "^0.1.17",
 		"@dnd-kit/helpers": "^0.1.17",
@@ -24,6 +26,7 @@
 		"@equinor/eds-core-react": "^0.45.1",
 		"@equinor/eds-icons": "^0.22.0",
 		"@radix-ui/react-collapsible": "^1.1.11",
+		"@tanstack/react-query": "^5.81.5",
 		"@uidotdev/usehooks": "^2.4.1",
 		"@xyflow/react": "^12.6.4",
 		"react": "^19.0.0",
