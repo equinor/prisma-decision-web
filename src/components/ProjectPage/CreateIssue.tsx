@@ -1,29 +1,98 @@
 import { Autocomplete, Button, TextField } from '@equinor/eds-core-react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { ChangeEvent, useState } from 'react';
-import { Issue } from './ProjectPage';
+import { useController, useForm } from 'react-hook-form';
+import { useCreateIssue } from '../../hooks/api/useCreateIssue';
+import { useSelectedProject } from '../../hooks/useSelectedProject';
+import { Issue, issueSchema, issueTypes } from '../../validators';
+import { useMemo } from 'react';
 
-const categoryOptions = [
-	{ label: 'Decision', value: 'decision' },
-	{ label: 'Uncertainty', value: 'uncertainty' },
-	{ label: 'Fact', value: 'fact' },
-	{ label: 'Value', value: 'value' },
-	{ label: 'Unassigned', value: 'unassigned' },
-];
+const getDefaultValues = (scenarioId: string): Issue => {
+	return {
+		boundry: 'in',
+		name: '',
+		description: '',
+		type: 'Unassigned',
+		id: crypto.randomUUID(),
+		order: 0,
+		scenario_id: scenarioId,
+		decision: {
+			id: crypto.randomUUID(),
+			issue_id: crypto.randomUUID(),
+			alternatives: [],
+		},
+		uncertainty: {
+			id: crypto.randomUUID(),
+			issue_id: crypto.randomUUID(),
+			probabilities: [],
+		},
+		utility: {
+			id: crypto.randomUUID(),
+			issue_id: crypto.randomUUID(),
+			values: [],
+		},
+		value_metric: {
+			id: crypto.randomUUID(),
+			issue_id: crypto.randomUUID(),
+			name: '',
+		},
+		node: {
+			id: crypto.randomUUID(),
+			issue_id: crypto.randomUUID(),
+			name: 'default',
+			scenario_id: scenarioId,
+			node_style: {
+				id: crypto.randomUUID(),
+				node_id: crypto.randomUUID(),
+				x_position: 0,
+				y_position: 0,
+			},
+		},
+	};
+};
 
 export const CreateIssues = () => {
-	const [issue, setIssue] = useState<Issue>({
-		type: 'decision',
-		name: '',
-		id: crypto.randomUUID(),
-		description: '',
+	const selectedProject = useSelectedProject();
+	const scenario = selectedProject?.scenarios[0];
+	const { mutate: createIssue } = useCreateIssue();
+	const defaultValues = useMemo(() => getDefaultValues(scenario?.id || crypto.randomUUID()), []);
+	const { register, control, handleSubmit } = useForm({
+		values: defaultValues,
+		resolver: zodResolver(issueSchema),
 	});
+
+	const {
+		field: { onChange: onChangeType, ref: typeRef, value: selectedType },
+	} = useController({
+		control,
+		name: 'type',
+	});
+
+	const {
+		field: { onChange: onBoundryType, ref: boundryRef, value: selectedBoundry },
+	} = useController({
+		control,
+		name: 'boundry',
+	});
+
+	const onSubmit = handleSubmit(
+		async data => {
+			await createIssue(data);
+			// Reset form values after submission
+		},
+		errors => {
+			// eslint-disable-next-line no-console
+			console.error('Form errors:', errors);
+		},
+	);
 	const [isOpen, setIsOpen] = useLocalStorage('createIssueOpen', true);
-	const selectedCategory = categoryOptions.find(option => option.value === issue?.type);
 	return (
 		<Collapsible open={isOpen} onOpenChange={setIsOpen}>
-			<div className='bg-background-default shadow-tile flex flex-col items-start gap-6 rounded-sm p-6'>
+			<form
+				onSubmit={onSubmit}
+				className='bg-background-default shadow-tile flex flex-col items-start gap-6 rounded-sm p-6'
+			>
 				<CollapsibleTrigger asChild>
 					<div className='w-full cursor-pointer'>
 						<h2 className='text-2xl font-semibold'>Create Issue</h2>
@@ -37,38 +106,45 @@ export const CreateIssues = () => {
 						<TextField
 							placeholder='Enter issue name...'
 							label='Issue Name'
-							onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-								setIssue(prev => ({ ...prev, name: e.target.value }))
-							}
-							value={issue.name}
+							{...register('name')}
 						/>
 						<TextField placeholder='Enter label...' label='Label' />
 						<Autocomplete
 							label='Category'
-							optionLabel={option => option.label}
-							options={categoryOptions}
-							selectedOptions={selectedCategory ? [selectedCategory] : []}
+							options={issueTypes}
+							hideClearButton
+							selectedOptions={[selectedType]}
+							ref={typeRef}
 							onOptionsChange={({ selectedItems }) => {
 								if (selectedItems.length === 0) return;
-								setIssue(prev => ({ ...prev, type: selectedItems[0].value }));
+								onChangeType(selectedItems[0]);
 							}}
 						/>
 						<Autocomplete
 							label='Boundry'
+							hideClearButton
 							options={['In', 'On', 'Out']}
-							initialSelectedOptions={['In']}
+							selectedOptions={[selectedBoundry]}
+							ref={boundryRef}
+							onOptionsChange={({ selectedItems }) => {
+								if (selectedItems.length === 0) return;
+								onBoundryType(selectedItems[0]);
+							}}
 						/>
 						<TextField
 							label='Description'
 							placeholder='Enter description...'
 							className='md:col-span-2'
+							{...register('description')}
 							multiline
 							rows={4}
 						/>
 					</div>
-					<Button className='md:self-end'>Add Issue</Button>
+					<Button className='md:self-end' type='submit'>
+						Add Issue
+					</Button>
 				</CollapsibleContent>
-			</div>
+			</form>
 		</Collapsible>
 	);
 };

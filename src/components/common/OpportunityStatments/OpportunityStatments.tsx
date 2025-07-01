@@ -1,10 +1,13 @@
-import { Button, Icon, Table, TextField } from '@equinor/eds-core-react';
-import { add } from '@equinor/eds-icons';
+import { Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { OpportunityStatmentsForm } from './OpportunityStatmentsForm';
 
 export const OpportunityStatments = () => {
 	const [open, setOpen] = useLocalStorage('opportunityStatmentsOpen', true);
+	const project = useSelectedProject();
+	const opportunities = project?.scenarios[0].opportunities || [];
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
@@ -21,16 +24,7 @@ export const OpportunityStatments = () => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-6'>
-					<div className='grid w-full md:grid-cols-[1fr_auto] md:gap-4'>
-						<TextField
-							label='Add New Statement'
-							placeholder='Enter opportunity statement...'
-						/>
-						<Button className='mt-4!'>
-							<Icon data={add} />
-							Add
-						</Button>
-					</div>
+					<OpportunityStatmentsForm />
 					<div className='outline-background-medium w-full rounded-sm outline-1'>
 						<Table className='w-full'>
 							<Table.Head>
@@ -40,14 +34,12 @@ export const OpportunityStatments = () => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								<Table.Row>
-									<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-									<Table.Cell>2023-05-01</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-									<Table.Cell>2023-05-01</Table.Cell>
-								</Table.Row>
+								{opportunities.map(opportunity => (
+									<Table.Row key={opportunity.id}>
+										<Table.Cell>{opportunity.name}</Table.Cell>
+										<Table.Cell>{opportunity.description}</Table.Cell>
+									</Table.Row>
+								))}
 							</Table.Body>
 						</Table>
 					</div>

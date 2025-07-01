@@ -4,19 +4,20 @@ import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { Issue } from '../ProjectPage';
 import { useState } from 'react';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
+import { issueTypes } from '../../../validators';
 
 export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
-		type: 'decision',
-		accept: ['decision', 'uncertainty', 'value', 'fact', 'unassigned'],
+		type: 'Decision',
+		accept: [...issueTypes],
 		data: {
 			issue,
 		},
 		disabled: index === -1,
-		group: 'decision',
+		group: 'Decision',
 	});
 	return (
 		<div

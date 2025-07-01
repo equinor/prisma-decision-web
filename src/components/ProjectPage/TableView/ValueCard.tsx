@@ -2,17 +2,18 @@ import { useSortable } from '@dnd-kit/react/sortable';
 import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { Issue } from '../ProjectPage';
+import { issueTypes } from '../../../validators';
 
 export const ValueCard = ({ issue, index }: ValueCardProps) => {
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
-		type: 'value',
+		type: 'Value',
 		data: {
 			issue,
 		},
-		accept: ['decision', 'uncertainty', 'value', 'fact', 'unassigned'],
-		group: 'value',
+		accept: [...issueTypes],
+		group: 'Value',
 		disabled: index === -1,
 	});
 

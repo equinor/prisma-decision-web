@@ -3,12 +3,13 @@ import { cn } from '../../../utils/cn';
 import { Issue } from '../ProjectPage';
 import { UnassignedCard } from './UnassignedCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
+import { issueTypes } from '../../../validators';
 
 export const UnassignedColumn = ({ issues, className }: UnassignedColumn) => {
 	const { ref } = useDroppable({
-		id: 'unassigned',
+		id: 'Unassigned',
 		type: 'column',
-		accept: ['decision', 'uncertainty', 'value', 'fact', 'unassigned'],
+		accept: [...issueTypes],
 		collisionPriority: CollisionPriority.Low,
 	});
 	return (

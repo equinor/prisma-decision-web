@@ -1,11 +1,13 @@
-import { Autocomplete, Button, Icon, Table, TextField } from '@equinor/eds-core-react';
-import { add } from '@equinor/eds-icons';
+import { Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import { ProjectObjectivesForm } from './ProjectObjectivesForm';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectObjectives = () => {
 	const [open, setOpen] = useLocalStorage('projectObjectivesOpen', true);
-
+	const project = useSelectedProject();
+	const objectives = project?.scenarios[0].objectives || [];
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
@@ -21,22 +23,7 @@ export const ProjectObjectives = () => {
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-6'>
-					<div className='grid w-full grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto] md:gap-4 lg:grid-cols-[3fr_1fr_1fr_auto]'>
-						<TextField
-							label='Add New Statement'
-							className='md:col-span-3 lg:col-span-1'
-							placeholder='Enter opportunity statement...'
-						/>
-						<Autocomplete
-							label='Category'
-							options={['Strategic', 'Fundemantal', 'Mean']}
-						/>
-						<TextField label='Label' placeholder='Enter label...' />
-						<Button className='mt-4!'>
-							<Icon data={add} />
-							Add
-						</Button>
-					</div>
+					<ProjectObjectivesForm />
 					<div className='outline-background-medium w-full rounded-sm outline-1'>
 						<Table className='w-full'>
 							<Table.Head>
@@ -46,14 +33,12 @@ export const ProjectObjectives = () => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								<Table.Row>
-									<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-									<Table.Cell>2023-05-01</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell>Lorem ipsum dolor sit amet</Table.Cell>
-									<Table.Cell>2023-05-01</Table.Cell>
-								</Table.Row>
+								{objectives.map(objectives => (
+									<Table.Row key={objectives.id}>
+										<Table.Cell>{objectives.name}</Table.Cell>
+										<Table.Cell>{objectives.description}</Table.Cell>
+									</Table.Row>
+								))}
 							</Table.Body>
 						</Table>
 					</div>

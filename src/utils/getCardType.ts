@@ -8,13 +8,13 @@ import { ValueCard } from '../components/ProjectPage/TableView/ValueCard';
 export const getCardType = (type?: Type) => {
 	if (!type) return UnassignedCard;
 	switch (type) {
-		case 'decision':
+		case 'Decision':
 			return DecisionCard;
-		case 'uncertainty':
+		case 'Uncertainty':
 			return UncertaintieCard;
-		case 'value':
+		case 'Value':
 			return ValueCard;
-		case 'fact':
+		case 'Fact':
 			return FactCard;
 		default:
 			return UnassignedCard;

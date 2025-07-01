@@ -4,6 +4,7 @@ import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { Issue } from '../ProjectPage';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { useState } from 'react';
+import { issueTypes } from '../../../validators';
 
 export const UnassignedCard = ({ issue, index }: UnassignedCardProps) => {
 	const [deleteOpen, setDeleteOpen] = useState(false);
@@ -11,12 +12,12 @@ export const UnassignedCard = ({ issue, index }: UnassignedCardProps) => {
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
-		type: 'unassigned',
-		accept: ['decision', 'uncertainty', 'value', 'fact', 'unassigned'],
+		type: 'Unassigned',
+		accept: [...issueTypes],
 		data: {
 			issue,
 		},
-		group: 'unassigned',
+		group: 'Unassigned',
 		disabled: index === -1,
 	});
 

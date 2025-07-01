@@ -7,8 +7,8 @@ import { useUpdateProject } from './api/useUpdateProject';
 
 export const useProjectForm = () => {
 	const selectedProject = useSelectedProject();
-	const { mutate: createProject } = useCreateProject();
-	const { mutate: updateProject } = useUpdateProject();
+	const { mutate: createProject, isPending: isPendingCreate } = useCreateProject();
+	const { mutate: updateProject, isPending: isPendingUpdate } = useUpdateProject();
 	const formMethods = useForm({
 		resolver: zodResolver(projectSchema),
 		values: { ...defaultValues, ...selectedProject },
@@ -28,6 +28,7 @@ export const useProjectForm = () => {
 	return {
 		...formMethods,
 		handleSubmit,
+		isPending: isPendingCreate || isPendingUpdate,
 	};
 };
 

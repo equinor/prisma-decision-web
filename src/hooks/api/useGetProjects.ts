@@ -3,7 +3,7 @@ import { apiClient } from '../../api';
 import { Project } from '../../validators';
 
 export const useGetProjects = () => {
-	const { data = [] } = useQuery({
+	const { data = [], ...rest } = useQuery({
 		queryKey: ['projects'],
 		queryFn: async () => {
 			const res = await apiClient.get<Project[]>('/projects');
@@ -11,5 +11,8 @@ export const useGetProjects = () => {
 		},
 	});
 
-	return data;
+	return {
+		projects: data,
+		...rest,
+	};
 };

@@ -11,11 +11,11 @@ export const ListView = () => {
 	return (
 		<>
 			<CreateIssues />
-			<Unassgined issues={issues['unassigned']} />
-			<Decisions issues={issues['decision']} />
-			<Uncertainties issues={issues['uncertainty']} />
-			<Values issues={issues['value']} />
-			<Facts issues={issues['fact']} />
+			<Unassgined issues={issues['Unassigned']} />
+			<Decisions issues={issues['Decision']} />
+			<Uncertainties issues={issues['Uncertainty']} />
+			<Values issues={issues['Value']} />
+			<Facts issues={issues['Fact']} />
 		</>
 	);
 };

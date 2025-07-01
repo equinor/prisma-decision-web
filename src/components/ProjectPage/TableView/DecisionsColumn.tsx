@@ -3,12 +3,13 @@ import { cn } from '../../../utils/cn';
 import { Issue } from '../ProjectPage';
 import { DecisionCard } from './DecisionCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
+import { issueTypes } from '../../../validators';
 
 export const DecisionsColumn = ({ issues, className }: DecisionsColumn) => {
 	const { ref } = useDroppable({
-		id: 'decision',
+		id: 'Decision',
 		type: 'column',
-		accept: ['decision', 'uncertainty', 'value', 'fact', 'unassigned'],
+		accept: [...issueTypes],
 		collisionPriority: CollisionPriority.Low,
 	});
 	return (

@@ -1,9 +1,12 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Link, Outlet, useLocation } from 'react-router';
-import { NetworkIcon } from '../common/NetworkIcon';
 import { createContext, useContext, useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router';
+import { useGetProjects } from '../../hooks/api/useGetProjects';
+import { useSelectedProject } from '../../hooks/useSelectedProject';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { NetworkIcon } from '../common/NetworkIcon';
 
 export type Issue = {
 	name: string;
@@ -30,9 +33,13 @@ export const ProjectPage = () => {
 	const [issues, setIssues] = useState(defaultIssues);
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
 	const showIssuesView = location.pathname.includes('issues');
+	const selectedProject = useSelectedProject();
+	const { isLoading } = useGetProjects();
 	let activeView = 0;
 	if (issueView === 'table') activeView = 1;
 	if (issueView === 'diagram') activeView = 2;
+	if (isLoading) return <LoadingSpinner />;
+	if (!selectedProject) return;
 
 	return (
 		<IssuesContext.Provider
@@ -44,7 +51,7 @@ export const ProjectPage = () => {
 			<div className='mx-auto w-[min(1600px,_90%)]'>
 				<div className='flex flex-col gap-6'>
 					<div className='max-w-[1000px]'>
-						<h1 className='text-3xl font-bold'>The Used Car Buyer Problem</h1>
+						<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 					</div>
 					<div className='flex justify-between'>
 						<Button.Toggle selectedIndexes={[showIssuesView ? 1 : 0]}>
@@ -77,9 +84,9 @@ export const ProjectPage = () => {
 };
 
 const defaultIssues: Record<string, Issue[]> = {
-	decision: [
+	Decision: [
 		{
-			type: 'decision',
+			type: 'Decision',
 			name: 'Decision 1',
 			id: crypto.randomUUID(),
 			description: '',
@@ -89,7 +96,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'decision',
+			type: 'Decision',
 			name: 'Decision 2',
 			id: crypto.randomUUID(),
 			description: '',
@@ -99,7 +106,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'decision',
+			type: 'Decision',
 			name: 'asdqwdq ',
 			id: crypto.randomUUID(),
 			description: '',
@@ -109,7 +116,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'decision',
+			type: 'Decision',
 			name: '2424rfevwef',
 			id: crypto.randomUUID(),
 			description: '',
@@ -119,7 +126,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'decision',
+			type: 'Decision',
 			name: 'Decision 2',
 			id: crypto.randomUUID(),
 			description: '',
@@ -129,9 +136,9 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 	],
-	uncertainty: [
+	Uncertainty: [
 		{
-			type: 'uncertainty',
+			type: 'Uncertainty',
 			name: 'Uncertainties 3',
 			id: crypto.randomUUID(),
 			description: '',
@@ -141,7 +148,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'uncertainty',
+			type: 'Uncertainty',
 			name: 'wefv42fvwef',
 			id: crypto.randomUUID(),
 			description: '',
@@ -161,9 +168,9 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 	],
-	value: [
+	Value: [
 		{
-			type: 'value',
+			type: 'Value',
 			name: 'Uncertainties 4',
 			id: crypto.randomUUID(),
 			description: '',
@@ -173,7 +180,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'value',
+			type: 'Value',
 			name: 'k768j567hgv5v3gr',
 			id: crypto.randomUUID(),
 			description: '',
@@ -183,7 +190,7 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 		{
-			type: 'value',
+			type: 'Value',
 			name: 'e5t35bt3tb5',
 			id: crypto.randomUUID(),
 			description: '',
@@ -193,9 +200,9 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 	],
-	fact: [
+	Fact: [
 		{
-			type: 'fact',
+			type: 'Fact',
 			name: 'hrt h4tb4hbh4t',
 			id: crypto.randomUUID(),
 			description: '',
@@ -205,5 +212,5 @@ const defaultIssues: Record<string, Issue[]> = {
 			},
 		},
 	],
-	unassigned: [],
+	Unassigned: [],
 };

@@ -1,8 +1,14 @@
-import { Autocomplete, Button, DatePicker, TextField } from '@equinor/eds-core-react';
+import {
+	Autocomplete,
+	Button,
+	CircularProgress,
+	DatePicker,
+	TextField,
+} from '@equinor/eds-core-react';
 import { useProjectForm } from '../../hooks/useProjectForm';
 
 export const ProjectInformation = () => {
-	const { handleSubmit, register } = useProjectForm();
+	const { handleSubmit, register, isPending } = useProjectForm();
 	return (
 		<form
 			onSubmit={handleSubmit}
@@ -33,7 +39,7 @@ export const ProjectInformation = () => {
 					{...register('description')}
 				/>
 				<Button className='-col-end-1 md:w-max md:place-self-end' type='submit'>
-					Save
+					{isPending ? <CircularProgress size={24} /> : 'Save'}
 				</Button>
 			</div>
 		</form>

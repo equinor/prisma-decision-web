@@ -36,15 +36,15 @@ export const TableView = () => {
 					<div className='grid w-full grid-cols-[repeat(5,minmax(257px,1fr))] gap-4 overflow-auto'>
 						<UnassignedColumn
 							className='bg-blue-400/20'
-							issues={issues['unassigned']}
+							issues={issues['Unassigned']}
 						/>
-						<DecisionsColumn className='bg-red-400/20' issues={issues['decision']} />
+						<DecisionsColumn className='bg-red-400/20' issues={issues['Decision']} />
 						<UncertaintiesColumn
 							className='bg-pink-400/20'
-							issues={issues['uncertainty']}
+							issues={issues['Uncertainty']}
 						/>
-						<ValuesColumn className='bg-emerald-400/20' issues={issues['value']} />
-						<FactsColumn className='bg-cyan-400/20' issues={issues['fact']} />
+						<ValuesColumn className='bg-emerald-400/20' issues={issues['Value']} />
+						<FactsColumn className='bg-cyan-400/20' issues={issues['Fact']} />
 					</div>
 				</div>
 				<DragOverlay>
