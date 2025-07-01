@@ -1,18 +1,17 @@
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { move } from '@dnd-kit/helpers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
-import { useState } from 'react';
+import { getCardType } from '../../../utils/getCardType';
 import { CreateIssues } from '../CreateIssue';
-import { Issue } from '../ProjectPage';
+import { useIssuesContext } from '../ProjectPage';
 import { DecisionsColumn } from './DecisionsColumn';
 import { FactsColumn } from './FactsColumn';
 import { UnassignedColumn } from './UnassignedColumn';
 import { UncertaintiesColumn } from './UncertaintiesColumn';
 import { ValuesColumn } from './ValuesColumn';
-import { getCardType } from '../../../utils/getCardType';
 
 export const TableView = () => {
-	const [issues, setIssues] = useState(defaultIssues);
+	const { issues, setIssues } = useIssuesContext();
 	return (
 		<>
 			<CreateIssues />
@@ -20,6 +19,9 @@ export const TableView = () => {
 				onDragOver={event => {
 					if (event.operation?.target?.type === 'column' && event.operation.source) {
 						event.operation.source.data.issue.type = event.operation.target.id;
+					}
+					if (event.operation?.target?.type !== 'column' && event.operation.source) {
+						event.operation.source.data.issue.type = event.operation?.target?.type;
 					}
 					setIssues(issues => {
 						return move(issues, event);
@@ -54,88 +56,4 @@ export const TableView = () => {
 			</DragDropProvider>
 		</>
 	);
-};
-
-const defaultIssues: Record<string, Issue[]> = {
-	decision: [
-		{
-			type: 'decision',
-			name: 'Decision 1',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'decision',
-			name: 'Decision 2',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'decision',
-			name: 'asdqwdq ',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'decision',
-			name: '2424rfevwef',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'decision',
-			name: 'Decision 2',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-	],
-	uncertainty: [
-		{
-			type: 'uncertainty',
-			name: 'Uncertainties 3',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'uncertainty',
-			name: 'wefv42fvwef',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'uncertainty',
-			name: 'bgern535b35gb',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-	],
-	value: [
-		{
-			type: 'value',
-			name: 'Uncertainties 4',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'value',
-			name: 'k768j567hgv5v3gr',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-		{
-			type: 'value',
-			name: 'e5t35bt3tb5',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-	],
-	fact: [
-		{
-			type: 'fact',
-			name: 'hrt h4tb4hbh4t',
-			id: crypto.randomUUID(),
-			description: '',
-		},
-	],
-	unassigned: [],
 };

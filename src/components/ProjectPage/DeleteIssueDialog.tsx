@@ -1,7 +1,9 @@
 import { Button, Dialog, DialogContent } from '@equinor/eds-core-react';
-import { Issue } from './ProjectPage';
+import { Issue, useIssuesContext } from './ProjectPage';
 
 export const DeleteIssueDialog = ({ issue, open = false, onClose }: DeleteIssueDialogProps) => {
+	const { setIssues } = useIssuesContext();
+
 	return (
 		<Dialog
 			open={open}
@@ -20,6 +22,14 @@ export const DeleteIssueDialog = ({ issue, open = false, onClose }: DeleteIssueD
 						<Button
 							color='danger'
 							onClick={() => {
+								setIssues(issues => {
+									return {
+										...issues,
+										[issue.type]: issues[issue.type].filter(
+											x => x.id !== issue.id,
+										),
+									};
+								});
 								onClose();
 							}}
 						>
