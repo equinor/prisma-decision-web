@@ -12,7 +12,7 @@ export default defineConfig({
 			typescript: {
 				tsconfigPath: './tsconfig.app.json',
 			},
-			eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"' },
+			eslint: { lintCommand: 'eslint "./src/**/*.{ts,tsx}"', useFlatConfig: true },
 			overlay: { initialIsOpen: false },
 		}),
 	],
