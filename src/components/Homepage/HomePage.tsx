@@ -32,13 +32,9 @@ export const HomePage = () => {
 						<Search className='xl:w-[350px]' placeholder='Search projects...' />
 					</div>
 					<div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
-						<ProjectCard />
-						<ProjectCard />
-						<ProjectCard />
-						<ProjectCard />
-						<ProjectCard />
-						<ProjectCard />
-						<ProjectCard />
+						{projects.map(project => (
+							<ProjectCard key={project.id} project={project} />
+						))}
 					</div>
 				</div>
 			</div>
