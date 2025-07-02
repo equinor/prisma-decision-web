@@ -39,7 +39,7 @@
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
-		"@tailwindcss/vite": "^4.1.4",
+		"@tailwindcss/vite": "^4.1.11",
 		"@types/react": "^19.1.4",
 		"@types/react-dom": "^19.1.2",
 		"@typescript-eslint/eslint-plugin": "^8.29.0",
