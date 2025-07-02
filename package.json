@@ -23,7 +23,7 @@
 		"@dnd-kit/collision": "^0.1.17",
 		"@dnd-kit/helpers": "^0.1.17",
 		"@dnd-kit/react": "^0.1.17",
-		"@equinor/eds-core-react": "^0.45.1",
+		"@equinor/eds-core-react": "^0.46.0",
 		"@equinor/eds-icons": "^0.22.0",
 		"@hookform/resolvers": "^5.1.1",
 		"@radix-ui/react-collapsible": "^1.1.11",
