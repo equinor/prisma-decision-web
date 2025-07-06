@@ -1,12 +1,12 @@
-import { Autocomplete, Button, TextField } from '@equinor/eds-core-react';
+import { Autocomplete, Button, CircularProgress, TextField } from '@equinor/eds-core-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import { useMemo } from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { useCreateIssue } from '../../hooks/api/useCreateIssue';
 import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { Issue, issueSchema, issueTypes } from '../../validators';
-import { useMemo } from 'react';
 
 const getDefaultValues = (scenarioId: string): Issue => {
 	return {
@@ -55,11 +55,15 @@ const getDefaultValues = (scenarioId: string): Issue => {
 export const CreateIssues = () => {
 	const selectedProject = useSelectedProject();
 	const scenario = selectedProject?.scenarios[0];
-	const { mutate: createIssue } = useCreateIssue();
 	const defaultValues = useMemo(() => getDefaultValues(scenario?.id || crypto.randomUUID()), []);
-	const { register, control, handleSubmit } = useForm({
+	const { register, control, handleSubmit, reset } = useForm({
 		values: defaultValues,
 		resolver: zodResolver(issueSchema),
+	});
+	const { mutate: createIssue, isPending } = useCreateIssue({
+		onSuccess: () => {
+			reset(getDefaultValues(scenario?.id || crypto.randomUUID()));
+		},
 	});
 
 	const {
@@ -141,7 +145,7 @@ export const CreateIssues = () => {
 						/>
 					</div>
 					<Button className='md:self-end' type='submit'>
-						Add Issue
+						{isPending ? <CircularProgress size={16} /> : 'Add Issue'}
 					</Button>
 				</CollapsibleContent>
 			</form>

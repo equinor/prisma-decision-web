@@ -1,9 +1,8 @@
 import { useDroppable } from '@dnd-kit/react';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../ProjectPage';
 import { UncertaintieCard } from './UncertaintieCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const UncertaintiesColumn = ({ issues, className }: UncertaintiesColumn) => {
 	const { ref } = useDroppable({

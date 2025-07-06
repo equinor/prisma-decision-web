@@ -1,8 +1,7 @@
 import { useSortable } from '@dnd-kit/react/sortable';
 import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
-import { Issue } from '../ProjectPage';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const UncertaintieCard = ({ issue, index }: UncertaintieCardProps) => {
 	const { ref, isDragging } = useSortable({

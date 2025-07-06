@@ -1,10 +1,9 @@
 import { useSortable } from '@dnd-kit/react/sortable';
 import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
-import { Issue } from '../ProjectPage';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { useState } from 'react';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const UnassignedCard = ({ issue, index }: UnassignedCardProps) => {
 	const [deleteOpen, setDeleteOpen] = useState(false);

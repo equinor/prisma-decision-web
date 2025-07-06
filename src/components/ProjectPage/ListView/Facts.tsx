@@ -2,9 +2,12 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Issue } from '../ProjectPage';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { DeleteIssueDialog } from '../DeleteIssueDialog';
+import { isEdge } from '@xyflow/react';
 
-export const Facts = ({ issues }: FactsProps) => {
+export const Facts = () => {
+	const facts = useSelectedProjectIssues().filter(issue => issue.type === 'Fact');
 	const [open, setOpen] = useLocalStorage('factsOpen', true);
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
@@ -31,16 +34,14 @@ export const Facts = ({ issues }: FactsProps) => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{issues.map(issue => (
+								{facts.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex'>
 												<Button variant='ghost_icon'>
 													<Icon data={edit} />
 												</Button>
-												<Button variant='ghost_icon'>
-													<Icon data={delete_forever} />
-												</Button>
+												<DeleteIssueDialog issue={issue} />
 											</div>
 										</Table.Cell>
 										<Table.Cell>{issue.name}</Table.Cell>
@@ -58,8 +59,4 @@ export const Facts = ({ issues }: FactsProps) => {
 			</div>
 		</Collapsible>
 	);
-};
-
-type FactsProps = {
-	issues: Issue[];
 };

@@ -14,10 +14,12 @@ import {
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useEffect, useRef } from 'react';
+import { MouseEvent, useRef } from 'react';
+import { useUpdateIssues } from '../../../hooks/api/useUpdateIssues';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { convertNodesToIssues } from '../../../utils/convertNodesToIssues';
 import { convertToNodes } from '../../../utils/convertToNodes';
 import { CreateIssues } from '../CreateIssue';
-import { Issue, useIssuesContext } from '../ProjectPage';
 import { ConnectionLine } from './ConnectingLine';
 import { CustomEdge } from './CustomEdge';
 import { DiagramIssueCard } from './DiagramIssueCard';
@@ -26,12 +28,10 @@ const nodeTypes = { issue: DiagramIssueCard };
 const edgeTypes = { issue: CustomEdge };
 
 export const DiagramView = () => {
-	const { issues, setIssues } = useIssuesContext();
+	const issues = useSelectedProjectIssues();
+	const { mutate: updateIssue } = useUpdateIssues();
 	const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
-	const [nodes, setNodes, onNodesChange] = useNodesState(convertToNodes(issues));
-	useEffect(() => {
-		setNodes(convertToNodes(issues));
-	}, [issues]);
+	const [_nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
 	const draggingEdge = useRef<Edge | null>(null);
 
 	const onConnect: OnConnect = params => {
@@ -46,26 +46,12 @@ export const DiagramView = () => {
 		draggingEdge.current = edge;
 	};
 
-	const onNodeDragStop = (_: MouseEvent, node: Node) => {
-		const issue = node.data.issue as Issue;
-		setIssues(issues => {
-			return {
-				...issues,
-				[issue.type]: issues[issue.type].map(x => {
-					if (x.id === issue.id) {
-						return {
-							...x,
-							position: {
-								x: node.position.x,
-								y: node.position.y,
-							},
-						};
-					}
-					return x;
-				}),
-			};
-		});
+	const onNodeDragStop = async () => {
+		setNodes([]);
+		await updateIssue(convertNodesToIssues(_nodes));
 	};
+
+	const nodes = _nodes.length > 0 ? _nodes : convertToNodes(issues);
 
 	const isValidConnection: IsValidConnection = (connection: Connection | Edge) => {
 		if (connection.source === connection.target) return false;
@@ -99,13 +85,19 @@ export const DiagramView = () => {
 					connectionMode={ConnectionMode.Loose}
 					onReconnect={onReconnect}
 					onNodeDragStop={onNodeDragStop}
+					onNodeDragStart={() => {
+						setNodes(convertToNodes(issues));
+					}}
 					onReconnectStart={onReconnectStart}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}
 					connectionLineComponent={ConnectionLine}
 					onConnect={onConnect}
 					isValidConnection={isValidConnection}
-					onNodesChange={onNodesChange}
+					onNodesChange={changes => {
+						if (_nodes.length === 0) return;
+						onNodesChange(changes);
+					}}
 					onEdgesChange={onEdgesChange}
 					proOptions={{ hideAttribution: true }}
 					fitView

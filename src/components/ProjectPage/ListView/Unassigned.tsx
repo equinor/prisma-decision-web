@@ -2,9 +2,11 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Issue } from '../ProjectPage';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
-export const Unassgined = ({ issues }: UnassginedProps) => {
+export const Unassgined = () => {
+	const unassigned = useSelectedProjectIssues().filter(issue => issue.type === 'Unassigned');
+
 	const [open, setOpen] = useLocalStorage('unassignedOpen', true);
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
@@ -33,7 +35,7 @@ export const Unassgined = ({ issues }: UnassginedProps) => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{issues.map(issue => (
+								{unassigned.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex'>
@@ -60,8 +62,4 @@ export const Unassgined = ({ issues }: UnassginedProps) => {
 			</div>
 		</Collapsible>
 	);
-};
-
-type UnassginedProps = {
-	issues: Issue[];
 };

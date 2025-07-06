@@ -3,8 +3,7 @@ import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
-import { Issue } from '../ProjectPage';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const FactCard = ({ issue, index }: FactCardProps) => {
 	const [deleteOpen, setDeleteOpen] = useState(false);
@@ -37,25 +36,13 @@ export const FactCard = ({ issue, index }: FactCardProps) => {
 					<Button variant='ghost_icon'>
 						<Icon data={edit} />
 					</Button>
-					<Button
-						variant='ghost_icon'
-						onPointerDown={() => {
-							setDeleteOpen(true);
-						}}
-					>
-						<Icon data={delete_to_trash} />
-					</Button>
+					<DeleteIssueDialog issue={issue} />
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
 			<p className='text-text-tertiary text-sm'>
 				Lorem ipsum dolor sit amet consectetur adipisicing elit
 			</p>
-			<DeleteIssueDialog
-				issue={issue}
-				onClose={() => setDeleteOpen(false)}
-				open={deleteOpen}
-			/>
 		</div>
 	);
 };

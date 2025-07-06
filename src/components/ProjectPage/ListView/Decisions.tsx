@@ -2,9 +2,11 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Issue } from '../ProjectPage';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
-export const Decisions = ({ issues }: DecisionsProps) => {
+export const Decisions = () => {
+	const decisions = useSelectedProjectIssues().filter(issue => issue.type === 'Decision');
+
 	const [open, setOpen] = useLocalStorage('decisionsOpen', true);
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
@@ -34,7 +36,7 @@ export const Decisions = ({ issues }: DecisionsProps) => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{issues.map(issue => (
+								{decisions.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex'>
@@ -68,8 +70,4 @@ export const Decisions = ({ issues }: DecisionsProps) => {
 			</div>
 		</Collapsible>
 	);
-};
-
-type DecisionsProps = {
-	issues: Issue[];
 };

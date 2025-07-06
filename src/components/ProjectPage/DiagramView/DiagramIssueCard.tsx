@@ -1,6 +1,6 @@
 import { NodeProps, Handle, Position, Node } from '@xyflow/react';
 import { getCardType } from '../../../utils/getCardType';
-import { Issue } from '../ProjectPage';
+import { Issue } from '../../../validators';
 
 export const DiagramIssueCard = ({ data }: NodeProps<Node<{ issue: Issue }>>) => {
 	const IssueCard = getCardType(data.issue.type);

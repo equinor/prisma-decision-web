@@ -2,9 +2,10 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_forever, edit } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Issue } from '../ProjectPage';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
-export const Values = ({ issues }: ValuesProps) => {
+export const Values = () => {
+	const values = useSelectedProjectIssues().filter(issue => issue.type === 'Value');
 	const [open, setOpen] = useLocalStorage('valuesOpen', true);
 
 	return (
@@ -34,7 +35,7 @@ export const Values = ({ issues }: ValuesProps) => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{issues.map(issue => (
+								{values.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex'>
@@ -61,8 +62,4 @@ export const Values = ({ issues }: ValuesProps) => {
 			</div>
 		</Collapsible>
 	);
-};
-
-type ValuesProps = {
-	issues: Issue[];
 };
