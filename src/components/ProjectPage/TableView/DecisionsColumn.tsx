@@ -1,9 +1,8 @@
 import { useDroppable } from '@dnd-kit/react';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../ProjectPage';
-import { DecisionCard } from './DecisionCard';
+import { DecisionCard } from '../../common/DecisionCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const DecisionsColumn = ({ issues, className }: DecisionsColumn) => {
 	const { ref } = useDroppable({

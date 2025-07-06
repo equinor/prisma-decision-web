@@ -1,24 +1,21 @@
 import { useSortable } from '@dnd-kit/react/sortable';
 import { Button, Chip, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
-import { Issue } from '../ProjectPage';
-import { useState } from 'react';
-import { DeleteIssueDialog } from '../DeleteIssueDialog';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../validators';
 
-export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
-	const [deleteOpen, setDeleteOpen] = useState(false);
+export const ValueCard = ({ issue, index }: ValueCardProps) => {
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
-		type: 'Decision',
-		accept: [...issueTypes],
+		type: 'Value',
 		data: {
 			issue,
 		},
+		accept: [...issueTypes],
+		group: 'Value',
 		disabled: index === -1,
-		group: 'Decision',
 	});
+
 	return (
 		<div
 			ref={ref}
@@ -28,7 +25,7 @@ export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
 		>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
-					<Chip>Decision</Chip>
+					<Chip>Value</Chip>
 					<Chip>In</Chip>
 				</div>
 				<div>
@@ -44,24 +41,11 @@ export const DecisionCard = ({ issue, index }: DecisionCardProps) => {
 			<p className='text-text-tertiary text-sm'>
 				Lorem ipsum dolor sit amet consectetur adipisicing elit
 			</p>
-			<div className='flex flex-col gap-2'>
-				<h4 className='text-sm font-medium'>Alternatives:</h4>
-				<ul className='flex flex-col gap-2 text-sm'>
-					<li>Option 1</li>
-					<li>Option 2</li>
-					<li>Option 3</li>
-				</ul>
-			</div>
-			<DeleteIssueDialog
-				issue={issue}
-				onClose={() => setDeleteOpen(false)}
-				open={deleteOpen}
-			/>
 		</div>
 	);
 };
 
-type DecisionCardProps = {
+type ValueCardProps = {
 	issue: Issue;
 	index: number;
 };

@@ -1,18 +1,17 @@
 import { Node } from '@xyflow/react';
-import { Issue } from '../components/ProjectPage/ProjectPage';
+import { Issue } from '../validators';
 
-export const convertToNodes = (issues: Record<string, Issue[]>) => {
-	return Object.entries(issues).reduce((acc, [, value]) => {
-		return acc.concat(
-			value.map(issue => ({
-				id: issue.id,
-				type: 'issue',
-				position: issue.position || { x: 0, y: 0 },
-				data: {
-					label: issue.name,
-					issue,
-				},
-			})),
-		);
-	}, [] as Node[]);
+export const convertToNodes = (issues: Issue[]): Node[] => {
+	return issues.map(issue => ({
+		id: issue.id,
+		type: 'issue',
+		position: {
+			x: issue.node.node_style.x_position,
+			y: issue.node.node_style.y_position,
+		},
+		data: {
+			label: issue.name,
+			issue,
+		},
+	}));
 };

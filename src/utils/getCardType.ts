@@ -1,9 +1,9 @@
 import { Type } from '@dnd-kit/abstract';
-import { DecisionCard } from '../components/ProjectPage/TableView/DecisionCard';
-import { FactCard } from '../components/ProjectPage/TableView/FactCard';
-import { UnassignedCard } from '../components/ProjectPage/TableView/UnassignedCard';
-import { UncertaintieCard } from '../components/ProjectPage/TableView/UncertaintieCard';
-import { ValueCard } from '../components/ProjectPage/TableView/ValueCard';
+import { DecisionCard } from '../components/common/DecisionCard';
+import { FactCard } from '../components/common/FactCard';
+import { UnassignedCard } from '../components/common/UnassignedCard';
+import { UncertaintieCard } from '../components/common/UncertaintieCard';
+import { ValueCard } from '../components/common/ValueCard';
 
 export const getCardType = (type?: Type) => {
 	if (!type) return UnassignedCard;

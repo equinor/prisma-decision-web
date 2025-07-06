@@ -1,10 +1,12 @@
-import { Button, Icon, Table } from '@equinor/eds-core-react';
-import { delete_forever, edit } from '@equinor/eds-icons';
+import { Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { Issue } from '../ProjectPage';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { DeleteIssueDialog } from '../DeleteIssueDialog';
+import { EditIssueModal } from '../EditIssueModal';
 
-export const Facts = ({ issues }: FactsProps) => {
+export const FactList = () => {
+	const facts = useSelectedProjectIssues().filter(issue => issue.type === 'Fact');
 	const [open, setOpen] = useLocalStorage('factsOpen', true);
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
@@ -26,28 +28,24 @@ export const Facts = ({ issues }: FactsProps) => {
 									<Table.Cell className='w-21 px-0! pl-5!'>Actions</Table.Cell>
 									<Table.Cell>Name</Table.Cell>
 									<Table.Cell>Description</Table.Cell>
-									<Table.Cell>Boundry</Table.Cell>
+									<Table.Cell>Boundary</Table.Cell>
 									<Table.Cell>Date Added</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{issues.map(issue => (
+								{facts.map(issue => (
 									<Table.Row key={issue.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex'>
-												<Button variant='ghost_icon'>
-													<Icon data={edit} />
-												</Button>
-												<Button variant='ghost_icon'>
-													<Icon data={delete_forever} />
-												</Button>
+												<EditIssueModal issue={issue} />
+												<DeleteIssueDialog issue={issue} />
 											</div>
 										</Table.Cell>
 										<Table.Cell>{issue.name}</Table.Cell>
 										<Table.Cell className='max-w-md py-2!'>
 											{issue.description}
 										</Table.Cell>
-										<Table.Cell>Out</Table.Cell>
+										<Table.Cell>{issue.boundary}</Table.Cell>
 										<Table.Cell>2023-05-01</Table.Cell>
 									</Table.Row>
 								))}
@@ -58,8 +56,4 @@ export const Facts = ({ issues }: FactsProps) => {
 			</div>
 		</Collapsible>
 	);
-};
-
-type FactsProps = {
-	issues: Issue[];
 };

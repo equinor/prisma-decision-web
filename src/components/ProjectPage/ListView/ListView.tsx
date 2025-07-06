@@ -1,21 +1,19 @@
-import { CreateIssues } from '../CreateIssue';
-import { useIssuesContext } from '../ProjectPage';
-import { Decisions } from './Decisions';
-import { Facts } from './Facts';
-import { Unassgined } from './Unassigned';
-import { Uncertainties } from './Uncertainties';
-import { Values } from './Values';
+import { CreateIssues } from '../CreateIssueForm';
+import { DecisionList } from './DecisionList';
+import { FactList } from './FactList';
+import { UnassignedList } from './UnassignedList';
+import { UncertaintyList } from './UncertaintyList';
+import { ValueList } from './ValueList';
 
 export const ListView = () => {
-	const { issues } = useIssuesContext();
 	return (
 		<>
 			<CreateIssues />
-			<Unassgined issues={issues['Unassigned']} />
-			<Decisions issues={issues['Decision']} />
-			<Uncertainties issues={issues['Uncertainty']} />
-			<Values issues={issues['Value']} />
-			<Facts issues={issues['Fact']} />
+			<UnassignedList />
+			<DecisionList />
+			<UncertaintyList />
+			<ValueList />
+			<FactList />
 		</>
 	);
 };

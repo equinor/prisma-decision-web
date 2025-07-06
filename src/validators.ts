@@ -1,6 +1,7 @@
 import { uuid, z } from 'zod/v4';
 
 export const issueTypes = ['Decision', 'Uncertainty', 'Fact', 'Unassigned', 'Value'] as const;
+export type IssueType = (typeof issueTypes)[number];
 
 export const opportunitySchema = z.object({
 	id: uuid(),
@@ -34,7 +35,12 @@ export const projectSchema = z.object({
 export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
-	alternatives: z.array(z.string().min(1, 'Alternative is required')),
+	alternatives: z.array(
+		z.object({
+			name: z.string().min(1, 'Alternative is required'),
+			id: uuid(),
+		}),
+	),
 });
 
 export const valueMetricSchema = z.object({
@@ -49,14 +55,17 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
-export const uncertaintyScehma = z.object({
+export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
 	probabilities: z.array(
-		z
-			.number()
-			.min(0, 'Probability must be non-negative')
-			.max(1, 'Probability must be at most 1'),
+		z.object({
+			name: z.string().min(1, 'Outcome name is required'),
+			probability: z
+				.number()
+				.min(0, 'Probability must be non-negative')
+				.max(1, 'Probability must be at most 1'),
+		}),
 	),
 });
 
@@ -82,11 +91,11 @@ export const issueSchema = z.object({
 	description: z.string().min(1, 'Description is required'),
 	order: z.number().int().nonnegative(),
 	type: z.enum(issueTypes),
-	boundry: z.enum(['in', 'on', 'out']),
-	decision: decisionSchema,
-	value_metric: valueMetricSchema,
-	utility: utilitySchema,
-	uncertainty: uncertaintyScehma,
+	boundary: z.enum(['in', 'on', 'out']),
+	decision: decisionSchema.nullable(),
+	value_metric: valueMetricSchema.nullable(),
+	utility: utilitySchema.nullable(),
+	uncertainty: uncertaintySchema.nullable(),
 	node: nodeSchema,
 });
 

@@ -1,9 +1,8 @@
 import { useDroppable } from '@dnd-kit/react';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../ProjectPage';
-import { UnassignedCard } from './UnassignedCard';
+import { UnassignedCard } from '../../common/UnassignedCard';
 import { CollisionPriority } from '@dnd-kit/abstract';
-import { issueTypes } from '../../../validators';
+import { Issue, issueTypes } from '../../../validators';
 
 export const UnassignedColumn = ({ issues, className }: UnassignedColumn) => {
 	const { ref } = useDroppable({

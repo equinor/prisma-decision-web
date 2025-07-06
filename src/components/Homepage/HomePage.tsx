@@ -1,9 +1,11 @@
 import { Button, Search } from '@equinor/eds-core-react';
 import { ProjectCard } from './ProjectCard';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
+import { useGetIssues } from '../../hooks/api/useGetIssues';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
+	useGetIssues();
 	return (
 		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-12'>

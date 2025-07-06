@@ -2,15 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 
-export const useCreateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useUpdateIssues = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (issue: Issue) => {
-			const res = await apiClient.post('/issues', [issue]);
-			return res.data[0];
+		mutationFn: async (issues: Issue[]) => {
+			await apiClient.put('/issues', issues);
 		},
 		onSuccess: () => {
-			onSuccess?.();
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});

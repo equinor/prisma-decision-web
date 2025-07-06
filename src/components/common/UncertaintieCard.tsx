@@ -1,8 +1,8 @@
 import { useSortable } from '@dnd-kit/react/sortable';
-import { Button, Chip, Icon } from '@equinor/eds-core-react';
-import { delete_to_trash, edit } from '@equinor/eds-icons';
-import { Issue } from '../ProjectPage';
-import { issueTypes } from '../../../validators';
+import { Chip } from '@equinor/eds-core-react';
+import { Issue, issueTypes } from '../../validators';
+import { DeleteIssueDialog } from '../ProjectPage/DeleteIssueDialog';
+import { EditIssueModal } from '../ProjectPage/EditIssueModal';
 
 export const UncertaintieCard = ({ issue, index }: UncertaintieCardProps) => {
 	const { ref, isDragging } = useSortable({
@@ -27,15 +27,11 @@ export const UncertaintieCard = ({ issue, index }: UncertaintieCardProps) => {
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Uncertainty</Chip>
-					<Chip>In</Chip>
+					<Chip>{issue.boundary}</Chip>
 				</div>
 				<div>
-					<Button variant='ghost_icon'>
-						<Icon data={edit} />
-					</Button>
-					<Button variant='ghost_icon'>
-						<Icon data={delete_to_trash} />
-					</Button>
+					<EditIssueModal issue={issue} />
+					<DeleteIssueDialog issue={issue} />
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
