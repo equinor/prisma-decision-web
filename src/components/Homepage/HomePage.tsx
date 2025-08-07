@@ -1,10 +1,15 @@
-import { Button, Search } from '@equinor/eds-core-react';
-import { ProjectCard } from './ProjectCard';
-import { useGetProjects } from '../../hooks/api/useGetProjects';
+import { Search } from '@equinor/eds-core-react';
+import { useState } from 'react';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
+import { useGetProjects } from '../../hooks/api/useGetProjects';
+import { ProjectCard } from './ProjectCard';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
+	const [searchTerm, setSearchTerm] = useState('');
+	const filteredProjects = projects.filter(project =>
+		project.name.toLowerCase().includes(searchTerm.toLowerCase()),
+	);
 	useGetIssues();
 	return (
 		<div className='mx-auto w-[min(1600px,_90%)]'>
@@ -22,19 +27,14 @@ export const HomePage = () => {
 				</div>
 
 				<div className='flex flex-col gap-4'>
-					<div className='flex flex-col justify-between gap-4 md:flex-row'>
-						<Button.Toggle
-							selectedIndexes={[0]}
-							className='grid! grid-cols-3 md:inline-flex'
-						>
-							<Button>All projects</Button>
-							<Button>Open</Button>
-							<Button>Restricted</Button>
-						</Button.Toggle>
-						<Search className='xl:w-[350px]' placeholder='Search projects...' />
-					</div>
-					<div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
-						{projects.map(project => (
+					<Search
+						className='xl:w-[350px]'
+						placeholder='Search projects...'
+						value={searchTerm}
+						onChange={e => setSearchTerm(e.target.value)}
+					/>
+					<div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
+						{filteredProjects.map(project => (
 							<ProjectCard key={project.id} project={project} />
 						))}
 					</div>

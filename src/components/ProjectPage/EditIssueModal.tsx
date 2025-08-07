@@ -1,13 +1,13 @@
 import { Button, CircularProgress, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
-import { edit } from '@equinor/eds-icons';
+import { close, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { useIssueForm } from '../../hooks/useIssueForm';
 import { Issue } from '../../validators';
-import { DecisionFormSection } from '../common/DecisionFormSection';
-import { IssueFormSection } from '../common/IssueFormSection';
-import { UncertaintyFormSection } from '../common/UncertaintyFormSection';
-import { ValueFormSection } from '../common/ValueFormSection';
+import { DecisionFormSection } from '../common/IssueFormSections/DecisionFormSection';
+import { IssueFormSection } from '../common/IssueFormSections/IssueFormSection';
+import { UncertaintyFormSection } from '../common/IssueFormSections/UncertaintyFormSection';
+import { ValueMetricFormSection } from '../common/IssueFormSections/ValueMetricFormSection';
 
 interface EditIssueModalProps {
 	issue: Issue;
@@ -33,22 +33,23 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 			{isOpen && (
 				<Dialog
 					open
-					className='fixed top-1/2 left-1/2 max-h-[90vh] w-[min(700px,_90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
+					className='nodrag fixed top-1/2 left-1/2 max-h-[90vh] w-[min(700px,_90vw)]!
+					 -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
 				>
 					<DialogContent>
 						<FormProvider {...formMethods}>
-							<form onSubmit={onSubmit} className='flex flex-col gap-6'>
+							<form onSubmit={onSubmit} className='flex flex-col gap-4'>
 								<div className='flex items-center justify-between'>
 									<h2 className='text-2xl font-semibold'>Edit Issue</h2>
 									<Button variant='ghost_icon' onClick={handleClose}>
-										×
+										<Icon data={close} />
 									</Button>
 								</div>
 
 								<IssueFormSection />
 								{selectedType === 'Decision' && <DecisionFormSection />}
 								{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
-								{selectedType === 'Value' && <ValueFormSection />}
+								{selectedType === 'Value Metric' && <ValueMetricFormSection />}
 								<div className='flex justify-end gap-2'>
 									<Button variant='outlined' onClick={handleClose}>
 										Cancel

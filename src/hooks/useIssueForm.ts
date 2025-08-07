@@ -1,16 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
+import { useForm, useFormContext } from 'react-hook-form';
 import { Issue, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
-import { useSelectedProject } from './useSelectedProject';
 import { useUpdateIssue } from './api/useUpdateIssue';
+import { useSelectedScenario } from './useSelectedScenario';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = (issue?: Issue) => {
-	const selectedProject = useSelectedProject();
-	const scenario = selectedProject?.scenarios[0];
-	const defaultValues = useMemo(() => getDefaultValues(scenario?.id || crypto.randomUUID()), []);
+	const selectedScenario = useSelectedScenario();
+	const defaultValues = useMemo(
+		() => getDefaultValues(selectedScenario?.id || crypto.randomUUID()),
+		[],
+	);
 
 	const formMethods = useForm({
 		values: { ...defaultValues, ...issue },
@@ -18,12 +20,11 @@ export const useIssueForm = (issue?: Issue) => {
 	});
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(scenario?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
 		},
 	});
 
 	const { mutate: updateIssue, isPending: isUpdating } = useUpdateIssue();
-
 	const onSubmit = formMethods.handleSubmit(
 		async data => {
 			const mutationFn = issue ? updateIssue : createIssue;
@@ -44,7 +45,7 @@ export const useIssueForm = (issue?: Issue) => {
 
 const getDefaultValues = (scenarioId: string): Issue => {
 	return {
-		boundary: 'in',
+		boundary: 'on',
 		name: '',
 		description: '',
 		type: 'Unassigned',

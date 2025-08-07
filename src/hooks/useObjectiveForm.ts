@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { opportunitySchema } from '../validators';
-import { useCreateObjective } from './api/useCreateObjective';
+import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedProject } from './useSelectedProject';
 
 export const useObjectiveForm = () => {
 	const selectedProject = useSelectedProject();
-	const { mutate: createObjective } = useCreateObjective();
+	const { mutate: createObjective } = useCreateObjectiveOptimistic();
 	const scenario = selectedProject?.scenarios[0];
 	const formMethods = useForm({
 		values: {

@@ -1,7 +1,7 @@
 import { Button, Icon, TextField } from '@equinor/eds-core-react';
 import { useFieldArray } from 'react-hook-form';
 import { delete_to_trash } from '@equinor/eds-icons';
-import { useIssueFormContext } from '../../hooks/useIssueForm';
+import { useIssueFormContext } from '../../../hooks/useIssueForm';
 
 export const DecisionFormSection = () => {
 	const { control, register } = useIssueFormContext();
@@ -15,7 +15,7 @@ export const DecisionFormSection = () => {
 	});
 
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Decision Details</h3>
 			<div className='grid w-full grid-cols-1 gap-4'>
 				{alternatives.map((field, index) => (

@@ -1,12 +1,7 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
-import {
-	EdgeProps,
-	getSmoothStepPath,
-	useReactFlow,
-	BaseEdge,
-	EdgeLabelRenderer,
-} from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath } from '@xyflow/react';
+import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 
 export const CustomEdge = ({
 	id,
@@ -27,10 +22,10 @@ export const CustomEdge = ({
 		targetPosition,
 	});
 
-	const { setEdges } = useReactFlow();
+	const { mutate: deleteEdge } = useDeleteEdge();
 
 	const handleDelete = () => {
-		setEdges(eds => eds.filter(edge => edge.id !== id));
+		deleteEdge(id);
 	};
 
 	return (

@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useGetIssues } from './api/useGetIssues';
-import { useSelectedProject } from './useSelectedProject';
+import { useSelectedScenario } from './useSelectedScenario';
 
 export const useSelectedProjectIssues = () => {
-	const selectedProject = useSelectedProject();
+	const selectedScenario = useSelectedScenario();
 	const { issues } = useGetIssues();
 	const projectIssues = useMemo(
-		() => issues.filter(issue => issue.scenario_id === selectedProject?.scenarios[0]?.id),
-		[issues, selectedProject?.scenarios],
+		() => issues.filter(issue => issue.scenario_id === selectedScenario?.id),
+		[issues, selectedScenario?.id],
 	);
-	if (!selectedProject) return [];
+	if (!selectedScenario) return [];
 	return projectIssues;
 };

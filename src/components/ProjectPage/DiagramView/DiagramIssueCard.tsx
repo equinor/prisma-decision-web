@@ -12,7 +12,7 @@ export const DiagramIssueCard = ({ data }: NodeProps<Node<{ issue: Issue }>>) =>
 				id='a'
 				className='bg-primary-resting! h-3! w-3!'
 			/>
-			<IssueCard issue={data.issue} index={-1} />
+			<IssueCard issue={data.issue} />
 			<Handle
 				type='source'
 				position={Position.Bottom}

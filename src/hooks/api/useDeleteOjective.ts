@@ -2,29 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective, Project } from '../../validators';
 
-export const useCreateObjective = () => {
+export const useDeleteObjective = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (data: Objective) => {
-			const res = await apiClient.post('/objectives', [data]);
-			return res.data[0];
+		mutationFn: async (objective: Objective) => {
+			await apiClient.delete(`/objectives/${objective.id}`);
+			return objective;
 		},
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['projects'] });
-		},
-	});
-};
-
-export const useCreateObjectiveOptimistic = () => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async (data: Objective) => {
-			const res = await apiClient.post('/objectives', [data]);
-			return res.data[0];
-		},
-		onMutate: (newObjective: Objective) => {
+		onMutate: (deletedObjective: Objective) => {
 			queryClient.cancelQueries({ queryKey: ['projects'] });
-			const scenarioId = newObjective.scenario_id;
+			const scenarioId = deletedObjective.scenario_id;
 			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
 			const newProjects = previousProjects.map(project => {
 				return {
@@ -33,21 +20,22 @@ export const useCreateObjectiveOptimistic = () => {
 						if (scenario.id === scenarioId) {
 							return {
 								...scenario,
-								objectives: [...scenario.objectives, newObjective],
+								objectives: scenario.objectives.filter(
+									objective => objective.id !== deletedObjective.id,
+								),
 							};
 						}
 						return scenario;
 					}),
 				};
 			});
-			queryClient.setQueryData(['projects'], [...newProjects]);
+			queryClient.setQueryData(['projects'], newProjects);
 			return { previousProjects };
 		},
-		onError: (_err, _newOpportunity, context) => {
+		onError: (_err, _deletedObjective, context) => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
-			return _err;
 		},
 	});
 };

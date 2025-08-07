@@ -1,7 +1,7 @@
 import { Button, TopBar as EdsTopBar, Icon, StarProgress } from '@equinor/eds-core-react';
 import { sun } from '@equinor/eds-icons';
-import { useNavigate } from 'react-router';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 import useDarkMode from '../hooks/useDarkMode';
 
 export const TopBar = () => {

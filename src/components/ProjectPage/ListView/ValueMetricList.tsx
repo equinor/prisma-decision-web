@@ -5,42 +5,44 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
 
-export const FactList = () => {
-	const facts = useSelectedProjectIssues().filter(issue => issue.type === 'Fact');
-	const [open, setOpen] = useLocalStorage('factsOpen', true);
-	const hasFacts = facts.length > 0;
+export const ValueMetricList = () => {
+	const values = useSelectedProjectIssues().filter(issue => issue.type === 'Value Metric');
+	const [open, setOpen] = useLocalStorage('valuesOpen', true);
+	const hasValues = values.length > 0;
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
                  items-start gap-4 rounded-sm p-4'
 			>
-				<CollapsibleTrigger asChild disabled={!hasFacts}>
+				<CollapsibleTrigger asChild disabled={!hasValues}>
 					<button className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end text-start disabled:cursor-default disabled:opacity-50'>
 						<div>
-							<h2 className='text-2xl font-semibold'>Facts</h2>
+							<h2 className='text-2xl font-semibold'>Value Metrics</h2>
 							<p className='text-text-tertiary'>
-								The objective facts about the project
+								Manage the potential costs and benefits of this project
 							</p>
 						</div>
-						{!hasFacts && <p className='text-text-tertiary '>No facts added</p>}
+						{!hasValues && (
+							<p className='text-text-tertiary '>No value metrics added</p>
+						)}
 					</button>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
-					{hasFacts && (
+					{hasValues && (
 						<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
-							<Table className='w-full table-fixed'>
+							<Table className='w-full'>
 								<Table.Head>
 									<Table.Row>
 										<Table.Cell className='w-21'></Table.Cell>
-										<Table.Cell className='w-2/10'>Name</Table.Cell>
-										<Table.Cell className='w-6/10'>Description</Table.Cell>
-										<Table.Cell className='w-1/10'>Boundary</Table.Cell>
-										<Table.Cell className='w-1/10'>Date Added</Table.Cell>
+										<Table.Cell>Name</Table.Cell>
+										<Table.Cell>Description</Table.Cell>
+										<Table.Cell>Boundary</Table.Cell>
+										<Table.Cell>Date Added</Table.Cell>
 									</Table.Row>
 								</Table.Head>
 								<Table.Body>
-									{facts.map(issue => (
+									{values.map(issue => (
 										<Table.Row key={issue.id}>
 											<Table.Cell className='px-0! pl-1!'>
 												<div className='flex'>

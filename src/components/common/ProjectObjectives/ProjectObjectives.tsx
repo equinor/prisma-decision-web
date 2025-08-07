@@ -1,47 +1,68 @@
 import { Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { ProjectObjectivesForm } from './ProjectObjectivesForm';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+import { ProjectObjectivesForm } from './ProjectObjectivesForm';
 
 export const ProjectObjectives = () => {
 	const [open, setOpen] = useLocalStorage('projectObjectivesOpen', true);
 	const project = useSelectedProject();
 	const objectives = project?.scenarios[0].objectives || [];
+	const hasObjectives = objectives.length > 0;
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
-            	items-start gap-6 rounded-sm p-6'
+            	items-start gap-4 rounded-sm p-4'
 			>
 				<CollapsibleTrigger asChild>
-					<div className='w-full cursor-pointer'>
-						<h2 className='text-2xl font-semibold'>Project Objectives</h2>
-						<p className='text-text-tertiary'>
-							Define the objectives that will help achieve the desired outcome
-						</p>
+					<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end'>
+						<div>
+							<h2 className='text-2xl font-semibold'>Project Objectives</h2>
+							<p className='text-text-tertiary'>
+								Define the objectives that will help achieve the desired outcome
+							</p>
+						</div>
+						{!hasObjectives && (
+							<p className='text-text-tertiary '>No objectives added</p>
+						)}
 					</div>
 				</CollapsibleTrigger>
-				<CollapsibleContent className='flex w-full flex-col gap-6'>
+				<CollapsibleContent className='flex w-full flex-col gap-4'>
 					<ProjectObjectivesForm />
-					<div className='outline-background-medium w-full rounded-sm outline-1'>
-						<Table className='w-full'>
-							<Table.Head>
-								<Table.Row>
-									<Table.Cell>Opportunity Statement</Table.Cell>
-									<Table.Cell>Date Added</Table.Cell>
-								</Table.Row>
-							</Table.Head>
-							<Table.Body>
-								{objectives.map(objectives => (
-									<Table.Row key={objectives.id}>
-										<Table.Cell>{objectives.name}</Table.Cell>
-										<Table.Cell>{objectives.description}</Table.Cell>
+					{hasObjectives && (
+						<div className='outline-background-medium w-full rounded-sm outline-1'>
+							<Table className='w-full table-fixed'>
+								<Table.Head>
+									<Table.Row>
+										<Table.Cell className='w-10'></Table.Cell>
+										<Table.Cell className='w-1/3 md:w-3/9'>Name</Table.Cell>
+										<Table.Cell className='w-1/3 md:w-5/9'>
+											Description
+										</Table.Cell>
+										<Table.Cell className='w-1/3 md:w-2/9'>
+											Date Added
+										</Table.Cell>
 									</Table.Row>
-								))}
-							</Table.Body>
-						</Table>
-					</div>
+								</Table.Head>
+								<Table.Body>
+									{objectives.map(objectives => (
+										<Table.Row key={objectives.id}>
+											<Table.Cell className='px-0! pl-1!'>
+												<div className='flex justify-center'>
+													<DeleteObjectiveDialog objective={objectives} />
+												</div>
+											</Table.Cell>
+											<Table.Cell>{objectives.name}</Table.Cell>
+											<Table.Cell>{objectives.description}</Table.Cell>
+											<Table.Cell></Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table>
+						</div>
+					)}
 				</CollapsibleContent>
 			</div>
 		</Collapsible>

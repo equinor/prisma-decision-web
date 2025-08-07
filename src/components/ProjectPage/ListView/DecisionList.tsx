@@ -8,60 +8,72 @@ import { EditIssueModal } from '../EditIssueModal';
 export const DecisionList = () => {
 	const decisions = useSelectedProjectIssues().filter(issue => issue.type === 'Decision');
 	const [open, setOpen] = useLocalStorage('decisionsOpen', true);
+	const hasDecisions = decisions.length > 0;
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
-        		items-start gap-6 rounded-sm p-6'
+        		items-start gap-4 rounded-sm p-4'
 			>
-				<CollapsibleTrigger asChild>
-					<div className='w-full cursor-pointer'>
-						<h2 className='text-2xl font-semibold'>Decisions</h2>
-						<p className='text-text-tertiary'>
-							Manage the decisions that need to be made in this project
-						</p>
-					</div>
+				<CollapsibleTrigger asChild disabled={!hasDecisions}>
+					<button className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end text-start disabled:cursor-default disabled:opacity-50'>
+						<div>
+							<h2 className='text-2xl font-semibold'>Decisions</h2>
+							<p className='text-text-tertiary'>
+								Manage the decisions that need to be made in this project
+							</p>
+						</div>
+						{!hasDecisions && <p className='text-text-tertiary '>No decisions added</p>}
+					</button>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
-					<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
-						<Table className='w-full'>
-							<Table.Head>
-								<Table.Row>
-									<Table.Cell className='w-21 px-0! pl-5!'>Actions</Table.Cell>
-									<Table.Cell>Name</Table.Cell>
-									<Table.Cell>Description</Table.Cell>
-									<Table.Cell>Alternatives</Table.Cell>
-									<Table.Cell>Boundary</Table.Cell>
-									<Table.Cell>Date Added</Table.Cell>
-								</Table.Row>
-							</Table.Head>
-							<Table.Body>
-								{decisions.map(issue => (
-									<Table.Row key={issue.id}>
-										<Table.Cell className='px-0! pl-1!'>
-											<div className='flex'>
-												<EditIssueModal issue={issue} />
-												<DeleteIssueDialog issue={issue} />
-											</div>
-										</Table.Cell>
-										<Table.Cell>{issue.name}</Table.Cell>
-										<Table.Cell className='max-w-md py-2!'>
-											{issue.description}
-										</Table.Cell>
-										<Table.Cell>
-											<ul className='flex flex-col gap-2 py-4'>
-												<li>Option 1</li>
-												<li>Option 2</li>
-												<li>Option 3</li>
-											</ul>
-										</Table.Cell>
-										<Table.Cell>{issue.boundary}</Table.Cell>
-										<Table.Cell>2023-05-01</Table.Cell>
+					{hasDecisions && (
+						<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
+							<Table className='w-full table-fixed'>
+								<Table.Head>
+									<Table.Row>
+										<Table.Cell className='w-21'></Table.Cell>
+										<Table.Cell className='w-2/10'>Name</Table.Cell>
+										<Table.Cell className='w-4/10'>Description</Table.Cell>
+										<Table.Cell className='w-2/10'>Alternatives</Table.Cell>
+										<Table.Cell className='w-1/10'>Boundary</Table.Cell>
+										<Table.Cell className='w-1/10'>Date Added</Table.Cell>
 									</Table.Row>
-								))}
-							</Table.Body>
-						</Table>
-					</div>
+								</Table.Head>
+								<Table.Body>
+									{decisions.map(issue => (
+										<Table.Row key={issue.id}>
+											<Table.Cell className='px-0! pl-1!'>
+												<div className='flex'>
+													<EditIssueModal issue={issue} />
+													<DeleteIssueDialog issue={issue} />
+												</div>
+											</Table.Cell>
+											<Table.Cell>{issue.name}</Table.Cell>
+											<Table.Cell className='max-w-md py-2!'>
+												{issue.description}
+											</Table.Cell>
+											<Table.Cell>
+												<ul className='flex flex-col gap-2 py-4'>
+													<li className='bg-background-light rounded-sm px-2 py-1'>
+														Option 1
+													</li>
+													<li className='bg-background-light rounded-sm px-2 py-1'>
+														Option 2
+													</li>
+													<li className='bg-background-light rounded-sm px-2 py-1'>
+														Option 3
+													</li>
+												</ul>
+											</Table.Cell>
+											<Table.Cell>{issue.boundary}</Table.Cell>
+											<Table.Cell>2023-05-01</Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table>
+						</div>
+					)}
 				</CollapsibleContent>
 			</div>
 		</Collapsible>

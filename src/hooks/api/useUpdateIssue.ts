@@ -6,7 +6,7 @@ export const useUpdateIssue = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (issue: Issue) => {
-			const res = await apiClient.put(`/issues/${issue.id}`, issue);
+			const res = await apiClient.put('/issues', [issue]);
 			return res.data;
 		},
 		onSuccess: () => {

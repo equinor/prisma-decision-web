@@ -1,6 +1,12 @@
 import { uuid, z } from 'zod/v4';
 
-export const issueTypes = ['Decision', 'Uncertainty', 'Fact', 'Unassigned', 'Value'] as const;
+export const issueTypes = [
+	'Decision',
+	'Uncertainty',
+	'Fact',
+	'Unassigned',
+	'Value Metric',
+] as const;
 export type IssueType = (typeof issueTypes)[number];
 
 export const opportunitySchema = z.object({
@@ -37,7 +43,7 @@ export const decisionSchema = z.object({
 	issue_id: uuid(),
 	alternatives: z.array(
 		z.object({
-			name: z.string().min(1, 'Alternative is required'),
+			name: z.string().min(1, 'Alternative name is required'),
 			id: uuid(),
 		}),
 	),
@@ -55,7 +61,7 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
-export const uncertaintySchema = z.object({
+export const uncertaintyScehma = z.object({
 	id: uuid(),
 	issue_id: uuid(),
 	probabilities: z.array(
@@ -63,7 +69,7 @@ export const uncertaintySchema = z.object({
 			name: z.string().min(1, 'Outcome name is required'),
 			probability: z
 				.number()
-				.min(0, 'Probability must be non-negative')
+				.min(0.01, 'Probability must be higher than 0')
 				.max(1, 'Probability must be at most 1'),
 		}),
 	),
@@ -84,6 +90,13 @@ export const nodeSchema = z.object({
 	node_style: nodeStyleSchema,
 });
 
+export const edgeSchema = z.object({
+	id: uuid(),
+	head_id: uuid(),
+	tail_id: uuid(),
+	scenario_id: uuid(),
+});
+
 export const issueSchema = z.object({
 	id: uuid(),
 	scenario_id: uuid(),
@@ -92,10 +105,10 @@ export const issueSchema = z.object({
 	order: z.number().int().nonnegative(),
 	type: z.enum(issueTypes),
 	boundary: z.enum(['in', 'on', 'out']),
-	decision: decisionSchema.nullable(),
-	value_metric: valueMetricSchema.nullable(),
-	utility: utilitySchema.nullable(),
-	uncertainty: uncertaintySchema.nullable(),
+	decision: decisionSchema,
+	value_metric: valueMetricSchema,
+	utility: utilitySchema,
+	uncertainty: uncertaintyScehma,
 	node: nodeSchema,
 });
 
@@ -103,3 +116,5 @@ export type Project = z.infer<typeof projectSchema>;
 export type Opportunity = z.infer<typeof opportunitySchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
+export type Edge = z.infer<typeof edgeSchema>;
+export type Scenario = z.infer<typeof scenarioSchema>;

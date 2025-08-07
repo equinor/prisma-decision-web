@@ -1,17 +1,19 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteIssueOptimistic } from '../../hooks/api/useDeleteIssue';
-import { Issue } from '../../validators';
+import { useDeleteProjectOptimistic } from '../../hooks/api/useDeleteProject';
+import { Project } from '../../validators';
 
-export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
+export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { mutate: deleteIssue } = useDeleteIssueOptimistic();
+	const { mutate: deleteProject } = useDeleteProjectOptimistic();
 	return (
 		<>
 			<Button
 				variant='ghost_icon'
-				onPointerDown={() => {
+				onClick={e => {
+					e.stopPropagation();
+					e.preventDefault();
 					setIsOpen(true);
 				}}
 			>
@@ -19,6 +21,10 @@ export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
 			</Button>
 			{isOpen && (
 				<Dialog
+					onClick={e => {
+						e.stopPropagation();
+						e.preventDefault();
+					}}
 					open
 					className='nodrag fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 				>
@@ -26,7 +32,8 @@ export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
 						<div className='flex flex-col gap-4 text-center'>
 							<h2 className='text-2xl font-semibold'>Delete Issue</h2>
 							<p className='text-text-tertiary'>
-								Are you sure you want to delete the issue &quot;{issue.name}&quot;?
+								Are you sure you want to delete the issue &quot;{project.name}
+								&quot;?
 							</p>
 							<div className='flex flex-col gap-2'>
 								<Button variant='outlined' onClick={() => setIsOpen(prev => !prev)}>
@@ -35,7 +42,7 @@ export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
 								<Button
 									color='danger'
 									onClick={() => {
-										deleteIssue(issue.id);
+										deleteProject(project.id);
 									}}
 								>
 									Delete
@@ -49,6 +56,6 @@ export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
 	);
 };
 
-type DeleteIssueDialogProps = {
-	issue: Issue;
+type DeleteProjectDialogProps = {
+	project: Project;
 };
