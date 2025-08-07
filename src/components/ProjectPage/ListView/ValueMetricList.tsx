@@ -1,9 +1,10 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { chevron_up } from '@equinor/eds-icons';
 
 export const ValueMetricList = () => {
 	const values = useSelectedProjectIssues().filter(issue => issue.type === 'Value Metric');
@@ -15,18 +16,27 @@ export const ValueMetricList = () => {
 				className='bg-background-default shadow-tile flex w-full flex-col
                  items-start gap-4 rounded-sm p-4'
 			>
-				<CollapsibleTrigger asChild disabled={!hasValues}>
-					<button className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end text-start disabled:cursor-default disabled:opacity-50'>
+				<CollapsibleTrigger asChild>
+					<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-center text-start'>
 						<div>
-							<h2 className='text-2xl font-semibold'>Value Metrics</h2>
+							<div className='flex gap-2'>
+								<h2 className='text-2xl font-semibold'>Value Metrics</h2>
+								<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+									{values.length}
+								</span>
+							</div>
 							<p className='text-text-tertiary'>
 								Manage the potential costs and benefits of this project
 							</p>
 						</div>
-						{!hasValues && (
-							<p className='text-text-tertiary '>No value metrics added</p>
-						)}
-					</button>
+						<Button variant='ghost_icon'>
+							<Icon
+								data={chevron_up}
+								data-open={open}
+								className='data-[open="true"]:rotate-180'
+							/>
+						</Button>
+					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
 					{hasValues && (

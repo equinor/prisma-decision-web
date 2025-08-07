@@ -1,9 +1,10 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { chevron_up } from '@equinor/eds-icons';
 
 export const FactList = () => {
 	const facts = useSelectedProjectIssues().filter(issue => issue.type === 'Fact');
@@ -15,16 +16,27 @@ export const FactList = () => {
 				className='bg-background-default shadow-tile flex w-full flex-col
                  items-start gap-4 rounded-sm p-4'
 			>
-				<CollapsibleTrigger asChild disabled={!hasFacts}>
-					<button className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end text-start disabled:cursor-default disabled:opacity-50'>
+				<CollapsibleTrigger asChild>
+					<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-center text-start'>
 						<div>
-							<h2 className='text-2xl font-semibold'>Facts</h2>
+							<div className='flex gap-2'>
+								<h2 className='text-2xl font-semibold'>Facts</h2>
+								<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+									{facts.length}
+								</span>
+							</div>
 							<p className='text-text-tertiary'>
 								The objective facts about the project
 							</p>
 						</div>
-						{!hasFacts && <p className='text-text-tertiary '>No facts added</p>}
-					</button>
+						<Button variant='ghost_icon'>
+							<Icon
+								data={chevron_up}
+								data-open={open}
+								className='data-[open="true"]:rotate-180'
+							/>
+						</Button>
+					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
 					{hasFacts && (

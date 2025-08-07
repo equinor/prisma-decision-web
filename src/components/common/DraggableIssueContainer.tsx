@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/react/sortable';
-import { Issue, IssueType, issueTypes } from '../../../validators';
+import { Issue, IssueType, issueTypes } from '../../validators';
 
-export const DraggableCard = ({ issue, index, type, children }: DraggableCardProps) => {
+export const DraggableIssueContainer = ({ issue, index, type, children }: DraggableCardProps) => {
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
@@ -16,8 +16,8 @@ export const DraggableCard = ({ issue, index, type, children }: DraggableCardPro
 		<div
 			ref={ref}
 			data-dragging={isDragging}
-			className='w-full data-[dragging="true"]:cursor-grabbing
-			data-[dragging="true"]:opacity-40 data-[dragging="true"]:outline-1'
+			className='data-[dragging="true"]:cursor-grabbing
+			data-[dragging="true"]:opacity-40'
 		>
 			{children}
 		</div>

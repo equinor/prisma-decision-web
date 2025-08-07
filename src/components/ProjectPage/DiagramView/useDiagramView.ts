@@ -3,41 +3,49 @@ import {
 	Edge as FlowEdge,
 	IsValidConnection,
 	Node,
+	NodeChange,
 	OnConnect,
 	OnReconnect,
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useRef } from 'react';
+import { MouseEvent, useEffect, useMemo, useRef } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { convertNodesToIssues } from '../../../utils/convertNodesToIssues';
+import { convertToEdges } from '../../../utils/convertToEdges';
 import { convertToNodes } from '../../../utils/convertToNodes';
-import { Edge } from '../../../validators';
 
 export const useDiagramView = () => {
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
-	const selectedScenario = useSelectedProject();
+	const selectedScenario = useSelectedScenario();
 	const { mutate: updateIssue } = useUpdateIssuesOptimistic();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const [localNodes, setLocalNodes, onLocalNodesChange] = useNodesState([] as Node[]);
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
-	const activeNodes = localNodes.length > 0 ? localNodes : convertToNodes(issues);
-	const activeEdges = localEdges.length > 0 ? localEdges : convertToEdges(edges);
+
+	const nodes = useMemo(() => convertToNodes(issues), [issues]);
+	const activeNodes = localNodes.length > 0 ? localNodes : nodes;
+	const nodeEdges = useMemo(() => convertToEdges(edges, activeNodes), [edges, activeNodes]);
+	const activeEdges = localEdges.length > 0 ? localEdges : nodeEdges;
+
+	useEffect(() => {
+		setLocalNodes(convertToNodes(issues));
+	}, [issues]);
 
 	const onConnect: OnConnect = params => {
 		if (!selectedScenario) return;
 		createEdge({
 			head_id: params.target,
 			tail_id: params.source,
-			scenario_id: selectedScenario.scenarios[0].id,
+			scenario_id: selectedScenario.id,
 			id: crypto.randomUUID(),
 		});
 		setEdges([]);
@@ -49,7 +57,7 @@ export const useDiagramView = () => {
 			id: oldEdge.id,
 			tail_id: newConnection.source,
 			head_id: newConnection.target,
-			scenario_id: selectedScenario.scenarios[0].id,
+			scenario_id: selectedScenario.id,
 		});
 		setEdges([]);
 	};
@@ -59,8 +67,14 @@ export const useDiagramView = () => {
 	};
 
 	const onNodeDragStop = async () => {
-		await updateIssue(convertNodesToIssues(localNodes));
-		setLocalNodes([]);
+		await updateIssue(convertNodesToIssues(activeNodes));
+		setEdges([]);
+	};
+
+	const onNodesChange = (changes: NodeChange[]) => {
+		onLocalNodesChange(changes);
+		const updatedEdges = convertToEdges(edges, activeNodes);
+		setEdges(updatedEdges);
 	};
 
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {
@@ -77,25 +91,14 @@ export const useDiagramView = () => {
 	return {
 		nodes: activeNodes,
 		edges: activeEdges,
-		_nodes: localNodes,
-		issues,
 		onConnect,
 		onReconnect,
 		onReconnectStart,
 		onNodeDragStop,
-		onNodesChange: onLocalNodesChange,
+		onNodesChange,
 		onEdgesChange,
 		isValidConnection,
 		setEdges,
 		setNodes: setLocalNodes,
 	};
-};
-
-const convertToEdges = (edges: Edge[]) => {
-	return edges.map(edge => ({
-		...edge,
-		id: edge.id,
-		source: edge.tail_id,
-		target: edge.head_id,
-	}));
 };

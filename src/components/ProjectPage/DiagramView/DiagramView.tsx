@@ -1,5 +1,4 @@
 import { Background, ConnectionMode, Controls, MarkerType, ReactFlow } from '@xyflow/react';
-import { convertToNodes } from '../../../utils/convertToNodes';
 import { ConnectionLine } from './ConnectingLine';
 import { CustomEdge } from './CustomEdge';
 import { DiagramIssueCard } from './DiagramIssueCard';
@@ -12,9 +11,6 @@ export const DiagramView = () => {
 	const {
 		nodes,
 		edges,
-		_nodes,
-		issues,
-		setNodes,
 		onConnect,
 		isValidConnection,
 		onEdgesChange,
@@ -41,13 +37,7 @@ export const DiagramView = () => {
 				connectionMode={ConnectionMode.Loose}
 				onReconnect={onReconnect}
 				onNodeDragStop={onNodeDragStop}
-				onNodeDragStart={() => {
-					setNodes(convertToNodes(issues));
-				}}
-				onNodesChange={changes => {
-					if (_nodes.length === 0) return;
-					onNodesChange(changes);
-				}}
+				onNodesChange={onNodesChange}
 				onReconnectStart={onReconnectStart}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}

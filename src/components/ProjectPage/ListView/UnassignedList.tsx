@@ -1,9 +1,10 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { chevron_up } from '@equinor/eds-icons';
 
 export const UnassignedList = () => {
 	const unassigned = useSelectedProjectIssues().filter(issue => issue.type === 'Unassigned');
@@ -13,27 +14,36 @@ export const UnassignedList = () => {
 		<Collapsible open={open} onOpenChange={setOpen}>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col items-start
-                gap-4 rounded-sm'
+                gap-4 rounded-sm p-4'
 			>
-				<CollapsibleTrigger asChild disabled={!hasUnassigned}>
-					<button
-						className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end p-4
-					 	text-start disabled:cursor-default disabled:opacity-50'
+				<CollapsibleTrigger asChild>
+					<div
+						className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-center
+					 	text-start'
 					>
 						<div>
-							<h2 className='text-2xl font-semibold'>Unassigned</h2>
+							<div className='flex gap-2'>
+								<h2 className='text-2xl font-semibold'>Unassigned</h2>
+								<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+									{unassigned.length}
+								</span>
+							</div>
 							<p className='text-text-tertiary'>
 								Issues that have not been given a category yet
 							</p>
 						</div>
-						{!hasUnassigned && (
-							<p className='text-text-tertiary '>No unassigned added</p>
-						)}
-					</button>
+						<Button variant='ghost_icon'>
+							<Icon
+								data={chevron_up}
+								data-open={open}
+								className='data-[open="true"]:rotate-180'
+							/>
+						</Button>
+					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent asChild>
 					{hasUnassigned && (
-						<div className='outline-background-medium w-full overflow-auto rounded-sm p-4 outline-1'>
+						<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
 							<Table className='w-full'>
 								<Table.Head>
 									<Table.Row>

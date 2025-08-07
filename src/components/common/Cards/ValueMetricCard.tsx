@@ -6,8 +6,8 @@ import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 export const ValueMetricCard = ({ issue }: ValueMetricCardProps) => {
 	return (
 		<div
-			className='bg-background-default shadow-tile outline-primary-resting
-			flex w-full max-w-[440px] cursor-grab flex-col gap-2 rounded-sm p-4'
+			className='bg-background-default shadow-tile
+			flex w-full max-w-[450px] min-w-[241px] cursor-grab flex-col gap-2 rounded-sm p-4'
 		>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
