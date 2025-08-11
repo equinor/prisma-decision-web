@@ -16,7 +16,7 @@ export const ScenarioSelector = () => {
 	});
 	if (!selectedProject || !selectedScenario) return null;
 	return (
-		<div className='flex h-[35px] flex-col-reverse'>
+		<div className='flex h-[35px] flex-col-reverse **:box-content'>
 			<Autocomplete
 				options={selectedProject.scenarios}
 				hideClearButton
@@ -36,7 +36,9 @@ export const ScenarioSelector = () => {
 				label='Selected Scenario'
 				onOptionsChange={({ selectedItems }) => {
 					if (selectedItems[0]) {
-						navigate(`../${selectedItems[0].id}`);
+						navigate(`../${selectedItems[0].id}`, {
+							relative: 'path',
+						});
 					}
 				}}
 			/>
