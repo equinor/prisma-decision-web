@@ -7,13 +7,13 @@ export const convertToEdges = (edges: Edge[], nodes: Node[]) => {
 		const sourceNode = nodes.find(node => node.id === edge.tail_id);
 		const targetNode = nodes.find(node => node.id === edge.head_id);
 
-		const { sourceHandle, targetHandle } = calculateBestHandles(sourceNode!, targetNode!);
+		const { sourceHandle, targetHandle } = calculateBestHandles(targetNode!, sourceNode!);
 
 		return {
 			...edge,
 			id: edge.id,
-			source: edge.tail_id,
-			target: edge.head_id,
+			source: edge.head_id,
+			target: edge.tail_id,
 			sourceHandle,
 			targetHandle,
 		};

@@ -1,6 +1,12 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath } from '@xyflow/react';
+import {
+	BaseEdge,
+	EdgeLabelRenderer,
+	EdgeProps,
+	getSmoothStepPath,
+	useReactFlow,
+} from '@xyflow/react';
 import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 
 export const CustomEdge = ({
@@ -23,9 +29,11 @@ export const CustomEdge = ({
 	});
 
 	const { mutate: deleteEdge } = useDeleteEdge();
+	const { setEdges } = useReactFlow();
 
 	const handleDelete = () => {
 		deleteEdge(id);
+		setEdges([]);
 	};
 
 	return (

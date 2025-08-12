@@ -35,7 +35,6 @@ export const useDiagramView = () => {
 	const activeNodes = localNodes.length > 0 ? localNodes : nodes;
 	const nodeEdges = useMemo(() => convertToEdges(edges, activeNodes), [edges, activeNodes]);
 	const activeEdges = localEdges.length > 0 ? localEdges : nodeEdges;
-
 	useEffect(() => {
 		setLocalNodes(convertToNodes(issues));
 	}, [issues]);
@@ -48,7 +47,6 @@ export const useDiagramView = () => {
 			scenario_id: selectedScenario.id,
 			id: crypto.randomUUID(),
 		});
-		setEdges([]);
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
@@ -59,7 +57,6 @@ export const useDiagramView = () => {
 			head_id: newConnection.target,
 			scenario_id: selectedScenario.id,
 		});
-		setEdges([]);
 	};
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
@@ -68,7 +65,6 @@ export const useDiagramView = () => {
 
 	const onNodeDragStop = async () => {
 		await updateIssue(convertNodesToIssues(activeNodes));
-		setEdges([]);
 	};
 
 	const onNodesChange = (changes: NodeChange[]) => {
