@@ -22,7 +22,7 @@
 		"@dnd-kit/abstract": "^0.1.17",
 		"@dnd-kit/collision": "^0.1.21",
 		"@dnd-kit/helpers": "^0.1.19",
-		"@dnd-kit/react": "^0.1.19",
+		"@dnd-kit/react": "^0.1.21",
 		"@equinor/eds-icons": "^0.22.0",
 		"@hookform/error-message": "^2.0.1",
 		"@hookform/resolvers": "^5.1.1",
