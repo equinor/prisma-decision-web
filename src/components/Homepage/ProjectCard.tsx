@@ -5,8 +5,10 @@ import { Project } from '../../validators';
 import { DeleteProjectDialog } from '../common/DeleteProjectDialog';
 
 export const ProjectCard = ({ project }: ProjectCardProps) => {
+	const scenario = project.scenarios.find(scenario => scenario.name === 'main');
+	if (!scenario) return null;
 	return (
-		<Link to={`/project/${project.id}/${project.scenarios[0].id}`}>
+		<Link to={`/project/${project.id}/${scenario.id}`}>
 			<div
 				className='bg-background-default outline-background-medium
 				hover:bg-background-light shadow-tile grid h-[180px] cursor-pointer
