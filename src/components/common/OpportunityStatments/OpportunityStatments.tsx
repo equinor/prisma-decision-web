@@ -1,15 +1,15 @@
 import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { OpportunityStatmentsForm } from './OpportunityStatmentsForm';
+import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { DeleteOpportunityStatment } from './DeleteOpportunityStatmentDialog';
 import { chevron_up } from '@equinor/eds-icons';
+import { OpportunityStatmentsForm } from './OpportunityStatmentsForm';
 
 export const OpportunityStatments = () => {
 	const [open, setOpen] = useLocalStorage('opportunityStatmentsOpen', true);
-	const project = useSelectedProject();
-	const opportunities = project?.scenarios[0].opportunities || [];
+	const scenario = useSelectedScenario();
+	const opportunities = scenario?.opportunities || [];
 	const hasOpportunities = opportunities.length > 0;
 	return (
 		<Collapsible open={open} onOpenChange={setOpen}>
