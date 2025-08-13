@@ -1,9 +1,10 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { ProjectObjectivesForm } from './ProjectObjectivesForm';
+import { chevron_up } from '@equinor/eds-icons';
 
 export const ProjectObjectives = () => {
 	const [open, setOpen] = useLocalStorage('projectObjectivesOpen', true);
@@ -17,16 +18,25 @@ export const ProjectObjectives = () => {
             	items-start gap-4 rounded-sm p-4'
 			>
 				<CollapsibleTrigger asChild>
-					<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-end'>
+					<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-center'>
 						<div>
-							<h2 className='text-2xl font-semibold'>Project Objectives</h2>
+							<div className='flex gap-2'>
+								<h2 className='text-2xl font-semibold'>Project Objectives</h2>
+								<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+									{objectives.length}
+								</span>
+							</div>
 							<p className='text-text-tertiary'>
 								Define the objectives that will help achieve the desired outcome
 							</p>
 						</div>
-						{!hasObjectives && (
-							<p className='text-text-tertiary '>No objectives added</p>
-						)}
+						<Button variant='ghost_icon'>
+							<Icon
+								data={chevron_up}
+								data-open={open}
+								className='data-[open="true"]:rotate-180'
+							/>
+						</Button>
 					</div>
 				</CollapsibleTrigger>
 				<CollapsibleContent className='flex w-full flex-col gap-4'>
