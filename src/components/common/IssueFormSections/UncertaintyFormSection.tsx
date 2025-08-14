@@ -17,7 +17,7 @@ export const UncertaintyFormSection = () => {
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
 			<div className='grid grid-cols-1 gap-4'>
 				{probabilitiesArray.fields.map((field, index) => (
-					<div key={field.id} className='grid grid-cols-[3fr_1fr_auto] gap-2'>
+					<div key={field.id} className='relative grid grid-cols-[3fr_1fr_auto] gap-2'>
 						<div>
 							<TextField
 								placeholder={`Outcome ${index + 1}...`}
@@ -33,10 +33,14 @@ export const UncertaintyFormSection = () => {
 							<TextField
 								type='number'
 								step={0.01}
-								placeholder='0.5'
+								min={0}
+								max={1}
 								label='Probability'
 								{...register(`uncertainty.probabilities.${index}.probability`, {
-									valueAsNumber: true,
+									setValueAs: value => {
+										const num = parseFloat(value);
+										return isNaN(num) ? 0 : num;
+									},
 								})}
 							/>
 							<ErrorMessage
@@ -47,7 +51,7 @@ export const UncertaintyFormSection = () => {
 						<Button
 							variant='ghost_icon'
 							onClick={() => probabilitiesArray.remove(index)}
-							className='self-end'
+							className='absolute top-3.5'
 						>
 							<Icon data={delete_to_trash} />
 						</Button>
@@ -60,6 +64,7 @@ export const UncertaintyFormSection = () => {
 				>
 					Add Outcome
 				</Button>
+				<ErrorMessage as={FormErrorMessage} name={'uncertainty.probabilities.root'} />
 			</div>
 		</div>
 	);

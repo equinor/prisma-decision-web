@@ -61,19 +61,30 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
-export const uncertaintyScehma = z.object({
-	id: uuid(),
-	issue_id: uuid(),
-	probabilities: z.array(
-		z.object({
-			name: z.string().min(1, 'Outcome name is required'),
-			probability: z
-				.number()
-				.min(0.01, 'Probability must be higher than 0')
-				.max(1, 'Probability must be at most 1'),
-		}),
-	),
-});
+export const uncertaintySchema = z
+	.object({
+		id: uuid(),
+		issue_id: uuid(),
+		probabilities: z.array(
+			z.object({
+				name: z.string().min(1, 'Outcome name is required'),
+				probability: z.number().min(0.01, 'min 0.01').max(1, 'max 1'),
+			}),
+		),
+	})
+	.refine(
+		data => {
+			const totalProbability = data.probabilities.reduce(
+				(sum, item) => sum + item.probability,
+				0,
+			);
+			return totalProbability >= 0.999 && totalProbability <= 1.001;
+		},
+		{
+			message: 'Probabilities must sum to more than 0.999 and less than 1.001',
+			path: ['probabilities'],
+		},
+	);
 
 const nodeStyleSchema = z.object({
 	id: uuid(),
@@ -108,7 +119,7 @@ export const issueSchema = z.object({
 	decision: decisionSchema,
 	value_metric: valueMetricSchema,
 	utility: utilitySchema,
-	uncertainty: uncertaintyScehma,
+	uncertainty: uncertaintySchema,
 	node: nodeSchema,
 });
 
