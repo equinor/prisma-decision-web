@@ -1,4 +1,4 @@
-import { Dialog, Typography, Button } from '@equinor/eds-core-react';
+import { Dialog, Typography, Button, Table } from '@equinor/eds-core-react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -8,11 +8,14 @@ const Wrapper = styled.div`
 
 type ProjectAssignmentDialogProps = {
 	isProjectAssignmentDialogOpen: boolean;
+	selectedProjectId: string;
+	selectedProjectName: string;
 	onClose: (value: React.SetStateAction<boolean>) => void;
 };
 
 export const ProjectAssignmentDialog = ({
 	isProjectAssignmentDialogOpen,
+	selectedProjectName,
 	onClose,
 }: ProjectAssignmentDialogProps) => {
 	const handleClose = () => {
@@ -22,13 +25,28 @@ export const ProjectAssignmentDialog = ({
 	return (
 		<Dialog
 			open={isProjectAssignmentDialogOpen}
-			className='nodrag fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
+			className='fixed top-1/2 left-1/2 min-w-2xl -translate-x-1/2 -translate-y-1/2 transform'
 		>
 			<Dialog.Header>
-				<Dialog.Title>Role assignment</Dialog.Title>
+				<Dialog.Title>Role Assignment in {selectedProjectName}</Dialog.Title>
 			</Dialog.Header>
 			<Dialog.CustomContent>
-				<Typography variant='body_short'>Small description here.</Typography>
+				<Table className='w-full'>
+					<Table.Head>
+						<Table.Row>
+							<Table.Cell>Project Name</Table.Cell>
+							<Table.Cell>Users</Table.Cell>
+							<Table.Cell>Role</Table.Cell>
+						</Table.Row>
+					</Table.Head>
+					<Table.Body>
+						<Table.Row>
+							<Table.Cell>{selectedProjectName}</Table.Cell>
+							<Table.Cell>Kiwi</Table.Cell>
+							<Table.Cell>1.5</Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table>
 			</Dialog.CustomContent>
 			<Dialog.Actions>
 				<Wrapper>

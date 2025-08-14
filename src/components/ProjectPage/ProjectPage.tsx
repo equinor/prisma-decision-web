@@ -17,6 +17,10 @@ export const ProjectPage = () => {
 	const location = useLocation();
 	const selectedScenario = useSelectedScenario();
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
+	const [projectDetailsView, setProjectDetailsView] = useLocalStorage(
+		'projectDetailsView',
+		'details',
+	);
 	const showIssuesView = location.pathname.includes('issues');
 	const selectedProject = useSelectedProject();
 	const { isLoading: isLoadingProjects } = useGetProjects();
@@ -30,6 +34,7 @@ export const ProjectPage = () => {
 	if (issueView === 'diagram') activeView = 2;
 	if (isLoadingIssues || isLoadingProjects || isLoadingEdges) return <LoadingSpinner />;
 	if (!selectedProject) return;
+	console.log(projectDetailsView);
 
 	const handleProjectAssignment = (projectId: string) => {
 		setIsProjectAssignmentDialogOpen(true);
@@ -45,10 +50,18 @@ export const ProjectPage = () => {
 						<Button
 							as={Link}
 							to={`/project/${selectedProject.id}/${selectedScenario?.id}`}
+							onClick={() => setProjectDetailsView('projectDetails')}
 						>
 							Project Details
 						</Button>
-						<Button as={Link} to='issues'>
+						<Button
+							as={Link}
+							to='issues'
+							onClick={() => {
+								setIssuesView('list');
+								setProjectDetailsView('');
+							}}
+						>
 							Issues
 						</Button>
 					</Button.Toggle>
@@ -56,19 +69,23 @@ export const ProjectPage = () => {
 						<div className='flex flex-1 justify-center'>
 							<ScenarioSelector />
 						</div>
-						<div className='ml-4'>
-							<Button
-								onClick={() => {
-									handleProjectAssignment(selectedProject.id);
-								}}
-							>
-								Assign project to user
-							</Button>
-							<ProjectAssignmentDialog
-								isProjectAssignmentDialogOpen={isProjectAssignmentDialogOpen}
-								onClose={() => setIsProjectAssignmentDialogOpen(false)}
-							/>
-						</div>
+						{projectDetailsView === 'projectDetails' && (
+							<div className='ml-4'>
+								<Button
+									onClick={() => {
+										handleProjectAssignment(selectedProject.name);
+									}}
+								>
+									Assign Project Role
+								</Button>
+								<ProjectAssignmentDialog
+									isProjectAssignmentDialogOpen={isProjectAssignmentDialogOpen}
+									onClose={() => setIsProjectAssignmentDialogOpen(false)}
+									selectedProjectId={selectedProject.id}
+									selectedProjectName={selectedProject.name}
+								/>
+							</div>
+						)}
 						{showIssuesView && (
 							<>
 								<CreateIssues />
