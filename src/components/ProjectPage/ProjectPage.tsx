@@ -10,6 +10,8 @@ import { useSelectedScenario } from '../../hooks/useSelectedScenario';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { CreateIssues } from './CreateIssueForm';
 import { ScenarioSelector } from './ScenarioSelector';
+import { useState } from 'react';
+import { ProjectAssignmentDialog } from './ProjectAssignmentDialog';
 
 export const ProjectPage = () => {
 	const location = useLocation();
@@ -21,12 +23,17 @@ export const ProjectPage = () => {
 	const { isLoading: isLoadingIssues } = useGetIssues();
 
 	const { isLoading: isLoadingEdges } = useGetEdges();
+	const [isProjectAssignmentDialogOpen, setIsProjectAssignmentDialogOpen] = useState(false);
+
 	let activeView = 0;
 	if (issueView === 'table') activeView = 1;
 	if (issueView === 'diagram') activeView = 2;
 	if (isLoadingIssues || isLoadingProjects || isLoadingEdges) return <LoadingSpinner />;
 	if (!selectedProject) return;
 
+	const handleProjectAssignment = (projectId: string) => {
+		setIsProjectAssignmentDialogOpen(true);
+	};
 	return (
 		<div className='mx-auto w-[min(2400px,_90%)]'>
 			<div className='flex flex-col gap-4'>
@@ -45,8 +52,23 @@ export const ProjectPage = () => {
 							Issues
 						</Button>
 					</Button.Toggle>
-					<div className='flex items-center gap-2'>
-						<ScenarioSelector />
+					<div className='flex w-full items-center'>
+						<div className='flex flex-1 justify-center'>
+							<ScenarioSelector />
+						</div>
+						<div className='ml-4'>
+							<Button
+								onClick={() => {
+									handleProjectAssignment(selectedProject.id);
+								}}
+							>
+								Assign project to user
+							</Button>
+							<ProjectAssignmentDialog
+								isProjectAssignmentDialogOpen={isProjectAssignmentDialogOpen}
+								onClose={() => setIsProjectAssignmentDialogOpen(false)}
+							/>
+						</div>
 						{showIssuesView && (
 							<>
 								<CreateIssues />
