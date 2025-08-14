@@ -1,12 +1,13 @@
 import { cn } from '../../../utils/cn';
-import { getCardType } from '../../../utils/getCardType';
+import { getIssueCardType } from '../../../utils/getIssueCardType';
+import { getIssueColumnColor } from '../../../utils/getIssueColumnColor';
 import { Issue, IssueType } from '../../../validators';
 import { DraggableIssueContainer } from '../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../common/DroppableIssueContainer';
 
-export const IssueColumn = ({ issueType, issues, className, label }: IssueColumnProps) => {
+export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps) => {
 	return (
-		<div className='flex flex-col gap-2'>
+		<div className='flex min-w-[257px] basis-full flex-col gap-2'>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
@@ -15,10 +16,13 @@ export const IssueColumn = ({ issueType, issues, className, label }: IssueColumn
 			</div>
 			<DroppableIssueContainer
 				issueType={issueType}
-				className={cn('flex h-full flex-col gap-2 rounded-sm p-2', className)}
+				className={cn(
+					'flex h-full flex-col gap-2 rounded-sm p-2',
+					getIssueColumnColor(issueType),
+				)}
 			>
 				{issues.map((issue, index) => {
-					const Card = getCardType(issue.type);
+					const Card = getIssueCardType(issue.type);
 					return (
 						<DraggableIssueContainer
 							key={issue.id}
@@ -38,6 +42,5 @@ export const IssueColumn = ({ issueType, issues, className, label }: IssueColumn
 type IssueColumnProps = {
 	issueType: IssueType;
 	issues: Issue[];
-	className?: string;
 	label: string;
 };

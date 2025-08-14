@@ -5,18 +5,16 @@ import { UncertaintyeCard } from '../components/common/Cards/UncertaintyeCard';
 import { ValueMetricCard } from '../components/common/Cards/ValueMetricCard';
 import { IssueType } from '../validators';
 
-export const getCardType = (type?: IssueType) => {
+export const getIssueCardType = (type?: IssueType) => {
 	if (!type) return UnassignedCard;
-	switch (type) {
-		case 'Decision':
-			return DecisionCard;
-		case 'Uncertainty':
-			return UncertaintyeCard;
-		case 'Value Metric':
-			return ValueMetricCard;
-		case 'Fact':
-			return FactCard;
-		default:
-			return UnassignedCard;
-	}
+	return issueCardTypes[type];
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const issueCardTypes: Record<IssueType, React.ComponentType<any>> = {
+	Decision: DecisionCard,
+	Uncertainty: UncertaintyeCard,
+	'Value Metric': ValueMetricCard,
+	Fact: FactCard,
+	Unassigned: UnassignedCard,
 };

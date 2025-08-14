@@ -1,11 +1,11 @@
 import { uuid, z } from 'zod/v4';
 
 export const issueTypes = [
+	'Unassigned',
 	'Decision',
 	'Uncertainty',
-	'Fact',
-	'Unassigned',
 	'Value Metric',
+	'Fact',
 ] as const;
 export type IssueType = (typeof issueTypes)[number];
 
