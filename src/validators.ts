@@ -1,4 +1,4 @@
-import { uuid, z } from 'zod/v4';
+import { int, uuid, z } from 'zod/v4';
 
 export const issueTypes = [
 	'Decision',
@@ -8,6 +8,9 @@ export const issueTypes = [
 	'Value Metric',
 ] as const;
 export type IssueType = (typeof issueTypes)[number];
+
+export const roleTypes = ['contributor', 'owner'] as const;
+export type RoleType = (typeof roleTypes)[number];
 
 export const opportunitySchema = z.object({
 	id: uuid(),
@@ -96,6 +99,16 @@ export const edgeSchema = z.object({
 	tail_id: uuid(),
 	scenario_id: uuid(),
 });
+export const userSchema = z.object({
+	id: int(),
+	name: z.string(),
+	azure_id: uuid(),
+});
+export const roleAssignmentSchema = z.object({
+	user_ids: z.array(int()).min(1, 'At least one user must be selected'),
+	project_id: uuid(),
+	role: z.string().min(1, 'Role is required'),
+});
 
 export const issueSchema = z.object({
 	id: uuid(),
@@ -118,3 +131,5 @@ export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
+export type User = z.infer<typeof userSchema>;
+export type RoleAssignment = z.infer<typeof roleAssignmentSchema>;
