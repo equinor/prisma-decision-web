@@ -2,13 +2,11 @@ import { Chip } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+import { CardContainer } from './CardContainer';
 
-export const FactCard = ({ issue }: FactCardProps) => {
+export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 	return (
-		<div
-			className='bg-background-default shadow-tile
-			flex w-full max-w-[450px] min-w-[241px] cursor-grab flex-col gap-2 rounded-sm p-4'
-		>
+		<CardContainer {...rest}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Fact</Chip>
@@ -21,10 +19,11 @@ export const FactCard = ({ issue }: FactCardProps) => {
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
 			<p className='text-text-tertiary text-sm'>{issue.description}</p>
-		</div>
+		</CardContainer>
 	);
 };
 
 type FactCardProps = {
 	issue: Issue;
+	className?: string;
 };

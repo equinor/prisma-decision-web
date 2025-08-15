@@ -58,12 +58,10 @@ export const DiagramIssueCard = ({ data, selected }: NodeProps<Node<{ issue: Iss
 				id='right'
 				className='bg-primary-resting! h-3! w-3!'
 			/>
-
-			<div
+			<IssueCard
+				issue={data.issue}
 				className={`rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-			>
-				<IssueCard issue={data.issue} />
-			</div>
+			/>
 		</>
 	);
 };

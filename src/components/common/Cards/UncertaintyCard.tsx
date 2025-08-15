@@ -2,13 +2,11 @@ import { Chip } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+import { CardContainer } from './CardContainer';
 
-export const UncertaintyeCard = ({ issue }: UncertaintieCardProps) => {
+export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 	return (
-		<div
-			className='bg-background-default shadow-tile
-			flex w-full max-w-[450px] min-w-[241px] cursor-grab flex-col gap-2 rounded-sm p-4'
-		>
+		<CardContainer {...rest}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Uncertainty</Chip>
@@ -38,10 +36,11 @@ export const UncertaintyeCard = ({ issue }: UncertaintieCardProps) => {
 					</li>
 				</ul>
 			</div>
-		</div>
+		</CardContainer>
 	);
 };
 
-type UncertaintieCardProps = {
+type UncertaintyCardProps = {
 	issue: Issue;
+	className?: string;
 };
