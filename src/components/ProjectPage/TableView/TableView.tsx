@@ -1,45 +1,16 @@
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
-import { move } from '@dnd-kit/helpers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
-import { useState } from 'react';
-import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
-import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { Issue, IssueType, issueTypes } from '../../../validators';
-import { IssueColumn } from './IssueColumn';
-import { groupByIssueType } from '../../../utils/groupByIssueType';
+import { useIssueDragAndDrop } from '../../../hooks/useIssueDragAndDrop';
 import { getIssueCardType } from '../../../utils/getIssueCardType';
+import { IssueType, issueTypes } from '../../../validators';
+import { IssueColumn } from './IssueColumn';
 
 export const TableView = () => {
-	const issues = groupByIssueType(useSelectedProjectIssues());
-	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
-
-	const [tempIssues, setTempIssues] = useState<Record<IssueType, Issue[]> | null>(null);
-	const localIssues = tempIssues ? tempIssues : issues;
+	const { issues, onDragEnd, onDragOver } = useIssueDragAndDrop();
 	return (
 		<DragDropProvider
-			onDragOver={event => {
-				if (event.operation?.target?.type === 'column' && event.operation.source) {
-					event.operation.source.data.issue.type = event.operation.target.id;
-				}
-				if (event.operation?.target?.type !== 'column' && event.operation.source) {
-					event.operation.source.data.issue.type = event.operation?.target?.type;
-				}
-				const newTempIssues = tempIssues ? tempIssues : structuredClone(issues);
-
-				setTempIssues(move(newTempIssues, event));
-			}}
-			onDragEnd={() => {
-				if (!tempIssues) return;
-				Object.keys(tempIssues).forEach(key => {
-					tempIssues[key as IssueType].forEach((issue, index) => {
-						issue.type = key as IssueType;
-						issue.order = index + 1;
-					});
-				});
-				const updatedIssues = Object.values(tempIssues).flat();
-				setTempIssues(null);
-				updateIssues(updatedIssues);
-			}}
+			onDragOver={onDragOver}
+			onDragEnd={onDragEnd}
 			modifiers={[RestrictToElement]}
 		>
 			<div className='bg-background-default shadow-tile h-[calc(100vh-285px)] w-full rounded-sm p-4'>
@@ -47,7 +18,7 @@ export const TableView = () => {
 					{issueTypes.map(issueType => (
 						<IssueColumn
 							key={issueType}
-							issues={localIssues[issueType]}
+							issues={issues[issueType]}
 							issueType={issueType}
 							label={issueType}
 						/>
