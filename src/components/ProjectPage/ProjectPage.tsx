@@ -34,11 +34,7 @@ export const ProjectPage = () => {
 	if (issueView === 'diagram') activeView = 2;
 	if (isLoadingIssues || isLoadingProjects || isLoadingEdges) return <LoadingSpinner />;
 	if (!selectedProject) return;
-	console.log(projectDetailsView);
 
-	const handleProjectAssignment = (projectId: string) => {
-		setIsProjectAssignmentDialogOpen(true);
-	};
 	return (
 		<div className='mx-auto w-[min(2400px,_90%)]'>
 			<div className='flex flex-col gap-4'>
@@ -73,7 +69,7 @@ export const ProjectPage = () => {
 							<div className='ml-4'>
 								<Button
 									onClick={() => {
-										handleProjectAssignment(selectedProject.name);
+										setIsProjectAssignmentDialogOpen(true);
 									}}
 								>
 									Assign Project Role
