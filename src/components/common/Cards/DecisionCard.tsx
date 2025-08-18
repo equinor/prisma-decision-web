@@ -2,13 +2,11 @@ import { Chip } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+import { CardContainer } from './CardContainer';
 
-export const DecisionCard = ({ issue }: DecisionCardProps) => {
+export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
 	return (
-		<div
-			className='bg-background-default shadow-tile
-			flex w-full max-w-[450px] min-w-[241px] cursor-grab flex-col gap-2 rounded-sm p-4'
-		>
+		<CardContainer {...rest}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Decision</Chip>
@@ -29,10 +27,11 @@ export const DecisionCard = ({ issue }: DecisionCardProps) => {
 					<li className='bg-background-light rounded-sm px-2 py-1'>Option 3</li>
 				</ul>
 			</div>
-		</div>
+		</CardContainer>
 	);
 };
 
 type DecisionCardProps = {
 	issue: Issue;
+	className?: string;
 };
