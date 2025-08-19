@@ -66,12 +66,9 @@ export const ProjectAssignmentDialog = ({
 								name='project_id'
 								control={control}
 								render={({ field }) => (
-									<>
-										<Typography className='mr-2' {...field}>
-											{selectedProjectName}
-										</Typography>
-										
-									</>
+									<Typography className='mr-2' {...field}>
+										{selectedProjectName}
+									</Typography>
 								)}
 							/>
 						</div>
@@ -139,7 +136,6 @@ export const ProjectAssignmentDialog = ({
 										style={{ width: '50%' }}
 										options={roleTypes}
 										label='Assign Role'
-										loading={isLoadingUsers}
 										placeholder={'Search for roles'}
 										onOptionsChange={({ selectedItems }) => {
 											if (selectedItems !== undefined) {
