@@ -70,7 +70,7 @@ export const ProjectAssignmentDialog = ({
 										<Typography className='mr-2' {...field}>
 											{selectedProjectName}
 										</Typography>
-										{/* {setValue('project_id', selectedProjectId)} */}
+										
 									</>
 								)}
 							/>
