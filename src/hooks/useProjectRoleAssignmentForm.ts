@@ -5,7 +5,7 @@ import { useCreateRoleAssignment } from './api/useCreateProjectRoleAssignment';
 
 const defaultValues = {
 	user_ids: [],
-	project_id: crypto.randomUUID(),
+	project_id: '',
 	role: '',
 };
 
