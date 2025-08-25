@@ -6,12 +6,14 @@ spec:
     build:
     environments:
         - name: prod
+          build:
+            from: PROD
         - name: test
           build:
-            from: v0*   
+            from: TEST   
         - name: dev
           build:
-              from: main|dev-deploy
+              from: main
     components:
         - name: frontend
           src: .
