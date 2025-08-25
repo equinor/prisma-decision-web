@@ -6,6 +6,8 @@ export const useDeleteOpportunityStatment = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (opportunity: Opportunity) => {
+			console.log('here');
+
 			await apiClient.delete(`/opportunities/${opportunity.id}`);
 			return opportunity;
 		},

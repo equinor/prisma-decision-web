@@ -33,11 +33,18 @@ export const scenarioSchema = z.object({
 	objectives: z.array(objectiveSchema),
 	opportunities: z.array(opportunitySchema),
 });
+export const projectRoleSchema = z.object({
+	user_name: z.string(),
+	user_id: z.int(),
+	project_id: uuid(),
+	role: z.enum(roleTypes, { error: 'Role is required' }).nullable(),
+});
 
 export const projectSchema = z.object({
 	description: z.string().min(1, 'Description is required'),
 	name: z.string().min(1, 'Name is required'),
 	id: uuid(),
+	users: z.array(projectRoleSchema),
 	scenarios: z.array(scenarioSchema),
 });
 
@@ -104,11 +111,6 @@ export const userSchema = z.object({
 	name: z.string(),
 	azure_id: uuid(),
 });
-export const roleAssignmentSchema = z.object({
-	user_ids: z.array(int()).min(1, 'At least one user must be selected'),
-	project_id: uuid(),
-	role: z.string().min(1, 'Role is required'),
-});
 
 export const issueSchema = z.object({
 	id: uuid(),
@@ -132,4 +134,4 @@ export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
 export type User = z.infer<typeof userSchema>;
-export type RoleAssignment = z.infer<typeof roleAssignmentSchema>;
+export type ProjectRole = z.infer<typeof projectRoleSchema>;

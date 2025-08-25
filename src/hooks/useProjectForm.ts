@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { projectSchema } from '../validators';
+import { Project, projectSchema } from '../validators';
 import { useSelectedProject } from './useSelectedProject';
 import { useCreateProject } from './api/useCreateProject';
 import { useUpdateProject } from './api/useUpdateProject';
@@ -32,10 +32,18 @@ export const useProjectForm = () => {
 	};
 };
 
-const defaultValues = {
+const defaultValues: Project = {
 	name: '',
 	description: '',
 	id: crypto.randomUUID(),
+	users: [
+		// {
+		// 	user_id: 1,
+		// 	project_id: crypto.randomUUID(),
+		// 	azure_id: crypto.randomUUID(),
+		// 	role: 'contributor',
+		// },
+	],
 	scenarios: [
 		{
 			id: crypto.randomUUID(),
