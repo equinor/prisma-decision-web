@@ -10,24 +10,18 @@ import { useSelectedScenario } from '../../hooks/useSelectedScenario';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { CreateIssues } from './CreateIssueForm';
 import { ScenarioSelector } from './ScenarioSelector';
-import { useState } from 'react';
-import { ProjectAssignmentDialog } from './ProjectAssignmentDialog';
 
 export const ProjectPage = () => {
 	const location = useLocation();
 	const selectedScenario = useSelectedScenario();
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
-	const [projectDetailsView, setProjectDetailsView] = useLocalStorage(
-		'projectDetailsView',
-		'details',
-	);
+
 	const showIssuesView = location.pathname.includes('issues');
 	const selectedProject = useSelectedProject();
 	const { isLoading: isLoadingProjects } = useGetProjects();
 	const { isLoading: isLoadingIssues } = useGetIssues();
 
 	const { isLoading: isLoadingEdges } = useGetEdges();
-	const [isProjectAssignmentDialogOpen, setIsProjectAssignmentDialogOpen] = useState(false);
 
 	let activeView = 0;
 	if (issueView === 'table') activeView = 1;
@@ -46,7 +40,6 @@ export const ProjectPage = () => {
 						<Button
 							as={Link}
 							to={`/project/${selectedProject.id}/${selectedScenario?.id}`}
-							onClick={() => setProjectDetailsView('projectDetails')}
 						>
 							Project Details
 						</Button>
@@ -55,7 +48,6 @@ export const ProjectPage = () => {
 							to='issues'
 							onClick={() => {
 								setIssuesView('list');
-								setProjectDetailsView('');
 							}}
 						>
 							Issues
@@ -65,23 +57,7 @@ export const ProjectPage = () => {
 						<div className='flex flex-1 justify-center'>
 							<ScenarioSelector />
 						</div>
-						{projectDetailsView === 'projectDetails' && (
-							<div className='ml-4'>
-								<Button
-									onClick={() => {
-										setIsProjectAssignmentDialogOpen(true);
-									}}
-								>
-									Assign Project Role
-								</Button>
-								<ProjectAssignmentDialog
-									isProjectAssignmentDialogOpen={isProjectAssignmentDialogOpen}
-									onClose={() => setIsProjectAssignmentDialogOpen(false)}
-									selectedProjectId={selectedProject.id}
-									selectedProjectName={selectedProject.name}
-								/>
-							</div>
-						)}
+
 						{showIssuesView && (
 							<>
 								<CreateIssues />

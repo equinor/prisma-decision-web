@@ -8,8 +8,10 @@ export const useCreateProject = () => {
 	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: async (project: Project) => {
-			const res = await apiClient.post<Project[]>('/projects', [project]);
-			return res.data[0];
+			console.log(project);
+
+			// const res = await apiClient.post<Project[]>('/projects', [project]);
+			// return res.data[0];
 		},
 		onSuccess: async data => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });

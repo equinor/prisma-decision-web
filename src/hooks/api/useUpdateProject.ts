@@ -6,7 +6,9 @@ export const useUpdateProject = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (project: Project) => {
-			await apiClient.put('/projects', [project]);
+			console.log(project);
+
+			// await apiClient.put('/projects', [project]);
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['projects'] });
