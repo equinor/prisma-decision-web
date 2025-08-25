@@ -5,9 +5,13 @@ metadata:
 spec:
     build:
     environments:
+        - name: prod
+        - name: test
+          build:
+            from: v0*   
         - name: dev
           build:
-              from: main
+              from: main|dev-deploy
     components:
         - name: frontend
           src: .
