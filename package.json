@@ -10,7 +10,7 @@
 		"build:prod": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode production",
 		"build:test": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode test",
 		"release:prod": "npm run fetch-tags && git tag -f PROD && npm run push-tags",
-		"release:test": "npm run fetch-tags && git tag -f PRTEOD && npm run push-tags",
+		"release:test": "npm run fetch-tags && git tag -f TEST && npm run push-tags",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"tsc": "tsc",
 		"prettier": "prettier --check ./src",
