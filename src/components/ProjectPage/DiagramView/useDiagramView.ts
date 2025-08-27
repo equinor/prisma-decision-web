@@ -9,7 +9,7 @@ import {
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useEffect, useMemo, useRef } from 'react';
+import { MouseEvent, useEffect, useRef } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
@@ -31,13 +31,13 @@ export const useDiagramView = () => {
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 
-	const nodes = useMemo(() => convertToNodes(issues), [issues]);
-	const activeNodes = localNodes.length > 0 ? localNodes : nodes;
-	const nodeEdges = useMemo(() => convertToEdges(edges, activeNodes), [edges, activeNodes]);
-	const activeEdges = localEdges.length > 0 ? localEdges : nodeEdges;
 	useEffect(() => {
 		setLocalNodes(convertToNodes(issues));
 	}, [issues]);
+
+	useEffect(() => {
+		setEdges(convertToEdges(edges, localNodes));
+	}, [edges, localNodes]);
 
 	const onConnect: OnConnect = params => {
 		if (!selectedScenario) return;
@@ -53,8 +53,8 @@ export const useDiagramView = () => {
 		if (!selectedScenario) return;
 		updateEdge({
 			id: oldEdge.id,
-			tail_id: newConnection.source,
-			head_id: newConnection.target,
+			tail_id: newConnection.target,
+			head_id: newConnection.source,
 			scenario_id: selectedScenario.id,
 		});
 	};
@@ -64,18 +64,18 @@ export const useDiagramView = () => {
 	};
 
 	const onNodeDragStop = async () => {
-		await updateIssue(convertNodesToIssues(activeNodes));
+		await updateIssue(convertNodesToIssues(localNodes));
 	};
 
 	const onNodesChange = (changes: NodeChange[]) => {
 		onLocalNodesChange(changes);
-		const updatedEdges = convertToEdges(edges, activeNodes);
+		const updatedEdges = convertToEdges(edges, localNodes);
 		setEdges(updatedEdges);
 	};
 
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {
 		if (connection.source === connection.target) return false;
-		const edgeExists = activeEdges.some(edge => {
+		const edgeExists = localEdges.some(edge => {
 			if (draggingEdge.current && edge.id === draggingEdge.current.id) return false;
 			return (
 				(edge.source === connection.source && edge.target === connection.target) ||
@@ -85,8 +85,8 @@ export const useDiagramView = () => {
 		return !edgeExists;
 	};
 	return {
-		nodes: activeNodes,
-		edges: activeEdges,
+		nodes: localNodes,
+		edges: localEdges,
 		onConnect,
 		onReconnect,
 		onReconnectStart,
