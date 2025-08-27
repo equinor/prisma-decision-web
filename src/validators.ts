@@ -41,10 +41,12 @@ export const projectSchema = z.object({
 export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
-	alternatives: z.array(
+	options: z.array(
 		z.object({
-			name: z.string().min(1, 'Alternative name is required'),
+			name: z.string().min(1, 'Option name is required'),
+			utility: z.number(),
 			id: uuid(),
+			decision_id: uuid(),
 		}),
 	),
 });
@@ -64,10 +66,13 @@ export const utilitySchema = z.object({
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
-	probabilities: z.array(
+	outcomes: z.array(
 		z.object({
+			id: z.uuid(),
 			name: z.string().min(1, 'Outcome name is required'),
 			probability: z.number().min(0.01, 'min 0.01').max(1, 'max 1'),
+			utility: z.number(),
+			uncertainty_id: z.uuid(),
 		}),
 	),
 });
@@ -112,15 +117,15 @@ export const issueSchema = z
 	.refine(
 		data => {
 			if (data.type !== 'Uncertainty') return true;
-			const totalProbability = data.uncertainty.probabilities.reduce(
+			const totalProbability = data.uncertainty.outcomes.reduce(
 				(sum, item) => sum + item.probability,
 				0,
 			);
 			return totalProbability >= 0.999 && totalProbability <= 1.001;
 		},
 		{
-			message: 'Probabilities must sum to more than 0.999 and less than 1.001',
-			path: ['uncertainty', 'probabilities'],
+			message: 'Outcomes must sum to more than 0.999 and less than 1.001',
+			path: ['uncertainty', 'outcomes', 'sum'],
 		},
 	);
 

@@ -1,35 +1,63 @@
 import { Button, Icon, TextField } from '@equinor/eds-core-react';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useIssueFormContext } from '../../../hooks/useIssueForm';
+import { ErrorMessage } from '@hookform/error-message';
+import { FormErrorMessage } from '../FormErrorMessage';
 
 export const DecisionFormSection = () => {
 	const { control, register } = useIssueFormContext();
 	const {
-		fields: alternatives,
+		fields: options,
 		append,
 		remove,
 	} = useFieldArray({
 		control,
-		name: 'decision.alternatives',
+		name: 'decision.options',
+	});
+	const decisionId = useWatch({
+		control,
+		name: 'decision.id',
 	});
 
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Decision Details</h3>
 			<div className='grid w-full grid-cols-1 gap-4'>
-				{alternatives.map((field, index) => (
-					<div key={field.id} className='flex gap-2'>
-						<TextField
-							placeholder={`Alternative ${index + 1}...`}
-							label={`Alternative ${index + 1}`}
-							{...register(`decision.alternatives.${index}.name`)}
-							className='flex-1'
-						/>
+				{options.map((field, index) => (
+					<div key={field.id} className='relative grid grid-cols-[3fr_1fr_auto] gap-2'>
+						<div>
+							<TextField
+								placeholder={`Option ${index + 1}...`}
+								label={`Option ${index + 1}`}
+								{...register(`decision.options.${index}.name`)}
+								className='flex-1'
+							/>
+							<ErrorMessage
+								as={FormErrorMessage}
+								name={`decision.options.${index}.name`}
+							/>
+						</div>
+						<div>
+							<TextField
+								type='number'
+								label='Utility'
+								{...register(`decision.options.${index}.utility`, {
+									setValueAs: value => {
+										const num = parseFloat(value);
+										return isNaN(num) ? 0 : num;
+									},
+								})}
+							/>
+							<ErrorMessage
+								as={FormErrorMessage}
+								name={`decision.options.${index}.utility`}
+							/>
+						</div>
 						<Button
 							variant='ghost_icon'
 							onClick={() => remove(index)}
-							className='self-end'
+							className='absolute top-3.5'
 						>
 							<Icon data={delete_to_trash} />
 						</Button>
@@ -37,10 +65,17 @@ export const DecisionFormSection = () => {
 				))}
 				<Button
 					variant='outlined'
-					onClick={() => append({ name: '', id: crypto.randomUUID() })}
+					onClick={() =>
+						append({
+							name: '',
+							id: crypto.randomUUID(),
+							decision_id: decisionId,
+							utility: 0,
+						})
+					}
 					className='self-start'
 				>
-					Add Alternative
+					Add Option
 				</Button>
 			</div>
 		</div>
