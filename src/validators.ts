@@ -1,5 +1,4 @@
 import { int, uuid, z } from 'zod/v4';
-import { id } from 'zod/v4/locales';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
 export type IssueType = (typeof issueTypes)[number];
