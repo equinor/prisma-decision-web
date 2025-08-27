@@ -10,7 +10,10 @@ import { UncertaintyFormSection } from '../common/IssueFormSections/UncertaintyF
 import { ValueMetricFormSection } from '../common/IssueFormSections/ValueMetricFormSection';
 
 export const CreateIssues = () => {
-	const formMethods = useIssueForm();
+	const [isOpen, setIsOpen] = useState(false);
+	const formMethods = useIssueForm({
+		onSuccess: () => setIsOpen(false),
+	});
 	const { control, isPending, onSubmit } = formMethods;
 	const selectedType = useWatch({
 		control,
@@ -18,7 +21,6 @@ export const CreateIssues = () => {
 	});
 	const referenceElement = useRef<HTMLButtonElement>(null);
 
-	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<>
 			<Button

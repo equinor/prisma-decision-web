@@ -7,13 +7,12 @@ import { useUpdateIssue } from './api/useUpdateIssue';
 import { useSelectedScenario } from './useSelectedScenario';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
-export const useIssueForm = (issue?: Issue) => {
+export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	const selectedScenario = useSelectedScenario();
 	const defaultValues = useMemo(
 		() => getDefaultValues(selectedScenario?.id || crypto.randomUUID()),
 		[],
 	);
-
 	const formMethods = useForm({
 		values: { ...defaultValues, ...issue },
 		resolver: zodResolver(issueSchema),
@@ -21,6 +20,7 @@ export const useIssueForm = (issue?: Issue) => {
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
 			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
+			onSuccess?.();
 		},
 	});
 
@@ -85,4 +85,9 @@ const getDefaultValues = (scenarioId: string): Issue => {
 			},
 		},
 	};
+};
+
+type UseIssueFormArgs = {
+	issue?: Issue;
+	onSuccess?: () => void;
 };

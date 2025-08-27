@@ -9,9 +9,9 @@ export const useCreateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 			const res = await apiClient.post('/issues', [issue]);
 			return res.data[0];
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['issues'] });
 			onSuccess?.();
-			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});
 };

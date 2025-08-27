@@ -15,7 +15,7 @@ interface EditIssueModalProps {
 
 export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const formMethods = useIssueForm(issue);
+	const formMethods = useIssueForm({ issue });
 	const { control, onSubmit, isPending } = formMethods;
 	const selectedType = useWatch({
 		control,
