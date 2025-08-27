@@ -3,6 +3,7 @@ import {
 	Button,
 	CircularProgress,
 	DatePicker,
+	Icon,
 	Table,
 	TextField,
 	Typography,
@@ -14,7 +15,8 @@ import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { useGetUsers } from '../../hooks/api/useGetUsers';
 import { useState } from 'react';
 import { useController } from 'react-hook-form';
-import { ProjectRole, roleTypes } from '../../validators';
+import { ProjectRole, RoleType, roleTypes, User } from '../../validators';
+import { add } from '@equinor/eds-icons';
 
 export const ProjectInformation = () => {
 	const {
@@ -26,10 +28,11 @@ export const ProjectInformation = () => {
 		formState: { errors },
 	} = useProjectForm();
 	const { users, isLoading: isLoadingUsers } = useGetUsers();
-	const [selectedUsers, setSelectedUser] = useState<ProjectRole[]>();
-	const [isOptionChanged, setIsOptionChanged] = useState<boolean>(false);
+	const [selectedUsers, setSelectedUser] = useState<User[]>([]);
+	const [selectedUsersWithoutRole, setSelectedUserWithoutRole] = useState<ProjectRole[]>();
+	const [selectedUsersWithRole, setSelectedUserWithRole] = useState<ProjectRole[]>();
+	const [selectedRole, setSelectedRole] = useState<RoleType>();
 	const selectedProject = useSelectedProject();
-
 	const {
 		field: { value: usersValue, onChange: setUser },
 	} = useController({
@@ -40,7 +43,40 @@ export const ProjectInformation = () => {
 	const handleDeleteUser = (user: ProjectRole) => {
 		setUser(usersValue.filter(u => u.user_id !== user.user_id));
 	};
-
+	const handleRoleCreate = (role: RoleType | undefined) => () => {
+		if (role !== undefined && role) {
+			if (selectedUsersWithoutRole && selectedUsersWithoutRole.length > 0) {
+				const userWithRole: ProjectRole[] = selectedUsersWithoutRole.map(selectedUser => ({
+					...selectedUser,
+					role: role,
+				}));
+				setSelectedUserWithRole(userWithRole);
+				if (selectedProject) {
+					if (selectedUsersWithRole && selectedUsersWithRole.length > 0) {
+						const mergeUser = [
+							...selectedProject.users,
+							...userWithRole,
+							...selectedUsersWithRole,
+						];
+						setUser(mergeUser);
+					} else {
+						const mergeUser = [...selectedProject.users, ...userWithRole];
+						setUser(mergeUser);
+					}
+				} else {
+					if (selectedUsersWithRole && selectedUsersWithRole.length > 0) {
+						const mergeUser = [...userWithRole, ...selectedUsersWithRole];
+						setUser(mergeUser);
+					} else {
+						const mergeUser = [...userWithRole];
+						setUser(mergeUser);
+					}
+				}
+				setSelectedUser([]);
+				setSelectedRole(undefined);
+			}
+		}
+	};
 	return (
 		<form
 			onSubmit={handleSubmit}
@@ -74,91 +110,68 @@ export const ProjectInformation = () => {
 					/>
 					<ErrorMessage as={FormErrorMessage} name='description' errors={errors} />
 				</div>
-				<Autocomplete
-					itemToKey={user => user?.id}
-					options={users}
-					optionLabel={user => user.name}
-					label='Assign Users'
-					loading={isLoadingUsers}
-					multiple
-					placeholder={'Search for users'}
-					onOptionsChange={({ selectedItems }) => {
-						const userWithRole: ProjectRole[] = selectedItems.map(user => ({
-							user_name: user.name,
-							user_id: user.id,
-							project_id: getValues('id'),
-							role: null,
-						}));
-						if (isOptionChanged) {
-							setSelectedUser((prev: ProjectRole[] | undefined) => [
-								...(prev || []),
-								...userWithRole,
-							]);
-						} else {
-							setSelectedUser(userWithRole);
-						}
-						setIsOptionChanged(true);
-					}}
-				/>
-				<Autocomplete
-					options={roleTypes}
-					label='Assign Role'
-					placeholder={'Search for roles'}
-					onOptionsChange={({ selectedItems }) => {
-						if (selectedItems !== undefined && selectedUsers) {
-							if (selectedUsers && selectedUsers.length > 0) {
-								const userWithRole: ProjectRole[] = selectedUsers.map(
-									selectedUser => ({
-										...selectedUser,
-										role: selectedItems[0],
-									}),
-								);
-								// // Remove duplicates by user_id and role
-								// const uniqueUserWithRole = userWithRole.filter(
-								// 	(user, index, self) =>
-								// 		self.findIndex(
-								// 			u => u.user_id === user.user_id && u.role === user.role,
-								// 		) === index,
-								// );
-								// console.log(uniqueUserWithRole);
+				<div className='col-span-1 flex w-full flex-row items-end gap-8 md:col-span-2'>
+					<Autocomplete
+						itemToKey={user => user?.id}
+						options={users}
+						optionLabel={user => user.name}
+						label='Assign Users'
+						loading={isLoadingUsers}
+						multiple={true}
+						placeholder={'Search for users'}
+						onOptionsChange={({ selectedItems }) => {
+							const userWithRole: ProjectRole[] = selectedItems.map(user => ({
+								id: crypto.randomUUID(),
+								user_name: user.name,
+								user_id: user.id,
+								azure_id: user.azure_id,
+								project_id: selectedProject ? selectedProject.id : getValues('id'),
+								role: null,
+							}));
 
-								if (selectedProject) {
-									const mergeUser = [...selectedProject.users, ...userWithRole];
-									setUser(mergeUser);
-								} else {
-									setUser(userWithRole);
-								}
-							}
-						}
-					}}
-				/>
-				{selectedProject && (
-					<Table>
-						<Table.Caption>
-							<Typography variant='h2'>Project Roles</Typography>
-						</Table.Caption>
-						<Table.Head>
-							<Table.Row>
-								<Table.Cell>User Name</Table.Cell>
-								<Table.Cell>Role</Table.Cell>
-								<Table.Cell>Action</Table.Cell>
+							setSelectedUserWithoutRole(userWithRole);
+							setSelectedUser(selectedItems);
+						}}
+						selectedOptions={selectedUsers}
+					/>
+					<Autocomplete
+						options={roleTypes}
+						label='Assign Role'
+						placeholder={'Search for roles'}
+						onOptionsChange={({ selectedItems }) => {
+							setSelectedRole(selectedItems[0]);
+						}}
+						selectedOptions={selectedRole ? [selectedRole] : []}
+					/>
+					<Button className='mt-4' onClick={handleRoleCreate(selectedRole)}>
+						<Icon data={add} />
+						Add
+					</Button>
+				</div>
+				<Table>
+					<Table.Caption>
+						<Typography variant='h2'>Project Roles</Typography>
+					</Table.Caption>
+					<Table.Head>
+						<Table.Row>
+							<Table.Cell>User Name</Table.Cell>
+							<Table.Cell>Role</Table.Cell>
+							<Table.Cell>Action</Table.Cell>
+						</Table.Row>
+					</Table.Head>
+					<Table.Body>
+						{usersValue.map(user => (
+							<Table.Row key={user.user_id + (user.role ?? 'NoRole')}>
+								<Table.Cell>{user.user_name}</Table.Cell>
+								<Table.Cell>{user.role}</Table.Cell>
+								<Table.Cell>
+									<Button onClick={() => handleDeleteUser(user)}>Delete</Button>
+								</Table.Cell>
 							</Table.Row>
-						</Table.Head>
-						<Table.Body>
-							{usersValue.map(user => (
-								<Table.Row key={user.user_id + (user.role ?? 'NoRole')}>
-									<Table.Cell>{user.user_name}</Table.Cell>
-									<Table.Cell>{user.role}</Table.Cell>
-									<Table.Cell>
-										<Button onClick={() => handleDeleteUser(user)}>
-											Delete
-										</Button>
-									</Table.Cell>
-								</Table.Row>
-							))}
-						</Table.Body>
-					</Table>
-				)}
+						))}
+					</Table.Body>
+				</Table>
+
 				<ErrorMessage as={FormErrorMessage} name='users.0.role' errors={errors} />
 
 				<Button

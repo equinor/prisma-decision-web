@@ -1,4 +1,5 @@
 import { int, uuid, z } from 'zod/v4';
+import { id } from 'zod/v4/locales';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
 export type IssueType = (typeof issueTypes)[number];
@@ -28,8 +29,10 @@ export const scenarioSchema = z.object({
 	opportunities: z.array(opportunitySchema),
 });
 export const projectRoleSchema = z.object({
+	id: uuid(),
 	user_name: z.string(),
 	user_id: z.int(),
+	azure_id: uuid(),
 	project_id: uuid(),
 	role: z.enum(roleTypes, { error: 'Role is required' }).nullable(),
 });
