@@ -55,12 +55,12 @@ const getDefaultValues = (scenarioId: string): Issue => {
 		decision: {
 			id: crypto.randomUUID(),
 			issue_id: crypto.randomUUID(),
-			alternatives: [],
+			options: [],
 		},
 		uncertainty: {
 			id: crypto.randomUUID(),
 			issue_id: crypto.randomUUID(),
-			probabilities: [],
+			outcomes: [],
 		},
 		utility: {
 			id: crypto.randomUUID(),

@@ -5,6 +5,7 @@ import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
 
 export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
+	const hasOutcomes = issue.uncertainty.outcomes.length > 0;
 	return (
 		<CardContainer {...rest}>
 			<div className='flex items-center justify-between'>
@@ -20,21 +21,22 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 			<h3 className='font-semibold '>{issue.name}</h3>
 			<p className='text-text-tertiary text-sm'>{issue.description}</p>
 			<div className='flex flex-col gap-2'>
-				<h4 className='text-sm font-medium'>Outcomes:</h4>
-				<ul className='flex flex-col gap-2 rounded-sm text-sm'>
-					<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-						<p>Outcome 1</p>
-						<p>20%</p>
-					</li>
-					<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-						<p>Outcome 2</p>
-						<p>30%</p>
-					</li>
-					<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-						<p>Outcome 3</p>
-						<p>55%</p>
-					</li>
-				</ul>
+				{hasOutcomes && (
+					<ul className='flex flex-col gap-2 rounded-sm text-sm'>
+						{issue.uncertainty.outcomes.map(outcome => (
+							<li
+								key={outcome.id}
+								className='bg-background-light grid grid-cols-[1fr_1fr_1fr] items-center justify-end gap-2 rounded-sm px-2 py-1'
+							>
+								<p className='truncate'>{outcome.name}</p>
+								<p className='place-self-center truncate'>
+									{outcome.probability * 100}%
+								</p>
+								<p className='place-self-end truncate'>{outcome.utility}</p>
+							</li>
+						))}
+					</ul>
+				)}
 			</div>
 		</CardContainer>
 	);

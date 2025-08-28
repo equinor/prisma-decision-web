@@ -1,5 +1,5 @@
 import { Button, Icon, TextField } from '@equinor/eds-core-react';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useIssueFormContext } from '../../../hooks/useIssueForm';
@@ -7,26 +7,33 @@ import { FormErrorMessage } from '../FormErrorMessage';
 
 export const UncertaintyFormSection = () => {
 	const { control, register } = useIssueFormContext();
-	const probabilitiesArray = useFieldArray({
+	const outcomesArray = useFieldArray({
 		control,
-		name: 'uncertainty.probabilities',
+		name: 'uncertainty.outcomes',
+	});
+	const uncertaintyId = useWatch({
+		control,
+		name: 'uncertainty.id',
 	});
 
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
 			<div className='grid grid-cols-1 gap-4'>
-				{probabilitiesArray.fields.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[3fr_1fr_auto] gap-2'>
+				{outcomesArray.fields.map((field, index) => (
+					<div
+						key={field.id}
+						className='relative grid grid-cols-[3fr_1fr_1fr_auto] gap-2'
+					>
 						<div>
 							<TextField
 								placeholder={`Outcome ${index + 1}...`}
 								label={`Outcome ${index + 1} Name`}
-								{...register(`uncertainty.probabilities.${index}.name`)}
+								{...register(`uncertainty.outcomes.${index}.name`)}
 							/>
 							<ErrorMessage
 								as={FormErrorMessage}
-								name={`uncertainty.probabilities.${index}.name`}
+								name={`uncertainty.outcomes.${index}.name`}
 							/>
 						</div>
 						<div>
@@ -36,7 +43,7 @@ export const UncertaintyFormSection = () => {
 								min={0}
 								max={1}
 								label='Probability'
-								{...register(`uncertainty.probabilities.${index}.probability`, {
+								{...register(`uncertainty.outcomes.${index}.probability`, {
 									setValueAs: value => {
 										const num = parseFloat(value);
 										return isNaN(num) ? 0 : num;
@@ -45,12 +52,28 @@ export const UncertaintyFormSection = () => {
 							/>
 							<ErrorMessage
 								as={FormErrorMessage}
-								name={`uncertainty.probabilities.${index}.probability`}
+								name={`uncertainty.outcomes.${index}.probability`}
+							/>
+						</div>
+						<div>
+							<TextField
+								type='number'
+								label='Utility'
+								{...register(`uncertainty.outcomes.${index}.utility`, {
+									setValueAs: value => {
+										const num = parseFloat(value);
+										return isNaN(num) ? 0 : num;
+									},
+								})}
+							/>
+							<ErrorMessage
+								as={FormErrorMessage}
+								name={`uncertainty.outcomes.${index}.utility`}
 							/>
 						</div>
 						<Button
 							variant='ghost_icon'
-							onClick={() => probabilitiesArray.remove(index)}
+							onClick={() => outcomesArray.remove(index)}
 							className='absolute top-3.5'
 						>
 							<Icon data={delete_to_trash} />
@@ -59,12 +82,20 @@ export const UncertaintyFormSection = () => {
 				))}
 				<Button
 					variant='outlined'
-					onClick={() => probabilitiesArray.append({ name: '', probability: 0 })}
+					onClick={() =>
+						outcomesArray.append({
+							name: '',
+							probability: 0,
+							utility: 0,
+							id: crypto.randomUUID(),
+							uncertainty_id: uncertaintyId,
+						})
+					}
 					className='self-start'
 				>
 					Add Outcome
 				</Button>
-				<ErrorMessage as={FormErrorMessage} name={'uncertainty.probabilities.root'} />
+				<ErrorMessage as={FormErrorMessage} name={'uncertainty.outcomes.sum'} />
 			</div>
 		</div>
 	);
