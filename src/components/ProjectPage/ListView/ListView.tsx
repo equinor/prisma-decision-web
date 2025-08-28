@@ -2,7 +2,6 @@ import { DecisionList } from './DecisionList';
 import { FactList } from './FactList';
 import { UnassignedList } from './UnassignedList';
 import { UncertaintyList } from './UncertaintyList';
-import { ValueMetricList } from './ValueMetricList';
 
 export const ListView = () => {
 	return (
@@ -10,7 +9,6 @@ export const ListView = () => {
 			<UnassignedList />
 			<DecisionList />
 			<UncertaintyList />
-			<ValueMetricList />
 			<FactList />
 		</>
 	);

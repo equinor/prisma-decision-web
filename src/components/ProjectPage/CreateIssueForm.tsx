@@ -7,7 +7,6 @@ import { useIssueForm } from '../../hooks/useIssueForm';
 import { DecisionFormSection } from '../common/IssueFormSections/DecisionFormSection';
 import { IssueFormSection } from '../common/IssueFormSections/IssueFormSection';
 import { UncertaintyFormSection } from '../common/IssueFormSections/UncertaintyFormSection';
-import { ValueMetricFormSection } from '../common/IssueFormSections/ValueMetricFormSection';
 
 export const CreateIssues = () => {
 	const formMethods = useIssueForm();
@@ -61,7 +60,6 @@ export const CreateIssues = () => {
 							<IssueFormSection />
 							{selectedType === 'Decision' && <DecisionFormSection />}
 							{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
-							{selectedType === 'Value Metric' && <ValueMetricFormSection />}
 							<Button className='md:self-end' type='submit'>
 								{isPending ? <CircularProgress size={16} /> : 'Add Issue'}
 							</Button>
