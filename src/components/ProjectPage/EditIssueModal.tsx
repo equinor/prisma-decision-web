@@ -7,7 +7,6 @@ import { Issue } from '../../validators';
 import { DecisionFormSection } from '../common/IssueFormSections/DecisionFormSection';
 import { IssueFormSection } from '../common/IssueFormSections/IssueFormSection';
 import { UncertaintyFormSection } from '../common/IssueFormSections/UncertaintyFormSection';
-import { ValueMetricFormSection } from '../common/IssueFormSections/ValueMetricFormSection';
 
 interface EditIssueModalProps {
 	issue: Issue;
@@ -49,7 +48,6 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 								<IssueFormSection />
 								{selectedType === 'Decision' && <DecisionFormSection />}
 								{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
-								{selectedType === 'Value Metric' && <ValueMetricFormSection />}
 								<div className='flex justify-end gap-2'>
 									<Button variant='outlined' onClick={handleClose}>
 										Cancel

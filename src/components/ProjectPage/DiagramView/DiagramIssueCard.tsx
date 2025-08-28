@@ -60,7 +60,7 @@ export const DiagramIssueCard = ({ data, selected }: NodeProps<Node<{ issue: Iss
 			/>
 			<IssueCard
 				issue={data.issue}
-				className={`rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				className={`max-w-[350px] rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
 			/>
 		</>
 	);

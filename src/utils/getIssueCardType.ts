@@ -2,7 +2,6 @@ import { DecisionCard } from '../components/common/Cards/DecisionCard';
 import { FactCard } from '../components/common/Cards/FactCard';
 import { UnassignedCard } from '../components/common/Cards/UnassignedCard';
 import { UncertaintyCard } from '../components/common/Cards/UncertaintyCard';
-import { ValueMetricCard } from '../components/common/Cards/ValueMetricCard';
 import { IssueType } from '../validators';
 
 export const getIssueCardType = (type?: IssueType) => {
@@ -14,7 +13,6 @@ export const getIssueCardType = (type?: IssueType) => {
 const issueCardTypes: Record<IssueType, React.ComponentType<any>> = {
 	Decision: DecisionCard,
 	Uncertainty: UncertaintyCard,
-	'Value Metric': ValueMetricCard,
 	Fact: FactCard,
 	Unassigned: UnassignedCard,
 };
