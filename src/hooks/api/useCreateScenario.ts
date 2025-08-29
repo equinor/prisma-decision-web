@@ -9,8 +9,8 @@ export const useCreateScenario = (onSuccess?: (data: Scenario) => void) => {
 			const res = await apiClient.post<Scenario[]>('/scenarios', [scenario]);
 			return res.data[0];
 		},
-		onSuccess: data => {
-			queryClient.refetchQueries({ queryKey: ['scenarios'] });
+		onSuccess: async data => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			onSuccess?.(data);
 		},
 	});
