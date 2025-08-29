@@ -5,8 +5,8 @@ export const getIssueColumnColor = (issueType: IssueType) => {
 };
 
 const issueColumnColor: Record<IssueType, string> = {
-	Unassigned: 'bg-blue-400/20',
-	Decision: 'bg-red-400/20',
-	Uncertainty: 'bg-pink-400/20',
-	Fact: 'bg-cyan-400/20',
+	Unassigned: 'bg-red-300/25',
+	Decision: 'bg-yellow-300/25',
+	Uncertainty: 'bg-green-300/25',
+	Fact: 'bg-gray-300/25',
 };
