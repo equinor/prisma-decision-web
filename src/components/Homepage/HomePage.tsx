@@ -1,8 +1,9 @@
 import { Search } from '@equinor/eds-core-react';
 import { useState } from 'react';
-import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
+import { useGetIssues } from '../../hooks/api/useGetIssues';
+import { useGetEdges } from '../../hooks/api/useGetEdges';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -11,6 +12,7 @@ export const HomePage = () => {
 		project.name.toLowerCase().includes(searchTerm.toLowerCase()),
 	);
 	useGetIssues();
+	useGetEdges();
 	return (
 		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-12'>

@@ -32,7 +32,7 @@ export const IssueFormSection = () => {
 			<TextField placeholder='Enter label...' label='Label' />
 			<div>
 				<Autocomplete
-					label='Category'
+					label='Issue Type'
 					options={issueTypes}
 					hideClearButton
 					selectedOptions={[selectedType]}

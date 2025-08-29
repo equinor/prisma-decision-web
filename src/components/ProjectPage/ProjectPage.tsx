@@ -2,6 +2,7 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { category, view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, Outlet, useLocation } from 'react-router';
+import { useGetEdges } from '../../hooks/api/useGetEdges';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { useSelectedProject } from '../../hooks/useSelectedProject';
@@ -18,10 +19,12 @@ export const ProjectPage = () => {
 	const selectedProject = useSelectedProject();
 	const { isLoading: isLoadingProjects } = useGetProjects();
 	const { isLoading: isLoadingIssues } = useGetIssues();
+
+	const { isLoading: isLoadingEdges } = useGetEdges();
 	let activeView = 0;
 	if (issueView === 'table') activeView = 1;
 	if (issueView === 'diagram') activeView = 2;
-	if (isLoadingIssues || isLoadingProjects) return <LoadingSpinner />;
+	if (isLoadingIssues || isLoadingProjects || isLoadingEdges) return <LoadingSpinner />;
 	if (!selectedProject) return;
 
 	return (
