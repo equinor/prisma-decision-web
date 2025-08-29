@@ -1,5 +1,5 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { view_column, view_list } from '@equinor/eds-icons';
+import { category, view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { Link, Outlet, useLocation } from 'react-router';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
@@ -7,7 +7,6 @@ import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { useSelectedScenario } from '../../hooks/useSelectedScenario';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { NetworkIcon } from '../common/NetworkIcon';
 import { CreateIssues } from './CreateIssueForm';
 import { ScenarioSelector } from './ScenarioSelector';
 
@@ -56,7 +55,7 @@ export const ProjectPage = () => {
 										<Icon data={view_column} />
 									</Button>
 									<Button onClick={() => setIssuesView('diagram')}>
-										<NetworkIcon />
+										<Icon data={category} />
 									</Button>
 								</Button.Toggle>
 							</>
