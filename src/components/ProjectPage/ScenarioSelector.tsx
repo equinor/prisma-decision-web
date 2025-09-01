@@ -7,10 +7,10 @@ import { useSelectedScenario } from '../../hooks/useSelectedScenario';
 export const ScenarioSelector = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const isIssuePage = location.pathname.includes('issues');
 	const selectedProject = useSelectedProject();
 	const selectedScenario = useSelectedScenario();
 	const { mutate: createScenario, isPending } = useCreateScenario(data => {
+		const isIssuePage = location.pathname.includes('issues');
 		if (!isIssuePage) return navigate(`/project/${data.project_id}/${data.id}`);
 		navigate(`/project/${data.project_id}/${data.id}/issues`);
 	});
@@ -35,11 +35,14 @@ export const ScenarioSelector = () => {
 				optionLabel={option => option.name}
 				label='Selected Scenario'
 				onOptionsChange={({ selectedItems }) => {
-					if (selectedItems[0]) {
-						navigate(`../${selectedItems[0].id}`, {
-							relative: 'path',
-						});
-					}
+					if (!selectedItems[0]) return;
+					const isNewOption = !selectedProject.scenarios.find(
+						scenario => scenario.id === selectedItems[0].id,
+					);
+					if (isNewOption) return;
+					navigate(`../${selectedItems[0].id}`, {
+						relative: 'path',
+					});
 				}}
 			/>
 		</div>
