@@ -11,9 +11,10 @@ export const useCreateProject = () => {
 			const res = await apiClient.post<Project[]>('/projects', [project]);
 			return res.data[0];
 		},
-		onSuccess: data => {
-			queryClient.refetchQueries({ queryKey: ['projects'] });
-			navigate(`/project/${data.id}`);
+		onSuccess: async data => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
+			const mainScenario = data.scenarios.find(scenario => scenario.name === 'main');
+			navigate(`/project/${data.id}/${mainScenario?.id}`);
 		},
 	});
 };
