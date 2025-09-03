@@ -18,7 +18,7 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
-			<p className='text-text-tertiary text-sm'>{issue.description}</p>
+			<p className='text-text-tertiary line-clamp-2 text-sm'>{issue.description}</p>
 		</CardContainer>
 	);
 };

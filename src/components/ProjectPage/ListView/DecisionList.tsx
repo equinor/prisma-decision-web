@@ -66,16 +66,16 @@ export const DecisionList = () => {
 												{issue.description}
 											</Table.Cell>
 											<Table.Cell>
-												<ul className='flex flex-col gap-2 py-4'>
-													<li className='bg-background-light rounded-sm px-2 py-1'>
-														Option 1
-													</li>
-													<li className='bg-background-light rounded-sm px-2 py-1'>
-														Option 2
-													</li>
-													<li className='bg-background-light rounded-sm px-2 py-1'>
-														Option 3
-													</li>
+												<ul className='flex flex-col gap-2 py-4 text-sm'>
+													{issue.decision.options.map(option => (
+														<li
+															key={option.id}
+															className='bg-background-light flex justify-between rounded-sm px-2 py-1'
+														>
+															<p>{option.name}</p>
+															<p>{option.utility}</p>
+														</li>
+													))}
 												</ul>
 											</Table.Cell>
 											<Table.Cell>{issue.boundary}</Table.Cell>
