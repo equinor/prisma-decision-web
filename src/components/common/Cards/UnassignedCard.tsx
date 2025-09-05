@@ -10,7 +10,7 @@ export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Unassigned</Chip>
-					<Chip>{issue.boundary}</Chip>
+					<Chip className='capitalize'>{issue.boundary}</Chip>
 				</div>
 				<div>
 					<EditIssueModal issue={issue} />

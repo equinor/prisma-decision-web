@@ -15,7 +15,7 @@ export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Decision</Chip>
-					<Chip>{issue.boundary}</Chip>
+					<Chip className='capitalize'>{issue.boundary}</Chip>
 				</div>
 				<div>
 					<EditIssueModal issue={issue} />
