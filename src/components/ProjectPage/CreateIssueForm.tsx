@@ -32,7 +32,7 @@ export const CreateIssues = () => {
 			</Button>
 			<Popover
 				open={isOpen}
-				onClick={() => setIsOpen(true)}
+				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
 			>
 				<Popover.Content className='relative w-[min(543px,_90vw)]'>
