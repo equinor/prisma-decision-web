@@ -27,13 +27,17 @@ export const scenarioSchema = z.object({
 	objectives: z.array(objectiveSchema),
 	opportunities: z.array(opportunitySchema),
 });
-export const projectRoleSchema = z.object({
-	id: uuid(),
+export const userSchema = z.object({
+	user_id: int(),
 	user_name: z.string(),
-	user_id: z.int(),
 	azure_id: uuid(),
+});
+
+export const projectRoleSchema = z.object({
+	...userSchema.shape,
+	id: uuid(),
 	project_id: uuid(),
-	role: z.enum(roleTypes, { error: 'Role is required' }).nullable(),
+	role: z.enum(roleTypes, { error: 'Role is required' }),
 });
 
 export const projectSchema = z.object({
@@ -103,11 +107,6 @@ export const edgeSchema = z.object({
 	head_id: uuid(),
 	tail_id: uuid(),
 	scenario_id: uuid(),
-});
-export const userSchema = z.object({
-	id: int(),
-	name: z.string(),
-	azure_id: uuid(),
 });
 
 export const issueSchema = z

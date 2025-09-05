@@ -5,9 +5,13 @@ import { User } from '../../validators';
 export const useGetUsers = () => {
 	const { data = [], ...rest } = useQuery({
 		queryKey: ['users'],
-		queryFn: async () => {
-			const res = await apiClient.get<User[]>('/users');
-			return res.data;
+		queryFn: async (): Promise<User[]> => {
+			const res = await apiClient.get<UserResponse[]>('/users');
+			return res.data.map(user => ({
+				user_id: user.id,
+				user_name: user.name,
+				azure_id: user.azure_id,
+			}));
 		},
 	});
 
@@ -15,4 +19,10 @@ export const useGetUsers = () => {
 		users: data,
 		...rest,
 	};
+};
+
+type UserResponse = {
+	id: number;
+	name: string;
+	azure_id: string;
 };

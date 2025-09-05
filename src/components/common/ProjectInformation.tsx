@@ -8,15 +8,14 @@ import {
 	TextField,
 	Typography,
 } from '@equinor/eds-core-react';
+import { add } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
-import { useProjectForm } from '../../hooks/useProjectForm';
-import { FormErrorMessage } from './FormErrorMessage';
-import { useSelectedProject } from '../../hooks/useSelectedProject';
-import { useGetUsers } from '../../hooks/api/useGetUsers';
 import { useState } from 'react';
 import { useController } from 'react-hook-form';
+import { useGetUsers } from '../../hooks/api/useGetUsers';
+import { useProjectForm } from '../../hooks/useProjectForm';
 import { ProjectRole, RoleType, roleTypes, User } from '../../validators';
-import { add } from '@equinor/eds-icons';
+import { FormErrorMessage } from './FormErrorMessage';
 
 export const ProjectInformation = () => {
 	const {
@@ -29,10 +28,7 @@ export const ProjectInformation = () => {
 	} = useProjectForm();
 	const { users, isLoading: isLoadingUsers } = useGetUsers();
 	const [selectedUsers, setSelectedUser] = useState<User[]>([]);
-	const [selectedUsersWithoutRole, setSelectedUserWithoutRole] = useState<ProjectRole[]>();
-	const [selectedUsersWithRole, setSelectedUserWithRole] = useState<ProjectRole[]>();
 	const [selectedRole, setSelectedRole] = useState<RoleType>();
-	const selectedProject = useSelectedProject();
 	const {
 		field: { value: usersValue, onChange: setUser },
 	} = useController({
@@ -43,23 +39,25 @@ export const ProjectInformation = () => {
 	const handleDeleteUser = (user: ProjectRole) => {
 		setUser(usersValue.filter(u => u.user_id !== user.user_id));
 	};
-	const handleRoleCreate = (role: RoleType | undefined) => () => {
-		if (role !== undefined && role) {
-			if (selectedUsersWithoutRole && selectedUsersWithoutRole.length > 0) {
-				const userWithRole: ProjectRole[] = selectedUsersWithoutRole.map(selectedUser => ({
-					...selectedUser,
-					role: role,
-				}));
-				const existingUsers = selectedProject ? selectedProject.users : [];
-				const additionalUsers = selectedUsersWithRole ?? [];
-				const mergeUser = [...existingUsers, ...userWithRole, ...additionalUsers];
-				setSelectedUserWithRole(prev =>
-					prev ? [...prev, ...userWithRole] : [...userWithRole],
-				);
-				setUser(mergeUser);
-				setSelectedUser([]);
-				setSelectedRole(undefined);
-			}
+	const handleRoleCreate = () => {
+		if (selectedRole && selectedUsers.length > 0) {
+			const userWithRole: ProjectRole[] = selectedUsers.map(user => {
+				return {
+					id: crypto.randomUUID(),
+					project_id: getValues('id'),
+					role: selectedRole,
+					...user,
+				};
+			});
+			const mergeUser = [...usersValue, ...userWithRole].reduce((acc, user) => {
+				if (!acc[user.user_id]) {
+					acc[user.user_id] = user;
+				}
+				return acc;
+			}, [] as ProjectRole[]);
+			setUser(mergeUser);
+			setSelectedUser([]);
+			setSelectedRole(undefined);
 		}
 	};
 	return (
@@ -98,24 +96,16 @@ export const ProjectInformation = () => {
 			</div>
 			<div className='grid w-full gap-4 md:grid-cols-[1fr_1fr_auto]'>
 				<Autocomplete
-					itemToKey={user => user?.id}
-					options={users}
-					optionLabel={user => user.name}
+					itemToKey={user => user?.user_id}
+					options={users.filter(
+						user => !usersValue.some(u => u.user_id === user.user_id),
+					)}
+					optionLabel={user => user.user_name}
 					label='Assign Users'
 					loading={isLoadingUsers}
 					multiple={true}
 					placeholder={'Search for users'}
 					onOptionsChange={({ selectedItems }) => {
-						const userWithRole: ProjectRole[] = selectedItems.map(user => ({
-							id: crypto.randomUUID(),
-							user_name: user.name,
-							user_id: user.id,
-							azure_id: user.azure_id,
-							project_id: selectedProject ? selectedProject.id : getValues('id'),
-							role: null,
-						}));
-
-						setSelectedUserWithoutRole(userWithRole);
 						setSelectedUser(selectedItems);
 					}}
 					selectedOptions={selectedUsers}
@@ -129,7 +119,7 @@ export const ProjectInformation = () => {
 					}}
 					selectedOptions={selectedRole ? [selectedRole] : []}
 				/>
-				<Button className='mt-4!' onClick={handleRoleCreate(selectedRole)}>
+				<Button className='mt-4!' onClick={handleRoleCreate}>
 					<Icon data={add} />
 					Add
 				</Button>
@@ -147,7 +137,7 @@ export const ProjectInformation = () => {
 				</Table.Head>
 				<Table.Body>
 					{usersValue.map(user => (
-						<Table.Row key={user.user_id + (user.role ?? 'NoRole')}>
+						<Table.Row key={user.user_id + user.role}>
 							<Table.Cell>{user.user_name}</Table.Cell>
 							<Table.Cell>{user.role}</Table.Cell>
 							<Table.Cell>
@@ -157,8 +147,6 @@ export const ProjectInformation = () => {
 					))}
 				</Table.Body>
 			</Table>
-
-			<ErrorMessage as={FormErrorMessage} name='users.0.role' errors={errors} />
 
 			<Button
 				className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'
