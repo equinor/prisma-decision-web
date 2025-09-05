@@ -19,7 +19,7 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
-		"@azure/msal-browser": "^4.21.0",
+		"@azure/msal-browser": "^4.22.0",
 		"@azure/msal-react": "^3.0.19",
 		"@dnd-kit/abstract": "^0.1.21",
 		"@dnd-kit/collision": "^0.1.21",
@@ -29,7 +29,7 @@
 		"@hookform/error-message": "^2.0.1",
 		"@hookform/resolvers": "^5.2.1",
 		"@radix-ui/react-collapsible": "^1.1.12",
-		"@tanstack/react-query": "^5.85.5",
+		"@tanstack/react-query": "^5.87.0",
 		"@uidotdev/usehooks": "^2.4.1",
 		"@xyflow/react": "^12.8.4",
 		"axios": "^1.11.0",
@@ -39,26 +39,26 @@
 		"react-hook-form": "^7.62.0",
 		"react-router": "^7.8.2",
 		"tailwind-merge": "^3.3.1",
-		"zod": "^4.1.3"
+		"zod": "^4.1.5"
 	},
 	"devDependencies": {
 		"@equinor/eds-core-react": "^0.48.0",
 		"@hookform/devtools": "^4.4.0",
-		"@tailwindcss/vite": "^4.1.12",
-		"@types/react": "^19.1.11",
-		"@types/react-dom": "^19.1.8",
-		"@vitejs/plugin-react": "^5.0.1",
+		"@tailwindcss/vite": "^4.1.13",
+		"@types/react": "^19.1.12",
+		"@types/react-dom": "^19.1.9",
+		"@vitejs/plugin-react": "^5.0.2",
 		"eslint": "^9.34.0",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^5.2.0",
 		"eslint-plugin-react-refresh": "^0.4.20",
 		"prettier": "^3.6.2",
 		"prettier-plugin-tailwindcss": "^0.6.14",
-		"tailwindcss": "^4.1.12",
+		"tailwindcss": "^4.1.13",
 		"tailwindcss-animate": "^1.0.7",
 		"typescript": "^5.9.2",
-		"typescript-eslint": "^8.41.0",
-		"vite": "^7.1.3",
+		"typescript-eslint": "^8.42.0",
+		"vite": "^7.1.4",
 		"vite-plugin-checker": "^0.10.3"
 	}
 }
