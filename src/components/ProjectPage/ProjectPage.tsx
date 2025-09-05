@@ -15,12 +15,14 @@ export const ProjectPage = () => {
 	const location = useLocation();
 	const selectedScenario = useSelectedScenario();
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
+
 	const showIssuesView = location.pathname.includes('issues');
 	const selectedProject = useSelectedProject();
 	const { isLoading: isLoadingProjects } = useGetProjects();
 	const { isLoading: isLoadingIssues } = useGetIssues();
 
 	const { isLoading: isLoadingEdges } = useGetEdges();
+
 	let activeView = 0;
 	if (issueView === 'table') activeView = 1;
 	if (issueView === 'diagram') activeView = 2;
@@ -41,12 +43,21 @@ export const ProjectPage = () => {
 						>
 							Project Details
 						</Button>
-						<Button as={Link} to='issues'>
+						<Button
+							as={Link}
+							to='issues'
+							onClick={() => {
+								setIssuesView('list');
+							}}
+						>
 							Issues
 						</Button>
 					</Button.Toggle>
-					<div className='flex items-center gap-2'>
-						<ScenarioSelector />
+					<div className='flex w-full items-center'>
+						<div className='flex flex-1 justify-center'>
+							<ScenarioSelector />
+						</div>
+
 						{showIssuesView && (
 							<>
 								<CreateIssues />
