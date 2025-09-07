@@ -7,7 +7,12 @@ import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
 
-export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
+export const DecisionCard = ({
+	issue,
+	onSelectAlternative,
+	selectedOptions = [],
+	...rest
+}: DecisionCardProps) => {
 	const hasOptions = issue.decision.options.length > 0;
 	const { expanded, toggle } = useExpandCard(issue.id);
 	return (
@@ -27,24 +32,31 @@ export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
 			<Collapsible
 				open={expanded}
 				onOpenChange={toggle}
-				className='flex flex-col items-center justify-center'
+				className='-mx-4 flex flex-col items-center justify-center'
 			>
 				<CollapsibleContent
-					className='data-[state=open]:animate-slide-down
-					data-[state=closed]:animate-slide-up w-full overflow-hidden'
+					className='data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up
+					w-full overflow-hidden px-4'
 				>
-					<div className='mb-2 flex flex-col'>
+					<div className='mb-2 flex flex-col pt-2'>
 						{hasOptions && (
 							<ul className='flex flex-col gap-2 text-sm'>
-								{issue.decision.options.map(option => (
-									<li
-										key={option.id}
-										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
-									>
-										<p>{option.name}</p>
-										<p>{option.utility}</p>
-									</li>
-								))}
+								{issue.decision.options.map(option => {
+									const isSelected = selectedOptions.includes(option.id);
+									return (
+										<li
+											key={option.id}
+											data-selected={isSelected}
+											data-can-select={!!onSelectAlternative}
+											onClick={() => onSelectAlternative?.(option.id)}
+											className='bg-background-light data-[can-select=true]:hover:bg-primary-hover-alt outline-primary-resting flex
+											justify-between rounded-sm px-2 py-1 data-[can-select=true]:cursor-pointer data-[selected=true]:outline-2'
+										>
+											<p>{option.name}</p>
+											<p>{option.utility}</p>
+										</li>
+									);
+								})}
 							</ul>
 						)}
 					</div>
@@ -63,4 +75,6 @@ export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
 type DecisionCardProps = {
 	issue: Issue;
 	className?: string;
+	onSelectAlternative?: (optionId: string) => void;
+	selectedOptions?: string[];
 };

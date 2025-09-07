@@ -8,24 +8,25 @@ import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { useSelectedScenario } from '../../hooks/useSelectedScenario';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { CreateIssues } from './CreateIssueForm';
+import { CreateIssueForm } from './CreateIssueForm';
 import { ScenarioSelector } from './ScenarioSelector';
+import { CreateStrategyForm } from './CreateStrategyForm';
 
 export const ProjectPage = () => {
 	const location = useLocation();
 	const selectedScenario = useSelectedScenario();
-	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
 
-	const showIssuesView = location.pathname.includes('issues');
+	let projectView = 0;
+	if (location.pathname.includes('issues')) projectView = 1;
+	if (location.pathname.includes('strategies')) projectView = 2;
+	const showIssuesToolBar = location.pathname.includes('issues');
+	const showStrategiesToolBar = location.pathname.includes('strategies');
 	const selectedProject = useSelectedProject();
+
 	const { isLoading: isLoadingProjects } = useGetProjects();
 	const { isLoading: isLoadingIssues } = useGetIssues();
-
 	const { isLoading: isLoadingEdges } = useGetEdges();
 
-	let activeView = 0;
-	if (issueView === 'table') activeView = 1;
-	if (issueView === 'diagram') activeView = 2;
 	if (isLoadingIssues || isLoadingProjects || isLoadingEdges) return <LoadingSpinner />;
 	if (!selectedProject) return;
 
@@ -36,48 +37,57 @@ export const ProjectPage = () => {
 					<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				</div>
 				<div className='flex justify-between gap-8'>
-					<Button.Toggle selectedIndexes={[showIssuesView ? 1 : 0]}>
+					<Button.Toggle selectedIndexes={[projectView]}>
 						<Button
 							as={Link}
 							to={`/project/${selectedProject.id}/${selectedScenario?.id}`}
 						>
 							Project Details
 						</Button>
-						<Button
-							as={Link}
-							to='issues'
-							onClick={() => {
-								setIssuesView('list');
-							}}
-						>
+						<Button as={Link} to='issues'>
 							Issues
 						</Button>
+						<Button as={Link} to='strategies'>
+							Strategies
+						</Button>
 					</Button.Toggle>
-					<div className='flex w-full items-center'>
-						<div className='flex flex-1 justify-center'>
-							<ScenarioSelector />
-						</div>
+					<div className='flex items-center gap-4'>
+						<ScenarioSelector />
 
-						{showIssuesView && (
-							<>
-								<CreateIssues />
-								<Button.Toggle selectedIndexes={[activeView]}>
-									<Button onClick={() => setIssuesView('list')}>
-										<Icon data={view_list} />
-									</Button>
-									<Button onClick={() => setIssuesView('table')}>
-										<Icon data={view_column} />
-									</Button>
-									<Button onClick={() => setIssuesView('diagram')}>
-										<Icon data={category} />
-									</Button>
-								</Button.Toggle>
-							</>
-						)}
+						{showIssuesToolBar && <IssuesToolBar />}
+						{showStrategiesToolBar && <StrategiesToolBar />}
 					</div>
 				</div>
 				<Outlet />
 			</div>
 		</div>
 	);
+};
+
+const IssuesToolBar = () => {
+	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
+	let activeView = 0;
+	if (issueView === 'table') activeView = 1;
+	if (issueView === 'diagram') activeView = 2;
+
+	return (
+		<>
+			<CreateIssueForm />
+			<Button.Toggle selectedIndexes={[activeView]}>
+				<Button onClick={() => setIssuesView('list')}>
+					<Icon data={view_list} />
+				</Button>
+				<Button onClick={() => setIssuesView('table')}>
+					<Icon data={view_column} />
+				</Button>
+				<Button onClick={() => setIssuesView('diagram')}>
+					<Icon data={category} />
+				</Button>
+			</Button.Toggle>
+		</>
+	);
+};
+
+const StrategiesToolBar = () => {
+	return <CreateStrategyForm />;
 };

@@ -16,8 +16,8 @@ export const DraggableIssueContainer = ({ issue, index, type, children }: Dragga
 		<div
 			ref={ref}
 			data-dragging={isDragging}
-			className='data-[dragging="true"]:cursor-grabbing
-			data-[dragging="true"]:opacity-40'
+			className='cursor-grab
+			data-[dragging="true"]:cursor-grabbing data-[dragging="true"]:opacity-40'
 		>
 			{children}
 		</div>

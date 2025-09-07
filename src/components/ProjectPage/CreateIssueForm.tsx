@@ -1,6 +1,5 @@
 import { Button, CircularProgress, Icon, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
-import { DevTool } from '@hookform/devtools';
 import { useRef, useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { useIssueForm } from '../../hooks/useIssueForm';
@@ -8,7 +7,7 @@ import { DecisionFormSection } from '../common/IssueFormSections/DecisionFormSec
 import { IssueFormSection } from '../common/IssueFormSections/IssueFormSection';
 import { UncertaintyFormSection } from '../common/IssueFormSections/UncertaintyFormSection';
 
-export const CreateIssues = () => {
+export const CreateIssueForm = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const formMethods = useIssueForm({
 		onSuccess: () => setIsOpen(false),
@@ -41,7 +40,6 @@ export const CreateIssues = () => {
 							onSubmit={onSubmit}
 							className='flex flex-col items-start gap-4 rounded-sm'
 						>
-							<DevTool control={control} />
 							<div className='w-full cursor-pointer pr-16'>
 								<h2 className='text-2xl font-semibold'>Create Issue</h2>
 								<p className='text-text-tertiary'>
