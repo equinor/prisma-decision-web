@@ -50,9 +50,8 @@ export const ProjectInformation = () => {
 				};
 			});
 			const mergeUser = [...usersValue, ...userWithRole].reduce((acc, user) => {
-				if (!acc[user.user_id]) {
-					acc[user.user_id] = user;
-				}
+				if (acc.find(u => u.user_id === user.user_id)) return acc;
+				acc.push(user);
 				return acc;
 			}, [] as ProjectRole[]);
 			setUser(mergeUser);
