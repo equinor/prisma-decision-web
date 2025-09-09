@@ -51,6 +51,7 @@ const defaultValues: Project = {
 			name: 'main',
 			objectives: [],
 			opportunities: [],
+			id_default: true,
 		},
 	],
 };
