@@ -16,11 +16,10 @@ export const ScenarioSelector = () => {
 	});
 	if (!selectedProject || !selectedScenario) return null;
 	return (
-		<div className='flex h-[35px] flex-col-reverse **:box-content'>
+		<div className='flex h-[35px] flex-col-reverse'>
 			<Autocomplete
 				options={selectedProject.scenarios}
 				hideClearButton
-				autoWidth
 				loading={isPending}
 				onAddNewOption={value => {
 					createScenario({
@@ -29,18 +28,15 @@ export const ScenarioSelector = () => {
 						id: crypto.randomUUID(),
 						objectives: [],
 						opportunities: [],
-						id_default: false,
+						is_default: false,
 					});
 				}}
+				className='**:box-content'
 				selectedOptions={[selectedScenario]}
 				optionLabel={option => option.name}
 				label='Selected Scenario'
 				onOptionsChange={({ selectedItems }) => {
 					if (!selectedItems[0]) return;
-					const isNewOption = !selectedProject.scenarios.find(
-						scenario => scenario.id === selectedItems[0].id,
-					);
-					if (isNewOption) return;
 					navigate(`../${selectedItems[0].id}`, {
 						relative: 'path',
 					});
