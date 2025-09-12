@@ -49,17 +49,24 @@ export const ProjectInformation = () => {
 					...user,
 				};
 			});
-			const mergeUser = [...usersValue, ...userWithRole].reduce((acc, user) => {
+
+			const mergeUsers = [...usersValue, ...userWithRole].reduce((acc, user) => {
 				if (!acc[user.user_id]) {
 					acc[user.user_id] = user;
 				}
 				return acc;
 			}, [] as ProjectRole[]);
-			setUser(mergeUser);
+			const cleanedMergeUser = mergeUsers.filter(
+				mergeUser => mergeUser !== undefined && mergeUser !== null,
+			);
+
+			setUser(cleanedMergeUser);
+
 			setSelectedUser([]);
 			setSelectedRole(undefined);
 		}
 	};
+
 	return (
 		<form
 			onSubmit={handleSubmit}
@@ -137,7 +144,7 @@ export const ProjectInformation = () => {
 				</Table.Head>
 				<Table.Body>
 					{usersValue.map(user => (
-						<Table.Row key={user.user_id + user.role}>
+						<Table.Row key={user.azure_id + user.role}>
 							<Table.Cell>{user.user_name}</Table.Cell>
 							<Table.Cell>{user.role}</Table.Cell>
 							<Table.Cell>
