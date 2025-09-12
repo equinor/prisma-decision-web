@@ -5,7 +5,7 @@ import { Project } from '../../validators';
 import { DeleteProjectDialog } from '../common/DeleteProjectDialog';
 
 export const ProjectCard = ({ project }: ProjectCardProps) => {
-	const scenario = project.scenarios.find(scenario => scenario.name === 'main');
+	const scenario = project.scenarios.find(scenario => scenario.id_default);
 	if (!scenario) return null;
 	return (
 		<Link to={`/project/${project.id}/${scenario.id}`}>

@@ -24,6 +24,7 @@ export const scenarioSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Scenario name is required'),
 	project_id: uuid(),
+	id_default: z.boolean(),
 	objectives: z.array(objectiveSchema),
 	opportunities: z.array(opportunitySchema),
 });

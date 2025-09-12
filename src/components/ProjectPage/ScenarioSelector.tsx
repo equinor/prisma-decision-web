@@ -29,6 +29,7 @@ export const ScenarioSelector = () => {
 						id: crypto.randomUUID(),
 						objectives: [],
 						opportunities: [],
+						id_default: false,
 					});
 				}}
 				selectedOptions={[selectedScenario]}
