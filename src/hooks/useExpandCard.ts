@@ -8,7 +8,7 @@ const isExpanded = atomFamily((id: string) => {
 });
 
 export const useExpandCard = (id: string) => {
-	const expanded = useAtomValue(isExpanded(id));
+	const expanded = !useAtomValue(isExpanded(id));
 	const setExpanded = useSetAtom(expandedCardsAtom);
 	const toggle = () => {
 		setExpanded(prev => {
