@@ -5,6 +5,7 @@ import { groupByIssueType } from '../utils/groupByIssueType';
 import { IssueType, Issue } from '../validators';
 import { useUpdateIssuesOptimistic } from './api/useUpdateIssues';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
+import { canDndStartFrom } from '../utils/canDndStartFrom';
 
 export const useIssueDragAndDrop = () => {
 	const issues = groupByIssueType(useSelectedProjectIssues());
@@ -38,9 +39,16 @@ export const useIssueDragAndDrop = () => {
 		updateIssues(updatedIssues);
 	};
 
+	const onBeforeDragStart: DragDropEvents['beforedragstart'] = event => {
+		if (!canDndStartFrom(event.operation.activatorEvent?.target)) {
+			event.preventDefault();
+		}
+	};
+
 	return {
 		issues: localIssues,
 		onDragEnd,
 		onDragOver,
+		onBeforeDragStart,
 	};
 };
