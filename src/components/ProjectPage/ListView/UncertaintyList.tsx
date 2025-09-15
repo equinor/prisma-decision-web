@@ -68,19 +68,24 @@ export const UncertaintyList = () => {
 												{issue.description}
 											</Table.Cell>
 											<Table.Cell>
-												<ul className='flex flex-col gap-2 py-4'>
-													<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-														<p>Outcome 1</p>
-														<p>20%</p>
-													</li>
-													<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-														<p>Outcome 1</p>
-														<p>20%</p>
-													</li>
-													<li className='bg-background-light flex items-center justify-between rounded-sm px-2 py-1'>
-														<p>Outcome 1</p>
-														<p>20%</p>
-													</li>
+												<ul className='flex flex-col gap-2 rounded-sm py-4 text-sm'>
+													{issue.uncertainty.outcomes.map(outcome => (
+														<li
+															key={outcome.id}
+															className='bg-background-light grid grid-cols-[1fr_1fr_1fr]
+															items-center justify-end gap-2 rounded-sm px-2 py-1'
+														>
+															<p className='truncate'>
+																{outcome.name}
+															</p>
+															<p className='place-self-center truncate'>
+																{outcome.probability * 100}%
+															</p>
+															<p className='place-self-end truncate'>
+																{outcome.utility}
+															</p>
+														</li>
+													))}
 												</ul>
 											</Table.Cell>
 											<Table.Cell>{issue.boundary}</Table.Cell>
