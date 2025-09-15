@@ -53,11 +53,8 @@ export const ProjectPage = () => {
 							Issues
 						</Button>
 					</Button.Toggle>
-					<div className='flex w-full items-center'>
-						<div className='flex flex-1 justify-center'>
-							<ScenarioSelector />
-						</div>
-
+					<div className='flex items-center gap-4'>
+						<ScenarioSelector />
 						{showIssuesView && (
 							<>
 								<CreateIssues />
