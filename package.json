@@ -19,7 +19,7 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
-		"@azure/msal-browser": "^4.22.0",
+		"@azure/msal-browser": "^4.22.1",
 		"@azure/msal-react": "^3.0.19",
 		"@dnd-kit/abstract": "^0.1.21",
 		"@dnd-kit/collision": "^0.1.21",
@@ -29,20 +29,20 @@
 		"@hookform/error-message": "^2.0.1",
 		"@hookform/resolvers": "^5.2.1",
 		"@radix-ui/react-collapsible": "^1.1.12",
-		"@tanstack/react-query": "^5.87.1",
+		"@tanstack/react-query": "^5.87.4",
 		"@uidotdev/usehooks": "^2.4.1",
 		"@xyflow/react": "^12.8.4",
-		"axios": "^1.11.0",
+		"axios": "^1.12.0",
 		"jotai": "^2.14.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"react-hook-form": "^7.62.0",
 		"react-router": "^7.8.2",
 		"tailwind-merge": "^3.3.1",
-		"zod": "^4.1.5"
+		"zod": "^4.1.8"
 	},
 	"devDependencies": {
-		"@equinor/eds-core-react": "^0.48.0",
+		"@equinor/eds-core-react": "^0.49.0",
 		"@hookform/devtools": "^4.4.0",
 		"@tailwindcss/vite": "^4.1.13",
 		"@types/react": "^19.1.12",

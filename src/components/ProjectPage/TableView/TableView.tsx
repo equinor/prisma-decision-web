@@ -6,9 +6,10 @@ import { IssueType, issueTypes } from '../../../validators';
 import { IssueColumn } from './IssueColumn';
 
 export const TableView = () => {
-	const { issues, onDragEnd, onDragOver } = useIssueDragAndDrop();
+	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop();
 	return (
 		<DragDropProvider
+			onBeforeDragStart={onBeforeDragStart}
 			onDragOver={onDragOver}
 			onDragEnd={onDragEnd}
 			modifiers={[RestrictToElement]}

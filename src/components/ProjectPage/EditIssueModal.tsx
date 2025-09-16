@@ -26,14 +26,20 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 	};
 	return (
 		<>
-			<Button variant='ghost_icon' onClick={() => setIsOpen(true)}>
+			<Button
+				variant='ghost_icon'
+				onClick={() => setIsOpen(true)}
+				className='nodrag'
+				data-no-dnd
+			>
 				<Icon data={edit} />
 			</Button>
 			{isOpen && (
 				<Dialog
+					data-no-dnd
 					open
-					className='nodrag fixed top-1/2 left-1/2 max-h-[90vh] w-[min(700px,_90vw)]!
-					 -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
+					className='nodrag nowheel fixed top-1/2 left-1/2 max-h-[90vh]
+					 w-[min(700px,_90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
 				>
 					<DialogContent>
 						<FormProvider {...formMethods}>
