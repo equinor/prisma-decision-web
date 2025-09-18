@@ -5,6 +5,7 @@ import {
 	info_circle,
 	measure,
 	share,
+	star_outlined,
 	timeline,
 } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
@@ -124,6 +125,20 @@ export const SideBar = () => {
 						</Button>
 					</Popover.Content>
 				</Popover>
+				<Divider className='my-0!' />
+				<p
+					data-open={isOpen}
+					className='pt-3 pb-2 text-xs data-[open="false"]:text-center data-[open="true"]:pl-6'
+				>
+					EVALUATE
+				</p>
+				<EdsSideBar.Link
+					as={Link}
+					label='Assessments'
+					className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:w-full!'
+					icon={star_outlined}
+					to={`/project/${project.id}/assessments`}
+				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>
 				<div className='flex items-center justify-center py-4'>
