@@ -3,9 +3,9 @@ import { chevron_down, chevron_up } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { Issue } from '../../../validators';
-import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
+import { DeleteIssueDialog } from '../../ProjectPage/ProjectIssues/DeleteIssueDialog';
+import { EditIssueModal } from '../../ProjectPage/ProjectIssues/EditIssueModal';
 
 export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 	const hasOutcomes = issue.uncertainty.outcomes.length > 0;

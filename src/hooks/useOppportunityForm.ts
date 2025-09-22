@@ -4,7 +4,7 @@ import { opportunitySchema } from '../validators';
 import { useCreateOpportunityOptimistic } from './api/useCreateOpportunity';
 import { useSelectedScenario } from './useSelectedScenario';
 
-export const useOppportunityForm = () => {
+export const useOppportunityForm = (onSuccess?: () => void) => {
 	const scenario = useSelectedScenario();
 	const { mutate: createOpportunity } = useCreateOpportunityOptimistic();
 	const formMethods = useForm({
@@ -17,8 +17,13 @@ export const useOppportunityForm = () => {
 
 	const handleSubmit = formMethods.handleSubmit(
 		async data => {
+			onSuccess?.();
 			await createOpportunity(data);
-			formMethods.reset();
+			formMethods.reset({
+				...defaultValues,
+				id: crypto.randomUUID(),
+				scenario_id: scenario?.id || crypto.randomUUID(),
+			});
 		},
 		errors => {
 			// eslint-disable-next-line no-console

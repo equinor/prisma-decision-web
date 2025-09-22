@@ -1,0 +1,69 @@
+import { Table } from '@equinor/eds-core-react';
+import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
+import { ProjectTabs } from '../ProjectTabs';
+import { ScenarioSelector } from '../ScenarioSelector';
+import { CreateObjective } from './CreateObjective';
+import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+
+export const ProjectObjectives = () => {
+	const scenario = useSelectedScenario();
+	const objectives = scenario?.objectives || [];
+	const hasObjectives = objectives.length > 0;
+	return (
+		<div className='flex flex-col gap-4'>
+			<div className='flex w-full items-center justify-between'>
+				<ProjectTabs />
+				<div className='flex items-center gap-4'>
+					<ScenarioSelector />
+					<CreateObjective />
+				</div>
+			</div>
+			<div
+				className='bg-background-default shadow-tile flex w-full flex-col
+            	items-start gap-4 rounded-sm p-4'
+			>
+				<div className='grid w-full cursor-pointer grid-cols-[1fr_auto] items-center'>
+					<div>
+						<div className='flex gap-2'>
+							<h2 className='text-2xl font-semibold'>Objectives</h2>
+							<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+								{objectives.length}
+							</span>
+						</div>
+						<p className='text-text-tertiary'>
+							Define the objectives that will help achieve the desired outcome
+						</p>
+					</div>
+				</div>
+				{hasObjectives && (
+					<div className='outline-background-medium w-full rounded-sm outline-1'>
+						<Table className='w-full table-fixed'>
+							<Table.Head>
+								<Table.Row>
+									<Table.Cell className='w-12'></Table.Cell>
+									<Table.Cell className='w-1/3 md:w-3/9'>Name</Table.Cell>
+									<Table.Cell className='w-1/3 md:w-5/9'>Description</Table.Cell>
+									<Table.Cell className='w-1/3 md:w-2/9'>Date Added</Table.Cell>
+								</Table.Row>
+							</Table.Head>
+							<Table.Body>
+								{objectives.map(objectives => (
+									<Table.Row key={objectives.id}>
+										<Table.Cell className='px-0! pl-1!'>
+											<div className='flex justify-center'>
+												<DeleteObjectiveDialog objective={objectives} />
+											</div>
+										</Table.Cell>
+										<Table.Cell>{objectives.name}</Table.Cell>
+										<Table.Cell>{objectives.description}</Table.Cell>
+										<Table.Cell></Table.Cell>
+									</Table.Row>
+								))}
+							</Table.Body>
+						</Table>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+};

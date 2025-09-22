@@ -3,9 +3,10 @@ import { sun } from '@equinor/eds-icons';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import useDarkMode from '../hooks/useDarkMode';
+import { MoonIcon } from './common/MoonIcon';
 
 export const TopBar = () => {
-	const toggleDarkMode = useDarkMode();
+	const { toggleDarkMode, darkMode } = useDarkMode();
 	const navigate = useNavigate();
 	const isFetching = useIsFetching();
 	const isMutating = useIsMutating();
@@ -33,7 +34,7 @@ export const TopBar = () => {
 					onClick={toggleDarkMode}
 					onMouseDown={e => e.stopPropagation()}
 				>
-					<Icon data={sun}>dark mode</Icon>
+					{darkMode ? <Icon data={sun}>dark mode</Icon> : <MoonIcon />}
 				</Button>
 			</EdsTopBar.Actions>
 		</EdsTopBar>

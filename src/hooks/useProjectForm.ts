@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import { Project, projectSchema } from '../validators';
 import { useSelectedProject } from './useSelectedProject';
 import { useCreateProject } from './api/useCreateProject';
 import { useUpdateProject } from './api/useUpdateProject';
 
+export const useProjectFormContext = () => useFormContext<Project>();
 export const useProjectForm = () => {
 	const selectedProject = useSelectedProject();
 	const { mutate: createProject, isPending: isPendingCreate } = useCreateProject();
@@ -26,7 +27,7 @@ export const useProjectForm = () => {
 	);
 
 	return {
-		...formMethods,
+		formMethods,
 		handleSubmit,
 		isPending: isPendingCreate || isPendingUpdate,
 	};

@@ -3,7 +3,13 @@ import { int, uuid, z } from 'zod/v4';
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
 export type IssueType = (typeof issueTypes)[number];
 
-export const roleTypes = ['contributor', 'owner'] as const;
+export const roleTypes = [
+	'contributor',
+	'owner',
+	'Member',
+	'Decision Maker',
+	'Facilitator',
+] as const;
 export type RoleType = (typeof roleTypes)[number];
 
 export const opportunitySchema = z.object({

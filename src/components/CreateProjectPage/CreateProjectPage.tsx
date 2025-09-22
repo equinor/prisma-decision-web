@@ -1,4 +1,4 @@
-import { ProjectInformation } from '../common/ProjectInformation';
+import { ProjectInformation } from '../common/ProjectInformation/ProjectInformation';
 
 export const CreateProjectPage = () => {
 	return (

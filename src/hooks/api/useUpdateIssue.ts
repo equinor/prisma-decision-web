@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 
-export const useUpdateIssue = () => {
+export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (issue: Issue) => {
@@ -11,6 +11,7 @@ export const useUpdateIssue = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
+			onSuccess?.();
 		},
 	});
 };

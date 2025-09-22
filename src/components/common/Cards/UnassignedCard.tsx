@@ -1,8 +1,9 @@
 import { Chip } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
-import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+
 import { CardContainer } from './CardContainer';
+import { DeleteIssueDialog } from '../../ProjectPage/ProjectIssues/DeleteIssueDialog';
+import { EditIssueModal } from '../../ProjectPage/ProjectIssues/EditIssueModal';
 
 export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 	return (

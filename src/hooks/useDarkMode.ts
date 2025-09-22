@@ -12,5 +12,5 @@ export default function useDarkMode() {
 		document.body.classList.toggle('dark', darkMode);
 	}, [darkMode]);
 
-	return toggleDarkMode;
+	return { toggleDarkMode, darkMode };
 }

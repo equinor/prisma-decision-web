@@ -8,8 +8,8 @@ export const useUpdateProject = () => {
 		mutationFn: async (project: Project) => {
 			await apiClient.put('/projects', [project]);
 		},
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['projects'] });
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
 		},
 	});
 };
