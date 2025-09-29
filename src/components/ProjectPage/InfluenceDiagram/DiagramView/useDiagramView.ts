@@ -20,7 +20,7 @@ import { convertNodesToIssues } from '../../../../utils/convertNodesToIssues';
 import { convertToEdges } from '../../../../utils/convertToEdges';
 import { convertToNodes } from '../../../../utils/convertToNodes';
 
-export const useDiagramView = () => {
+export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();

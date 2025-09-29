@@ -1,4 +1,4 @@
-import { Chip, Icon } from '@equinor/eds-core-react';
+import { Chip, EdsProvider, Icon } from '@equinor/eds-core-react';
 import { chevron_down, chevron_up } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useExpandCard } from '../../../hooks/useExpandCard';
@@ -27,7 +27,7 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 			<Collapsible
 				open={expanded}
 				onOpenChange={toggle}
-				className='flex flex-col items-center justify-center'
+				className='flex flex-col items-center justify-center pb-4'
 			>
 				<CollapsibleContent
 					className='data-[state=open]:animate-slide-down
@@ -53,12 +53,19 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 						)}
 					</div>
 				</CollapsibleContent>
-				<CollapsibleTrigger className='hover:bg-primary-hover-alt rounded-full p-1'>
-					<Icon
-						data={expanded ? chevron_up : chevron_down}
-						className='fill-primary-resting'
-					/>
-				</CollapsibleTrigger>
+				<EdsProvider density='compact'>
+					<CollapsibleTrigger>
+						<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
+							<p className='text-text-tertiary text-sm'>
+								{issue.uncertainty.outcomes.length} Outcomes
+							</p>
+							<Icon
+								className='fill-primary-resting'
+								data={expanded ? chevron_up : chevron_down}
+							/>
+						</button>
+					</CollapsibleTrigger>
+				</EdsProvider>
 			</Collapsible>
 		</CardContainer>
 	);

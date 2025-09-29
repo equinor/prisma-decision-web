@@ -52,7 +52,7 @@ export const DecisionCard = ({ issue, ...rest }: DecisionCardProps) => {
 				<EdsProvider density='compact'>
 					<CollapsibleTrigger asChild>
 						<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
-							<p className='text-text-tertiary'>
+							<p className='text-text-tertiary text-sm'>
 								{issue.decision.options.length} Options
 							</p>
 							<Icon

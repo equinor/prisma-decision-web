@@ -2,12 +2,14 @@ import { Background, ConnectionMode, Controls, MarkerType, ReactFlow } from '@xy
 import { ConnectionLine } from './ConnectingLine';
 import { CustomEdge } from './CustomEdge';
 import { DiagramIssueCard } from './DiagramIssueCard';
-import { useDiagramView } from './useDiagramView';
+import { useInfluenceDiagram } from './useDiagramView';
+import { CreateIssues } from '../../ProjectIssues/CreateIssue';
+import { ToggleExpandAll } from '../../ProjectIssues/ToggleExpandAll';
 
 const nodeTypes = { issue: DiagramIssueCard };
 const edgeTypes = { issue: CustomEdge };
 
-export const DiagramView = () => {
+export const InfluenceDiagram = () => {
 	const {
 		nodes,
 		edges,
@@ -18,12 +20,16 @@ export const DiagramView = () => {
 		onNodesChange,
 		onReconnect,
 		onReconnectStart,
-	} = useDiagramView();
+	} = useInfluenceDiagram();
 	return (
 		<div
-			className='bg-background-light shadow-tile
-			h-[calc(100vh-285px)] w-full rounded-sm'
+			className='bg-background-light shadow-tile absolute
+			inset-0 rounded-sm'
 		>
+			<div className='absolute top-4 right-4 z-10 flex gap-4'>
+				<CreateIssues />
+				<ToggleExpandAll />
+			</div>
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}

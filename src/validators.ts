@@ -87,7 +87,7 @@ export const uncertaintySchema = z.object({
 		z.object({
 			id: z.uuid(),
 			name: z.string().min(1, 'Outcome name is required'),
-			probability: z.number().min(0.01, 'min 0.01').max(1, 'max 1'),
+			probability: z.number().min(0, 'min 0').max(1, 'max 1'),
 			utility: z.number(),
 			uncertainty_id: z.uuid(),
 		}),
@@ -116,35 +116,20 @@ export const edgeSchema = z.object({
 	scenario_id: uuid(),
 });
 
-export const issueSchema = z
-	.object({
-		id: uuid(),
-		scenario_id: uuid(),
-		name: z.string().min(1, 'Issue name is required'),
-		description: z.string().min(1, 'Description is required'),
-		order: z.number().int().nonnegative(),
-		type: z.enum(issueTypes),
-		boundary: z.enum(['in', 'on', 'out']),
-		decision: decisionSchema,
-		value_metric: valueMetricSchema,
-		utility: utilitySchema,
-		uncertainty: uncertaintySchema,
-		node: nodeSchema,
-	})
-	.refine(
-		data => {
-			if (data.type !== 'Uncertainty') return true;
-			const totalProbability = data.uncertainty.outcomes.reduce(
-				(sum, item) => sum + item.probability,
-				0,
-			);
-			return totalProbability >= 0.999 && totalProbability <= 1.001;
-		},
-		{
-			message: 'Outcomes must sum to more than 0.999 and less than 1.001',
-			path: ['uncertainty', 'outcomes', 'sum'],
-		},
-	);
+export const issueSchema = z.object({
+	id: uuid(),
+	scenario_id: uuid(),
+	name: z.string().min(1, 'Issue name is required'),
+	description: z.string().min(1, 'Description is required'),
+	order: z.number().int().nonnegative(),
+	type: z.enum(issueTypes),
+	boundary: z.enum(['in', 'on', 'out']),
+	decision: decisionSchema,
+	value_metric: valueMetricSchema,
+	utility: utilitySchema,
+	uncertainty: uncertaintySchema,
+	node: nodeSchema,
+});
 
 export type Project = z.infer<typeof projectSchema>;
 export type Opportunity = z.infer<typeof opportunitySchema>;

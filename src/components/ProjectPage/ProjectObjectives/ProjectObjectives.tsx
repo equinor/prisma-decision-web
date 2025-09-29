@@ -1,6 +1,5 @@
 import { Table } from '@equinor/eds-core-react';
 import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
-import { ProjectTabs } from '../ProjectTabs';
 import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
@@ -12,9 +11,8 @@ export const ProjectObjectives = () => {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
-				<ProjectTabs />
+				<ScenarioSelector />
 				<div className='flex items-center gap-4'>
-					<ScenarioSelector />
 					<CreateObjective />
 				</div>
 			</div>

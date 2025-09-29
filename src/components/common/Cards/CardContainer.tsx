@@ -5,7 +5,7 @@ export const CardContainer = ({ className, ...props }: CardContainerProps) => {
 	return (
 		<div
 			className={cn(
-				`bg-background-default shadow-tile relative flex w-full
+				`bg-background-default shadow-tile flex w-full
                  min-w-[241px] cursor-grab flex-col gap-2 rounded-sm p-4`,
 				className,
 			)}

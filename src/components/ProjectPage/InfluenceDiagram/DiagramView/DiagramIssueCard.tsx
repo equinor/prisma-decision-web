@@ -12,25 +12,25 @@ export const DiagramIssueCard = ({ data, selected }: NodeProps<Node<{ issue: Iss
 				type='source'
 				position={Position.Top}
 				id='top'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='source'
 				position={Position.Bottom}
 				id='bottom'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='source'
 				position={Position.Left}
 				id='left'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='source'
 				position={Position.Right}
 				id='right'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 
 			{/* Target handles */}
@@ -38,19 +38,19 @@ export const DiagramIssueCard = ({ data, selected }: NodeProps<Node<{ issue: Iss
 				type='target'
 				position={Position.Top}
 				id='top'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='target'
 				position={Position.Bottom}
 				id='bottom'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='target'
 				position={Position.Left}
 				id='left'
-				className='bg-primary-resting! z-10 h-3! w-3!'
+				className='bg-primary-resting! h-3! w-3!'
 			/>
 			<Handle
 				type='target'

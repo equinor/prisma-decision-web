@@ -7,6 +7,7 @@ import { ProjectIssues } from './components/ProjectPage/ProjectIssues/ProjectIss
 import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectDetails';
 import { ProjectOpportunities } from './components/ProjectPage/ProjectOpportunities/ProjectOpportunities';
 import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
+import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/DiagramView/InfluenceDiagram';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
 				<Route path='issues' element={<ProjectIssues />} />
 				<Route path='opportunities' element={<ProjectOpportunities />} />
 				<Route path='objectives' element={<ProjectObjectives />} />
+				<Route path='influence-diagram' element={<InfluenceDiagram />} />
 			</Route>
 		</Route>,
 	),
