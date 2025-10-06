@@ -7,7 +7,7 @@ import { ProjectIssues } from './components/ProjectPage/ProjectIssues/ProjectIss
 import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectDetails';
 import { ProjectOpportunities } from './components/ProjectPage/ProjectOpportunities/ProjectOpportunities';
 import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
-import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/DiagramView/InfluenceDiagram';
+import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(

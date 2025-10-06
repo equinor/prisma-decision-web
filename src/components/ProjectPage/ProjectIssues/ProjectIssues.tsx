@@ -3,10 +3,10 @@ import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import '@xyflow/react/dist/style.css';
 import { ScenarioSelector } from '../ScenarioSelector';
-import { CreateIssues } from './CreateIssue';
+import { CreateIssues } from '../CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
-import { ToggleExpandAll } from './ToggleExpandAll';
+import { ToggleExpandAll } from '../ToggleExpandAll';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');

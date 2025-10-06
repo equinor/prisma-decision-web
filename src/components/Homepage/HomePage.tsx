@@ -1,9 +1,11 @@
-import { Search } from '@equinor/eds-core-react';
+import { Button, Icon, Search } from '@equinor/eds-core-react';
 import { useState } from 'react';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
-import { useGetIssues } from '../../hooks/api/useGetIssues';
+import { useGetIssues, useGetNodes } from '../../hooks/api/useGetIssues';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
+import { Link } from 'react-router';
+import { add } from '@equinor/eds-icons';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -13,6 +15,7 @@ export const HomePage = () => {
 	);
 	useGetIssues();
 	useGetEdges();
+	useGetNodes();
 	return (
 		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-12'>
@@ -29,12 +32,18 @@ export const HomePage = () => {
 				</div>
 
 				<div className='flex flex-col gap-4'>
-					<Search
-						className='xl:w-[350px]'
-						placeholder='Search projects...'
-						value={searchTerm}
-						onChange={e => setSearchTerm(e.target.value)}
-					/>
+					<div className='flex justify-between'>
+						<Search
+							className='xl:w-[350px]'
+							placeholder='Search projects...'
+							value={searchTerm}
+							onChange={e => setSearchTerm(e.target.value)}
+						/>
+						<Button as={Link} to='/create-project' variant='outlined'>
+							<Icon data={add} />
+							Create Project
+						</Button>
+					</div>
 					<div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
 						{filteredProjects.map(project => (
 							<ProjectCard key={project.id} project={project} />

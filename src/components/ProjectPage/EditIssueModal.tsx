@@ -2,11 +2,11 @@ import { Button, CircularProgress, Dialog, DialogContent, Icon } from '@equinor/
 import { close, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
-import { useIssueForm } from '../../../hooks/useIssueForm';
-import { Issue } from '../../../validators';
-import { DecisionFormSection } from './IssueFormSections/DecisionFormSection';
-import { IssueFormSection } from './IssueFormSections/IssueFormSection';
-import { UncertaintyFormSection } from './IssueFormSections/UncertaintyFormSection';
+import { useIssueForm } from '../../hooks/useIssueForm';
+import { Issue } from '../../validators';
+import { DecisionFormSection } from './ProjectIssues/IssueFormSections/DecisionFormSection';
+import { IssueFormSection } from './ProjectIssues/IssueFormSections/IssueFormSection';
+import { UncertaintyFormSection } from './ProjectIssues/IssueFormSections/UncertaintyFormSection';
 
 interface EditIssueModalProps {
 	issue: Issue;

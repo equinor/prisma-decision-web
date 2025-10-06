@@ -23,7 +23,11 @@ export const useUpdateIssuesOptimistic = () => {
 		onMutate: issues => {
 			queryClient.cancelQueries({ queryKey: ['issues'] });
 			const previousIssues = queryClient.getQueryData<Issue[]>(['issues']);
-			queryClient.setQueryData(['issues'], issues);
+			const newIssues = previousIssues?.map(issue => {
+				const updatedIssue = issues.find(i => i.id === issue.id);
+				return updatedIssue ? { ...issue, ...updatedIssue } : issue;
+			});
+			queryClient.setQueryData(['issues'], newIssues);
 			return { previousIssues };
 		},
 		onError: (_err, _issues, context) => {

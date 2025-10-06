@@ -1,8 +1,8 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteIssueOptimistic } from '../../../hooks/api/useDeleteIssue';
-import { Issue } from '../../../validators';
+import { useDeleteIssueOptimistic } from '../../hooks/api/useDeleteIssue';
+import { Issue } from '../../validators';
 
 export const DeleteIssueDialog = ({ issue }: DeleteIssueDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);

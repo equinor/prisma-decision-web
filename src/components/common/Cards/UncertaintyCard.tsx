@@ -4,8 +4,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/r
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { Issue } from '../../../validators';
 import { CardContainer } from './CardContainer';
-import { DeleteIssueDialog } from '../../ProjectPage/ProjectIssues/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/ProjectIssues/EditIssueModal';
+import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
+import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 
 export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 	const hasOutcomes = issue.uncertainty.outcomes.length > 0;
@@ -23,7 +23,7 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
-			<p className='text-text-tertiary text-sm'>{issue.description}</p>
+			<p className='text-text-tertiary overflow-hidden text-sm'>{issue.description}</p>
 			<Collapsible
 				open={expanded}
 				onOpenChange={toggle}
@@ -54,7 +54,7 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 					</div>
 				</CollapsibleContent>
 				<EdsProvider density='compact'>
-					<CollapsibleTrigger>
+					<CollapsibleTrigger asChild>
 						<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
 							<p className='text-text-tertiary text-sm'>
 								{issue.uncertainty.outcomes.length} Outcomes

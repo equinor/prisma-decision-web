@@ -4,21 +4,22 @@ import {
 	IsValidConnection,
 	Node,
 	NodeChange,
+	NodeDimensionChange,
 	OnConnect,
 	OnReconnect,
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useEffect, useRef } from 'react';
-import { useCreateEdge } from '../../../../hooks/api/useCreateEdge';
-import { useUpdateEdge } from '../../../../hooks/api/useUpdateEdge';
-import { useUpdateIssuesOptimistic } from '../../../../hooks/api/useUpdateIssues';
-import { useSelectedProjectEdges } from '../../../../hooks/useSelectedProjectEdges';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import { useSelectedScenario } from '../../../../hooks/useSelectedScenario';
-import { convertNodesToIssues } from '../../../../utils/convertNodesToIssues';
-import { convertToEdges } from '../../../../utils/convertToEdges';
-import { convertToNodes } from '../../../../utils/convertToNodes';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
+import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
+import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
+import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
+import { convertNodesToIssues } from '../../../utils/convertNodesToIssues';
+import { convertToEdges } from '../../../utils/convertToEdges';
+import { convertToNodes } from '../../../utils/convertToNodes';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
@@ -27,17 +28,29 @@ export const useInfluenceDiagram = () => {
 	const { mutate: updateIssue } = useUpdateIssuesOptimistic();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
+	const [customNodeSizes, setCustomNodeSizes] = useState<
+		Record<string, { width: number; height: number }>
+	>({});
 	const [localNodes, setLocalNodes, onLocalNodesChange] = useNodesState([] as Node[]);
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
+	const [isSelecting, setIsSelecting] = useState(false);
+
+	const selectedIssues = localNodes.filter(node => node.selected);
 
 	useEffect(() => {
-		setLocalNodes(convertToNodes(issues));
+		setLocalNodes(
+			convertToNodes(issues).map(node => ({
+				...node,
+				height: customNodeSizes[node.id]?.height || node.height,
+				width: customNodeSizes[node.id]?.width || node.width,
+			})),
+		);
 	}, [issues]);
 
 	useEffect(() => {
-		setEdges(convertToEdges(edges, localNodes));
-	}, [edges, localNodes]);
+		setEdges(convertToEdges(edges, convertToNodes(issues)));
+	}, [edges, issues]);
 
 	const onConnect: OnConnect = params => {
 		if (!selectedScenario) return;
@@ -53,8 +66,8 @@ export const useInfluenceDiagram = () => {
 		if (!selectedScenario) return;
 		updateEdge({
 			id: oldEdge.id,
-			tail_id: newConnection.target,
-			head_id: newConnection.source,
+			tail_id: newConnection.source,
+			head_id: newConnection.target,
 			scenario_id: selectedScenario.id,
 		});
 	};
@@ -67,7 +80,34 @@ export const useInfluenceDiagram = () => {
 		await updateIssue(convertNodesToIssues(localNodes));
 	};
 
+	const onNodeResize = (changes: NodeDimensionChange[]) => {
+		setCustomNodeSizes(prev => {
+			const updated = { ...prev };
+			changes.forEach(change => {
+				if (change.id && change.dimensions) {
+					updated[change.id] = {
+						width: change.dimensions.width,
+						height: change.dimensions.height,
+					};
+				}
+			});
+			return updated;
+		});
+	};
+
+	const onClickSelectionMode = () => {
+		setIsSelecting(true);
+	};
+
+	const onClickPanMode = () => {
+		setIsSelecting(false);
+	};
+
 	const onNodesChange = (changes: NodeChange[]) => {
+		const resizeChange = changes
+			.filter(change => change.type === 'dimensions')
+			.filter(change => change.resizing);
+		if (resizeChange.length > 0) onNodeResize(resizeChange);
 		onLocalNodesChange(changes);
 		const updatedEdges = convertToEdges(edges, localNodes);
 		setEdges(updatedEdges);
@@ -96,5 +136,9 @@ export const useInfluenceDiagram = () => {
 		isValidConnection,
 		setEdges,
 		setNodes: setLocalNodes,
+		selectedIssues,
+		isSelecting,
+		onClickSelectionMode,
+		onClickPanMode,
 	};
 };

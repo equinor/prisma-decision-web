@@ -1,8 +1,8 @@
 import { Checkbox, EdsProvider, Table } from '@equinor/eds-core-react';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
-import { DeleteIssueDialog } from '../DeleteIssueDialog';
-import { EditIssueModal } from '../EditIssueModal';
+import { DeleteIssueDialog } from '../../DeleteIssueDialog';
+import { EditIssueModal } from '../../EditIssueModal';
 
 export const ListView = () => {
 	const issues = useSelectedProjectIssues();

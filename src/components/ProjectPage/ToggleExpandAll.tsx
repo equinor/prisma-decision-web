@@ -1,6 +1,6 @@
 import { Button } from '@equinor/eds-core-react';
-import { useToggleAll } from '../../../hooks/useExpandCard';
-import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useToggleAll } from '../../hooks/useExpandCard';
+import { useSelectedProjectIssues } from '../../hooks/useSelectedProjectIssues';
 
 export const ToggleExpandAll = () => {
 	const { toggleAll, expandedCards } = useToggleAll();

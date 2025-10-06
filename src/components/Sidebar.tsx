@@ -13,10 +13,10 @@ import { useSelectedScenario } from '../hooks/useSelectedScenario';
 import { EquinorStar } from './EquinorStar';
 
 export const SideBar = () => {
-	const [isOpen, setIsOpen] = useState(true);
+	const [isOpen, setIsOpen] = useState(false);
 	const scenario = useSelectedScenario();
 	const project = useSelectedProject();
-	if (!scenario || !project) return null;
+	if (!scenario || !project) return <div />;
 	return (
 		<EdsSideBar
 			className='h-[calc(100vh-64px)] !overflow-x-hidden !border-r-0'

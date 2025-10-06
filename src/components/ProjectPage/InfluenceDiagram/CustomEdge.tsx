@@ -7,7 +7,7 @@ import {
 	getSmoothStepPath,
 	useReactFlow,
 } from '@xyflow/react';
-import { useDeleteEdge } from '../../../../hooks/api/useDeleteEdge';
+import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 
 export const CustomEdge = ({
 	id,

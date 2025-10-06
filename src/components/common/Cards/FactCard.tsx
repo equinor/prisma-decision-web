@@ -1,8 +1,8 @@
 import { Chip } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
 import { CardContainer } from './CardContainer';
-import { DeleteIssueDialog } from '../../ProjectPage/ProjectIssues/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/ProjectIssues/EditIssueModal';
+import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
+import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 
 export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 	return (

@@ -1,10 +1,12 @@
 import { Node } from '@xyflow/react';
 import { Issue } from '../validators';
 
-export const convertToNodes = (issues: Issue[]): Node[] => {
+export const convertToNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
 	return issues.map(issue => ({
 		id: issue.node.id,
 		type: 'issue',
+		height: 150,
+		width: 250,
 		position: {
 			x: issue.node.node_style.x_position,
 			y: issue.node.node_style.y_position,
