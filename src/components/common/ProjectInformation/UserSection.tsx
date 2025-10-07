@@ -68,9 +68,6 @@ export const UserSection = () => {
 				<Autocomplete
 					options={roleTypes}
 					label='Assign Role'
-					optionDisabled={role =>
-						['Member', 'Decision Maker', 'Facilitator'].includes(role)
-					}
 					placeholder={'Search for roles'}
 					onOptionsChange={({ selectedItems }) => {
 						setSelectedRole(selectedItems[0]);

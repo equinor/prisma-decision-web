@@ -1,4 +1,4 @@
-import { Button, CircularProgress, DatePicker, TextField } from '@equinor/eds-core-react';
+import { Button, CircularProgress, DatePicker, Switch, TextField } from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormProvider } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
@@ -34,7 +34,16 @@ export const ProjectInformation = () => {
 						/>
 						<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 					</div>
-					<DatePicker label='Select End Date' />
+					<DatePicker
+						label='Select End Date'
+						value={formMethods.watch('endDate')}
+						onChange={endDate => {
+							if (endDate) {
+								formMethods.setValue('endDate', endDate);
+							}
+						}}
+					/>
+					<Switch label='Make Project Public' {...register('isPublic')} />
 					<div className='col-span-1 md:col-span-2'>
 						<TextField
 							multiline
@@ -46,6 +55,7 @@ export const ProjectInformation = () => {
 						<ErrorMessage as={FormErrorMessage} name='description' errors={errors} />
 					</div>
 				</div>
+
 				<UserSection />
 				<Button
 					className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'

@@ -3,13 +3,7 @@ import { int, uuid, z } from 'zod/v4';
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
 export type IssueType = (typeof issueTypes)[number];
 
-export const roleTypes = [
-	'contributor',
-	'owner',
-	'Member',
-	'Decision Maker',
-	'Facilitator',
-] as const;
+export const roleTypes = ['Member', 'Decision Maker', 'Facilitator'] as const;
 export type RoleType = (typeof roleTypes)[number];
 
 export const opportunitySchema = z.object({
@@ -48,9 +42,11 @@ export const projectRoleSchema = z.object({
 });
 
 export const projectSchema = z.object({
-	description: z.string().min(1, 'Description is required'),
-	name: z.string().min(1, 'Name is required'),
 	id: uuid(),
+	name: z.string().min(1, 'Name is required'),
+	description: z.string().min(1, 'Description is required'),
+	isPublic: z.boolean(),
+	endDate: z.date(),
 	users: z.array(projectRoleSchema),
 	scenarios: z.array(scenarioSchema),
 });
