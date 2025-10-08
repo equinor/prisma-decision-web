@@ -34,15 +34,17 @@ export const ProjectInformation = () => {
 						/>
 						<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 					</div>
-					<DatePicker
-						label='Select End Date'
-						value={formMethods.watch('endDate')}
-						onChange={endDate => {
-							if (endDate) {
-								formMethods.setValue('endDate', endDate);
-							}
-						}}
-					/>
+					<div>
+						<DatePicker
+							label='Select End Date'
+							onChange={endDate => {
+								if (endDate) {
+									formMethods.setValue('endDate', endDate);
+								}
+							}}
+						/>
+						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
+					</div>
 					<Switch label='Make Project Public' {...register('isPublic')} />
 					<div className='col-span-1 md:col-span-2'>
 						<TextField
