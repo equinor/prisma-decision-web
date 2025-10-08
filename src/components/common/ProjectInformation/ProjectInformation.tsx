@@ -1,9 +1,10 @@
 import { Button, CircularProgress, DatePicker, Switch, TextField } from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
-import { FormProvider } from 'react-hook-form';
+import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { UserSection } from './UserSection';
+import { parseISO } from 'date-fns';
 
 export const ProjectInformation = () => {
 	const { formMethods, isPending, handleSubmit } = useProjectForm();
@@ -11,6 +12,13 @@ export const ProjectInformation = () => {
 		register,
 		formState: { errors },
 	} = formMethods;
+
+	const {
+		field: { value: endDate, onChange: onChangeEndDate },
+	} = useController({
+		name: 'endDate',
+		control: formMethods.control,
+	});
 
 	return (
 		<FormProvider {...formMethods}>
@@ -37,9 +45,10 @@ export const ProjectInformation = () => {
 					<div>
 						<DatePicker
 							label='Select End Date'
+							value={parseISO(endDate)}
 							onChange={endDate => {
 								if (endDate) {
-									formMethods.setValue('endDate', endDate);
+									onChangeEndDate(endDate.toISOString());
 								}
 							}}
 						/>

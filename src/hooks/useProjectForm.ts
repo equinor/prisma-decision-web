@@ -37,7 +37,7 @@ const defaultValues: Project = {
 	name: '',
 	description: '',
 	isPublic: false,
-	endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // default to 30 days from now
+	endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // default to 30 days from now
 	id: crypto.randomUUID(),
 	users: [],
 	scenarios: [

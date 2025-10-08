@@ -1,4 +1,5 @@
 import { int, uuid, z } from 'zod/v4';
+import { parseISO } from 'date-fns';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
 export type IssueType = (typeof issueTypes)[number];
@@ -46,9 +47,11 @@ export const projectSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	description: z.string().min(1, 'Description is required'),
 	isPublic: z.boolean(),
-	endDate: z
-		.date()
-		.refine(date => date >= new Date(), { message: 'End date must be in the future' }),
+	endDate: z.iso
+		.datetime()
+		.refine(date => parseISO(date) >= new Date(), {
+			message: 'End date must be in the future',
+		}),
 	users: z.array(projectRoleSchema),
 	scenarios: z.array(scenarioSchema),
 });
