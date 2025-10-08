@@ -5,6 +5,8 @@ import { Issue, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useUpdateIssue } from './api/useUpdateIssue';
 import { useSelectedScenario } from './useSelectedScenario';
+import { useGetIssues } from './api/useGetIssues';
+import { getNextIssuePosition } from '../utils/getNextIssuePosition';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
@@ -17,6 +19,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 		values: { ...defaultValues, ...issue },
 		resolver: zodResolver(issueSchema),
 	});
+	const { issues } = useGetIssues();
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
 			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
@@ -28,7 +31,22 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	const onSubmit = formMethods.handleSubmit(
 		async data => {
 			const mutationFn = issue ? updateIssue : createIssue;
-			await mutationFn(data);
+			if (issue) return await mutationFn(data);
+
+			const scenarioId = selectedScenario?.id || data.scenario_id;
+			const scenarioIssues = issues.filter(i => i.scenario_id === scenarioId);
+			const { x, y } = getNextIssuePosition(scenarioIssues);
+			await mutationFn({
+				...data,
+				node: {
+					...data.node,
+					node_style: {
+						...data.node.node_style,
+						x_position: x,
+						y_position: y,
+					},
+				},
+			});
 		},
 		errors => {
 			// eslint-disable-next-line no-console
