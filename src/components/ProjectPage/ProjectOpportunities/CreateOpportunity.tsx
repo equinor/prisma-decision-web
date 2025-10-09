@@ -50,15 +50,9 @@ export const CreateOpportunity = () => {
 						</Button>
 						<div>
 							<TextField
-								label='Name'
-								placeholder='Enter opportunity name...'
-								{...register('name')}
-							/>
-							<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
-						</div>
-						<div>
-							<TextField
 								label='Description'
+								multiline
+								rows={4}
 								placeholder='Enter opportunity description...'
 								{...register('description')}
 							/>

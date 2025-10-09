@@ -9,7 +9,6 @@ export type RoleType = (typeof roleTypes)[number];
 
 export const opportunitySchema = z.object({
 	id: uuid(),
-	name: z.string().min(1, 'Opportunity name is required'),
 	description: z.string().min(1, 'Description is required'),
 	scenario_id: uuid(),
 });

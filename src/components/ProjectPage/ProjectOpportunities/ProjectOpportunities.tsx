@@ -40,9 +40,8 @@ export const ProjectOpportunities = () => {
 							<Table.Head>
 								<Table.Row>
 									<Table.Cell className='w-12'></Table.Cell>
-									<Table.Cell className='w-1/3 md:w-3/9'>Name</Table.Cell>
-									<Table.Cell className='w-1/3 md:w-5/9'>Description</Table.Cell>
-									<Table.Cell className='w-1/3 md:w-2/9'>Date Added</Table.Cell>
+									<Table.Cell className='w-1/2 md:w-6/9'>Description</Table.Cell>
+									<Table.Cell className='w-1/2 md:w-3/9'>Date Added</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
@@ -53,7 +52,6 @@ export const ProjectOpportunities = () => {
 												<DeleteOpportunity opportunity={opportunity} />
 											</div>
 										</Table.Cell>
-										<Table.Cell>{opportunity.name}</Table.Cell>
 										<Table.Cell>{opportunity.description}</Table.Cell>
 										<Table.Cell></Table.Cell>
 									</Table.Row>

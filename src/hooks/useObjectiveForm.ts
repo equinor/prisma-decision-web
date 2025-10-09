@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { opportunitySchema } from '../validators';
+import { objectiveSchema } from '../validators';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedScenario } from './useSelectedScenario';
 
@@ -12,7 +12,7 @@ export const useObjectiveForm = (onSuccess?: () => void) => {
 			...defaultValues,
 			scenario_id: scenario?.id || crypto.randomUUID(),
 		},
-		resolver: zodResolver(opportunitySchema),
+		resolver: zodResolver(objectiveSchema),
 	});
 
 	const handleSubmit = formMethods.handleSubmit(

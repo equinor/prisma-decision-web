@@ -26,8 +26,7 @@ export const DeleteOpportunity = ({ opportunity }: DeleteOpportunityProps) => {
 						<div className='flex flex-col gap-4 text-center'>
 							<h2 className='text-2xl font-semibold'>Delete Opportunity</h2>
 							<p className='text-text-tertiary'>
-								Are you sure you want to delete the opportunity &quot;
-								{opportunity.name}&quot;?
+								Are you sure you want to delete the opportunity
 							</p>
 							<div className='flex flex-col gap-2'>
 								<Button variant='outlined' onClick={() => setIsOpen(prev => !prev)}>
