@@ -1,9 +1,10 @@
-import { Button, CircularProgress, DatePicker, TextField } from '@equinor/eds-core-react';
+import { Button, CircularProgress, DatePicker, Switch, TextField } from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
-import { FormProvider } from 'react-hook-form';
+import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { UserSection } from './UserSection';
+import { parseISO } from 'date-fns';
 
 export const ProjectInformation = () => {
 	const { formMethods, isPending, handleSubmit } = useProjectForm();
@@ -11,6 +12,13 @@ export const ProjectInformation = () => {
 		register,
 		formState: { errors },
 	} = formMethods;
+
+	const {
+		field: { value: endDate, onChange: onChangeEndDate },
+	} = useController({
+		name: 'endDate',
+		control: formMethods.control,
+	});
 
 	return (
 		<FormProvider {...formMethods}>
@@ -34,7 +42,19 @@ export const ProjectInformation = () => {
 						/>
 						<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 					</div>
-					<DatePicker label='Select End Date' />
+					<div>
+						<DatePicker
+							label='Select End Date'
+							value={parseISO(endDate)}
+							onChange={endDate => {
+								if (endDate) {
+									onChangeEndDate(endDate.toISOString());
+								}
+							}}
+						/>
+						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
+					</div>
+					<Switch label='Make Project Public' {...register('isPublic')} />
 					<div className='col-span-1 md:col-span-2'>
 						<TextField
 							multiline
@@ -46,6 +66,7 @@ export const ProjectInformation = () => {
 						<ErrorMessage as={FormErrorMessage} name='description' errors={errors} />
 					</div>
 				</div>
+
 				<UserSection />
 				<Button
 					className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'

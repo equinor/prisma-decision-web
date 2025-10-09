@@ -33,6 +33,7 @@
 		"@uidotdev/usehooks": "^2.4.1",
 		"@xyflow/react": "^12.8.6",
 		"axios": "^1.12.2",
+		"date-fns": "^4.1.0",
 		"jotai": "^2.15.0",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
