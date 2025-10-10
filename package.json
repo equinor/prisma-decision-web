@@ -45,7 +45,7 @@
 	},
 	"devDependencies": {
 		"@hookform/devtools": "^4.4.0",
-		"@tailwindcss/vite": "^4.1.13",
+		"@tailwindcss/vite": "^4.1.14",
 		"@types/react": "^19.1.16",
 		"@types/react-dom": "^19.1.9",
 		"@vitejs/plugin-react": "^5.0.4",
