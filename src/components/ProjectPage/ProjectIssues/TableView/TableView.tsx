@@ -14,16 +14,18 @@ export const TableView = () => {
 			onDragEnd={onDragEnd}
 			modifiers={[RestrictToElement]}
 		>
-			<div className='bg-background-default shadow-tile h-[calc(100vh-285px)] w-full rounded-sm p-4'>
-				<div className='flex h-full w-full gap-4 overflow-auto'>
-					{issueTypes.map(issueType => (
-						<IssueColumn
-							key={issueType}
-							issues={issues[issueType]}
-							issueType={issueType}
-							label={issueType}
-						/>
-					))}
+			<div className='bg-background-default shadow-tile rounded-sm p-4'>
+				<div className=' h-[calc(100vh-285px)] w-full overflow-auto'>
+					<div className='flex min-h-full flex-1 items-stretch gap-4'>
+						{issueTypes.map(issueType => (
+							<IssueColumn
+								key={issueType}
+								issues={issues[issueType]}
+								issueType={issueType}
+								label={issueType}
+							/>
+						))}
+					</div>
 				</div>
 			</div>
 			<DragOverlay>
