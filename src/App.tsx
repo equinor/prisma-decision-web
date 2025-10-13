@@ -8,6 +8,7 @@ import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectD
 import { ProjectOpportunities } from './components/ProjectPage/ProjectOpportunities/ProjectOpportunities';
 import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
 import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
+import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -20,6 +21,7 @@ const router = createBrowserRouter(
 				<Route path='opportunities' element={<ProjectOpportunities />} />
 				<Route path='objectives' element={<ProjectObjectives />} />
 				<Route path='influence-diagram' element={<InfluenceDiagram />} />
+				<Route path='decision-tree' element={<DecisionTree />} />
 			</Route>
 		</Route>,
 	),

@@ -4,6 +4,7 @@ import {
 	info_circle,
 	measure,
 	mood_happy,
+	share,
 	timeline,
 } from '@equinor/eds-icons';
 import { useState } from 'react';
@@ -74,6 +75,13 @@ export const SideBar = () => {
 					className='[&_svg]:fill-primary-resting border-b-0!'
 					icon={timeline}
 					to={`/project/${project.id}/${scenario.id}/influence-diagram`}
+				/>
+				<EdsSideBar.Link
+					as={Link}
+					label='Decision Tree'
+					className='[&_svg]:fill-primary-resting border-b-0!'
+					icon={share}
+					to={`/project/${project.id}/${scenario.id}/decision-tree`}
 				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>

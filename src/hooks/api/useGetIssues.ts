@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
-import { convertToNodes } from '../../utils/convertToNodes';
+import { convertToInfluenceNodes } from '../../utils/convertToInfluenceNodes';
 import { Node } from '@xyflow/react';
 
 export const useGetIssues = () => {
@@ -26,7 +26,7 @@ export const useGetNodes = () => {
 
 		queryFn: async () => {
 			const res = await apiClient.get<Issue[]>('/issues');
-			return convertToNodes(res.data);
+			return convertToInfluenceNodes(res.data);
 		},
 	});
 
