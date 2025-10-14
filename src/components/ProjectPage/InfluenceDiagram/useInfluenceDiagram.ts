@@ -36,8 +36,6 @@ export const useInfluenceDiagram = () => {
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
 
-	const selectedIssues = localNodes.filter(node => node.selected);
-
 	useEffect(() => {
 		setLocalNodes(
 			convertToNodes(issues).map(node => ({
@@ -136,7 +134,6 @@ export const useInfluenceDiagram = () => {
 		isValidConnection,
 		setEdges,
 		setNodes: setLocalNodes,
-		selectedIssues,
 		isSelecting,
 		onClickSelectionMode,
 		onClickPanMode,
