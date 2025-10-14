@@ -10,7 +10,7 @@ export const ListView = () => {
 	return (
 		<div
 			className='bg-background-default shadow-tile flex w-full flex-col
-        		items-start gap-4 rounded-sm p-4'
+        	items-start gap-4 rounded-sm p-4'
 		>
 			<div className='grid w-full items-center text-start'>
 				<div className='flex gap-2'>
@@ -32,7 +32,7 @@ export const ListView = () => {
 									<Table.Cell className='w-21 pl-1!'>
 										<Checkbox />
 									</Table.Cell>
-									<Table.Cell>Name</Table.Cell>
+									<Table.Cell className='min-w-48'>Name</Table.Cell>
 									<Table.Cell className='w-[1350px]'>Description</Table.Cell>
 									<Table.Cell className='w-24'>Alternatives/Options</Table.Cell>
 									<Table.Cell className='w-30'>Issue Type</Table.Cell>
