@@ -41,7 +41,7 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 				<Dialog
 					data-no-dnd
 					open
-					className='nodrag nowheel fixed top-1/2 left-1/2 max-h-[90vh]
+					className='nodrag nopan nowheel fixed top-1/2 left-1/2 max-h-[90vh]
 					 w-[min(700px,_90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
 				>
 					<DialogContent>

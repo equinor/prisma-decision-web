@@ -1,13 +1,13 @@
 import { Background, ConnectionMode, MarkerType, ReactFlow, SelectionMode } from '@xyflow/react';
 
 import { ConnectionLine } from './ConnectingLine';
-import { CustomEdge } from './CustomEdge';
-import { IssueNode } from './IssueNode';
-import { useInfluenceDiagram } from './useInfluenceDiagram';
 import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
+import { InfluenceEdge } from './InfluenceEdge';
+import { InfluenceNode } from './InfluenceNode';
+import { useInfluenceDiagram } from './useInfluenceDiagram';
 
-const nodeTypes = { issue: IssueNode };
-const edgeTypes = { issue: CustomEdge };
+const nodeTypes = { issue: InfluenceNode };
+const edgeTypes = { issue: InfluenceEdge };
 
 export const InfluenceDiagram = () => {
 	const {

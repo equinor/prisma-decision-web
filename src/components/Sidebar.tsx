@@ -1,5 +1,12 @@
 import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
-import { assignment_important, info_circle, measure, timeline } from '@equinor/eds-icons';
+import {
+	assignment_important,
+	info_circle,
+	measure,
+	mood_happy,
+	share,
+	timeline,
+} from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
@@ -62,6 +69,13 @@ export const SideBar = () => {
 					className='[&_svg]:fill-primary-resting border-b-0!'
 					icon={timeline}
 					to={`/project/${project.id}/${scenario.id}/influence-diagram`}
+				/>
+				<EdsSideBar.Link
+					as={Link}
+					label='Decision Tree'
+					className='[&_svg]:fill-primary-resting border-b-0!'
+					icon={share}
+					to={`/project/${project.id}/${scenario.id}/decision-tree`}
 				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>
