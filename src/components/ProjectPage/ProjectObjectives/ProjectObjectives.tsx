@@ -3,6 +3,7 @@ import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+import { format } from 'date-fns';
 
 export const ProjectObjectives = () => {
 	const scenario = useSelectedScenario();
@@ -41,7 +42,8 @@ export const ProjectObjectives = () => {
 									<Table.Cell className='w-12'></Table.Cell>
 									<Table.Cell className='w-1/3 md:w-3/9'>Name</Table.Cell>
 									<Table.Cell className='w-1/3 md:w-5/9'>Description</Table.Cell>
-									<Table.Cell className='w-1/3 md:w-2/9'>Date Added</Table.Cell>
+									<Table.Cell className='w-1/3 md:w-2/9'>Date Created</Table.Cell>
+									<Table.Cell className='w-1/3 md:w-2/9'>Date Updated</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
@@ -54,6 +56,16 @@ export const ProjectObjectives = () => {
 										</Table.Cell>
 										<Table.Cell>{objectives.name}</Table.Cell>
 										<Table.Cell>{objectives.description}</Table.Cell>
+										<Table.Cell>
+											{objectives.created_at
+												? format(objectives.created_at, 'yyyy-MM-dd')
+												: '-'}
+										</Table.Cell>
+										<Table.Cell>
+											{objectives.updated_at
+												? format(objectives.updated_at, 'yyyy-MM-dd')
+												: '-'}
+										</Table.Cell>
 										<Table.Cell></Table.Cell>
 									</Table.Row>
 								))}
