@@ -1,7 +1,7 @@
 import { Node } from '@xyflow/react';
 import { Issue } from '../validators';
 
-export const convertToNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
+export const convertToInfluenceNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
 	return issues.map(issue => ({
 		id: issue.node.id,
 		type: 'issue',
@@ -12,7 +12,6 @@ export const convertToNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
 			y: issue.node.node_style.y_position,
 		},
 		data: {
-			label: issue.name,
 			issue,
 		},
 	}));

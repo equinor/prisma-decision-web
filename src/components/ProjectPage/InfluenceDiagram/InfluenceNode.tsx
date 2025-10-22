@@ -5,12 +5,11 @@ import { getIssueCardType } from '../../../utils/getIssueCardType';
 import { Issue } from '../../../validators';
 import { CardContainer } from '../../common/Cards/CardContainer';
 
-export const IssueNode = ({ data, selected }: NodeProps<Node<{ issue: Issue }>>) => {
+export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue }>>) => {
 	const { expanded } = useExpandCard(data.issue.id);
 	const IssueCard = getIssueCardType(data.issue.type);
 	return (
 		<>
-			{/* Source handles */}
 			<Handle
 				type='source'
 				position={Position.Top}

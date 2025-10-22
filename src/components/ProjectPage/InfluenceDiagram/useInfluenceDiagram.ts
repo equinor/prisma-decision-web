@@ -18,8 +18,8 @@ import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges'
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { convertNodesToIssues } from '../../../utils/convertNodesToIssues';
-import { convertToEdges } from '../../../utils/convertToEdges';
-import { convertToNodes } from '../../../utils/convertToNodes';
+import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
+import { convertToInfluenceNodes } from '../../../utils/convertToInfluenceNodes';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
@@ -38,7 +38,7 @@ export const useInfluenceDiagram = () => {
 
 	useEffect(() => {
 		setLocalNodes(
-			convertToNodes(issues).map(node => ({
+			convertToInfluenceNodes(issues).map(node => ({
 				...node,
 				height: customNodeSizes[node.id]?.height || node.height,
 				width: customNodeSizes[node.id]?.width || node.width,
@@ -47,7 +47,7 @@ export const useInfluenceDiagram = () => {
 	}, [issues]);
 
 	useEffect(() => {
-		setEdges(convertToEdges(edges, convertToNodes(issues)));
+		setEdges(convertToInfluenceEdges(edges, convertToInfluenceNodes(issues)));
 	}, [edges, issues]);
 
 	const onConnect: OnConnect = params => {
@@ -107,7 +107,7 @@ export const useInfluenceDiagram = () => {
 			.filter(change => change.resizing);
 		if (resizeChange.length > 0) onNodeResize(resizeChange);
 		onLocalNodesChange(changes);
-		const updatedEdges = convertToEdges(edges, localNodes);
+		const updatedEdges = convertToInfluenceEdges(edges, localNodes);
 		setEdges(updatedEdges);
 	};
 

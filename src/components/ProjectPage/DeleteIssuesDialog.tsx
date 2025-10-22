@@ -30,7 +30,7 @@ export const DeleteIssuesDialog = ({ issue }: DeleteIssueDialogProps) => {
 				<Dialog
 					open
 					data-no-dnd
-					className='nodrag nowheel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
+					className='nodrag nopan nowheel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 				>
 					<DialogContent>
 						<div className='flex flex-col gap-4 text-center'>

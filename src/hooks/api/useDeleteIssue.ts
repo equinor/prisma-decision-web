@@ -10,6 +10,7 @@ export const useDeleteIssue = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 		},
 	});
 };
@@ -31,6 +32,9 @@ export const useDeleteIssueOptimistic = () => {
 			if (context?.previousIssues) {
 				queryClient.setQueryData(['issues'], context.previousIssues);
 			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 		},
 	});
 };

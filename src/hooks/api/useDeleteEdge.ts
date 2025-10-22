@@ -16,6 +16,9 @@ export const useDeleteEdge = () => {
 			queryClient.setQueryData(['edges'], updatedEdges);
 			return { previousEdges };
 		},
+		onSuccess: () => {
+			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
+		},
 		onError: (_err, _updatedEdge, context) => {
 			if (context?.previousEdges) {
 				queryClient.setQueryData(['edges'], context.previousEdges);

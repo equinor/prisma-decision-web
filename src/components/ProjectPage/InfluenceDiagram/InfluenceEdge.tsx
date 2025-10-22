@@ -9,7 +9,7 @@ import {
 } from '@xyflow/react';
 import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 
-export const CustomEdge = ({
+export const InfluenceEdge = ({
 	id,
 	sourceX,
 	sourceY,
