@@ -27,7 +27,6 @@ export const scenarioSchema = z.object({
 	project_id: uuid(),
 	is_default: z.boolean(),
 	objectives: z.array(objectiveSchema),
-	opportunities: z.array(opportunitySchema),
 });
 export const userSchema = z.object({
 	user_id: int(),
@@ -45,7 +44,7 @@ export const projectRoleSchema = z.object({
 export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
-	description: z.string().min(1, 'Description is required'),
+	opportunityStatement: z.string().min(1, 'Opportunity statement is required'),
 	isPublic: z.boolean(),
 	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
