@@ -1,9 +1,10 @@
-import { Button, Icon, TextField } from '@equinor/eds-core-react';
+import { Button, Icon, TextField, Switch } from '@equinor/eds-core-react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
 import { FormErrorMessage } from '../../../common/FormErrorMessage';
+import { issueTypes } from '../../../../validators';
 
 export const UncertaintyFormSection = () => {
 	const { control, register } = useIssueFormContext();
@@ -15,10 +16,19 @@ export const UncertaintyFormSection = () => {
 		control,
 		name: 'uncertainty.id',
 	});
-
+	const selectedType = useWatch({
+		control,
+		name: 'type',
+	});
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
+			{selectedType === issueTypes[2] && (
+				<div>
+					<Switch label='Is Key' {...register('uncertainty.is_key')} />
+					<ErrorMessage as={FormErrorMessage} name='uncertainty.is_key' />
+				</div>
+			)}
 			<div className='grid grid-cols-1 gap-4'>
 				{outcomesArray.fields.map((field, index) => (
 					<div

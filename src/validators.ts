@@ -7,6 +7,9 @@ export type IssueType = (typeof issueTypes)[number];
 export const roleTypes = ['Member', 'Decision Maker', 'Facilitator'] as const;
 export type RoleType = (typeof roleTypes)[number];
 
+export const decisionTypes = ['Policy', 'Focus', 'Tactical'] as const;
+export type DecisionType = (typeof decisionTypes)[number];
+
 export const opportunitySchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Opportunity name is required'),
@@ -56,6 +59,7 @@ export const projectSchema = z.object({
 export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	type: z.enum(decisionTypes),
 	options: z.array(
 		z.object({
 			name: z.string().min(1, 'Option name is required'),
@@ -81,6 +85,7 @@ export const utilitySchema = z.object({
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	is_key: z.boolean(),
 	outcomes: z.array(
 		z.object({
 			id: z.uuid(),
