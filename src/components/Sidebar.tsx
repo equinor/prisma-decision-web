@@ -1,12 +1,5 @@
 import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
-import {
-	assignment_important,
-	info_circle,
-	measure,
-	mood_happy,
-	share,
-	timeline,
-} from '@equinor/eds-icons';
+import { assignment_important, info_circle, measure, share, timeline } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
