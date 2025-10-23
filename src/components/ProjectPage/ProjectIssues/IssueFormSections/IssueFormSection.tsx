@@ -43,6 +43,7 @@ export const IssueFormSection = () => {
 				/>
 				<ErrorMessage as={FormErrorMessage} name='type' />
 			</div>
+
 			<div>
 				<Autocomplete
 					label='Boundary'
