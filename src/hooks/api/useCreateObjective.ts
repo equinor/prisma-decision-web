@@ -50,6 +50,7 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 			return _err;
 		},
 		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 			onSuccess?.();
 		},
