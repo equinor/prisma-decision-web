@@ -85,8 +85,6 @@ export const uncertaintySchema = z.object({
 		z.object({
 			id: z.uuid(),
 			name: z.string().min(1, 'Outcome name is required'),
-			probability: z.number().min(0, 'min 0').max(1, 'max 1'),
-			utility: z.number(),
 			uncertainty_id: z.uuid(),
 		}),
 	),
