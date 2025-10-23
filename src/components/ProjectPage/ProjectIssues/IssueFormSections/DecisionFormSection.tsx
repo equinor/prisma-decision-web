@@ -5,7 +5,7 @@ import { useIssueFormContext } from '../../../../hooks/useIssueForm';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../../../common/FormErrorMessage';
 import { useController } from 'react-hook-form';
-import { decisionTypes, issueTypes } from '../../../../validators';
+import { decisionTypes } from '../../../../validators';
 
 export const DecisionFormSection = () => {
 	const { control, register } = useIssueFormContext();
@@ -21,10 +21,7 @@ export const DecisionFormSection = () => {
 		control,
 		name: 'decision.id',
 	});
-	const selectedType = useWatch({
-		control,
-		name: 'type',
-	});
+
 	const {
 		field: {
 			onChange: onChangeDecisionType,
@@ -38,22 +35,20 @@ export const DecisionFormSection = () => {
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Decision Details</h3>
-			{selectedType === issueTypes[1] && (
-				<div>
-					<Autocomplete
-						label='Decision Type'
-						options={decisionTypes}
-						selectedOptions={[selectedDecisionType]}
-						hideClearButton
-						ref={decisionTypeRef}
-						onOptionsChange={({ selectedItems }) => {
-							if (selectedItems.length === 0) return;
-							onChangeDecisionType(selectedItems[0]);
-						}}
-					/>
-					<ErrorMessage as={FormErrorMessage} name='decision.type' />
-				</div>
-			)}
+			<div>
+				<Autocomplete
+					label='Decision Type'
+					options={decisionTypes}
+					selectedOptions={[selectedDecisionType]}
+					hideClearButton
+					ref={decisionTypeRef}
+					onOptionsChange={({ selectedItems }) => {
+						if (selectedItems.length === 0) return;
+						onChangeDecisionType(selectedItems[0]);
+					}}
+				/>
+				<ErrorMessage as={FormErrorMessage} name='decision.type' />
+			</div>{' '}
 			<div className='grid w-full grid-cols-1 gap-4'>
 				{options.map((field, index) => (
 					<div key={field.id} className='relative grid grid-cols-[3fr_1fr_auto] gap-2'>
