@@ -16,6 +16,9 @@ export const useCreateEdge = () => {
 			queryClient.setQueryData(['edges'], [...previousEdges, newEdge]);
 			return { previousEdges };
 		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+		},
 		onError: (_err, _newEdge, context) => {
 			if (context?.previousEdges) {
 				queryClient.setQueryData(['edges'], context.previousEdges);

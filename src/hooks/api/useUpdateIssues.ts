@@ -9,7 +9,8 @@ export const useUpdateIssues = () => {
 			await apiClient.put('/issues', issues);
 		},
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 		},
 	});
 };
@@ -32,6 +33,9 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onError: (_err, _issues, context) => {
 			queryClient.setQueryData(['issues'], context?.previousIssues);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 		},
 	});
 };
