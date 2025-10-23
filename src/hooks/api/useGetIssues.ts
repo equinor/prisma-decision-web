@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { Issue } from '../../validators';
+import { InfluenceParentNode } from '../../components/ProjectPage/InfluenceDiagram/types';
 import { convertToInfluenceNodes } from '../../utils/convertToInfluenceNodes';
-import { Node } from '@xyflow/react';
+import { Issue } from '../../validators';
 
 export const useGetIssues = () => {
 	const { data = [], ...rest } = useQuery({
@@ -20,7 +20,7 @@ export const useGetIssues = () => {
 	};
 };
 
-const defaultValue: Node<{ issue: Issue }>[] = [];
+const defaultValue: InfluenceParentNode[] = [];
 export const useGetNodes = () => {
 	const { data = defaultValue, ...rest } = useQuery({
 		queryKey: ['nodes'],

@@ -1,16 +1,9 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { collapse_screen } from '@equinor/eds-icons';
-import {
-	BaseEdge,
-	EdgeLabelRenderer,
-	EdgeProps,
-	getSmoothStepPath,
-	Node,
-	useNodes,
-} from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, useNodes } from '@xyflow/react';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { Issue } from '../../../validators';
 import { cn } from '../../../utils/cn';
+import { InfluenceParentNode } from '../InfluenceDiagram/types';
 
 export const DecisionTreeEdge = ({
 	id,
@@ -34,7 +27,7 @@ export const DecisionTreeEdge = ({
 		sourcePosition,
 		targetPosition,
 	});
-	const nodes = useNodes<Node<{ issue: Issue }>>();
+	const nodes = useNodes<InfluenceParentNode>();
 	const sourceNode = nodes.find(n => n.id === source);
 	const { expanded, toggleExpanded } = useExpandedTreeNodes(target);
 

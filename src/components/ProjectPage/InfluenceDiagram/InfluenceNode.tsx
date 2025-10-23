@@ -1,11 +1,16 @@
-import { Handle, Node, NodeProps, NodeResizeControl, Position } from '@xyflow/react';
+import { Table } from '@equinor/eds-core-react';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { Handle, NodeProps, NodeResizeControl, Position, useEdges, useNodes } from '@xyflow/react';
+import { useMemo } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
+import { buildInfluenceTable } from '../../../utils/buildInfluenceRowItems';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { getIssueCardType } from '../../../utils/getIssueCardType';
 import { Issue } from '../../../validators';
 import { CardContainer } from '../../common/Cards/CardContainer';
+import { InfluenceParentNode } from './types';
 
-export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue }>>) => {
+export const InfluenceNode = ({ id, data, selected }: NodeProps<InfluenceParentNode>) => {
 	const { expanded } = useExpandCard(data.issue.id);
 	const IssueCard = getIssueCardType(data.issue.type);
 	return (
@@ -58,6 +63,9 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue 
 					</div>
 				</CardContainer>
 			)}
+			{data.issue.type === 'Uncertainty' && (
+				<ProbabilityTable id={id} issue={data.issue} selected={selected} />
+			)}
 			<NodeResizeControl
 				position='top-right'
 				minWidth={241}
@@ -83,5 +91,98 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue 
 				className='size-4! border-0! bg-transparent!'
 			/>
 		</>
+	);
+};
+
+const ProbabilityTable = ({
+	id,
+	issue,
+	selected,
+}: {
+	id: string;
+	issue: Issue;
+	selected: boolean;
+}) => {
+	const nodes = useNodes<InfluenceParentNode>();
+	const edges = useEdges();
+
+	// Find parent nodes (incoming edges -> sources are parents)
+	const parentNodes = useMemo(() => {
+		const incoming = edges.filter(e => e.target === id);
+		const parentIds = new Set(incoming.map(e => e.source));
+		return nodes.filter(n => parentIds.has(n.id)).map(n => n.data.issue);
+	}, [edges, nodes, id]);
+
+	// Build lightweight rows/columns, then convert to TanStack Table columns
+	const tableData = useMemo(() => {
+		return buildInfluenceTable(parentNodes, issue);
+	}, [parentNodes, id, issue, nodes]);
+
+	const columns = useMemo(
+		() =>
+			tableData.columns.map(col => {
+				const isCurrentIssueColumn = [
+					...issue.uncertainty.outcomes.map(o => o.id),
+					...issue.decision.options.map(o => o.id),
+				].includes(col.id);
+				if (isCurrentIssueColumn) {
+					return {
+						id: col.id,
+						header: col.header,
+						accessorKey: col.accessorKey,
+					};
+				}
+				return {
+					id: col.id,
+					header: col.header,
+					accessorKey: col.accessorKey,
+				};
+			}),
+		[tableData.columns],
+	);
+
+	const table = useReactTable({
+		data: tableData.rows,
+		columns,
+		getCoreRowModel: getCoreRowModel(),
+	});
+
+	if (table.getRowModel().rows.length === 0) return null;
+	return (
+		<CardContainer
+			className={`absolute top-0 left-[calc(100%+0.5rem)] h-auto w-auto overflow-hidden 
+					rounded-sm p-0 outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+		>
+			<Table className='w-full text-left text-xs'>
+				<Table.Head>
+					{table.getHeaderGroups().map(headerGroup => (
+						<Table.Row key={headerGroup.id}>
+							{headerGroup.headers.map(header => (
+								<Table.Cell key={header.id} className='px-2 py-1 whitespace-nowrap'>
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</Table.Cell>
+							))}
+						</Table.Row>
+					))}
+				</Table.Head>
+				<Table.Body>
+					{table.getRowModel().rows.map(row => (
+						<Table.Row key={row.id} className='odd:bg-background-light'>
+							{row.getVisibleCells().map(cell => (
+								<Table.Cell key={cell.id} className='px-2 py-1 whitespace-nowrap'>
+									{flexRender(cell.column.columnDef.cell, cell.getContext()) ??
+										String(cell.getValue() ?? '')}
+								</Table.Cell>
+							))}
+						</Table.Row>
+					))}
+				</Table.Body>
+			</Table>
+		</CardContainer>
 	);
 };

@@ -1,10 +1,10 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { add } from '@equinor/eds-icons';
-import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { Handle, NodeProps, Position } from '@xyflow/react';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { Issue } from '../../../validators';
+import { InfluenceParentNode } from '../InfluenceDiagram/types';
 
-export const ExpandNode = ({ id }: NodeProps<Node<{ issue: Issue }>>) => {
+export const ExpandNode = ({ id }: NodeProps<InfluenceParentNode>) => {
 	const { toggleExpanded } = useExpandedTreeNodes(id);
 
 	return (

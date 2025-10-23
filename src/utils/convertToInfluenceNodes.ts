@@ -1,7 +1,7 @@
-import { Node } from '@xyflow/react';
+import { InfluenceParentNode } from '../components/ProjectPage/InfluenceDiagram/types';
 import { Issue } from '../validators';
 
-export const convertToInfluenceNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
+export const convertToInfluenceNodes = (issues: Issue[]): InfluenceParentNode[] => {
 	return issues.map(issue => ({
 		id: issue.node.id,
 		type: 'issue',
