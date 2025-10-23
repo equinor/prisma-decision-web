@@ -59,11 +59,15 @@ export const ProjectInformation = () => {
 						<TextField
 							multiline
 							rows={5}
-							label='Description'
-							placeholder='Enter description...'
-							{...register('description')}
+							label='Opportunity Statement'
+							placeholder='Enter opportunity statement...'
+							{...register('opportunityStatement')}
 						/>
-						<ErrorMessage as={FormErrorMessage} name='description' errors={errors} />
+						<ErrorMessage
+							as={FormErrorMessage}
+							name='opportunityStatement'
+							errors={errors}
+						/>
 					</div>
 				</div>
 

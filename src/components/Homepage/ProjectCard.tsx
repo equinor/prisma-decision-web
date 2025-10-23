@@ -16,7 +16,9 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 			>
 				<div className='p-4'>
 					<h2 className='truncate text-lg font-semibold'>{project.name}</h2>
-					<p className='text-text-tertiary line-clamp-2'>{project.description}</p>
+					<p className='text-text-tertiary line-clamp-2'>
+						{project.opportunityStatement}
+					</p>
 				</div>
 				<div className='border-background-medium flex justify-between border-t-1 px-2 py-2'>
 					<DeleteProjectDialog project={project} />

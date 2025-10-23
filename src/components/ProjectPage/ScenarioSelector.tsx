@@ -27,7 +27,6 @@ export const ScenarioSelector = () => {
 						project_id: selectedProject.id,
 						id: crypto.randomUUID(),
 						objectives: [],
-						opportunities: [],
 						is_default: false,
 					});
 				}}

@@ -35,7 +35,7 @@ export const useProjectForm = () => {
 
 const defaultValues: Project = {
 	name: '',
-	description: '',
+	opportunityStatement: '',
 	isPublic: false,
 	endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // default to 30 days from now
 	id: crypto.randomUUID(),
@@ -46,7 +46,6 @@ const defaultValues: Project = {
 			project_id: crypto.randomUUID(),
 			name: 'main',
 			objectives: [],
-			opportunities: [],
 			is_default: true,
 		},
 	],

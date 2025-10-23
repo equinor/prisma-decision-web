@@ -1,12 +1,5 @@
 import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
-import {
-	assignment_important,
-	info_circle,
-	measure,
-	mood_happy,
-	share,
-	timeline,
-} from '@equinor/eds-icons';
+import { assignment_important, info_circle, measure, share, timeline } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
@@ -41,13 +34,7 @@ export const SideBar = () => {
 					as={Link}
 					to={`/project/${project.id}/${scenario.id}`}
 				/>
-				<EdsSideBar.Link
-					label='Opportunities'
-					className='[&_svg]:fill-primary-resting border-b-0!'
-					as={Link}
-					icon={mood_happy}
-					to={`/project/${project.id}/${scenario.id}/opportunities`}
-				/>
+
 				<EdsSideBar.Link
 					label='Objectives'
 					as={Link}
