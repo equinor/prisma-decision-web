@@ -4,6 +4,7 @@ import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { format } from 'date-fns';
+import { EditObjectiveDialog } from './EditObjectiveDialog';
 
 export const ProjectObjectives = () => {
 	const scenario = useSelectedScenario();
@@ -50,7 +51,8 @@ export const ProjectObjectives = () => {
 								{objectives.map(objectives => (
 									<Table.Row key={objectives.id}>
 										<Table.Cell className='px-0! pl-1!'>
-											<div className='flex justify-center'>
+											<div className='flex items-center gap-3'>
+												<EditObjectiveDialog objective={objectives} />
 												<DeleteObjectiveDialog objective={objectives} />
 											</div>
 										</Table.Cell>

@@ -1,28 +1,45 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { opportunitySchema } from '../validators';
+import { Objective } from '../validators';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedScenario } from './useSelectedScenario';
+import { useMemo } from 'react';
+import { useUpdateObjective } from './api/useUpdateObjective';
 
-export const useObjectiveForm = (onSuccess?: () => void) => {
-	const scenario = useSelectedScenario();
-	const { mutate: createObjective } = useCreateObjectiveOptimistic();
-	const formMethods = useForm({
+export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
+	const selectedScenario = useSelectedScenario();
+	const defaultValues = useMemo(
+		() => getDefaultValues(selectedScenario?.id || crypto.randomUUID()),
+		[selectedScenario?.id],
+	);
+	const formMethods = useForm<Objective>({
 		values: {
 			...defaultValues,
-			scenario_id: scenario?.id || crypto.randomUUID(),
+			...(objective
+				? {
+						id: objective.id,
+						name: objective.name,
+						description: objective.description,
+						scenario_id: objective.scenario_id,
+						// Explicitly exclude createdAt and updatedAt
+					}
+				: {}),
 		},
-		resolver: zodResolver(opportunitySchema),
+	});
+	const { mutate: createObjective, isPending: isCreating } = useCreateObjectiveOptimistic({
+		onSuccess: () => {
+			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
+			onSuccess?.();
+		},
+	});
+	const { mutate: updateObjective, isPending: isUpdating } = useUpdateObjective({
+		onSuccess: onSuccess,
 	});
 
 	const handleSubmit = formMethods.handleSubmit(
-		async data => {
-			onSuccess?.();
-			await createObjective(data);
-			formMethods.reset({
-				...defaultValues,
-				id: crypto.randomUUID(),
-				scenario_id: scenario?.id || crypto.randomUUID(),
+		data => {
+			const mutationFn = objective ? updateObjective : createObjective;
+			return mutationFn({
+				...data,
 			});
 		},
 		errors => {
@@ -34,11 +51,17 @@ export const useObjectiveForm = (onSuccess?: () => void) => {
 	return {
 		...formMethods,
 		handleSubmit,
+		isPending: isCreating || isUpdating,
 	};
 };
 
-const defaultValues = {
+const getDefaultValues = (scenarioId: string): Objective => ({
+	scenario_id: scenarioId,
 	name: '',
 	description: '',
 	id: crypto.randomUUID(),
+});
+type UseObjectiveFormArgs = {
+	objective?: Objective;
+	onSuccess?: () => void;
 };

@@ -15,7 +15,7 @@ export const useCreateObjective = () => {
 	});
 };
 
-export const useCreateObjectiveOptimistic = () => {
+export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: Objective) => {
@@ -48,6 +48,10 @@ export const useCreateObjectiveOptimistic = () => {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
 			return _err;
+		},
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['objectives'] });
+			onSuccess?.();
 		},
 	});
 };
