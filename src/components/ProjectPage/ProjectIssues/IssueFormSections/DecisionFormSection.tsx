@@ -51,7 +51,7 @@ export const DecisionFormSection = () => {
 			</div>{' '}
 			<div className='grid w-full grid-cols-1 gap-4'>
 				{options.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[3fr_1fr_auto] gap-2'>
+					<div key={field.id} className='relative grid grid-cols-[1fr_auto] gap-2'>
 						<div>
 							<TextField
 								placeholder={`Option ${index + 1}...`}
@@ -64,22 +64,7 @@ export const DecisionFormSection = () => {
 								name={`decision.options.${index}.name`}
 							/>
 						</div>
-						<div>
-							<TextField
-								type='number'
-								label='Utility'
-								{...register(`decision.options.${index}.utility`, {
-									setValueAs: value => {
-										const num = parseFloat(value);
-										return isNaN(num) ? 0 : num;
-									},
-								})}
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name={`decision.options.${index}.utility`}
-							/>
-						</div>
+
 						<Button
 							variant='ghost_icon'
 							onClick={() => remove(index)}
@@ -96,7 +81,6 @@ export const DecisionFormSection = () => {
 							name: '',
 							id: crypto.randomUUID(),
 							decision_id: decisionId,
-							utility: 0,
 						})
 					}
 					className='self-start'

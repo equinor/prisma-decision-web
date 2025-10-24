@@ -51,7 +51,6 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue 
 									className='bg-background-light flex justify-between rounded-sm px-2 py-1'
 								>
 									<p>{option.name}</p>
-									<p>{option.utility}</p>
 								</li>
 							))}
 						</ul>

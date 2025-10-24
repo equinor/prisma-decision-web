@@ -53,7 +53,6 @@ export const DecisionTreeEdge = ({
 		outcomeName = sourceNode.data.issue.decision.options.find(
 			o => o.id === data?.valueId,
 		)?.name;
-		value = sourceNode.data.issue.decision.options.find(o => o.id === data?.valueId)?.utility;
 	}
 	return (
 		<>
