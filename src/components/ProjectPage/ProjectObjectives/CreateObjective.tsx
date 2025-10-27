@@ -62,6 +62,8 @@ export const CreateObjective = () => {
 							<TextField
 								label='Description'
 								placeholder='Enter objective description...'
+								multiline
+								rows={6}
 								{...register('description')}
 							/>
 							<ErrorMessage

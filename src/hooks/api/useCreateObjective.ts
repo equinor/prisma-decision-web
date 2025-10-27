@@ -2,15 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective, Project } from '../../validators';
 
-export const useCreateObjective = () => {
+export const useCreateObjective = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: Objective) => {
 			const res = await apiClient.post('/objectives', [data]);
 			return res.data[0];
 		},
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['projects'] });
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
+			onSuccess?.();
 		},
 	});
 };
@@ -50,8 +51,6 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 			return _err;
 		},
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['projects'] });
-			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 			onSuccess?.();
 		},
 	});

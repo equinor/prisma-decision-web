@@ -28,28 +28,20 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 
 	return (
 		<>
-			<Button
-				variant='ghost_icon'
-				onClick={() => setIsOpen(true)}
-				className='nodrag'
-				data-no-dnd
-			>
+			<Button variant='ghost_icon' onClick={() => setIsOpen(true)}>
 				<Icon data={edit} />
 			</Button>
 			{isOpen && (
 				<Dialog
 					data-no-dnd
 					open
-					className='nodrag nopan nowheel fixed top-1/2 left-1/2 max-h-[90vh]
+					className='fixed top-1/2 left-1/2 max-h-[90vh]
 					 w-[min(700px,_90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
 				>
 					<DialogContent>
 						<form className='grid w-full grid-cols-1 gap-4' onSubmit={handleSubmit}>
 							<div className='w-full cursor-pointer pr-16'>
-								<h2 className='text-2xl font-semibold'>Create Objective</h2>
-								<p className='text-text-tertiary'>
-									Add objectives that will help achieve the desired outcome
-								</p>
+								<h2 className='text-2xl font-semibold'>Edit Objective</h2>
 							</div>
 							<Button
 								variant='ghost_icon'
@@ -73,6 +65,8 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 								<TextField
 									label='Description'
 									placeholder='Enter objective description...'
+									multiline
+									rows={6}
 									{...register('description')}
 								/>
 								<ErrorMessage
