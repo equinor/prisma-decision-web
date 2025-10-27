@@ -65,7 +65,6 @@ export const decisionSchema = z.object({
 	options: z.array(
 		z.object({
 			name: z.string().min(1, 'Option name is required'),
-			utility: z.number(),
 			id: uuid(),
 			decision_id: uuid(),
 		}),
