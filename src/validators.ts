@@ -22,6 +22,8 @@ export const objectiveSchema = z.object({
 	name: z.string().min(1, 'Objective name is required'),
 	description: z.string().min(1, 'Description is required'),
 	scenario_id: uuid(),
+	created_at: z.iso.datetime().optional(),
+	updated_at: z.iso.datetime().optional(),
 });
 
 export const scenarioSchema = z.object({
@@ -63,7 +65,6 @@ export const decisionSchema = z.object({
 	options: z.array(
 		z.object({
 			name: z.string().min(1, 'Option name is required'),
-			utility: z.number(),
 			id: uuid(),
 			decision_id: uuid(),
 		}),
@@ -90,8 +91,6 @@ export const uncertaintySchema = z.object({
 		z.object({
 			id: z.uuid(),
 			name: z.string().min(1, 'Outcome name is required'),
-			probability: z.number().min(0, 'min 0').max(1, 'max 1'),
-			utility: z.number(),
 			uncertainty_id: z.uuid(),
 		}),
 	),

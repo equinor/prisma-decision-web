@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteObjective } from '../../../hooks/api/useDeleteOjective';
+import { useDeleteObjective } from '../../../hooks/api/useDeleteObjective';
 import { Objective } from '../../../validators';
 
 export const DeleteObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
