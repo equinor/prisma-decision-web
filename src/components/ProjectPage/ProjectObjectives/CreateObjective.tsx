@@ -1,4 +1,4 @@
-import { Button, Icon, Popover, TextField } from '@equinor/eds-core-react';
+import { Button, Icon, CircularProgress, Popover, TextField } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
@@ -12,7 +12,10 @@ export const CreateObjective = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useObjectiveForm(() => setIsOpen(false));
+		isPending,
+	} = useObjectiveForm({
+		onSuccess: () => setIsOpen(false),
+	});
 
 	return (
 		<>
@@ -59,6 +62,8 @@ export const CreateObjective = () => {
 							<TextField
 								label='Description'
 								placeholder='Enter objective description...'
+								multiline
+								rows={6}
 								{...register('description')}
 							/>
 							<ErrorMessage
@@ -67,9 +72,12 @@ export const CreateObjective = () => {
 								errors={errors}
 							/>
 						</div>
-						<Button className='w-max justify-self-end' type='submit'>
-							<Icon data={add} />
-							Add
+						<Button
+							className='w-max justify-self-end'
+							type='submit'
+							disabled={isPending}
+						>
+							{isPending ? <CircularProgress size={16} /> : ' Add Objective'}
 						</Button>
 					</form>
 				</Popover.Content>

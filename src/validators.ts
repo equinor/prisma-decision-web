@@ -22,6 +22,8 @@ export const objectiveSchema = z.object({
 	name: z.string().min(1, 'Objective name is required'),
 	description: z.string().min(1, 'Description is required'),
 	scenario_id: uuid(),
+	created_at: z.iso.datetime().optional(),
+	updated_at: z.iso.datetime().optional(),
 });
 
 export const scenarioSchema = z.object({

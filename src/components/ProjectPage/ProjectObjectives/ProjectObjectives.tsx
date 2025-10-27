@@ -3,6 +3,8 @@ import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+import { format } from 'date-fns';
+import { EditObjectiveDialog } from './EditObjectiveDialog';
 
 export const ProjectObjectives = () => {
 	const scenario = useSelectedScenario();
@@ -38,22 +40,34 @@ export const ProjectObjectives = () => {
 						<Table className='w-full table-fixed'>
 							<Table.Head>
 								<Table.Row>
-									<Table.Cell className='w-12'></Table.Cell>
-									<Table.Cell className='w-1/3 md:w-3/9'>Name</Table.Cell>
-									<Table.Cell className='w-1/3 md:w-5/9'>Description</Table.Cell>
-									<Table.Cell className='w-1/3 md:w-2/9'>Date Added</Table.Cell>
+									<Table.Cell className='w-20'></Table.Cell>
+									<Table.Cell className='w-2/9'>Name</Table.Cell>
+									<Table.Cell className='w-5/9'>Description</Table.Cell>
+									<Table.Cell className='w-1/9 truncate'>Date Created</Table.Cell>
+									<Table.Cell className='w-1/9 truncate'>Date Updated</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
 								{objectives.map(objectives => (
 									<Table.Row key={objectives.id}>
 										<Table.Cell className='px-0! pl-1!'>
-											<div className='flex justify-center'>
+											<div className='flex items-center'>
+												<EditObjectiveDialog objective={objectives} />
 												<DeleteObjectiveDialog objective={objectives} />
 											</div>
 										</Table.Cell>
 										<Table.Cell>{objectives.name}</Table.Cell>
 										<Table.Cell>{objectives.description}</Table.Cell>
+										<Table.Cell className='truncate'>
+											{objectives.created_at
+												? format(objectives.created_at, 'yyyy-MM-dd')
+												: '-'}
+										</Table.Cell>
+										<Table.Cell className='truncate'>
+											{objectives.updated_at
+												? format(objectives.updated_at, 'yyyy-MM-dd')
+												: '-'}
+										</Table.Cell>
 										<Table.Cell></Table.Cell>
 									</Table.Row>
 								))}
