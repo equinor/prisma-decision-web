@@ -4,7 +4,6 @@ import {
 	IsValidConnection,
 	Node,
 	NodeChange,
-	NodeDimensionChange,
 	OnConnect,
 	OnReconnect,
 	useEdgesState,
@@ -28,22 +27,13 @@ export const useInfluenceDiagram = () => {
 	const { mutate: updateIssue } = useUpdateIssuesOptimistic();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
-	const [customNodeSizes, setCustomNodeSizes] = useState<
-		Record<string, { width: number; height: number }>
-	>({});
 	const [localNodes, setLocalNodes, onLocalNodesChange] = useNodesState([] as Node[]);
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
 
 	useEffect(() => {
-		setLocalNodes(
-			convertToInfluenceNodes(issues).map(node => ({
-				...node,
-				height: customNodeSizes[node.id]?.height || node.height,
-				width: customNodeSizes[node.id]?.width || node.width,
-			})),
-		);
+		setLocalNodes(convertToInfluenceNodes(issues));
 	}, [issues]);
 
 	useEffect(() => {
@@ -78,21 +68,6 @@ export const useInfluenceDiagram = () => {
 		await updateIssue(convertNodesToIssues(localNodes));
 	};
 
-	const onNodeResize = (changes: NodeDimensionChange[]) => {
-		setCustomNodeSizes(prev => {
-			const updated = { ...prev };
-			changes.forEach(change => {
-				if (change.id && change.dimensions) {
-					updated[change.id] = {
-						width: change.dimensions.width,
-						height: change.dimensions.height,
-					};
-				}
-			});
-			return updated;
-		});
-	};
-
 	const onClickSelectionMode = () => {
 		setIsSelecting(true);
 	};
@@ -102,10 +77,6 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onNodesChange = (changes: NodeChange[]) => {
-		const resizeChange = changes
-			.filter(change => change.type === 'dimensions')
-			.filter(change => change.resizing);
-		if (resizeChange.length > 0) onNodeResize(resizeChange);
 		onLocalNodesChange(changes);
 		const updatedEdges = convertToInfluenceEdges(edges, localNodes);
 		setEdges(updatedEdges);

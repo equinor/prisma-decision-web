@@ -1,8 +1,9 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useAtom } from 'jotai';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
-import { getIssueCardType } from '../../../utils/getIssueCardType';
 import { Issue } from '../../../validators';
+import { DecisionCard } from '../../common/Cards/DecisionCard';
+import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
 import { testAtom } from './useDecisionTree';
 
 const handlePositions = [Position.Left, Position.Right];
@@ -11,7 +12,7 @@ export const DecisionTreeNode = ({
 	data,
 	id,
 }: NodeProps<Node<{ issue: Issue; path: Set<string> }>>) => {
-	const IssueCard = getIssueCardType(data.issue.type);
+	const IssueCard = data.issue.type === 'Decision' ? DecisionCard : UncertaintyCard;
 	const [selectedNodes, setSelectedNodes] = useAtom(testAtom);
 	const selected = selectedNodes.has(id) || (data.path.size === 0 && selectedNodes.size > 0);
 	return (
@@ -41,8 +42,9 @@ export const DecisionTreeNode = ({
 				</>
 			))}
 			<IssueCard
+				isDecisionTree
 				issue={data.issue}
-				className={`h-full w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				className={`h-[130px] w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
 			/>
 		</div>
 	);
