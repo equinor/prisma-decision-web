@@ -1,8 +1,10 @@
 import { Table } from '@equinor/eds-core-react';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { Handle, NodeProps, NodeResizeControl, Position, useEdges, useNodes } from '@xyflow/react';
+import { Handle, NodeProps, NodeResizeControl, Position } from '@xyflow/react';
 import { useMemo } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
+import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { buildInfluenceTable } from '../../../utils/buildInfluenceRowItems';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { getIssueCardType } from '../../../utils/getIssueCardType';
@@ -103,62 +105,41 @@ const ProbabilityTable = ({
 	issue: Issue;
 	selected: boolean;
 }) => {
-	const nodes = useNodes<InfluenceParentNode>();
-	const edges = useEdges();
+	const issues = useSelectedProjectIssues();
+	const edges = useSelectedProjectEdges();
 
 	// Find parent nodes (incoming edges -> sources are parents)
 	const parentNodes = useMemo(() => {
-		const incoming = edges.filter(e => e.target === id);
-		const parentIds = new Set(incoming.map(e => e.source));
-		return nodes.filter(n => parentIds.has(n.id)).map(n => n.data.issue);
-	}, [edges, nodes, id]);
+		const incoming = edges.filter(e => e.head_id === id);
+		const parentIds = new Set(incoming.map(e => e.tail_id));
+		return issues.filter(n => parentIds.has(n.node.id));
+	}, [edges, issues, id]);
 
 	// Build lightweight rows/columns, then convert to TanStack Table columns
-	const tableData = useMemo(() => {
+	const { columns, rows } = useMemo(() => {
 		return buildInfluenceTable(parentNodes, issue);
-	}, [parentNodes, id, issue, nodes]);
-
-	const columns = useMemo(
-		() =>
-			tableData.columns.map(col => {
-				const isCurrentIssueColumn = [
-					...issue.uncertainty.outcomes.map(o => o.id),
-					...issue.decision.options.map(o => o.id),
-				].includes(col.id);
-				if (isCurrentIssueColumn) {
-					return {
-						id: col.id,
-						header: col.header,
-						accessorKey: col.accessorKey,
-					};
-				}
-				return {
-					id: col.id,
-					header: col.header,
-					accessorKey: col.accessorKey,
-				};
-			}),
-		[tableData.columns],
-	);
+	}, [parentNodes, id, issue, issues]);
 
 	const table = useReactTable({
-		data: tableData.rows,
+		data: rows,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	});
-
 	if (table.getRowModel().rows.length === 0) return null;
 	return (
 		<CardContainer
 			className={`absolute top-0 left-[calc(100%+0.5rem)] h-auto w-auto overflow-hidden 
-					rounded-sm p-0 outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+			p-0 outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 		>
 			<Table className='w-full text-left text-xs'>
 				<Table.Head>
 					{table.getHeaderGroups().map(headerGroup => (
 						<Table.Row key={headerGroup.id}>
 							{headerGroup.headers.map(header => (
-								<Table.Cell key={header.id} className='px-2 py-1 whitespace-nowrap'>
+								<Table.Cell
+									key={header.id}
+									className='min-w-25 px-2 py-1 whitespace-nowrap'
+								>
 									{header.isPlaceholder
 										? null
 										: flexRender(
@@ -173,12 +154,19 @@ const ProbabilityTable = ({
 				<Table.Body>
 					{table.getRowModel().rows.map(row => (
 						<Table.Row key={row.id} className='odd:bg-background-light'>
-							{row.getVisibleCells().map(cell => (
-								<Table.Cell key={cell.id} className='px-2 py-1 whitespace-nowrap'>
-									{flexRender(cell.column.columnDef.cell, cell.getContext()) ??
-										String(cell.getValue() ?? '')}
-								</Table.Cell>
-							))}
+							{row.getVisibleCells().map(cell => {
+								return (
+									<Table.Cell
+										key={cell.id}
+										className='px-2 py-1 whitespace-nowrap'
+									>
+										{flexRender(
+											cell.column.columnDef.cell,
+											cell.getContext(),
+										) ?? String(cell.getValue() ?? '')}
+									</Table.Cell>
+								);
+							})}
 						</Table.Row>
 					))}
 				</Table.Body>

@@ -82,6 +82,15 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
+export const discreteProbabilitySchema = z.object({
+	child_outcome_id: uuid(),
+	id: uuid(),
+	parent_options_ids: z.array(uuid()),
+	parent_outcome_ids: z.array(uuid()),
+	probability: z.number().min(0, 'min 0').max(1, 'max 1'),
+	uncertainty_id: uuid(),
+});
+
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
@@ -90,11 +99,11 @@ export const uncertaintySchema = z.object({
 		z.object({
 			id: z.uuid(),
 			name: z.string().min(1, 'Outcome name is required'),
-			probability: z.number().min(0, 'min 0').max(1, 'max 1'),
 			utility: z.number(),
 			uncertainty_id: z.uuid(),
 		}),
 	),
+	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({

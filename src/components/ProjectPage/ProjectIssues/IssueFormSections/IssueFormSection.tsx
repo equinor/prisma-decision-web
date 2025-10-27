@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@equinor/eds-core-react';
+import { Autocomplete, Textarea, TextField } from '@equinor/eds-core-react';
 import { useController } from 'react-hook-form';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
 import { ErrorMessage } from '@hookform/error-message';
@@ -59,11 +59,10 @@ export const IssueFormSection = () => {
 				<ErrorMessage as={FormErrorMessage} name='boundary' />
 			</div>
 			<div className='col-span-2'>
-				<TextField
+				<Textarea
 					label='Description'
 					placeholder='Enter description...'
 					{...register('description')}
-					multiline
 					rows={4}
 				/>
 				<ErrorMessage as={FormErrorMessage} name='description' />

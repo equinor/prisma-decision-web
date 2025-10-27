@@ -1,3 +1,4 @@
+import { TextField } from '@equinor/eds-core-react';
 import { Issue, IssueType } from '../validators';
 
 export type InfluenceRowSelection = {
@@ -93,7 +94,36 @@ export const buildInfluenceTable = (parents: Issue[], current: Issue) => {
 					accessorKey: outcome.id,
 				}));
 
-	const columns = [...parentColumns, ...currentOptionColumns];
+	const columns = [...parentColumns, ...currentOptionColumns].map(col => {
+		const isCurrentIssueColumn = [
+			...current.uncertainty.outcomes.map(o => o.id),
+			...current.decision.options.map(o => o.id),
+		].includes(col.id);
+		if (isCurrentIssueColumn) {
+			return {
+				id: col.id,
+				header: col.header,
+				cell: () => {
+					return (
+						<TextField
+							type='number'
+							className='nopan nodrag'
+							pattern='[0-9]*'
+							min={0}
+							max={1}
+							step={0.01}
+						/>
+					);
+				},
+				accessorKey: col.accessorKey,
+			};
+		}
+		return {
+			id: col.id,
+			header: col.header,
+			accessorKey: col.accessorKey,
+		};
+	});
 
 	const rows: InfluenceTableRow[] = rowItems.map(item => {
 		const row: InfluenceTableRow = { id: item.id };
