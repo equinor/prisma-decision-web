@@ -5,6 +5,7 @@ import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
 import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
+import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 
 const nodeTypes = { issue: InfluenceNode };
 const edgeTypes = { issue: InfluenceEdge };
@@ -45,7 +46,7 @@ export const InfluenceDiagram = () => {
 				connectionMode={ConnectionMode.Loose}
 				panOnDrag={!isSelecting}
 				selectNodesOnDrag={isSelecting}
-				selectionKeyCode={['Control']}
+				selectionKeyCode={['Con33trol']}
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
 				onNodeDragStop={onNodeDragStop}
@@ -62,6 +63,7 @@ export const InfluenceDiagram = () => {
 				fitViewOptions={{ padding: 0.4 }}
 			>
 				<Background />
+				<InfluenceDiagramValidation />
 				<DraggableToolbar
 					onClickPanMode={onClickPanMode}
 					onClickSelectionMode={onClickSelectionMode}
