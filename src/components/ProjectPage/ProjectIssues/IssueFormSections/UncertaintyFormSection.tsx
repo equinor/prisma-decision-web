@@ -21,7 +21,7 @@ export const UncertaintyFormSection = () => {
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
 			<div className='grid grid-cols-1 gap-4'>
 				{outcomesArray.fields.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[11fr_1fr]'>
+					<div key={field.id} className='relative grid grid-cols-[1fr_auto]'>
 						<div>
 							<TextField
 								placeholder={`Outcome ${index + 1}...`}
