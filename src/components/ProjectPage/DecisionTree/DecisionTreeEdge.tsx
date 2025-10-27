@@ -45,9 +45,6 @@ export const DecisionTreeEdge = ({
 		outcomeName = sourceNode.data.issue.uncertainty.outcomes.find(
 			o => o.id === data?.valueId,
 		)?.name;
-		value = sourceNode.data.issue.uncertainty.outcomes.find(
-			o => o.id === data?.valueId,
-		)?.utility;
 	}
 	if (sourceNode?.data.issue.type === 'Decision') {
 		outcomeName = sourceNode.data.issue.decision.options.find(

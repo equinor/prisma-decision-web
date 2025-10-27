@@ -43,10 +43,6 @@ export const UncertaintyCard = ({ issue, ...rest }: UncertaintyCardProps) => {
 										items-center justify-end gap-2 rounded-sm px-2 py-1'
 									>
 										<p className='truncate'>{outcome.name}</p>
-										<p className='place-self-center truncate'>
-											{outcome.probability * 100}%
-										</p>
-										<p className='place-self-end truncate'>{outcome.utility}</p>
 									</li>
 								))}
 							</ul>
