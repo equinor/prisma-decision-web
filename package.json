@@ -33,7 +33,7 @@
 		"@radix-ui/react-collapsible": "^1.1.12",
 		"@tanstack/react-query": "^5.90.3",
 		"@uidotdev/usehooks": "^2.4.1",
-		"@xyflow/react": "^12.8.6",
+		"@xyflow/react": "^12.9.2",
 		"axios": "^1.12.2",
 		"date-fns": "^4.1.0",
 		"jotai": "^2.15.0",
