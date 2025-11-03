@@ -19,7 +19,7 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
-		"@azure/msal-browser": "^4.25.0",
+		"@azure/msal-browser": "^4.26.0",
 		"@azure/msal-react": "^3.0.20",
 		"@dagrejs/dagre": "^1.1.5",
 		"@dnd-kit/abstract": "^0.1.21",
