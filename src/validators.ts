@@ -103,7 +103,7 @@ const nodeStyleSchema = z.object({
 	y_position: z.number().int(),
 });
 
-export const nodeSchema = z.object({
+export const influenceNodeSchema = z.object({
 	id: uuid(),
 	scenario_id: uuid(),
 	issue_id: uuid(),
@@ -130,7 +130,7 @@ export const issueSchema = z.object({
 	value_metric: valueMetricSchema,
 	utility: utilitySchema,
 	uncertainty: uncertaintySchema,
-	node: nodeSchema,
+	node: influenceNodeSchema,
 });
 
 export type Project = z.infer<typeof projectSchema>;
@@ -141,3 +141,4 @@ export type Edge = z.infer<typeof edgeSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
 export type User = z.infer<typeof userSchema>;
 export type ProjectRole = z.infer<typeof projectRoleSchema>;
+export type InfluenceNode = z.infer<typeof influenceNodeSchema>;

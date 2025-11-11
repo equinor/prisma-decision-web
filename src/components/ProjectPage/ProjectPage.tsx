@@ -1,16 +1,17 @@
 import { Outlet } from 'react-router';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
-import { useGetIssues, useGetNodes } from '../../hooks/api/useGetIssues';
+import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
 
 export const ProjectPage = () => {
 	const selectedProject = useSelectedProject();
 	const { isLoading: isLoadingProjects } = useGetProjects();
 	const { isLoading: isLoadingIssues } = useGetIssues();
 	const { isLoading: isLoadingEdges } = useGetEdges();
-	const { isLoading: isLoadingNodes } = useGetNodes();
+	const { isLoading: isLoadingNodes } = useGetInfluenceNodes();
 
 	if (isLoadingIssues || isLoadingProjects || isLoadingEdges || isLoadingNodes)
 		return <LoadingSpinner />;

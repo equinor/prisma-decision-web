@@ -1,19 +1,23 @@
 import { Button, Icon, Menu } from '@equinor/eds-core-react';
 import { edit } from '@equinor/eds-icons';
+import { useNodes } from '@xyflow/react';
 import { useState } from 'react';
 import { useUpdateIssuesOptimistic } from '../../../../hooks/api/useUpdateIssues';
-import { convertNodesToIssues } from '../../../../utils/convertNodesToIssues';
+import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
+import { ReactFlowInfluenceNode } from '../../../../types';
 import { IssueType } from '../../../../validators';
-import { useNodes } from '@xyflow/react';
 
 export const ChangeIssueType = () => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
 	const [isOpen, setIsOpen] = useState(false);
-	const selectedIssues = useNodes().filter(node => node.selected);
+	const projectIssues = useSelectedProjectIssues();
+	const selectedNodes = useNodes<ReactFlowInfluenceNode>().filter(node => node.selected);
 
 	const handleIssueTypeChange = (newType: IssueType) => {
-		const issues = convertNodesToIssues(selectedIssues);
+		const issues = projectIssues.filter(issue =>
+			selectedNodes.some(node => node.data.node.issue_id === issue.id),
+		);
 		const updatedIssues = issues.map(issue => ({
 			...issue,
 			type: newType,
@@ -22,7 +26,7 @@ export const ChangeIssueType = () => {
 		setIsOpen(false);
 	};
 
-	const noSelectedIssues = selectedIssues.length === 0;
+	const noSelectedIssues = selectedNodes.length === 0;
 
 	return (
 		<>

@@ -1,15 +1,9 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { collapse_screen } from '@equinor/eds-icons';
-import {
-	BaseEdge,
-	EdgeLabelRenderer,
-	EdgeProps,
-	getSmoothStepPath,
-	Node,
-	useNodes,
-} from '@xyflow/react';
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, useNodes } from '@xyflow/react';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { Issue } from '../../../validators';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { ReactFlowInfluenceNode } from '../../../types';
 import { cn } from '../../../utils/cn';
 
 export const DecisionTreeEdge = ({
@@ -34,22 +28,22 @@ export const DecisionTreeEdge = ({
 		sourcePosition,
 		targetPosition,
 	});
-	const nodes = useNodes<Node<{ issue: Issue }>>();
+	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const sourceNode = nodes.find(n => n.id === source);
+	const issue = useSelectedProjectIssues().find(
+		issue => issue.id === sourceNode?.data?.node.issue_id,
+	);
 	const { expanded, toggleExpanded } = useExpandedTreeNodes(target);
 
+	if (!issue) return null;
 	let outcomeName: string | undefined;
 	let value: number | undefined;
 
-	if (sourceNode?.data.issue.type === 'Uncertainty') {
-		outcomeName = sourceNode.data.issue.uncertainty.outcomes.find(
-			o => o.id === data?.valueId,
-		)?.name;
+	if (issue.type === 'Uncertainty') {
+		outcomeName = issue.uncertainty.outcomes.find(o => o.id === data?.valueId)?.name;
 	}
-	if (sourceNode?.data.issue.type === 'Decision') {
-		outcomeName = sourceNode.data.issue.decision.options.find(
-			o => o.id === data?.valueId,
-		)?.name;
+	if (issue.type === 'Decision') {
+		outcomeName = issue.decision.options.find(o => o.id === data?.valueId)?.name;
 	}
 	return (
 		<>
