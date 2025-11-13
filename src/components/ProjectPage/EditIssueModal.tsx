@@ -18,7 +18,7 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 		issue,
 		onSuccess: () => setIsOpen(false),
 	});
-	const { control, onSubmit, isPending } = formMethods;
+	const { control, onSubmit, isPending, reset } = formMethods;
 	const selectedType = useWatch({
 		control,
 		name: 'type',
@@ -26,6 +26,7 @@ export const EditIssueModal = ({ issue }: EditIssueModalProps) => {
 
 	const handleClose = () => {
 		setIsOpen(false);
+		reset();
 	};
 	return (
 		<>
