@@ -42,7 +42,7 @@
 		"react-hook-form": "^7.66.0",
 		"react-router": "^7.9.5",
 		"tailwind-merge": "^3.4.0",
-		"zod": "^4.1.12"
+		"zod": "^4.1.13"
 	},
 	"devDependencies": {
 		"@hookform/devtools": "^4.4.0",
