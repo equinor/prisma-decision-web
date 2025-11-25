@@ -1,12 +1,11 @@
 import { Checkbox, EdsProvider, Table } from '@equinor/eds-core-react';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
-import { DeleteIssueDialog } from '../../DeleteIssueDialog';
-import { EditIssueModal } from '../../EditIssueModal';
+import { IssueRow } from './IssueRow';
 
 export const ListView = () => {
 	const issues = useSelectedProjectIssues();
 	const hasIssues = issues.length > 0;
+
 	return (
 		<div
 			className='bg-background-default shadow-tile flex w-full flex-col
@@ -44,35 +43,7 @@ export const ListView = () => {
 							</Table.Head>
 							<Table.Body>
 								{issues.map(issue => (
-									<Table.Row key={issue.id}>
-										<Table.Cell className='px-0! pl-1!'>
-											<div className='flex items-center'>
-												<Checkbox />
-												<EditIssueModal issue={issue} />
-												<DeleteIssueDialog issue={issue} />
-											</div>
-										</Table.Cell>
-										<Table.Cell>{issue.name}</Table.Cell>
-										<Table.Cell className='max-w-xl truncate'>
-											{issue.description}
-										</Table.Cell>
-										<Table.Cell>
-											{issue.type === 'Decision'
-												? issue.decision.options.length
-												: issue.type === 'Uncertainty'
-													? issue.uncertainty.outcomes.length
-													: null}
-										</Table.Cell>
-										<Table.Cell className={getIssueColumnColor(issue.type)}>
-											{issue.type}
-										</Table.Cell>
-										<Table.Cell className='capitalize'>
-											{issue.boundary}
-										</Table.Cell>
-										<Table.Cell className='whitespace-nowrap'>
-											2023-05-01
-										</Table.Cell>
-									</Table.Row>
+									<IssueRow key={issue.id} issue={issue} />
 								))}
 							</Table.Body>
 						</Table>

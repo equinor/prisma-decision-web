@@ -16,6 +16,9 @@ export const buildDecisionTreeEdge = (
 		zIndex: animated ? 1 : 0,
 		animated,
 		data: {
+			probability: node.tree_node.probabilities
+				? node.tree_node.probabilities[index].probability_value
+				: 0,
 			valueId:
 				node.tree_node.issue.type === 'Uncertainty'
 					? node.tree_node.issue.uncertainty.outcomes[index].id

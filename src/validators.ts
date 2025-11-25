@@ -65,9 +65,9 @@ export const decisionSchema = z.object({
 	options: z.array(
 		z.object({
 			name: z.string().min(1, 'Option name is required'),
-			utility: z.number(),
 			id: uuid(),
 			decision_id: uuid(),
+			utility: z.number().optional(),
 		}),
 	),
 });
@@ -84,6 +84,15 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
+export const discreteProbabilitySchema = z.object({
+	outcome_id: uuid(),
+	id: uuid(),
+	parent_option_ids: z.array(uuid()),
+	probability: z.number().min(0).max(1),
+	parent_outcome_ids: z.array(uuid()),
+	uncertainty_id: uuid(),
+});
+
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
@@ -96,6 +105,7 @@ export const uncertaintySchema = z.object({
 			uncertainty_id: z.uuid(),
 		}),
 	),
+	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({
@@ -144,3 +154,4 @@ export type Scenario = z.infer<typeof scenarioSchema>;
 export type User = z.infer<typeof userSchema>;
 export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
+export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;

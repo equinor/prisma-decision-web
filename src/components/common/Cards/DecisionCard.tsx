@@ -1,5 +1,5 @@
-import { Chip, EdsProvider, Icon } from '@equinor/eds-core-react';
-import { chevron_down, chevron_up } from '@equinor/eds-icons';
+import { Button, Chip, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { chevron_down, chevron_up, more_vertical } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { Issue } from '../../../validators';
@@ -7,10 +7,15 @@ import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
 import { cn } from '../../../utils/cn';
+import { useState } from 'react';
 
 export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardProps) => {
 	const hasOptions = issue.decision.options.length > 0;
 	const { expanded, toggle } = useExpandCard(issue.id);
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [editOpen, setEditOpen] = useState(false);
+	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
 		<CardContainer {...rest}>
@@ -20,8 +25,17 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 					<Chip className='capitalize'>{issue.boundary}</Chip>
 				</div>
 				<div>
-					<EditIssueModal issue={issue} />
-					<DeleteIssueDialog issue={issue} />
+					<Button
+						ref={setAnchorEl}
+						onClick={() => setMenuOpen(true)}
+						variant='ghost_icon'
+					>
+						<Icon data={more_vertical} />
+					</Button>
+					<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
+						<Menu.Item onClick={() => setEditOpen(true)}>Edit</Menu.Item>
+						<Menu.Item onClick={() => setDeleteOpen(true)}>Delete</Menu.Item>
+					</Menu>
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
@@ -64,6 +78,12 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 					</EdsProvider>
 				</Collapsible>
 			)}
+			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
+			<DeleteIssueDialog
+				issue={issue}
+				open={deleteOpen}
+				onClose={() => setDeleteOpen(false)}
+			/>
 		</CardContainer>
 	);
 };

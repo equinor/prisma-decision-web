@@ -1,5 +1,5 @@
-import { Chip, EdsProvider, Icon } from '@equinor/eds-core-react';
-import { chevron_down, chevron_up } from '@equinor/eds-icons';
+import { Button, Chip, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { chevron_down, chevron_up, delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { Issue } from '../../../validators';
@@ -7,10 +7,20 @@ import { CardContainer } from './CardContainer';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { cn } from '../../../utils/cn';
+import { useState } from 'react';
 
-export const UncertaintyCard = ({ issue, isDecisionTree, ...rest }: UncertaintyCardProps) => {
+export const UncertaintyCard = ({
+	issue,
+	isDecisionTree,
+	onClickOpenProbabilities,
+	...rest
+}: UncertaintyCardProps) => {
 	const hasOutcomes = issue.uncertainty.outcomes.length > 0;
 	const { expanded, toggle } = useExpandCard(issue.id);
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+	const [editOpen, setEditOpen] = useState(false);
+	const [deleteOpen, setDeleteOpen] = useState(false);
 	return (
 		<CardContainer {...rest}>
 			<div className='flex items-center justify-between'>
@@ -19,8 +29,28 @@ export const UncertaintyCard = ({ issue, isDecisionTree, ...rest }: UncertaintyC
 					<Chip className='capitalize'>{issue.boundary}</Chip>
 				</div>
 				<div>
-					<EditIssueModal issue={issue} />
-					<DeleteIssueDialog issue={issue} />
+					<Button
+						ref={setAnchorEl}
+						onClick={() => setMenuOpen(true)}
+						variant='ghost_icon'
+					>
+						<Icon data={more_vertical} />
+					</Button>
+					<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
+						<Menu.Item onClick={() => setEditOpen(true)}>
+							<Icon data={edit} />
+							<p>Edit</p>
+						</Menu.Item>
+						<Menu.Item onClick={() => setDeleteOpen(true)}>
+							<Icon data={delete_to_trash} />
+							<p>Delete</p>
+						</Menu.Item>
+						{onClickOpenProbabilities && (
+							<Menu.Item onClick={onClickOpenProbabilities}>
+								<p>Probabilities</p>
+							</Menu.Item>
+						)}
+					</Menu>
 				</div>
 			</div>
 			<h3 className='font-semibold '>{issue.name}</h3>
@@ -63,6 +93,12 @@ export const UncertaintyCard = ({ issue, isDecisionTree, ...rest }: UncertaintyC
 					</EdsProvider>
 				</Collapsible>
 			)}
+			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
+			<DeleteIssueDialog
+				issue={issue}
+				open={deleteOpen}
+				onClose={() => setDeleteOpen(false)}
+			/>
 		</CardContainer>
 	);
 };
@@ -71,4 +107,5 @@ type UncertaintyCardProps = {
 	issue: Issue;
 	className?: string;
 	isDecisionTree?: boolean;
+	onClickOpenProbabilities?: () => void;
 };

@@ -17,7 +17,7 @@ export const convertToDecisionTreeNode = (
 			y: issue.node.node_style.y_position,
 		},
 		data: {
-			issue,
+			issue: issue,
 			path,
 		},
 	};
