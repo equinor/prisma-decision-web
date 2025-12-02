@@ -40,9 +40,10 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 								{issue.decision.options.map(option => (
 									<li
 										key={option.id}
-										className='bg-background-light rounded-sm px-2 py-1'
+										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
 									>
 										<p className='truncate'>{option.name}</p>
+										<p className='truncate'>{option.utility}</p>
 									</li>
 								))}
 							</ul>

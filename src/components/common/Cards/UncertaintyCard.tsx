@@ -39,9 +39,10 @@ export const UncertaintyCard = ({ issue, isDecisionTree, ...rest }: UncertaintyC
 								{issue.uncertainty.outcomes.map(outcome => (
 									<li
 										key={outcome.id}
-										className='bg-background-light rounded-sm px-2 py-1'
+										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
 									>
 										<p className='truncate'>{outcome.name}</p>
+										<p className='truncate'>{outcome.utility}</p>
 									</li>
 								))}
 							</ul>
