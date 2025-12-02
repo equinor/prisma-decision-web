@@ -61,7 +61,7 @@ export const ProjectInformation = () => {
 						/>
 						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
 					</div>
-					<Switch label='Make Project Public' {...register('isPublic')} />
+					<Switch label='Make Project Public' {...register('public')} />
 					<div className='col-span-1 md:col-span-2'>
 						<Textarea
 							rows={5}
