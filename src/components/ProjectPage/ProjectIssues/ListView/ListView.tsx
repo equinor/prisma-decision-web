@@ -34,7 +34,7 @@ export const ListView = () => {
 									</Table.Cell>
 									<Table.Cell className='min-w-48'>Name</Table.Cell>
 									<Table.Cell className='w-[1350px]'>Description</Table.Cell>
-									<Table.Cell className='w-24'>Alternatives/Options</Table.Cell>
+									<Table.Cell className='w-24'>Outcomes/Options</Table.Cell>
 									<Table.Cell className='w-30'>Issue Type</Table.Cell>
 									<Table.Cell className='w-12'>Boundary</Table.Cell>
 									<Table.Cell className='w-34 whitespace-nowrap'>
