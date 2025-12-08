@@ -1,8 +1,11 @@
 import { useDraggable } from '@dnd-kit/react';
+import { Icon } from '@equinor/eds-core-react';
+import { IconData } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
+import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
-import { convertNodesToIssues } from '../../../../utils/convertNodesToIssues';
+import {} from '../../../../utils/convertNodeToInfluenceNode';
 import { CreateIssues } from '../../CreateIssue';
 import { DeleteIssuesDialog } from '../../DeleteIssuesDialog';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
@@ -10,8 +13,6 @@ import { ChangeIssueType } from './ChangeIssueType';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { ZoomControls } from './ZoomControls';
-import { IconData } from '@equinor/eds-icons';
-import { Icon } from '@equinor/eds-core-react';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -19,7 +20,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 		id: 'toolbar',
 	});
 	const isSelecting = useStore(state => state.selectNodesOnDrag);
-	const selectedIssues = useNodes().filter(node => node.selected);
+	const selectedNodes = useNodes<ReactFlowInfluenceNode>().filter(node => node.selected);
 	return (
 		<div
 			ref={ref}
@@ -41,7 +42,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
 			<ToggleExpandAll />
 			<div className='bg-background-light h-9 w-[2px]' />
-			<DeleteIssuesDialog issue={convertNodesToIssues(selectedIssues)} />
+			<DeleteIssuesDialog nodes={selectedNodes} />
 			<ChangeIssueType />
 			<div className='bg-background-light h-9 w-[2px]' />
 			<CreateIssues />

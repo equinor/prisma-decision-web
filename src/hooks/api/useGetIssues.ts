@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
-import { convertToInfluenceNodes } from '../../utils/convertToInfluenceNodes';
-import { Node } from '@xyflow/react';
+
+const defaultValue: Issue[] = [];
 
 export const useGetIssues = () => {
-	const { data = [], ...rest } = useQuery({
+	const { data = defaultValue, ...rest } = useQuery({
 		queryKey: ['issues'],
 		queryFn: async () => {
 			const res = await apiClient.get<Issue[]>('/issues');
@@ -16,23 +16,6 @@ export const useGetIssues = () => {
 
 	return {
 		issues: data,
-		...rest,
-	};
-};
-
-const defaultValue: Node<{ issue: Issue }>[] = [];
-export const useGetNodes = () => {
-	const { data = defaultValue, ...rest } = useQuery({
-		queryKey: ['nodes'],
-
-		queryFn: async () => {
-			const res = await apiClient.get<Issue[]>('/issues');
-			return convertToInfluenceNodes(res.data);
-		},
-	});
-
-	return {
-		nodes: data,
 		...rest,
 	};
 };

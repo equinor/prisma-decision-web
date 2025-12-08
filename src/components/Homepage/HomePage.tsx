@@ -2,10 +2,11 @@ import { Button, Icon, Search } from '@equinor/eds-core-react';
 import { useState } from 'react';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
-import { useGetIssues, useGetNodes } from '../../hooks/api/useGetIssues';
+import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
 import { Link } from 'react-router';
 import { add } from '@equinor/eds-icons';
+import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -15,7 +16,7 @@ export const HomePage = () => {
 	);
 	useGetIssues();
 	useGetEdges();
-	useGetNodes();
+	useGetInfluenceNodes();
 	return (
 		<div className='mx-auto w-[min(1600px,_90%)]'>
 			<div className='flex flex-col gap-12'>

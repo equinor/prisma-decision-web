@@ -1,10 +1,13 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { getIssueCardType } from '../../../utils/getIssueCardType';
-import { Issue } from '../../../validators';
+import { InfluenceNode as InfluenceNodeType } from '../../../validators';
 
-export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue }>>) => {
-	const IssueCard = getIssueCardType(data.issue.type);
+export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ node: InfluenceNodeType }>>) => {
+	const issue = useSelectedProjectIssues().find(issue => issue.id === data.node.issue_id);
+	if (!issue) return null;
+	const IssueCard = getIssueCardType(issue.type);
 	return (
 		<>
 			<Handle
@@ -33,8 +36,8 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue 
 			/>
 
 			<IssueCard
-				issue={data.issue}
-				className={`h-full max-w-[350px] overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				issue={issue}
+				className={`h-full max-w-[350px] overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 			/>
 		</>
 	);
