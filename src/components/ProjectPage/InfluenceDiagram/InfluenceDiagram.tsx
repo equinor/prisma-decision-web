@@ -33,7 +33,6 @@ interface ReactFlowConfig {
 const nodeTypes = { issue: InfluenceNode };
 const edgeTypes = { issue: InfluenceEdge };
 
-// Helper functions - Updated to use ReactFlow edge structure
 const getNodeConnectivity = (nodeId: string, edges: ReactFlowEdge[]) => {
 	const hasIncoming = edges.some(edge => edge.target === nodeId);
 	const hasOutgoing = edges.some(edge => edge.source === nodeId);
