@@ -26,7 +26,7 @@ export const useInfluenceDiagram = (
 	handleShowDecisionTree: (show: boolean) => void,
 	nodeProps?: { handleClassName?: string }, // Add this third parameter
 ) => {
-	const nodes = useSelectedProjectInfluenceNodes();
+	const nodes = useSelectedProjectInfluenceNodes(nodeProps?.handleClassName);
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
 	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
@@ -58,15 +58,8 @@ export const useInfluenceDiagram = (
 	}, [isError, error]);
 
 	useEffect(() => {
-		setLocalNodes(
-			convertToInfluenceNodes(issues, nodeProps?.handleClassName).map(node => ({
-				...node,
-				height: customNodeSizes[node.id]?.height || node.height,
-				width: customNodeSizes[node.id]?.width || node.width,
-			})),
-		);
-		refetch();
-	}, [issues]);
+		setLocalNodes(nodes);
+	}, [nodes]);
 
 	useEffect(() => {
 		setEdges(convertToInfluenceEdges(edges, nodes));
