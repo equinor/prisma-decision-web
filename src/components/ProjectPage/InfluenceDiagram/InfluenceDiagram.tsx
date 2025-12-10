@@ -87,7 +87,7 @@ const getValidationStyles = (
 
 const processNode = (
 	node: ReactFlowInfluenceNode,
-	edges: ReactFlowEdge[], // Updated type
+	edges: ReactFlowEdge[],
 	validationFlags: ValidationFlags,
 ): ReactFlowInfluenceNode => {
 	const { hasAnyEdges } = getNodeConnectivity(node.id, edges);
