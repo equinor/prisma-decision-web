@@ -1,13 +1,14 @@
-import { Button, Chip, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
-import { chevron_down, chevron_up, more_vertical } from '@equinor/eds-icons';
+import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { chevron_down, chevron_up, delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
+import { cn } from '../../../utils/cn';
 import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
-import { cn } from '../../../utils/cn';
-import { useState } from 'react';
+import { BoundaryLabel, DecisionLabel } from './DecisionLabel';
 
 export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardProps) => {
 	const hasOptions = issue.decision.options.length > 0;
@@ -20,11 +21,11 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 	return (
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
-				<div className='flex gap-2'>
-					<Chip>Decision</Chip>
-					<Chip className='capitalize'>{issue.boundary}</Chip>
+				<div className='flex gap-1'>
+					<DecisionLabel />
+					<BoundaryLabel boundary={issue.boundary} />
 				</div>
-				<div>
+				<div className=''>
 					<Button
 						ref={setAnchorEl}
 						onClick={() => setMenuOpen(true)}
@@ -33,21 +34,29 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 						<Icon data={more_vertical} />
 					</Button>
 					<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
-						<Menu.Item onClick={() => setEditOpen(true)}>Edit</Menu.Item>
-						<Menu.Item onClick={() => setDeleteOpen(true)}>Delete</Menu.Item>
+						<Menu.Item onClick={() => setEditOpen(true)}>
+							<Icon data={edit} />
+							<p>Edit</p>
+						</Menu.Item>
+						<Menu.Item onClick={() => setDeleteOpen(true)}>
+							<Icon data={delete_to_trash} />
+							<p>Delete</p>
+						</Menu.Item>
 					</Menu>
 				</div>
 			</div>
-			<h3 className='font-semibold '>{issue.name}</h3>
-			<p
-				className={cn('text-text-tertiary  overflow-hidden text-sm', {
-					'line-clamp-3': !expanded,
-				})}
-			>
-				{issue.description}
-			</p>
+			<div>
+				<h3 className='font-semibold '>{issue.name}</h3>
+				<p
+					className={cn('text-text-tertiary  overflow-hidden text-sm', {
+						'line-clamp-3': !expanded,
+					})}
+				>
+					{issue.description}
+				</p>
+			</div>
 			{!isDecisionTree && (
-				<Collapsible open={expanded} onOpenChange={toggle} className='pb-4'>
+				<Collapsible open={expanded} onOpenChange={toggle} className='pb-7'>
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOptions && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>

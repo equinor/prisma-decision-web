@@ -1,10 +1,11 @@
-import { Button, Chip, Icon, Menu } from '@equinor/eds-core-react';
+import { Button, Icon, Menu } from '@equinor/eds-core-react';
+import { delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
+import { useState } from 'react';
 import { Issue } from '../../../validators';
-import { CardContainer } from './CardContainer';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
-import { useState } from 'react';
-import { edit, more_vertical } from '@equinor/eds-icons';
+import { CardContainer } from './CardContainer';
+import { BoundaryLabel, FactLabel } from './DecisionLabel';
 
 export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -15,8 +16,8 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
-					<Chip>Fact</Chip>
-					<Chip className='capitalize'>{issue.boundary}</Chip>
+					<FactLabel />
+					<BoundaryLabel boundary={issue.boundary} />
 				</div>
 				<div>
 					<Button
@@ -28,15 +29,20 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 					</Button>
 					<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
 						<Menu.Item onClick={() => setEditOpen(true)}>
-							<p>Edit</p>
 							<Icon data={edit} />
+							<p>Edit</p>
 						</Menu.Item>
-						<Menu.Item onClick={() => setDeleteOpen(true)}>Delete</Menu.Item>
+						<Menu.Item onClick={() => setDeleteOpen(true)}>
+							<Icon data={delete_to_trash} />
+							<p>Delete</p>
+						</Menu.Item>
 					</Menu>
 				</div>
 			</div>
-			<h3 className='font-semibold '>{issue.name}</h3>
-			<p className='text-text-tertiary line-clamp-2 text-sm'>{issue.description}</p>
+			<div>
+				<h3 className='font-semibold '>{issue.name}</h3>
+				<p className='text-text-tertiary line-clamp-2 text-sm'>{issue.description}</p>
+			</div>
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
 			<DeleteIssueDialog
 				issue={issue}

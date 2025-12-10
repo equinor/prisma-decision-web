@@ -1,13 +1,14 @@
-import { Button, Chip, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
 import { chevron_down, chevron_up, delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
+import { cn } from '../../../utils/cn';
 import { Issue } from '../../../validators';
-import { CardContainer } from './CardContainer';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
-import { cn } from '../../../utils/cn';
-import { useState } from 'react';
+import { CardContainer } from './CardContainer';
+import { BoundaryLabel, UncertaintyLabel } from './DecisionLabel';
 
 export const UncertaintyCard = ({
 	issue,
@@ -25,8 +26,8 @@ export const UncertaintyCard = ({
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
-					<Chip>Uncertainty</Chip>
-					<Chip className='capitalize'>{issue.boundary}</Chip>
+					<UncertaintyLabel />
+					<BoundaryLabel boundary={issue.boundary} />
 				</div>
 				<div>
 					<Button
@@ -53,16 +54,18 @@ export const UncertaintyCard = ({
 					</Menu>
 				</div>
 			</div>
-			<h3 className='font-semibold '>{issue.name}</h3>
-			<p
-				className={cn('text-text-tertiary  overflow-hidden text-sm', {
-					'line-clamp-3': !expanded,
-				})}
-			>
-				{issue.description}
-			</p>
+			<div>
+				<h3 className='font-semibold '>{issue.name}</h3>
+				<p
+					className={cn('text-text-tertiary  overflow-hidden text-sm', {
+						'line-clamp-3': !expanded,
+					})}
+				>
+					{issue.description}
+				</p>
+			</div>
 			{!isDecisionTree && (
-				<Collapsible open={expanded} onOpenChange={toggle} className='pb-4'>
+				<Collapsible open={expanded} onOpenChange={toggle} className='pb-7'>
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOutcomes && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>

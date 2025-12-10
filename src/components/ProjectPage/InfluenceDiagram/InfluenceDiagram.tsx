@@ -23,6 +23,8 @@ export const InfluenceDiagram = () => {
 		onClickPanMode,
 		onClickSelectionMode,
 		isSelecting,
+		onEdgeMouseEnter,
+		onEdgeMouseLeave,
 	} = useInfluenceDiagram();
 
 	return (
@@ -51,6 +53,8 @@ export const InfluenceDiagram = () => {
 				onNodeDragStop={onNodeDragStop}
 				onNodesChange={onNodesChange}
 				onReconnectStart={onReconnectStart}
+				onEdgeMouseEnter={onEdgeMouseEnter}
+				onEdgeMouseLeave={onEdgeMouseLeave}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}

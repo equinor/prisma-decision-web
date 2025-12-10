@@ -1,11 +1,12 @@
-import { Button, Chip, Icon, Menu } from '@equinor/eds-core-react';
+import { Button, Icon, Menu } from '@equinor/eds-core-react';
 import { Issue } from '../../../validators';
 
-import { CardContainer } from './CardContainer';
+import { delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
+import { useState } from 'react';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
-import { more_vertical } from '@equinor/eds-icons';
-import { useState } from 'react';
+import { CardContainer } from './CardContainer';
+import { BoundaryLabel, UnassignedLabel } from './DecisionLabel';
 
 export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -16,8 +17,8 @@ export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
-					<Chip>Unassigned</Chip>
-					<Chip className='capitalize'>{issue.boundary}</Chip>
+					<UnassignedLabel />
+					<BoundaryLabel boundary={issue.boundary} />
 				</div>
 				<div>
 					<Button
@@ -28,13 +29,21 @@ export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 						<Icon data={more_vertical} />
 					</Button>
 					<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
-						<Menu.Item onClick={() => setEditOpen(true)}>Edit</Menu.Item>
-						<Menu.Item onClick={() => setDeleteOpen(true)}>Delete</Menu.Item>
+						<Menu.Item onClick={() => setEditOpen(true)}>
+							<Icon data={edit} />
+							<p>Edit</p>
+						</Menu.Item>
+						<Menu.Item onClick={() => setDeleteOpen(true)}>
+							<Icon data={delete_to_trash} />
+							<p>Delete</p>
+						</Menu.Item>
 					</Menu>
 				</div>
 			</div>
-			<h3 className='font-semibold '>{issue.name}</h3>
-			<p className='text-text-tertiary overflow-hidden text-sm'>{issue.description}</p>
+			<div>
+				<h3 className='font-semibold '>{issue.name}</h3>
+				<p className='text-text-tertiary overflow-hidden text-sm'>{issue.description}</p>
+			</div>
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
 			<DeleteIssueDialog
 				issue={issue}

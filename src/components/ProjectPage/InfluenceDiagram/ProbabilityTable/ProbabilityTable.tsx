@@ -9,7 +9,6 @@ import { close } from '@equinor/eds-icons';
 
 export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableProps) => {
 	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
-	const hasParents = parents.length > 0;
 
 	if (!childOutcomes.length) {
 		return (
@@ -20,18 +19,15 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 	}
 	return (
 		<CardContainer
-			className={`absolute top-0 left-[calc(100%+8px)] w-auto rounded-sm outline-2 ${getDiagramIssueBorderColor(issue.type, selected ?? false)}`}
+			className={`absolute top-0 left-[calc(100%+8px)] w-auto rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
 		>
-			{!hasParents && (
-				<p className='text-text-tertiary mb-2 text-[0.7rem]'>
-					No parent decisions or uncertainties connected. Probabilities apply to every
-					scenario.
-				</p>
-			)}
 			<div className='flex flex-col gap-4'>
-				<Button variant='ghost_icon' className='self-end' onClick={() => onClose?.(false)}>
-					<Icon data={close} />
-				</Button>
+				<div className='flex items-center justify-between'>
+					<h6 className='leading-6 font-medium'>{`${issue.name} Probability table`}</h6>
+					<Button variant='ghost_icon' onClick={() => onClose?.(false)}>
+						<Icon data={close} />
+					</Button>
+				</div>
 				<table className='w-full border-collapse'>
 					<thead>
 						<tr className='text-text-tertiary text-left text-[0.7rem] uppercase'>

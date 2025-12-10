@@ -5,6 +5,7 @@ import {
 	NodeChange,
 	OnConnect,
 	OnReconnect,
+	EdgeMouseHandler,
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
@@ -77,6 +78,36 @@ export const useInfluenceDiagram = () => {
 		setIsSelecting(false);
 	};
 
+	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
+		setEdges(edges => {
+			return edges.map(e => {
+				if (e.id !== edge.id) return e;
+				return {
+					...e,
+					data: {
+						...e.data,
+						hovered: true,
+					},
+				};
+			});
+		});
+	};
+
+	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
+		setEdges(edges => {
+			return edges.map(e => {
+				if (e.id !== edge.id) return e;
+				return {
+					...e,
+					data: {
+						...e.data,
+						hovered: false,
+					},
+				};
+			});
+		});
+	};
+
 	const onNodesChange = (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
 		onLocalNodesChange(changes);
 		const updatedEdges = convertToInfluenceEdges(edges, localNodes);
@@ -109,5 +140,7 @@ export const useInfluenceDiagram = () => {
 		isSelecting,
 		onClickSelectionMode,
 		onClickPanMode,
+		onEdgeMouseEnter,
+		onEdgeMouseLeave,
 	};
 };

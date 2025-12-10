@@ -41,7 +41,7 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ node: Influen
 			/>
 			<div
 				className={`h-full max-w-[350px]
-				overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 			>
 				{issue.type === 'Fact' && <FactCard issue={issue} />}
 				{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
