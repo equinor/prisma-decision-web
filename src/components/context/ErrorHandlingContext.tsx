@@ -23,7 +23,7 @@ const ErrorHandlingProvider = ({ children }: IProps) => {
 	const [errorHandlingState, setErrorHandlingState] =
 		useState<ErrorHandlingState>(initialErrorHandlingState);
 	const setErrorMessage = (msg: string) => {
-		setErrorHandlingState({ ...errorHandlingState, message: msg });
+		setErrorHandlingState(prev => ({ ...prev, message: msg }));
 	};
 
 	const setShowDecisionTree = (show: boolean) => {
