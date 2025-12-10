@@ -71,9 +71,7 @@ export const InfluenceDiagramValidation = ({
 					<Accordion.Panel>
 						<p>Validation and guidelines for building valid influence diagram.</p>
 						<Divider />
-						{errorHandlingState.message === '' ? (
-							<div></div>
-						) : (
+						{errorHandlingState.message !== '' && (
 							<div
 								className='flex items-center rounded-md p-3'
 								style={{
