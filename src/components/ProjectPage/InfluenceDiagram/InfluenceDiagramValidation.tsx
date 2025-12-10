@@ -1,6 +1,6 @@
 import { Accordion, Button, Divider } from '@equinor/eds-core-react';
 import { Icon } from '@equinor/eds-core-react';
-import { warning_outlined, check_circle_outlined } from '@equinor/eds-icons'; // import "save" icon
+import { warning_outlined, check_circle_outlined } from '@equinor/eds-icons';
 
 import { useContext, useState } from 'react';
 import { ErrorHandlingContext } from '../../context/ErrorHandlingContext';
