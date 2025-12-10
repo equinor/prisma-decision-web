@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
-import { BoundaryLabel, UnassignedLabel } from './DecisionLabel';
+import { UnassignedLabel } from './IssueLabel';
+import { BoundaryLabel } from './BoundaryLabel';
 
 export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);

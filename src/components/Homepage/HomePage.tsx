@@ -18,7 +18,7 @@ export const HomePage = () => {
 	useGetEdges();
 	useGetInfluenceNodes();
 	return (
-		<div className='mx-auto w-[min(1600px,_90%)]'>
+		<div className='mx-auto w-[min(1600px,90%)]'>
 			<div className='flex flex-col gap-12'>
 				<div className='max-w-[1000px]'>
 					<h1 className='text-3xl font-bold'>
@@ -45,7 +45,7 @@ export const HomePage = () => {
 							Create Project
 						</Button>
 					</div>
-					<div className='grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'>
+					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
 						{filteredProjects.map(project => (
 							<ProjectCard key={project.id} project={project} />
 						))}

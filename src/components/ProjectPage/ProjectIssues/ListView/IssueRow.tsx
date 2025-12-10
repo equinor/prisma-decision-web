@@ -1,5 +1,5 @@
-import { Table, Checkbox, Button, Icon } from '@equinor/eds-core-react';
-import { edit, delete_to_trash } from '@equinor/eds-icons';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
+import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
 import { Issue } from '../../../../validators';
@@ -13,7 +13,6 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 		<Table.Row key={issue.id}>
 			<Table.Cell className='px-0! pl-1!'>
 				<div className='flex items-center'>
-					<Checkbox />
 					<Button variant='ghost_icon' onClick={() => setEditOpen(true)}>
 						<Icon data={edit} />
 					</Button>

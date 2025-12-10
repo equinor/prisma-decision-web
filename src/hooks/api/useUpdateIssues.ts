@@ -36,6 +36,7 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['issues'] });
 		},
 	});
 };

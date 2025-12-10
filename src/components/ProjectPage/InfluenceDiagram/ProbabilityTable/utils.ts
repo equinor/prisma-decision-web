@@ -83,6 +83,15 @@ export const buildRowKey = (optionIds: string[], outcomeIds: string[]): string =
 	return key.length > 1 ? key : 'base';
 };
 
+export const calculateRowSum = (probabilities: DiscreteProbability[]): number => {
+	return probabilities.reduce((sum, p) => sum + (p.probability || 0), 0);
+};
+
+export const isRowSumValid = (sum: number): boolean => {
+	// Use a small epsilon for floating point comparison
+	return Math.abs(sum - 1) < 0.0001;
+};
+
 export type ParentDescriptor = {
 	issueId: string;
 	issueName: string;

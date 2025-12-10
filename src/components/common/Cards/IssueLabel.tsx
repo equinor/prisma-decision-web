@@ -48,22 +48,3 @@ export const FactLabel = () => {
 		</div>
 	);
 };
-
-export const BoundaryLabel = ({ boundary }: BoundaryLabelProps) => {
-	let bg = '';
-	if (boundary === 'in') bg = '#CAE6FA';
-	if (boundary === 'out') bg = '#FFD0CE';
-	if (boundary === 'on') bg = '#FBDAC1';
-	return (
-		<div
-			className={`rounded-xl bg-[${bg}] px-2 py-1 text-center 
-            text-xs leading-4 font-medium text-[#585858]`}
-		>
-			<p className='pt-0.5 capitalize'>{boundary}</p>
-		</div>
-	);
-};
-
-type BoundaryLabelProps = {
-	boundary: 'in' | 'out' | 'on';
-};

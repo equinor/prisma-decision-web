@@ -28,8 +28,8 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 				`bg-background-default shadow-tile absolute
 				left-1/2 z-10 flex w-max -translate-x-1/2 gap-2 rounded-sm p-2`,
 				{
-					'top-12': toolBarPosition === 'top',
-					'bottom-12': toolBarPosition === 'bottom',
+					'top-6': toolBarPosition === 'top',
+					'bottom-6': toolBarPosition === 'bottom',
 				},
 			)}
 		>
@@ -37,14 +37,14 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 				<Icon data={dragHandle} size={24} />
 			</div>
 			<ZoomControls />
-			<div className='bg-background-light h-9 w-[2px]' />
+			<div className='bg-background-light h-9 w-0.5' />
 			<TogglePanMode checked={!isSelecting} onChange={onClickPanMode} />
 			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
 			<ToggleExpandAll />
-			<div className='bg-background-light h-9 w-[2px]' />
+			<div className='bg-background-light h-9 w-0.5' />
 			<DeleteIssuesDialog nodes={selectedNodes} />
 			<ChangeIssueType />
-			<div className='bg-background-light h-9 w-[2px]' />
+			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
 		</div>
 	);

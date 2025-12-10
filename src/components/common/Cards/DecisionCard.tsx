@@ -8,7 +8,8 @@ import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
-import { BoundaryLabel, DecisionLabel } from './DecisionLabel';
+import { DecisionLabel } from './IssueLabel';
+import { BoundaryLabel } from './BoundaryLabel';
 
 export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardProps) => {
 	const hasOptions = issue.decision.options.length > 0;

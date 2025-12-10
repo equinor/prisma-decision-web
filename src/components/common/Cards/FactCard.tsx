@@ -5,7 +5,8 @@ import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
 import { CardContainer } from './CardContainer';
-import { BoundaryLabel, FactLabel } from './DecisionLabel';
+import { FactLabel } from './IssueLabel';
+import { BoundaryLabel } from './BoundaryLabel';
 
 export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
