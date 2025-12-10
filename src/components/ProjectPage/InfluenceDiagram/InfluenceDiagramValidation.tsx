@@ -9,22 +9,22 @@ import { CreateIssues } from '../CreateIssue';
 type InfluenceDiagramValidationProps = {
 	isHighlightNodesWithNoEdges: boolean;
 	isHighlightDecisionNodeWithNoOptions: boolean;
-	isHighlightUncertainityNodeWithNoOutcomes: boolean;
+	isHighlightUncertaintyNodeWithNoOutcomes: boolean;
 	isHighlightLoops: boolean;
 	handleHighlightNodesWithNoEdges: (missing: boolean) => void;
 	handleHighlightDecisionNodeWithNoOptions: (missing: boolean) => void;
-	handleHighlightUncertainityNodeWithNoOutcomes: (missing: boolean) => void;
+	handleHighlightUncertaintyNodeWithNoOutcomes: (missing: boolean) => void;
 	handleHighlightLoops: (hasLoops: boolean) => void;
 };
 
 export const InfluenceDiagramValidation = ({
 	isHighlightNodesWithNoEdges,
 	isHighlightDecisionNodeWithNoOptions,
-	isHighlightUncertainityNodeWithNoOutcomes,
+	isHighlightUncertaintyNodeWithNoOutcomes,
 	isHighlightLoops,
 	handleHighlightNodesWithNoEdges,
 	handleHighlightDecisionNodeWithNoOptions,
-	handleHighlightUncertainityNodeWithNoOutcomes,
+	handleHighlightUncertaintyNodeWithNoOutcomes,
 	handleHighlightLoops,
 }: InfluenceDiagramValidationProps) => {
 	const { errorHandlingState } = useContext(ErrorHandlingContext);
@@ -170,8 +170,8 @@ export const InfluenceDiagramValidation = ({
 											{key === 'UncertaintyOutcomes' && (
 												<Button
 													onClick={() =>
-														handleHighlightUncertainityNodeWithNoOutcomes(
-															!isHighlightUncertainityNodeWithNoOutcomes,
+														handleHighlightUncertaintyNodeWithNoOutcomes(
+															!isHighlightUncertaintyNodeWithNoOutcomes,
 														)
 													}
 												>

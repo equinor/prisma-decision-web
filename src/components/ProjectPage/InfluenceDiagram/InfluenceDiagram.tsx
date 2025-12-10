@@ -73,7 +73,7 @@ const getValidationStyles = (
 
 	// Uncertainty nodes without outcomes validation
 	if (
-		validationFlags.isHighlightUncertainityNodeWithNoOutcomes &&
+		validationFlags.isHighlightUncertaintyNodeWithNoOutcomes &&
 		hasAnyEdges &&
 		issue?.type === 'Uncertainty' &&
 		Array.isArray(issue.uncertainty?.outcomes) &&
@@ -116,7 +116,7 @@ const processNode = (
 interface ValidationFlags {
 	isHighlightNodesWithNoEdges: boolean;
 	isHighlightDecisionNodeWithNoOptions: boolean;
-	isHighlightUncertainityNodeWithNoOutcomes: boolean;
+	isHighlightUncertaintyNodeWithNoOutcomes: boolean;
 	isHighlightLoops: boolean;
 }
 
@@ -127,17 +127,15 @@ export const InfluenceDiagram = () => {
 	const [isHighlightNodesWithNoEdges, setIsHighlightNodesWithNoEdges] = useState(false);
 	const [isHighlightDecisionNodeWithNoOptions, setIsHighlightDecisionNodeWithNoOptions] =
 		useState(false);
-	const [
-		isHighlightUncertainityNodeWithNoOutcomes,
-		setIsHighlightUncertainityNodeWithNoOutcomes,
-	] = useState(false);
+	const [isHighlightUncertaintyNodeWithNoOutcomes, setIsHighlightUncertaintyNodeWithNoOutcomes] =
+		useState(false);
 	const [isHighlightLoops, setIsHighlightLoops] = useState(false);
 
 	// Validation flags object
 	const validationFlags: ValidationFlags = {
 		isHighlightNodesWithNoEdges,
 		isHighlightDecisionNodeWithNoOptions,
-		isHighlightUncertainityNodeWithNoOutcomes,
+		isHighlightUncertaintyNodeWithNoOutcomes,
 		isHighlightLoops,
 	};
 
@@ -191,7 +189,7 @@ export const InfluenceDiagram = () => {
 	const validationHandlers = {
 		handleHighlightNodesWithNoEdges: setIsHighlightNodesWithNoEdges,
 		handleHighlightDecisionNodeWithNoOptions: setIsHighlightDecisionNodeWithNoOptions,
-		handleHighlightUncertainityNodeWithNoOutcomes: setIsHighlightUncertainityNodeWithNoOutcomes,
+		handleHighlightUncertaintyNodeWithNoOutcomes: setIsHighlightUncertaintyNodeWithNoOutcomes,
 		handleHighlightLoops: setIsHighlightLoops,
 	};
 
