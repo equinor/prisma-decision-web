@@ -6,7 +6,12 @@ import { DecisionTreeNode } from './DecisionTreeNode';
 import { ExpandNode } from './ExpandableNode';
 import { OutputNode } from './OutputNode';
 import { ErrorHandlingContext } from '../../context/ErrorHandlingContext';
+import { useNavigate } from 'react-router-dom'; // Add this import
+
 import { Dialog, DialogContent, Button } from '@equinor/eds-core-react';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
+import { trim } from 'zod/v4';
 
 const nodeTypes = { treeNode: DecisionTreeNode, expandNode: ExpandNode, outputNode: OutputNode };
 const edgeTypes = { decisionTreeEdge: DecisionTreeEdge };
@@ -14,6 +19,9 @@ const edgeTypes = { decisionTreeEdge: DecisionTreeEdge };
 export const DecisionTree = () => {
 	const { nodes, edges } = useDecisionTree();
 	const { errorHandlingState, setShowDecisionTree } = useContext(ErrorHandlingContext);
+	const navigate = useNavigate(); // Add this hook
+	const selectedScenario = useSelectedScenario();
+	console.log(selectedScenario);
 
 	return errorHandlingState.message ? (
 		<div>
@@ -38,12 +46,17 @@ export const DecisionTree = () => {
 								setShowDecisionTree(true);
 							}}
 						>
-							Go to Decision Tree
+							Stay on Decision Tree
 						</Button>
 						<Button
 							color='danger'
 							onClick={() => {
-								history.back();
+								const currentPath = window.location.pathname;
+								const urlToInfluenceDiagram = currentPath.replace(
+									/\/decision-tree$/,
+									'/influence-diagram',
+								);
+								navigate(urlToInfluenceDiagram);
 							}}
 						>
 							Open Validation
