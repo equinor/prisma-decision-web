@@ -11,6 +11,7 @@ export const useCreateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['issues'] });
+			await queryClient.refetchQueries({ queryKey: ['nodes'] });
 			onSuccess?.();
 		},
 	});

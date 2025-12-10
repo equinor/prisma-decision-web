@@ -2,17 +2,17 @@ import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useDeleteIssueOptimistic } from '../../hooks/api/useDeleteIssue';
-import { Issue } from '../../validators';
+import { ReactFlowInfluenceNode } from '../../types';
 
-export const DeleteIssuesDialog = ({ issue }: DeleteIssueDialogProps) => {
+export const DeleteIssuesDialog = ({ nodes }: DeleteIssueDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { mutate: deleteIssue } = useDeleteIssueOptimistic();
 
 	const handleDelete = () => {
-		issue.forEach(iss => deleteIssue(iss.id));
+		nodes.forEach(node => deleteIssue(node.data.node.issue_id));
 		setIsOpen(false);
 	};
-	const noSelectedIssues = issue.length === 0;
+	const noSelectedIssues = nodes.length === 0;
 	return (
 		<>
 			<Button
@@ -36,7 +36,7 @@ export const DeleteIssuesDialog = ({ issue }: DeleteIssueDialogProps) => {
 						<div className='flex flex-col gap-4 text-center'>
 							<h2 className='text-2xl font-semibold'>Delete Issues</h2>
 							<p className='text-text-tertiary'>
-								You are about to delete {issue.length} issues. Are you sure you want
+								You are about to delete {nodes.length} issues. Are you sure you want
 								to delete the selected issues?
 							</p>
 							<div className='flex flex-col gap-2'>
@@ -56,5 +56,5 @@ export const DeleteIssuesDialog = ({ issue }: DeleteIssueDialogProps) => {
 };
 
 type DeleteIssueDialogProps = {
-	issue: Issue[];
+	nodes: ReactFlowInfluenceNode[];
 };

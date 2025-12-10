@@ -5,12 +5,14 @@ import {
 	EdgeLabelRenderer,
 	EdgeProps,
 	getSmoothStepPath,
-	Node,
 	useNodes,
+	Node,
+	Edge,
 } from '@xyflow/react';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { Issue } from '../../../validators';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../utils/cn';
+import { Issue } from '../../../validators';
 
 export const DecisionTreeEdge = ({
 	id,
@@ -25,7 +27,7 @@ export const DecisionTreeEdge = ({
 	target,
 	animated,
 	data,
-}: EdgeProps) => {
+}: EdgeProps<Edge<{ probability: number; valueId: string }>>) => {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
@@ -34,22 +36,19 @@ export const DecisionTreeEdge = ({
 		sourcePosition,
 		targetPosition,
 	});
-	const nodes = useNodes<Node<{ issue: Issue }>>();
+	const nodes = useNodes<Node<{ issue: Issue; path: Set<string> }>>();
 	const sourceNode = nodes.find(n => n.id === source);
+	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issue.id);
 	const { expanded, toggleExpanded } = useExpandedTreeNodes(target);
 
+	if (!issue) return null;
 	let outcomeName: string | undefined;
-	let value: number | undefined;
 
-	if (sourceNode?.data.issue.type === 'Uncertainty') {
-		outcomeName = sourceNode.data.issue.uncertainty.outcomes.find(
-			o => o.id === data?.valueId,
-		)?.name;
+	if (issue.type === 'Uncertainty') {
+		outcomeName = issue.uncertainty.outcomes.find(o => o.id === data?.valueId)?.name;
 	}
-	if (sourceNode?.data.issue.type === 'Decision') {
-		outcomeName = sourceNode.data.issue.decision.options.find(
-			o => o.id === data?.valueId,
-		)?.name;
+	if (issue.type === 'Decision') {
+		outcomeName = issue.decision.options.find(o => o.id === data?.valueId)?.name;
 	}
 	return (
 		<>
@@ -70,14 +69,16 @@ export const DecisionTreeEdge = ({
 				>
 					{outcomeName}
 				</div>
-				<div
-					className='nodrag pointer-events-auto absolute origin-center'
-					style={{
-						transform: `translate(calc(-100% - 20px), 0%) translate(${targetX}px, ${targetY}px)`,
-					}}
-				>
-					{value}
-				</div>
+				{issue.type === 'Uncertainty' && (
+					<div
+						className='nodrag pointer-events-auto absolute origin-center'
+						style={{
+							transform: `translate(calc(-100% - 20px), 0%) translate(${targetX}px, ${targetY}px)`,
+						}}
+					>
+						{Math.round((data?.probability || 0) * 100) / 100}
+					</div>
+				)}
 				{expanded && (
 					<div
 						className='nodrag nopan pointer-events-auto absolute z-2 origin-center'

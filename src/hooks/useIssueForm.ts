@@ -81,6 +81,7 @@ const getDefaultValues = (scenarioId: string): Issue => {
 			issue_id: crypto.randomUUID(),
 			is_key: false,
 			outcomes: [],
+			discrete_probabilities: [],
 		},
 		utility: {
 			id: crypto.randomUUID(),

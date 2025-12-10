@@ -26,7 +26,7 @@ export const UncertaintyFormSection = () => {
 
 			<div className='grid grid-cols-1 gap-4'>
 				{outcomesArray.fields.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[1fr_auto]'>
+					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
 						<div>
 							<TextField
 								placeholder={`Outcome ${index + 1}...`}
@@ -38,7 +38,22 @@ export const UncertaintyFormSection = () => {
 								name={`uncertainty.outcomes.${index}.name`}
 							/>
 						</div>
-
+						<div>
+							<TextField
+								type='number'
+								label='Utility'
+								{...register(`uncertainty.outcomes.${index}.utility`, {
+									setValueAs: value => {
+										const num = parseFloat(value);
+										return isNaN(num) ? 0 : num;
+									},
+								})}
+							/>
+							<ErrorMessage
+								as={FormErrorMessage}
+								name={`uncertainty.outcomes.${index}.utility`}
+							/>
+						</div>
 						<Button
 							variant='ghost_icon'
 							onClick={() => outcomesArray.remove(index)}
@@ -55,6 +70,7 @@ export const UncertaintyFormSection = () => {
 							name: '',
 							id: crypto.randomUUID(),
 							uncertainty_id: uncertaintyId,
+							utility: 0,
 						})
 					}
 					className='self-start'

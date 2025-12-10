@@ -5,6 +5,7 @@ import {
 	DialogContent,
 	Icon,
 	TextField,
+	Textarea,
 } from '@equinor/eds-core-react';
 import { useState } from 'react';
 import { Objective } from '../../../validators';
@@ -62,10 +63,9 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 								<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 							</div>
 							<div>
-								<TextField
+								<Textarea
 									label='Description'
 									placeholder='Enter objective description...'
-									multiline
 									rows={6}
 									{...register('description')}
 								/>

@@ -19,7 +19,15 @@ export type DecisionTree = {
 	tree_node: {
 		id: string;
 		issue: Issue | EndNodeIssue;
+		probabilities: DecisionTreeProbability[] | null;
 	};
+};
+
+export type DecisionTreeProbability = {
+	discrete_probability_id: string;
+	outcome_id: string;
+	outcome_name: string;
+	probability_value: number;
 };
 
 type EndNodeIssue = {

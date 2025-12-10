@@ -1,4 +1,11 @@
-import { Button, Icon, CircularProgress, Popover, TextField } from '@equinor/eds-core-react';
+import {
+	Button,
+	Icon,
+	CircularProgress,
+	Popover,
+	TextField,
+	Textarea,
+} from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
@@ -59,10 +66,9 @@ export const CreateObjective = () => {
 							<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 						</div>
 						<div>
-							<TextField
+							<Textarea
 								label='Description'
 								placeholder='Enter objective description...'
-								multiline
 								rows={6}
 								{...register('description')}
 							/>

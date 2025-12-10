@@ -50,7 +50,7 @@ export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunityStatement: z.string().min(1, 'Opportunity statement is required'),
-	isPublic: z.boolean(),
+	public: z.boolean(),
 	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
@@ -67,6 +67,7 @@ export const decisionSchema = z.object({
 			name: z.string().min(1, 'Option name is required'),
 			id: uuid(),
 			decision_id: uuid(),
+			utility: z.number().optional(),
 		}),
 	),
 });
@@ -83,6 +84,15 @@ export const utilitySchema = z.object({
 	values: z.array(z.number().int()),
 });
 
+export const discreteProbabilitySchema = z.object({
+	outcome_id: uuid(),
+	id: uuid(),
+	parent_option_ids: z.array(uuid()),
+	probability: z.number().min(0).max(1),
+	parent_outcome_ids: z.array(uuid()),
+	uncertainty_id: uuid(),
+});
+
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
@@ -90,10 +100,12 @@ export const uncertaintySchema = z.object({
 	outcomes: z.array(
 		z.object({
 			id: z.uuid(),
+			utility: z.number(),
 			name: z.string().min(1, 'Outcome name is required'),
 			uncertainty_id: z.uuid(),
 		}),
 	),
+	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({
@@ -103,7 +115,7 @@ const nodeStyleSchema = z.object({
 	y_position: z.number().int(),
 });
 
-export const nodeSchema = z.object({
+export const influenceNodeSchema = z.object({
 	id: uuid(),
 	scenario_id: uuid(),
 	issue_id: uuid(),
@@ -130,7 +142,7 @@ export const issueSchema = z.object({
 	value_metric: valueMetricSchema,
 	utility: utilitySchema,
 	uncertainty: uncertaintySchema,
-	node: nodeSchema,
+	node: influenceNodeSchema,
 });
 export type ErrorHandlingState = {
 	message: string;
@@ -144,3 +156,5 @@ export type Edge = z.infer<typeof edgeSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
 export type User = z.infer<typeof userSchema>;
 export type ProjectRole = z.infer<typeof projectRoleSchema>;
+export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
+export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;

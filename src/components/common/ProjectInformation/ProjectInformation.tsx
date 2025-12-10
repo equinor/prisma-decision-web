@@ -1,4 +1,11 @@
-import { Button, CircularProgress, DatePicker, Switch, TextField } from '@equinor/eds-core-react';
+import {
+	Button,
+	CircularProgress,
+	DatePicker,
+	Switch,
+	Textarea,
+	TextField,
+} from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
@@ -54,10 +61,9 @@ export const ProjectInformation = () => {
 						/>
 						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
 					</div>
-					<Switch label='Make Project Public' {...register('isPublic')} />
+					<Switch label='Make Project Public' {...register('public')} />
 					<div className='col-span-1 md:col-span-2'>
-						<TextField
-							multiline
+						<Textarea
 							rows={5}
 							label='Opportunity Statement'
 							placeholder='Enter opportunity statement...'

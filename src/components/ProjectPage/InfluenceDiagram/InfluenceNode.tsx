@@ -1,16 +1,21 @@
-import { Handle, Node, NodeProps, NodeResizeControl, Position } from '@xyflow/react';
-import { useExpandCard } from '../../../hooks/useExpandCard';
+import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { useState } from 'react';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
-import { getIssueCardType } from '../../../utils/getIssueCardType';
-import { Issue } from '../../../validators';
-import { CardContainer } from '../../common/Cards/CardContainer';
+import { InfluenceNode as InfluenceNodeType } from '../../../validators';
+import { DecisionCard } from '../../common/Cards/DecisionCard';
+import { FactCard } from '../../common/Cards/FactCard';
+import { UnassignedCard } from '../../common/Cards/UnassignedCard';
+import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
+import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 
 export const InfluenceNode = ({
 	data,
 	selected,
-}: NodeProps<Node<{ issue: Issue; handleClassName?: string }>>) => {
-	const { expanded } = useExpandCard(data.issue.id);
-	const IssueCard = getIssueCardType(data.issue.type);
+}: NodeProps<Node<{ node: InfluenceNodeType; handleClassName?: string }>>) => {
+	const issue = useSelectedProjectIssues().find(issue => issue.id === data.node.issue_id);
+	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
+	if (!issue) return null;
 	const handleClassName = data.handleClassName || 'bg-primary-resting! z-1 h-3! w-3!';
 
 	return (
@@ -29,53 +34,27 @@ export const InfluenceNode = ({
 				id='right'
 				className={handleClassName}
 			/>
-
-			<IssueCard
-				issue={data.issue}
-				className={`h-full w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-			/>
-			{expanded && (
-				<CardContainer
-					className={`mt-2 h-auto w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-				>
-					<div className='mb-2 flex flex-col'>
-						<ul className='flex flex-col gap-2 text-sm'>
-							{data.issue.decision.options.map(option => (
-								<li
-									key={option.id}
-									className='bg-background-light flex justify-between rounded-sm px-2 py-1'
-								>
-									<p>{option.name}</p>
-								</li>
-							))}
-						</ul>
-					</div>
-				</CardContainer>
+			<div
+				className={`h-full max-w-[350px]
+				overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+			>
+				{issue.type === 'Fact' && <FactCard issue={issue} />}
+				{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
+				{issue.type === 'Decision' && <DecisionCard issue={issue} />}
+				{issue.type === 'Uncertainty' && (
+					<UncertaintyCard
+						issue={issue}
+						onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
+					/>
+				)}
+			</div>
+			{probabilityTableOpen && (
+				<ProbabilityTable
+					issue={issue}
+					selected={selected}
+					onClose={setProbabilityTableOpen}
+				/>
 			)}
-			<NodeResizeControl
-				position='top-right'
-				minWidth={241}
-				minHeight={130}
-				className='size-4! border-0! bg-transparent!'
-			/>
-			<NodeResizeControl
-				position='top-left'
-				minWidth={241}
-				minHeight={130}
-				className='size-4! border-0! bg-transparent!'
-			/>
-			<NodeResizeControl
-				position='bottom-left'
-				minWidth={241}
-				minHeight={130}
-				className='size-4! border-0! bg-transparent!'
-			/>
-			<NodeResizeControl
-				position='bottom-right'
-				minWidth={241}
-				minHeight={130}
-				className='size-4! border-0! bg-transparent!'
-			/>
 		</>
 	);
 };
