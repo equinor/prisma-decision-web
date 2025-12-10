@@ -1,7 +1,10 @@
 import { Node } from '@xyflow/react';
 import { Issue } from '../validators';
 
-export const convertToInfluenceNodes = (issues: Issue[]): Node<{ issue: Issue }>[] => {
+export const convertToInfluenceNodes = (
+	issues: Issue[],
+	handleClassName?: string,
+): Node<{ issue: Issue }>[] => {
 	return issues.map(issue => ({
 		id: issue.node.id,
 		type: 'issue',
@@ -13,6 +16,7 @@ export const convertToInfluenceNodes = (issues: Issue[]): Node<{ issue: Issue }>
 		},
 		data: {
 			issue,
+			handleClassName: handleClassName || 'bg-primary-resting! z-1 h-3! w-3!', // Add this
 		},
 	}));
 };

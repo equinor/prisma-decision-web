@@ -132,7 +132,10 @@ export const issueSchema = z.object({
 	uncertainty: uncertaintySchema,
 	node: nodeSchema,
 });
-
+export type ErrorHandlingState = {
+	message: string;
+	showDecisionTree: boolean;
+};
 export type Project = z.infer<typeof projectSchema>;
 export type Opportunity = z.infer<typeof opportunitySchema>;
 export type Objective = z.infer<typeof objectiveSchema>;

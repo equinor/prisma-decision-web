@@ -20,8 +20,14 @@ import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { convertNodesToIssues } from '../../../utils/convertNodesToIssues';
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
 import { convertToInfluenceNodes } from '../../../utils/convertToInfluenceNodes';
+import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
+import { AxiosError } from 'axios';
 
-export const useInfluenceDiagram = () => {
+export const useInfluenceDiagram = (
+	handleErrorMessage: (msg: string) => void,
+	handleShowDecisionTree: (show: boolean) => void,
+	nodeProps?: { handleClassName?: string }, // Add this third parameter
+) => {
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
@@ -35,19 +41,39 @@ export const useInfluenceDiagram = () => {
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
+	const { error, isError, refetch } = useGetDecisionTree(selectedScenario?.id);
+
+	useEffect(() => {
+		if (isError && error) {
+			const err = error as AxiosError;
+			if (
+				err.response?.data &&
+				typeof err.response.data === 'object' &&
+				'detail' in err.response.data
+			) {
+				handleErrorMessage(err.response.data.detail as string);
+				handleShowDecisionTree(false);
+			} else {
+				handleErrorMessage(err.message);
+				handleShowDecisionTree(false);
+			}
+		}
+	}, [isError, error]);
 
 	useEffect(() => {
 		setLocalNodes(
-			convertToInfluenceNodes(issues).map(node => ({
+			convertToInfluenceNodes(issues, nodeProps?.handleClassName).map(node => ({
 				...node,
 				height: customNodeSizes[node.id]?.height || node.height,
 				width: customNodeSizes[node.id]?.width || node.width,
 			})),
 		);
+		refetch();
 	}, [issues]);
 
 	useEffect(() => {
 		setEdges(convertToInfluenceEdges(edges, convertToInfluenceNodes(issues)));
+		refetch();
 	}, [edges, issues]);
 
 	const onConnect: OnConnect = params => {
@@ -58,6 +84,7 @@ export const useInfluenceDiagram = () => {
 			scenario_id: selectedScenario.id,
 			id: crypto.randomUUID(),
 		});
+		refetch();
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
@@ -68,6 +95,7 @@ export const useInfluenceDiagram = () => {
 			head_id: newConnection.target,
 			scenario_id: selectedScenario.id,
 		});
+		refetch();
 	};
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {

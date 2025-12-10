@@ -5,34 +5,29 @@ import { getIssueCardType } from '../../../utils/getIssueCardType';
 import { Issue } from '../../../validators';
 import { CardContainer } from '../../common/Cards/CardContainer';
 
-export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ issue: Issue }>>) => {
+export const InfluenceNode = ({
+	data,
+	selected,
+}: NodeProps<Node<{ issue: Issue; handleClassName?: string }>>) => {
 	const { expanded } = useExpandCard(data.issue.id);
 	const IssueCard = getIssueCardType(data.issue.type);
+	const handleClassName = data.handleClassName || 'bg-primary-resting! z-1 h-3! w-3!';
+
 	return (
 		<>
-			<Handle
-				type='source'
-				position={Position.Top}
-				id='top'
-				className='bg-primary-resting! z-1 h-3! w-3!'
-			/>
+			<Handle type='source' position={Position.Top} id='top' className={handleClassName} />
 			<Handle
 				type='source'
 				position={Position.Bottom}
 				id='bottom'
-				className='bg-primary-resting! z-1 h-3! w-3!'
+				className={handleClassName}
 			/>
-			<Handle
-				type='source'
-				position={Position.Left}
-				id='left'
-				className='bg-primary-resting! z-1 h-3! w-3!'
-			/>
+			<Handle type='source' position={Position.Left} id='left' className={handleClassName} />
 			<Handle
 				type='source'
 				position={Position.Right}
 				id='right'
-				className='bg-primary-resting! z-1 h-3! w-3!'
+				className={handleClassName}
 			/>
 
 			<IssueCard
