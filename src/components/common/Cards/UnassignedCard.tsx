@@ -13,7 +13,7 @@ export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	return (
-		<CardContainer {...rest}>
+		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Unassigned</Chip>

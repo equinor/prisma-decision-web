@@ -18,7 +18,7 @@ export const DecisionCard = ({ issue, isDecisionTree, ...rest }: DecisionCardPro
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
 	return (
-		<CardContainer {...rest}>
+		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
 					<Chip>Decision</Chip>
