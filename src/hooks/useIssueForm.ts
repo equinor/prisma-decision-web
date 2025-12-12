@@ -62,40 +62,41 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 };
 
 const getDefaultValues = (scenarioId: string): Issue => {
+	const id = crypto.randomUUID();
 	return {
 		boundary: 'on',
 		name: '',
 		description: '',
 		type: 'Unassigned',
-		id: crypto.randomUUID(),
+		id,
 		order: 0,
 		scenario_id: scenarioId,
 		decision: {
 			id: crypto.randomUUID(),
-			issue_id: crypto.randomUUID(),
+			issue_id: id,
 			type: 'Policy',
 			options: [],
 		},
 		uncertainty: {
 			id: crypto.randomUUID(),
-			issue_id: crypto.randomUUID(),
+			issue_id: id,
 			is_key: false,
 			outcomes: [],
 			discrete_probabilities: [],
 		},
 		utility: {
 			id: crypto.randomUUID(),
-			issue_id: crypto.randomUUID(),
-			values: [0],
+			issue_id: id,
+			discrete_utilities: [],
 		},
 		value_metric: {
-			id: crypto.randomUUID(),
-			issue_id: crypto.randomUUID(),
+			id: '288e0811-7ab6-5d24-b80c-9fa925b848a6',
+			issue_id: id,
 			name: '',
 		},
 		node: {
 			id: crypto.randomUUID(),
-			issue_id: crypto.randomUUID(),
+			issue_id: id,
 			name: 'default',
 			scenario_id: scenarioId,
 			node_style: {

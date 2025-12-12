@@ -1,8 +1,8 @@
 import { useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
-import { IconData } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
+import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
 import {} from '../../../../utils/convertNodeToInfluenceNode';
@@ -53,13 +53,4 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 type ToolBarProps = {
 	onClickPanMode: () => void;
 	onClickSelectionMode: () => void;
-};
-
-const dragHandle: IconData = {
-	name: 'drag_handle',
-	prefix: 'custom',
-	height: '16',
-	width: '16',
-	svgPathData:
-		'M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"',
 };

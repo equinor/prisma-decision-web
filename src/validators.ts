@@ -1,7 +1,7 @@
 import { int, uuid, z } from 'zod/v4';
 import { parseISO } from 'date-fns';
 
-export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact'] as const;
+export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
 
 export const roleTypes = ['Member', 'Decision Maker', 'Facilitator'] as const;
@@ -78,12 +78,6 @@ export const valueMetricSchema = z.object({
 	name: z.string(),
 });
 
-export const utilitySchema = z.object({
-	id: uuid(),
-	issue_id: uuid(),
-	values: z.array(z.number().int()),
-});
-
 export const discreteProbabilitySchema = z.object({
 	outcome_id: uuid(),
 	id: uuid(),
@@ -91,6 +85,21 @@ export const discreteProbabilitySchema = z.object({
 	probability: z.number().min(0).max(1),
 	parent_outcome_ids: z.array(uuid()),
 	uncertainty_id: uuid(),
+});
+
+export const discreteUtilitiesSchema = z.object({
+	id: uuid(),
+	utility_value: z.number(),
+	value_metric_id: uuid(),
+	parent_option_ids: z.array(uuid()),
+	parent_outcome_ids: z.array(uuid()),
+	utility_id: uuid(),
+});
+
+export const utilitySchema = z.object({
+	id: uuid(),
+	issue_id: uuid(),
+	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 
 export const uncertaintySchema = z.object({
@@ -155,3 +164,4 @@ export type User = z.infer<typeof userSchema>;
 export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
 export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
+export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;

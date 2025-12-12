@@ -3,28 +3,20 @@ import { close } from '@equinor/eds-icons';
 import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
-import { DiscreteProbabilityCell } from './DiscreteProbabilityCell';
-import { useProbablityTable } from './useProbablityTable';
-import { calculateRowSum, getParentLabel, isRowSumValid } from './utils';
+import { getParentLabel } from '../ProbabilityTable/utils';
+import { DiscreteUtilityCell } from './DiscreteUtilityCell';
+import { useUtilityTable } from './useUtilityTable';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
 
-export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableProps) => {
-	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
-
-	if (!childOutcomes.length) {
-		return (
-			<div className='border-background-medium bg-background-default text-text-tertiary absolute mt-2 max-w-[350px] rounded-sm border border-dashed px-3 py-2 text-xs'>
-				Add at least one outcome to this uncertainty to configure probabilities.
-			</div>
-		);
-	}
+export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) => {
+	const { parents, parentRowSpans, rows, lookups } = useUtilityTable(issue);
 	return (
 		<CardContainer
 			className={`absolute top-0 left-[calc(100%+8px)] w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
 		>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>
-					<h6 className='leading-6 font-medium'>{`${issue.name} Probability Table`}</h6>
+					<h6 className='leading-6 font-medium'>{`${issue.name} Utility Table`}</h6>
 					<Button variant='ghost_icon' onClick={() => onClose?.(false)}>
 						<Icon data={close} />
 					</Button>
@@ -58,7 +50,7 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 								</tr>
 							</thead>
 							<tbody>
-								{rows.map(({ rowKey, probabilities }, rowIndex) => (
+								{rows.map(({ rowKey, utilities }, rowIndex) => (
 									<tr key={rowKey}>
 										{parents.map((parent, parentIndex) => {
 											const rowSpan = parentRowSpans[parentIndex];
@@ -66,7 +58,7 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 											if (!shouldRenderCell) return null;
 
 											const label = getParentLabel(
-												probabilities[0],
+												utilities[0],
 												parent,
 												lookups,
 											);
@@ -86,50 +78,36 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 						</table>
 					)}
 
-					{/* Child outcomes table */}
+					{/* Child value metrics table */}
 					<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
 						<thead>
 							<tr className='text-left text-[0.7rem]'>
-								{childOutcomes.map(outcome => (
+								{[{ id: 'test', name: 'test' }].map(valueMetric => (
 									<th
-										key={outcome.id}
+										key={valueMetric.id}
 										className='bg-background-default rounded-sm px-2 py-1 font-normal'
 									>
 										<div className='text-text-tertiary text-[10px]'>
 											{issue.name}
 										</div>
 										<div className='max-w-20 truncate text-sm font-bold'>
-											{outcome.name}
+											{valueMetric.name}
 										</div>
 									</th>
 								))}
-								<th className='bg-background-default rounded-sm px-2 py-1 text-center'>
-									<div className='text-text-primary  text-sm font-medium'>
-										Sum
-									</div>
-								</th>
 							</tr>
 						</thead>
 						<tbody>
-							{rows.map(({ rowKey, probabilities }) => {
-								const sum = calculateRowSum(probabilities);
-								const isValid = isRowSumValid(sum);
+							{rows.map(({ rowKey, utilities }) => {
 								return (
 									<tr key={rowKey}>
-										{childOutcomes.map(outcome => (
-											<DiscreteProbabilityCell
-												key={outcome.id}
-												outcomeId={outcome.id}
-												probabilities={probabilities}
+										{utilities.map(utility => (
+											<DiscreteUtilityCell
+												key={utility.id}
+												utilityId={utility.utility_id}
+												discreteUtilities={utilities}
 											/>
 										))}
-										<td
-											className={`bg-background-default rounded-sm px-2 py-1 text-center text-sm ${
-												isValid ? 'text-text-tertiary' : 'text-red-600'
-											}`}
-										>
-											{isValid ? '∑=1' : '∑≠1'}
-										</td>
 									</tr>
 								);
 							})}
@@ -141,7 +119,7 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 	);
 };
 
-type ProbabilityTableProps = {
+type UtilityTableProps = {
 	issue: Issue;
 	selected: boolean | undefined;
 	onClose: (value: boolean) => void;

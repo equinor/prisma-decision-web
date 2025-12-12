@@ -1,8 +1,12 @@
-import { DiscreteProbability } from '../../../../validators';
+import {
+	DiscreteProbability,
+	discreteUtilitiesSchema,
+	DiscreteUtility,
+} from '../../../../validators';
 
 /** Get display label for a specific parent from a discrete probability */
 export const getParentLabel = (
-	dp: DiscreteProbability,
+	dp: DiscreteProbability | DiscreteUtility,
 	parent: ParentDescriptor,
 	lookups: {
 		optionMap: Map<string, { name: string; issueName: string; issueId: string }>;
@@ -29,7 +33,7 @@ export const getParentLabel = (
 
 /** Build a sort key that orders rows by parent states in tree order */
 export const buildSortKey = (
-	dp: DiscreteProbability,
+	dp: DiscreteProbability | DiscreteUtility,
 	parents: ParentDescriptor[],
 	lookups: {
 		optionMap: Map<string, { name: string; issueName: string; issueId: string }>;
@@ -83,8 +87,14 @@ export const buildRowKey = (optionIds: string[], outcomeIds: string[]): string =
 	return key.length > 1 ? key : 'base';
 };
 
-export const calculateRowSum = (probabilities: DiscreteProbability[]): number => {
-	return probabilities.reduce((sum, p) => sum + (p.probability || 0), 0);
+export const calculateRowSum = (values: (DiscreteProbability | DiscreteUtility)[]): number => {
+	return values.reduce((sum, v) => {
+		const { success: isUtility } = discreteUtilitiesSchema.safeParse(v);
+		const value = isUtility
+			? (v as DiscreteUtility).utility_value
+			: (v as DiscreteProbability).probability;
+		return sum + value;
+	}, 0);
 };
 
 export const isRowSumValid = (sum: number): boolean => {

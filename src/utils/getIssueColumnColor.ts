@@ -9,4 +9,5 @@ const issueColumnColor: Record<IssueType, string> = {
 	Decision: 'bg-yellow-300/25',
 	Uncertainty: 'bg-green-300/25',
 	Fact: 'bg-gray-300/25',
+	Utility: 'bg-blue-300/25',
 };

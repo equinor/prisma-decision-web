@@ -19,9 +19,11 @@ import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenceNode';
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
 export const useInfluenceDiagram = () => {
 	const nodes = useSelectedProjectInfluenceNodes();
+	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
 	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
@@ -42,7 +44,16 @@ export const useInfluenceDiagram = () => {
 		setEdges(convertToInfluenceEdges(edges, nodes));
 	}, [edges, nodes]);
 
+	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
+		const sourceNode = localNodes.find(node => node.id === sourceId);
+		const targetNode = localNodes.find(node => node.id === targetId);
+		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.node.issue_id);
+		const targetIssue = issues.find(issue => issue.id === targetNode?.data.node.issue_id);
+		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
+	};
+
 	const onConnect: OnConnect = params => {
+		if (sourceAndTargetAreUtility(params.source, params.target)) return;
 		if (!selectedScenario) return;
 		createEdge({
 			head_id: params.target,
@@ -53,6 +64,7 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
+		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
 		if (!selectedScenario) return;
 		updateEdge({
 			id: oldEdge.id,

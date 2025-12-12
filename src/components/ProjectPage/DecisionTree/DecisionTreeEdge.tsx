@@ -35,6 +35,7 @@ export const DecisionTreeEdge = ({
 		targetY,
 		sourcePosition,
 		targetPosition,
+		borderRadius: 25,
 	});
 	const nodes = useNodes<Node<{ issue: Issue; path: Set<string> }>>();
 	const sourceNode = nodes.find(n => n.id === source);

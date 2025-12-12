@@ -18,6 +18,7 @@ export const useDeleteEdge = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
+			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _updatedEdge, context) => {
 			if (context?.previousEdges) {

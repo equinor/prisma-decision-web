@@ -1,5 +1,6 @@
 import { Icon } from '@equinor/eds-core-react';
 import { check_circle_outlined, inbox, info_circle } from '@equinor/eds-icons';
+import { utilityIcon } from '../../../icons';
 
 export const DecisionLabel = () => {
 	return (
@@ -45,6 +46,18 @@ export const FactLabel = () => {
 		>
 			<Icon data={info_circle} size={16} />
 			<p className='pt-0.5'>Fact</p>
+		</div>
+	);
+};
+
+export const UtilityLabel = () => {
+	return (
+		<div
+			className='flex items-center justify-center gap-1 rounded-xl
+            bg-[#CAE6FA] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
+		>
+			<Icon data={utilityIcon} size={16} />
+			<p className='pt-0.5'>Utility</p>
 		</div>
 	);
 };

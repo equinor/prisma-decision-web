@@ -41,11 +41,16 @@ export const DecisionTreeNode = ({
 					/>
 				</>
 			))}
-			<IssueCard
-				isDecisionTree
-				issue={data.issue}
-				className={`h-[130px] w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-			/>
+			<div
+				className={`h-full max-w-[350px]
+				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+			>
+				<IssueCard
+					isDecisionTree
+					issue={data.issue}
+					className={`h-[130px] w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				/>
+			</div>
 		</div>
 	);
 };
