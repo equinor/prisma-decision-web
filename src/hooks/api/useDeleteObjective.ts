@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { Objective, Project } from '../../validators';
+import { Objective } from '../../validators';
 
 export const useDeleteObjective = () => {
 	const queryClient = useQueryClient();
@@ -10,31 +10,17 @@ export const useDeleteObjective = () => {
 			return objective;
 		},
 		onMutate: (deletedObjective: Objective) => {
-			queryClient.cancelQueries({ queryKey: ['projects'] });
-			const scenarioId = deletedObjective.scenario_id;
-			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
-			const newProjects = previousProjects.map(project => {
-				return {
-					...project,
-					scenarios: project.scenarios.map(scenario => {
-						if (scenario.id === scenarioId) {
-							return {
-								...scenario,
-								objectives: scenario.objectives.filter(
-									objective => objective.id !== deletedObjective.id,
-								),
-							};
-						}
-						return scenario;
-					}),
-				};
-			});
-			queryClient.setQueryData(['projects'], newProjects);
-			return { previousProjects };
+			queryClient.cancelQueries({ queryKey: ['objectives'] });
+			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']) || [];
+			const newObjectives = previousObjectives.filter(
+				objective => objective.id !== deletedObjective.id,
+			);
+			queryClient.setQueryData(['objectives'], newObjectives);
+			return { previousObjectives };
 		},
 		onError: (_err, _deletedObjective, context) => {
-			if (context?.previousProjects) {
-				queryClient.setQueryData(['projects'], context.previousProjects);
+			if (context?.previousObjectives) {
+				queryClient.setQueryData(['objectives'], context.previousObjectives);
 			}
 		},
 	});

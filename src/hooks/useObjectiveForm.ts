@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import { Objective, objectiveSchema } from '../validators';
 import { useCreateObjective } from './api/useCreateObjective';
 import { useUpdateObjective } from './api/useUpdateObjective';
-import { useSelectedScenario } from './useSelectedScenario';
+import { useSelectedProject } from './useSelectedProject';
 
 export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
-	const selectedScenario = useSelectedScenario();
+	const selectedProject = useSelectedProject();
 	const defaultValues = useMemo(
-		() => getDefaultValues(selectedScenario?.id || crypto.randomUUID()),
-		[selectedScenario?.id],
+		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
+		[selectedProject?.id],
 	);
 
 	const formMethods = useForm({
@@ -23,7 +23,7 @@ export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs)
 
 	const { mutate: createObjective, isPending: isCreating } = useCreateObjective({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
 			onSuccess?.();
 		},
 	});
@@ -52,8 +52,8 @@ export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs)
 	};
 };
 
-const getDefaultValues = (scenarioId: string): Objective => ({
-	scenario_id: scenarioId,
+const getDefaultValues = (projectId: string): Objective => ({
+	project_id: projectId,
 	name: '',
 	description: '',
 	id: crypto.randomUUID(),

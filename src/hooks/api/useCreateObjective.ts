@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { Objective, Project } from '../../validators';
+import { Objective } from '../../validators';
 
 export const useCreateObjective = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -24,29 +24,15 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 			return res.data[0];
 		},
 		onMutate: (newObjective: Objective) => {
-			queryClient.cancelQueries({ queryKey: ['projects'] });
-			const scenarioId = newObjective.scenario_id;
-			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
-			const newProjects = previousProjects.map(project => {
-				return {
-					...project,
-					scenarios: project.scenarios.map(scenario => {
-						if (scenario.id === scenarioId) {
-							return {
-								...scenario,
-								objectives: [...scenario.objectives, newObjective],
-							};
-						}
-						return scenario;
-					}),
-				};
-			});
-			queryClient.setQueryData(['projects'], [...newProjects]);
-			return { previousProjects };
+			queryClient.cancelQueries({ queryKey: ['objectives'] });
+			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']) || [];
+			const newObjectives = previousObjectives.concat(newObjective);
+			queryClient.setQueryData(['objectives'], [...newObjectives]);
+			return { previousObjectives };
 		},
 		onError: (_err, _newOpportunity, context) => {
-			if (context?.previousProjects) {
-				queryClient.setQueryData(['projects'], context.previousProjects);
+			if (context?.previousObjectives) {
+				queryClient.setQueryData(['objectives'], context.previousObjectives);
 			}
 			return _err;
 		},

@@ -14,7 +14,7 @@ const router = createBrowserRouter(
 		<Route element={<Layout />}>
 			<Route path='/' element={<HomePage />} />
 			<Route path='/create-project' element={<CreateProjectPage />} />
-			<Route path='/project/:projectId/:scenarioId' element={<ProjectPage />}>
+			<Route path='/project/:projectId/' element={<ProjectPage />}>
 				<Route index element={<ProjectDetails />} />
 				<Route path='issues' element={<ProjectIssues />} />
 				<Route path='objectives' element={<ProjectObjectives />} />
