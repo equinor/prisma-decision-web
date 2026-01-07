@@ -44,6 +44,8 @@ export const projectSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	opportunityStatement: z.string().min(1, 'Opportunity statement is required'),
 	public: z.boolean(),
+	parent_project_id: uuid().nullable(),
+	parent_project_name: z.string().optional(),
 	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),

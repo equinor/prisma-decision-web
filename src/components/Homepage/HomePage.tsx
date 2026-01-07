@@ -47,7 +47,7 @@ export const HomePage = () => {
 					</div>
 					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
 						{filteredProjects.map(project => (
-							<ProjectCard key={project.id} project={project} />
+							<ProjectCard key={`${project.id}`} project={project} />
 						))}
 					</div>
 				</div>
