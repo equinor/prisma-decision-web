@@ -11,7 +11,10 @@ export const useIssueDragAndDrop = () => {
 	const issues = groupByIssueType(useSelectedProjectIssues());
 	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
 
-	const [tempIssues, setTempIssues] = useState<Record<IssueType, Issue[]> | null>(null);
+	const [tempIssues, setTempIssues] = useState<Record<
+		Exclude<IssueType, 'Utility'>,
+		Issue[]
+	> | null>(null);
 	const localIssues = tempIssues ? tempIssues : issues;
 
 	const onDragOver: DragDropEvents['dragover'] = event => {
@@ -29,7 +32,7 @@ export const useIssueDragAndDrop = () => {
 	const onDragEnd: DragDropEvents['dragend'] = () => {
 		if (!tempIssues) return;
 		Object.keys(tempIssues).forEach(key => {
-			tempIssues[key as IssueType].forEach((issue, index) => {
+			tempIssues[key as Exclude<IssueType, 'Utility'>].forEach((issue, index) => {
 				issue.type = key as IssueType;
 				issue.order = index + 1;
 			});

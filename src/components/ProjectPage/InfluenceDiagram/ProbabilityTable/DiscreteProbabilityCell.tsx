@@ -7,7 +7,7 @@ export const DiscreteProbabilityCell = ({ outcomeId, probabilities }: DiscretePr
 	const { mutate } = useUpdateDiscreteProbabilities();
 	if (!dp) return;
 	return (
-		<td className='px-2 py-1 text-right' key={dp.probability}>
+		<td className='text-right' key={dp.probability}>
 			<TextField
 				type='number'
 				min={0}
@@ -19,7 +19,7 @@ export const DiscreteProbabilityCell = ({ outcomeId, probabilities }: DiscretePr
 					mutate({ ...dp, probability: newValue });
 				}}
 				inputMode='decimal'
-				className='nopan nodrag w-24!'
+				className='nopan nodrag [&_input]:bg-background-default! w-24!'
 				defaultValue={Math.round((dp?.probability || 0) * 100) / 100}
 				data-probability-id={dp?.id}
 			/>

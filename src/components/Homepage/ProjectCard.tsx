@@ -11,16 +11,13 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 		<Link to={`/project/${project.id}/${scenario.id}`}>
 			<div
 				className='bg-background-default outline-background-medium
-				hover:bg-background-light shadow-tile grid h-[180px] cursor-pointer
+				hover:bg-background-light shadow-tile grid h-28 cursor-pointer
 				grid-rows-[1fr_auto] rounded-sm transition-all duration-1000 hover:outline'
 			>
 				<div className='p-4'>
 					<h2 className='truncate text-lg font-semibold'>{project.name}</h2>
-					<p className='text-text-tertiary line-clamp-2'>
-						{project.opportunityStatement}
-					</p>
 				</div>
-				<div className='border-background-medium flex justify-between border-t-1 px-2 py-2'>
+				<div className='border-background-medium flex justify-between border-t px-2 py-2'>
 					<DeleteProjectDialog project={project} />
 					<Button variant='ghost_icon'>
 						<Icon data={download} />

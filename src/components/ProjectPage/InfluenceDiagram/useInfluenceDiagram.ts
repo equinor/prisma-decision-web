@@ -5,6 +5,7 @@ import {
 	NodeChange,
 	OnConnect,
 	OnReconnect,
+	EdgeMouseHandler,
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
@@ -20,6 +21,7 @@ import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenc
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { AxiosError } from 'axios';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
 export const useInfluenceDiagram = (
 	handleErrorMessage: (msg: string) => void,
@@ -27,6 +29,7 @@ export const useInfluenceDiagram = (
 	nodeProps?: { handleClassName?: string }, // Add this third parameter
 ) => {
 	const nodes = useSelectedProjectInfluenceNodes(nodeProps?.handleClassName);
+	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
 	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
@@ -66,7 +69,16 @@ export const useInfluenceDiagram = (
 		refetch();
 	}, [edges, nodes]);
 
+	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
+		const sourceNode = localNodes.find(node => node.id === sourceId);
+		const targetNode = localNodes.find(node => node.id === targetId);
+		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.node.issue_id);
+		const targetIssue = issues.find(issue => issue.id === targetNode?.data.node.issue_id);
+		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
+	};
+
 	const onConnect: OnConnect = params => {
+		if (sourceAndTargetAreUtility(params.source, params.target)) return;
 		if (!selectedScenario) return;
 		createEdge({
 			head_id: params.target,
@@ -78,6 +90,7 @@ export const useInfluenceDiagram = (
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
+		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
 		if (!selectedScenario) return;
 		updateEdge({
 			id: oldEdge.id,
@@ -102,6 +115,36 @@ export const useInfluenceDiagram = (
 
 	const onClickPanMode = () => {
 		setIsSelecting(false);
+	};
+
+	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
+		setEdges(edges => {
+			return edges.map(e => {
+				if (e.id !== edge.id) return e;
+				return {
+					...e,
+					data: {
+						...e.data,
+						hovered: true,
+					},
+				};
+			});
+		});
+	};
+
+	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
+		setEdges(edges => {
+			return edges.map(e => {
+				if (e.id !== edge.id) return e;
+				return {
+					...e,
+					data: {
+						...e.data,
+						hovered: false,
+					},
+				};
+			});
+		});
 	};
 
 	const onNodesChange = (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
@@ -136,5 +179,7 @@ export const useInfluenceDiagram = (
 		isSelecting,
 		onClickSelectionMode,
 		onClickPanMode,
+		onEdgeMouseEnter,
+		onEdgeMouseLeave,
 	};
 };

@@ -5,15 +5,17 @@ export const getDiagramIssueBorderColor = (type: IssueType, selected: boolean) =
 };
 
 const diagramIssueBorderColors: Record<IssueType, string> = {
-	Unassigned: 'outline-red-300/40',
-	Decision: 'outline-yellow-300/40',
-	Uncertainty: 'outline-green-300/40',
-	Fact: 'outline-gray-300/40',
+	Unassigned: 'border-red-300/40',
+	Decision: 'border-[#FF9200]/40',
+	Uncertainty: 'border-[#40D38F]/40',
+	Utility: 'border-[#52C0FF]/40',
+	Fact: 'border-gray-300/40',
 };
 
 const diagramSelectedIssueBorderColors: Record<IssueType, string> = {
-	Unassigned: 'outline-red-300',
-	Decision: 'outline-yellow-300',
-	Uncertainty: 'outline-green-300',
-	Fact: 'outline-gray-300',
+	Unassigned: 'border-red-300',
+	Decision: 'border-[#FF9200]',
+	Uncertainty: 'border-[#40D38F]',
+	Utility: 'border-[#52C0FF]',
+	Fact: 'border-gray-300',
 };

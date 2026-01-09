@@ -1,4 +1,4 @@
-import { Checkbox, EdsProvider, Table } from '@equinor/eds-core-react';
+import { EdsProvider, Table } from '@equinor/eds-core-react';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { IssueRow } from './IssueRow';
 
@@ -28,9 +28,7 @@ export const ListView = () => {
 						<Table className='w-full'>
 							<Table.Head>
 								<Table.Row>
-									<Table.Cell className='w-21 pl-1!'>
-										<Checkbox />
-									</Table.Cell>
+									<Table.Cell className='w-21 pl-1!'></Table.Cell>
 									<Table.Cell className='min-w-48'>Name</Table.Cell>
 									<Table.Cell className='w-[1350px]'>Description</Table.Cell>
 									<Table.Cell className='w-24'>Outcomes/Options</Table.Cell>

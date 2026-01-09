@@ -17,12 +17,18 @@ export const buildDecisionTreeEdge = (
 		animated,
 		data: {
 			probability: node.tree_node.probabilities
-				? node.tree_node.probabilities[index].probability_value
+				? node.tree_node.probabilities.sort((x, y) =>
+						x.outcome_name.localeCompare(y.outcome_name),
+					)[index].probability_value
 				: 0,
 			valueId:
 				node.tree_node.issue.type === 'Uncertainty'
-					? node.tree_node.issue.uncertainty.outcomes[index].id
-					: node.tree_node.issue.decision.options[index].id,
+					? node.tree_node.issue.uncertainty.outcomes.sort((x, y) =>
+							x.name.localeCompare(y.name),
+						)[index].id
+					: node.tree_node.issue.decision.options.sort((x, y) =>
+							x.name.localeCompare(y.name),
+						)[index].id,
 		},
 	};
 	return newEdge;

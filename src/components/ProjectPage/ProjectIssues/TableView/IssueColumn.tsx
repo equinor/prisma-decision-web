@@ -40,7 +40,7 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 };
 
 type IssueColumnProps = {
-	issueType: IssueType;
+	issueType: Exclude<IssueType, 'Utility'>;
 	issues: Issue[];
 	label: string;
 };

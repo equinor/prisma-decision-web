@@ -152,6 +152,8 @@ export const InfluenceDiagram = () => {
 		onClickPanMode,
 		onClickSelectionMode,
 		isSelecting,
+		onEdgeMouseEnter,
+		onEdgeMouseLeave,
 	} = useInfluenceDiagram(setErrorMessage, setShowDecisionTree, {
 		handleClassName: 'bg-primary-resting! z-1 h-3! w-3!',
 	});
@@ -203,6 +205,8 @@ export const InfluenceDiagram = () => {
 				onNodeDragStop={onNodeDragStop}
 				onNodesChange={onNodesChange}
 				onReconnectStart={onReconnectStart}
+				onEdgeMouseEnter={onEdgeMouseEnter}
+				onEdgeMouseLeave={onEdgeMouseLeave}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}

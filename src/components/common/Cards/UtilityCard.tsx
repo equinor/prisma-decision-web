@@ -4,11 +4,17 @@ import { useState } from 'react';
 import { Issue } from '../../../validators';
 import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
 import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
-import { CardContainer } from './CardContainer';
-import { FactLabel } from './IssueLabel';
 import { BoundaryLabel } from './BoundaryLabel';
+import { CardContainer } from './CardContainer';
+import { UtilityLabel } from './IssueLabel';
+import { utilityIcon } from '../../../icons';
 
-export const FactCard = ({ issue, ...rest }: FactCardProps) => {
+export const UtilityCard = ({
+	issue,
+	hasTwoOrMoreParents,
+	onClickOpenUtilityTable,
+	...rest
+}: UtilityCardProps) => {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [editOpen, setEditOpen] = useState(false);
@@ -17,7 +23,7 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
 				<div className='flex gap-2'>
-					<FactLabel />
+					<UtilityLabel />
 					<BoundaryLabel boundary={issue.boundary} />
 				</div>
 				<div>
@@ -37,12 +43,25 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 							<Icon data={delete_to_trash} />
 							<p>Delete</p>
 						</Menu.Item>
+						{onClickOpenUtilityTable && (
+							<Menu.Item
+								onClick={onClickOpenUtilityTable}
+								disabled={!hasTwoOrMoreParents}
+							>
+								<Icon data={utilityIcon} className='ml-1' />
+								<p>Utility Table</p>
+							</Menu.Item>
+						)}
 					</Menu>
 				</div>
 			</div>
 			<div>
 				<h3 className='font-semibold '>{issue.name}</h3>
-				<p className='text-text-tertiary line-clamp-2 text-sm'>{issue.description}</p>
+				{!hasTwoOrMoreParents && (
+					<p className='max-w-[220px] text-xs font-medium text-[#EA580C]'>
+						Connect 2+ parent nodes to enable utility table and solver
+					</p>
+				)}
 			</div>
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
 			<DeleteIssueDialog
@@ -54,7 +73,9 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 	);
 };
 
-type FactCardProps = {
+type UtilityCardProps = {
 	issue: Issue;
 	className?: string;
+	hasTwoOrMoreParents?: boolean;
+	onClickOpenUtilityTable?: () => void;
 };

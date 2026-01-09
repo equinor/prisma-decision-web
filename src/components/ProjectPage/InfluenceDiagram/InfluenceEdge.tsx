@@ -2,6 +2,7 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import {
 	BaseEdge,
+	Edge,
 	EdgeLabelRenderer,
 	EdgeProps,
 	getSmoothStepPath,
@@ -18,7 +19,8 @@ export const InfluenceEdge = ({
 	sourcePosition,
 	targetPosition,
 	markerEnd,
-}: EdgeProps) => {
+	data,
+}: EdgeProps<Edge<{ hovered?: boolean }>>) => {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
@@ -26,6 +28,7 @@ export const InfluenceEdge = ({
 		targetY,
 		sourcePosition,
 		targetPosition,
+		borderRadius: 25,
 	});
 
 	const { mutate: deleteEdge } = useDeleteEdge();
@@ -35,27 +38,34 @@ export const InfluenceEdge = ({
 		deleteEdge(id);
 		setEdges([]);
 	};
-
 	return (
 		<>
 			<BaseEdge
 				id={id}
 				path={edgePath}
 				markerEnd={markerEnd}
+				interactionWidth={60}
 				className='stroke-primary-resting! stroke-4!'
 			/>
-			<EdgeLabelRenderer>
-				<div
-					className='nodrag nopan pointer-events-auto absolute origin-center'
-					style={{
-						transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-					}}
-				>
-					<Button color='danger' className='p-1!' onClick={handleDelete}>
-						<Icon data={delete_to_trash} />
-					</Button>
-				</div>
-			</EdgeLabelRenderer>
+			{data?.hovered && (
+				<EdgeLabelRenderer>
+					<div
+						className='nodrag nopan bg-background-light pointer-events-auto absolute origin-center'
+						style={{
+							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+						}}
+					>
+						<Button
+							variant='ghost_icon'
+							className='p-1!'
+							color='danger'
+							onClick={handleDelete}
+						>
+							<Icon data={delete_to_trash} />
+						</Button>
+					</div>
+				</EdgeLabelRenderer>
+			)}
 		</>
 	);
 };
