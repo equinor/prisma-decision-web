@@ -42,15 +42,7 @@ const VALIDATION_MESSAGES = {
 		fix: 'Fix: Add possible outcomes to represent what could happen.',
 	},
 };
-const resetNodesHighlight = (nodes: Node<InfluenceNodeType>[]): Node<InfluenceNodeType>[] => {
-	return nodes.map(node => ({
-		...node,
-		data: {
-			...node.data,
-			handleClassName: undefined,
-		},
-	}));
-};
+
 // Helper Functions
 const getNodeConnectivity = (nodeId: string, edges: ReactFlowEdge[]): boolean => {
 	if (edges.length === 0) return false;
