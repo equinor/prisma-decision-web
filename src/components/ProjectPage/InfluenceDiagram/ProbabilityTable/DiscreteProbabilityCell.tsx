@@ -21,7 +21,6 @@ export const DiscreteProbabilityCell = ({ outcomeId, probabilities }: DiscretePr
 				inputMode='decimal'
 				className='nopan nodrag [&_input]:bg-background-default! w-24!'
 				defaultValue={Math.round((dp?.probability || 0) * 100) / 100}
-				data-probability-id={dp?.id}
 			/>
 		</td>
 	);

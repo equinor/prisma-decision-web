@@ -4,7 +4,7 @@ export const BoundaryLabel = ({ boundary }: BoundaryLabelProps) => {
 	return (
 		<div
 			className={cn(
-				'rounded-xl px-2 py-1 text-center text-xs leading-4 font-medium text-[#585858]',
+				'h-max w-max rounded-xl px-2 py-1 text-center text-xs leading-4 font-medium text-[#585858]',
 				{
 					'bg-[#CAE6FA] text-[#015E8D]': boundary === 'in',
 					'bg-[#FFD0CE] text-[#A50827]': boundary === 'out',
