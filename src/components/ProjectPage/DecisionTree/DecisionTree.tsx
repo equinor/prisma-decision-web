@@ -1,26 +1,25 @@
-import { useContext } from 'react';
 import { Background, MarkerType, ReactFlow } from '@xyflow/react';
 import { DecisionTreeEdge } from './DecisionTreeEdge';
 import { useDecisionTree } from './useDecisionTree';
 import { DecisionTreeNode } from './DecisionTreeNode';
 import { ExpandNode } from './ExpandableNode';
 import { OutputNode } from './OutputNode';
-import { ErrorHandlingContext } from '../../context/ErrorHandlingContext';
 import { useNavigate } from 'react-router-dom'; // Add this import
 import { Dialog, DialogContent, Button } from '@equinor/eds-core-react';
+import { useState } from 'react';
 
 const nodeTypes = { treeNode: DecisionTreeNode, expandNode: ExpandNode, outputNode: OutputNode };
 const edgeTypes = { decisionTreeEdge: DecisionTreeEdge };
 
 export const DecisionTree = () => {
-	const { nodes, edges } = useDecisionTree();
-	const { errorHandlingState, setShowDecisionTree } = useContext(ErrorHandlingContext);
-	const navigate = useNavigate(); // Add this hook
+	const { isError, nodes, edges } = useDecisionTree();
+	const navigate = useNavigate();
+	const [showDialog, setShowDialog] = useState(true);
 
-	return errorHandlingState.message ? (
+	return showDialog && isError ? (
 		<div>
 			<Dialog
-				open={errorHandlingState.message !== ''}
+				open={isError}
 				data-no-dnd
 				className='nodrag nopan nowheel fixed top-1/2
 					left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
@@ -37,7 +36,7 @@ export const DecisionTree = () => {
 						<Button
 							variant='outlined'
 							onClick={() => {
-								setShowDecisionTree(true);
+								setShowDialog(prev => !prev);
 							}}
 						>
 							Stay on Decision Tree

@@ -3,12 +3,12 @@ import { useGetInfluenceNodes } from './api/useGetInfluenceNodes';
 import { useSelectedScenario } from './useSelectedScenario';
 import { convertToReactFlowNodes } from '../utils/convertToReactFlowNodes';
 
-export const useSelectedProjectInfluenceNodes = (handleClassName?: string) => {
+export const useSelectedProjectInfluenceNodes = () => {
 	const selectedScenario = useSelectedScenario();
 	const { nodes } = useGetInfluenceNodes();
 	const reactFlowNodes = useMemo(
 		() =>
-			convertToReactFlowNodes(nodes, handleClassName).filter(
+			convertToReactFlowNodes(nodes).filter(
 				node => node.data.node.scenario_id === selectedScenario?.id,
 			),
 		[nodes, selectedScenario?.id],

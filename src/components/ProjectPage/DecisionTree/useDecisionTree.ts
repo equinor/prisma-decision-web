@@ -8,7 +8,7 @@ import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
 
 export const useDecisionTree = () => {
 	const scenario = useSelectedScenario();
-	const { data: decisionTree } = useGetDecisionTree(scenario?.id);
+	const { isError, data: decisionTree } = useGetDecisionTree(scenario?.id);
 	const expanded = useAtomValue(expandedDecisionTreeNodes);
 	const selected = useAtomValue(testAtom);
 
@@ -27,6 +27,7 @@ export const useDecisionTree = () => {
 	return {
 		nodes,
 		edges,
+		isError,
 	};
 };
 

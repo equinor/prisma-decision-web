@@ -20,15 +20,10 @@ import { ReactFlowInfluenceNode } from '../../../types';
 import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenceNode';
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
-import { AxiosError } from 'axios';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
-export const useInfluenceDiagram = (
-	handleErrorMessage: (msg: string) => void,
-	handleShowDecisionTree: (show: boolean) => void,
-	nodeProps?: { handleClassName?: string }, // Add this third parameter
-) => {
-	const nodes = useSelectedProjectInfluenceNodes(nodeProps?.handleClassName);
+export const useInfluenceDiagram = () => {
+	const nodes = useSelectedProjectInfluenceNodes();
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
@@ -41,24 +36,7 @@ export const useInfluenceDiagram = (
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
-	const { error, isError, refetch } = useGetDecisionTree(selectedScenario?.id);
-
-	useEffect(() => {
-		if (isError && error) {
-			const err = error as AxiosError;
-			if (
-				err.response?.data &&
-				typeof err.response.data === 'object' &&
-				'detail' in err.response.data
-			) {
-				handleErrorMessage(err.response.data.detail as string);
-				handleShowDecisionTree(false);
-			} else {
-				handleErrorMessage(err.message);
-				handleShowDecisionTree(false);
-			}
-		}
-	}, [isError, error]);
+	const { refetch } = useGetDecisionTree(selectedScenario?.id);
 
 	useEffect(() => {
 		setLocalNodes(nodes);

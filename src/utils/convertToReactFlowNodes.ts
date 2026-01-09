@@ -1,6 +1,6 @@
 import { InfluenceNode } from '../validators';
 
-export const convertToReactFlowNodes = (nodes: InfluenceNode[], handleClassName?: string) => {
+export const convertToReactFlowNodes = (nodes: InfluenceNode[]) => {
 	return nodes.map(node => ({
 		id: node.id,
 		type: 'issue',
@@ -10,7 +10,6 @@ export const convertToReactFlowNodes = (nodes: InfluenceNode[], handleClassName?
 		},
 		data: {
 			node: node,
-			handleClassName: handleClassName,
 		},
 	}));
 };
