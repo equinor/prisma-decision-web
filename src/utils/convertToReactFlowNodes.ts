@@ -1,6 +1,7 @@
+import { ReactFlowInfluenceNode } from '../types';
 import { InfluenceNode } from '../validators';
 
-export const convertToReactFlowNodes = (nodes: InfluenceNode[]) => {
+export const convertToReactFlowNodes = (nodes: InfluenceNode[]): ReactFlowInfluenceNode[] => {
 	return nodes.map(node => ({
 		id: node.id,
 		type: 'issue',
