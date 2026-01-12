@@ -12,7 +12,7 @@
 		"release:prod": "npm run fetch-tags && git tag -f PROD && npm run push-tags",
 		"release:test": "npm run fetch-tags && git tag -f TEST && npm run push-tags",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-		"tsc": "tsc",
+		"tsc": "tsc --build --noEmit",
 		"prettier": "prettier --check ./src",
 		"preview": "vite preview",
 		"fetch-tags": "git fetch origin --tags --force",
