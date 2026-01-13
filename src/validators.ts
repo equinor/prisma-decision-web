@@ -43,6 +43,7 @@ export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunityStatement: z.string().min(1, 'Opportunity statement is required'),
+	objectives: z.array(objectiveSchema),
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
