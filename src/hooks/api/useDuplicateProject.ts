@@ -11,7 +11,6 @@ export const useDuplicateProject = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['projects'] });
-			queryClient.refetchQueries({ queryKey: ['objectives'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.refetchQueries({ queryKey: ['nodes'] });
 			queryClient.refetchQueries({ queryKey: ['edges'] });
