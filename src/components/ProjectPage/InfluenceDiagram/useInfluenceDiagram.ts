@@ -19,11 +19,11 @@ import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenceNode';
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
-import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
 export const useInfluenceDiagram = () => {
 	const nodes = useSelectedProjectInfluenceNodes();
+
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
@@ -36,22 +36,19 @@ export const useInfluenceDiagram = () => {
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
-	const { refetch } = useGetDecisionTree(selectedScenario?.id);
-
 	useEffect(() => {
 		setLocalNodes(nodes);
 	}, [nodes]);
 
 	useEffect(() => {
 		setEdges(convertToInfluenceEdges(edges, nodes));
-		refetch();
 	}, [edges, nodes]);
 
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
 		const sourceNode = localNodes.find(node => node.id === sourceId);
 		const targetNode = localNodes.find(node => node.id === targetId);
-		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.node.issue_id);
-		const targetIssue = issues.find(issue => issue.id === targetNode?.data.node.issue_id);
+		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
+		const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
 		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
 	};
 
@@ -64,7 +61,6 @@ export const useInfluenceDiagram = () => {
 			scenario_id: selectedScenario.id,
 			id: crypto.randomUUID(),
 		});
-		refetch();
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
@@ -76,7 +72,6 @@ export const useInfluenceDiagram = () => {
 			head_id: newConnection.target,
 			scenario_id: selectedScenario.id,
 		});
-		refetch();
 	};
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {

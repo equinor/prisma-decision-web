@@ -11,13 +11,10 @@ import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { UtilityCard } from '../../common/Cards/UtilityCard';
 import { UtilityTable } from './UtilityTable/UtilityTable';
 
-export const InfluenceNode = ({
-	data,
-	selected,
-}: NodeProps<Node<{ node: InfluenceNodeType; handleClassName?: string }>>) => {
-	const issue = useSelectedProjectIssues().find(issue => issue.id === data.node.issue_id);
+export const InfluenceNode = ({ data, selected }: NodeProps<Node<InfluenceNodeType>>) => {
+	const issue = useSelectedProjectIssues().find(issue => issue.id === data.issue_id);
 	const edges = useEdges();
-	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.node.id).length >= 2;
+	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
 	if (!issue) return null;

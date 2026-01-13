@@ -1,13 +1,14 @@
 import { Accordion, Button, Divider, Icon } from '@equinor/eds-core-react';
 import { warning_outlined, check_circle_outlined } from '@equinor/eds-icons';
 import { Node, useReactFlow, Edge as ReactFlowEdge, MarkerType } from '@xyflow/react';
-import { useEffect, useState } from 'react';
-import { AxiosError } from 'axios';
+import { useState } from 'react';
 
 import { CreateIssues } from '../CreateIssue';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
-import { ErrorHandlingState, InfluenceNode as InfluenceNodeType } from '../../../validators';
+import { ErrorHandlingState, InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
+import z from 'zod/v3';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
 // Constants
 const INITIAL_ERROR_STATE: ErrorHandlingState = {
@@ -71,14 +72,19 @@ const highlightNodesWithMissingEdges = (
 const highlightDecisionsWithoutOptions = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
+	issues: Issue[],
 ): Node<InfluenceNodeType>[] => {
 	return nodes.map(node => {
-		const issue = node.data.node?.issue;
-		const isDecision = issue?.type === 'Decision';
-		const hasNoOptions = issue?.decision?.options?.length === 0;
 		const isConnected = getNodeConnectivity(node.id, edges);
+		const nodeIssueId = node.data.issue_id;
+		const issue = issues.find(i => {
+			const matchesNode = i.id === nodeIssueId;
+			const isDecision = i.type === 'Decision';
+			const hasNoOptions = i.decision?.options?.length === 0;
 
-		if (isDecision && hasNoOptions && isConnected) {
+			return matchesNode && isDecision && hasNoOptions;
+		});
+		if (issue && isConnected) {
 			return {
 				...node,
 				style: VALIDATION_STYLE,
@@ -92,14 +98,20 @@ const highlightDecisionsWithoutOptions = (
 const highlightUncertaintiesWithoutOutcomes = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
+	issues: Issue[],
 ): Node<InfluenceNodeType>[] => {
 	return nodes.map(node => {
-		const issue = node.data.node?.issue;
-		const isUncertainty = issue?.type === 'Uncertainty';
-		const hasNoOutcomes = issue?.uncertainty?.outcomes?.length === 0;
 		const isConnected = getNodeConnectivity(node.id, edges);
+		const nodeIssueId = node.data.issue_id;
+		const issue = issues.find(i => {
+			const matchesNode = i.id === nodeIssueId;
+			const isUncertainty = i.type === 'Uncertainty';
+			const hasNoOutcomes = i.uncertainty?.outcomes?.length === 0;
 
-		if (isUncertainty && hasNoOutcomes && isConnected) {
+			return matchesNode && isUncertainty && hasNoOutcomes;
+		});
+
+		if (issue && isConnected) {
 			return {
 				...node,
 				style: VALIDATION_STYLE,
@@ -184,50 +196,35 @@ const ValidationRuleItem = ({
 		</Accordion.Item>
 	);
 };
+const errorValidator = z.object({
+	response: z.object({
+		data: z.object({
+			detail: z.string(),
+		}),
+	}),
+});
+
+const parseDecisionTreeError = (error: unknown, isError: boolean) => {
+	if (!error || !isError) return INITIAL_ERROR_STATE;
+	const res = { ...INITIAL_ERROR_STATE };
+	const parsedError = errorValidator.safeParse(error);
+	if (parsedError.success) {
+		res.message = parsedError.data.response.data.detail;
+		res.showDecisionTree = true;
+	}
+	return res;
+};
 
 // Main Component
 export const InfluenceDiagramValidation = () => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [showValidation, setShowValidation] = useState(false);
-	const [errorHandlingState, setErrorHandlingState] =
-		useState<ErrorHandlingState>(INITIAL_ERROR_STATE);
-
 	const selectedScenario = useSelectedScenario();
 	const { error, isError } = useGetDecisionTree(selectedScenario?.id);
+	const issues = useSelectedProjectIssues();
 	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
+	const parsedError = parseDecisionTreeError(error, isError);
 
-	// Handle error state
-	useEffect(() => {
-		if (isError && error) {
-			const err = error as AxiosError;
-			if (
-				err.response?.data &&
-				typeof err.response.data === 'object' &&
-				'detail' in err.response.data
-			) {
-				const errorData = err.response.data as { detail: string };
-				setErrorHandlingState({
-					message: errorData.detail,
-					showDecisionTree: false,
-				});
-			}
-		}
-		if (getNodes().length > 0) {
-			setNodes(resetNodes());
-		}
-	}, [isError, error, getNodes]);
-	const resetNodes = (): Node<InfluenceNodeType>[] => {
-		const nodes = getNodes();
-
-		return nodes.map(node => ({
-			...node,
-			data: {
-				...node.data,
-				handleClassName: undefined,
-			},
-			style: undefined,
-		}));
-	};
 	// Event Handlers
 	const handleToggleAccordion = (expanded: boolean) => {
 		setIsExpanded(expanded);
@@ -246,13 +243,13 @@ export const InfluenceDiagramValidation = () => {
 	const handleShowMissingOptions = () => {
 		const edges = getEdges();
 		const nodes = getNodes();
-		setNodes(highlightDecisionsWithoutOptions(nodes, edges));
+		setNodes(highlightDecisionsWithoutOptions(nodes, edges, issues));
 	};
 
 	const handleShowMissingOutcomes = () => {
 		const edges = getEdges();
 		const nodes = getNodes();
-		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges));
+		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges, issues));
 	};
 
 	const handleShowLoop = () => {
@@ -260,7 +257,7 @@ export const InfluenceDiagramValidation = () => {
 		setEdges(highlightLoops(edges));
 	};
 
-	const hasError = errorHandlingState.message !== '';
+	const hasError = parsedError.message !== '';
 
 	return (
 		<div className='absolute top-1 right-1 z-10 w-1/3'>
@@ -307,7 +304,7 @@ export const InfluenceDiagramValidation = () => {
 								key={key}
 								title={key}
 								message={message}
-								isError={errorHandlingState.message.includes(key)}
+								isError={parsedError.message.includes(key)}
 								isExpanded={showValidation}
 								onShowMissingEdges={handleShowMissingEdges}
 								onShowMissingOptions={handleShowMissingOptions}
