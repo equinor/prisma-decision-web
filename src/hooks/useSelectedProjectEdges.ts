@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useGetEdges } from './api/useGetEdges';
-import { useSelectedScenario } from './useSelectedScenario';
+import { useSelectedProject } from './useSelectedProject';
 
 export const useSelectedProjectEdges = () => {
-	const selectedScenario = useSelectedScenario();
+	const selectedProject = useSelectedProject();
 	const { edges } = useGetEdges();
 	const projectEdges = useMemo(
-		() => edges.filter(edge => edge.scenario_id === selectedScenario?.id),
-		[edges, selectedScenario?.id],
+		() => edges.filter(edge => edge.project_id === selectedProject?.id),
+		[edges, selectedProject?.id],
 	);
-	if (!selectedScenario) return [];
+	if (!selectedProject) return [];
 	return projectEdges;
 };

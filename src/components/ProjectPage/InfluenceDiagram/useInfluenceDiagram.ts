@@ -15,18 +15,18 @@ import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useUpdateInfluenceNodesOptimistic } from '../../../hooks/api/useUpdateInfluenceNodes';
 import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 import { useSelectedProjectInfluenceNodes } from '../../../hooks/useSelectedProjectInfluenceNodes';
-import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenceNode';
 import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const useInfluenceDiagram = () => {
 	const nodes = useSelectedProjectInfluenceNodes();
 
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
-	const selectedScenario = useSelectedScenario();
+	const selectedProject = useSelectedProject();
 	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
@@ -54,23 +54,23 @@ export const useInfluenceDiagram = () => {
 
 	const onConnect: OnConnect = params => {
 		if (sourceAndTargetAreUtility(params.source, params.target)) return;
-		if (!selectedScenario) return;
+		if (!selectedProject) return;
 		createEdge({
 			head_id: params.target,
 			tail_id: params.source,
-			scenario_id: selectedScenario.id,
+			project_id: selectedProject.id,
 			id: crypto.randomUUID(),
 		});
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
 		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
-		if (!selectedScenario) return;
+		if (!selectedProject) return;
 		updateEdge({
 			id: oldEdge.id,
 			tail_id: newConnection.source,
 			head_id: newConnection.target,
-			scenario_id: selectedScenario.id,
+			project_id: selectedProject.id,
 		});
 	};
 

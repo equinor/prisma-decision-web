@@ -1,19 +1,16 @@
 import { Table } from '@equinor/eds-core-react';
-import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
-import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { format } from 'date-fns';
 import { EditObjectiveDialog } from './EditObjectiveDialog';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectObjectives = () => {
-	const scenario = useSelectedScenario();
-	const objectives = scenario?.objectives || [];
-	const hasObjectives = objectives.length > 0;
+	const project = useSelectedProject();
+	const objectives = project?.objectives || [];
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
-				<ScenarioSelector />
 				<div className='flex items-center gap-4'>
 					<CreateObjective />
 				</div>
@@ -35,7 +32,7 @@ export const ProjectObjectives = () => {
 						</p>
 					</div>
 				</div>
-				{hasObjectives && (
+				{objectives.length > 0 && (
 					<div className='outline-background-medium w-full rounded-sm outline-1'>
 						<Table className='w-full table-fixed'>
 							<Table.Head>

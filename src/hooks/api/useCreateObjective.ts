@@ -25,23 +25,18 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 		},
 		onMutate: (newObjective: Objective) => {
 			queryClient.cancelQueries({ queryKey: ['projects'] });
-			const scenarioId = newObjective.scenario_id;
+			const projectId = newObjective.project_id;
 			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
 			const newProjects = previousProjects.map(project => {
-				return {
-					...project,
-					scenarios: project.scenarios.map(scenario => {
-						if (scenario.id === scenarioId) {
-							return {
-								...scenario,
-								objectives: [...scenario.objectives, newObjective],
-							};
-						}
-						return scenario;
-					}),
-				};
+				if (project.id === projectId) {
+					return {
+						...project,
+						objectives: [...project.objectives, newObjective],
+					};
+				}
+				return project;
 			});
-			queryClient.setQueryData(['projects'], [...newProjects]);
+			queryClient.setQueryData(['projects'], newProjects);
 			return { previousProjects };
 		},
 		onError: (_err, _newOpportunity, context) => {

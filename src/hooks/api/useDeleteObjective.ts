@@ -11,23 +11,18 @@ export const useDeleteObjective = () => {
 		},
 		onMutate: (deletedObjective: Objective) => {
 			queryClient.cancelQueries({ queryKey: ['projects'] });
-			const scenarioId = deletedObjective.scenario_id;
+			const projectId = deletedObjective.project_id;
 			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
 			const newProjects = previousProjects.map(project => {
-				return {
-					...project,
-					scenarios: project.scenarios.map(scenario => {
-						if (scenario.id === scenarioId) {
-							return {
-								...scenario,
-								objectives: scenario.objectives.filter(
-									objective => objective.id !== deletedObjective.id,
-								),
-							};
-						}
-						return scenario;
-					}),
-				};
+				if (project.id === projectId) {
+					return {
+						...project,
+						objectives: project.objectives.filter(
+							objective => objective.id !== deletedObjective.id,
+						),
+					};
+				}
+				return project;
 			});
 			queryClient.setQueryData(['projects'], newProjects);
 			return { previousProjects };

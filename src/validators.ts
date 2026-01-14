@@ -14,25 +14,18 @@ export const opportunitySchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Opportunity name is required'),
 	description: z.string().min(1, 'Description is required'),
-	scenario_id: uuid(),
+	project_id: uuid(),
 });
 
 export const objectiveSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Objective name is required'),
 	description: z.string().min(1, 'Description is required'),
-	scenario_id: uuid(),
+	project_id: uuid(),
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
 });
 
-export const scenarioSchema = z.object({
-	id: uuid(),
-	name: z.string().min(1, 'Scenario name is required'),
-	project_id: uuid(),
-	is_default: z.boolean(),
-	objectives: z.array(objectiveSchema),
-});
 export const userSchema = z.object({
 	user_id: int(),
 	user_name: z.string(),
@@ -50,12 +43,14 @@ export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunityStatement: z.string().min(1, 'Opportunity statement is required'),
+	objectives: z.array(objectiveSchema),
 	public: z.boolean(),
+	parent_project_id: uuid().nullable(),
+	parent_project_name: z.string().optional(),
 	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
 	users: z.array(projectRoleSchema),
-	scenarios: z.array(scenarioSchema),
 });
 
 export const decisionSchema = z.object({
@@ -126,7 +121,7 @@ const nodeStyleSchema = z.object({
 
 export const influenceNodeSchema = z.object({
 	id: uuid(),
-	scenario_id: uuid(),
+	project_id: uuid(),
 	issue_id: uuid(),
 	name: z.string().min(1, 'Node name is required'),
 	handleClassName: z.string().optional(),
@@ -137,12 +132,12 @@ export const edgeSchema = z.object({
 	id: uuid(),
 	head_id: uuid(),
 	tail_id: uuid(),
-	scenario_id: uuid(),
+	project_id: uuid(),
 });
 
 export const issueSchema = z.object({
 	id: uuid(),
-	scenario_id: uuid(),
+	project_id: uuid(),
 	name: z.string().min(1, 'Issue name is required'),
 	description: z.string().min(1, 'Description is required'),
 	order: z.number().int().nonnegative(),
@@ -163,7 +158,7 @@ export type Opportunity = z.infer<typeof opportunitySchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;
-export type Scenario = z.infer<typeof scenarioSchema>;
+export type project = z.infer<typeof projectSchema>;
 export type User = z.infer<typeof userSchema>;
 export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;

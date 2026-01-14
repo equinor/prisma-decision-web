@@ -4,15 +4,15 @@ import { useForm, useFormContext } from 'react-hook-form';
 import { Issue, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useUpdateIssue } from './api/useUpdateIssue';
-import { useSelectedScenario } from './useSelectedScenario';
 import { useGetIssues } from './api/useGetIssues';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
+import { useSelectedProject } from './useSelectedProject';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
-	const selectedScenario = useSelectedScenario();
+	const selectedProject = useSelectedProject();
 	const defaultValues = useMemo(
-		() => getDefaultValues(selectedScenario?.id || crypto.randomUUID()),
+		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
 		[],
 	);
 	const formMethods = useForm({
@@ -22,7 +22,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	const { issues } = useGetIssues();
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedScenario?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
 			onSuccess?.();
 		},
 	});
@@ -33,9 +33,9 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 			const mutationFn = issue ? updateIssue : createIssue;
 			if (issue) return await mutationFn(data);
 
-			const scenarioId = selectedScenario?.id || data.scenario_id;
-			const scenarioIssues = issues.filter(i => i.scenario_id === scenarioId);
-			const { x, y } = getNextIssuePosition(scenarioIssues);
+			const projectId = selectedProject?.id || data.project_id;
+			const projectIssues = issues.filter(i => i.project_id === projectId);
+			const { x, y } = getNextIssuePosition(projectIssues);
 			await mutationFn({
 				...data,
 				node: {
@@ -61,7 +61,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	};
 };
 
-const getDefaultValues = (scenarioId: string): Issue => {
+const getDefaultValues = (projectId: string): Issue => {
 	const id = crypto.randomUUID();
 	return {
 		boundary: 'on',
@@ -70,7 +70,7 @@ const getDefaultValues = (scenarioId: string): Issue => {
 		type: 'Unassigned',
 		id,
 		order: 0,
-		scenario_id: scenarioId,
+		project_id: projectId,
 		decision: {
 			id: crypto.randomUUID(),
 			issue_id: id,
@@ -98,7 +98,7 @@ const getDefaultValues = (scenarioId: string): Issue => {
 			id: crypto.randomUUID(),
 			issue_id: id,
 			name: 'default',
-			scenario_id: scenarioId,
+			project_id: projectId,
 			node_style: {
 				id: crypto.randomUUID(),
 				node_id: crypto.randomUUID(),

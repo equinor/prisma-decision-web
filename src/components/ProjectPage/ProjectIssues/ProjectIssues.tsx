@@ -2,7 +2,6 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import '@xyflow/react/dist/style.css';
-import { ScenarioSelector } from '../ScenarioSelector';
 import { CreateIssues } from '../CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
@@ -20,7 +19,6 @@ export const ProjectIssues = () => {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
-				<ScenarioSelector />
 				<div className='flex items-center gap-4'>
 					<CreateIssues />
 					{activeView !== 0 && <ToggleExpandAll />}
