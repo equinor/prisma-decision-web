@@ -10,7 +10,7 @@ export const convertToReactFlowNodes = (nodes: InfluenceNode[]): ReactFlowInflue
 			y: node.node_style.y_position,
 		},
 		data: {
-			node: node,
+			...node,
 		},
 	}));
 };

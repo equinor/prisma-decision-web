@@ -23,6 +23,7 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 
 export const useInfluenceDiagram = () => {
 	const nodes = useSelectedProjectInfluenceNodes();
+
 	const issues = useSelectedProjectIssues();
 	const edges = useSelectedProjectEdges();
 	const selectedScenario = useSelectedScenario();
@@ -35,7 +36,6 @@ export const useInfluenceDiagram = () => {
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
-
 	useEffect(() => {
 		setLocalNodes(nodes);
 	}, [nodes]);
@@ -47,8 +47,8 @@ export const useInfluenceDiagram = () => {
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
 		const sourceNode = localNodes.find(node => node.id === sourceId);
 		const targetNode = localNodes.find(node => node.id === targetId);
-		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.node.issue_id);
-		const targetIssue = issues.find(issue => issue.id === targetNode?.data.node.issue_id);
+		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
+		const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
 		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
 	};
 

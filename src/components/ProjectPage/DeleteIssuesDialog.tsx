@@ -9,7 +9,7 @@ export const DeleteIssuesDialog = ({ nodes }: DeleteIssueDialogProps) => {
 	const { mutate: deleteIssue } = useDeleteIssueOptimistic();
 
 	const handleDelete = () => {
-		nodes.forEach(node => deleteIssue(node.data.node.issue_id));
+		nodes.forEach(node => deleteIssue(node.data.issue_id));
 		setIsOpen(false);
 	};
 	const noSelectedIssues = nodes.length === 0;
