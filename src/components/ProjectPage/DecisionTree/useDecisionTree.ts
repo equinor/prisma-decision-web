@@ -8,7 +8,7 @@ import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const useDecisionTree = () => {
 	const project = useSelectedProject();
-	const { data: decisionTree } = useGetDecisionTree(project?.id);
+	const { data: decisionTree, isError } = useGetDecisionTree(project?.id);
 	const expanded = useAtomValue(expandedDecisionTreeNodes);
 	const selected = useAtomValue(testAtom);
 
