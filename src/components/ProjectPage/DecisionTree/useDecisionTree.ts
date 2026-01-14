@@ -27,6 +27,7 @@ export const useDecisionTree = () => {
 	return {
 		nodes,
 		edges,
+		isError,
 	};
 };
 

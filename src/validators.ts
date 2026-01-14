@@ -124,6 +124,7 @@ export const influenceNodeSchema = z.object({
 	project_id: uuid(),
 	issue_id: uuid(),
 	name: z.string().min(1, 'Node name is required'),
+	handleClassName: z.string().optional(),
 	node_style: nodeStyleSchema,
 });
 
@@ -148,7 +149,10 @@ export const issueSchema = z.object({
 	uncertainty: uncertaintySchema,
 	node: influenceNodeSchema,
 });
-
+export type ErrorHandlingState = {
+	message: string;
+	showDecisionTree: boolean;
+};
 export type Project = z.infer<typeof projectSchema>;
 export type Opportunity = z.infer<typeof opportunitySchema>;
 export type Objective = z.infer<typeof objectiveSchema>;

@@ -11,38 +11,30 @@ import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { UtilityCard } from '../../common/Cards/UtilityCard';
 import { UtilityTable } from './UtilityTable/UtilityTable';
 
-export const InfluenceNode = ({ data, selected }: NodeProps<Node<{ node: InfluenceNodeType }>>) => {
-	const issue = useSelectedProjectIssues().find(issue => issue.id === data.node.issue_id);
+export const InfluenceNode = ({ data, selected }: NodeProps<Node<InfluenceNodeType>>) => {
+	const issue = useSelectedProjectIssues().find(issue => issue.id === data.issue_id);
 	const edges = useEdges();
-	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.node.id).length >= 2;
+	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
 	if (!issue) return null;
+	const handleClassName = data.handleClassName || 'bg-primary-resting! z-1 h-3! w-3!';
+
 	return (
 		<>
-			<Handle
-				type='source'
-				position={Position.Top}
-				id='top'
-				className='bg-primary-resting! z-1 h-3! w-3!'
-			/>
+			<Handle type='source' position={Position.Top} id='top' className={handleClassName} />
 			<Handle
 				type='source'
 				position={Position.Bottom}
 				id='bottom'
-				className='bg-primary-resting! z-1 h-3! w-3!'
+				className={handleClassName}
 			/>
-			<Handle
-				type='source'
-				position={Position.Left}
-				id='left'
-				className='bg-primary-resting! z-1 h-3! w-3!'
-			/>
+			<Handle type='source' position={Position.Left} id='left' className={handleClassName} />
 			<Handle
 				type='source'
 				position={Position.Right}
 				id='right'
-				className='bg-primary-resting! z-1 h-3! w-3!'
+				className={handleClassName}
 			/>
 			<div
 				className={`h-full max-w-[350px]

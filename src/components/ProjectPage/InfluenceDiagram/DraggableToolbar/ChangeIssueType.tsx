@@ -16,7 +16,7 @@ export const ChangeIssueType = () => {
 
 	const handleIssueTypeChange = (newType: IssueType) => {
 		const issues = projectIssues.filter(issue =>
-			selectedNodes.some(node => node.data.node.issue_id === issue.id),
+			selectedNodes.some(node => node.data.issue_id === issue.id),
 		);
 		const updatedIssues = issues.map(issue => ({
 			...issue,

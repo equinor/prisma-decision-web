@@ -9,7 +9,7 @@ export const useSelectedProjectInfluenceNodes = () => {
 	const reactFlowNodes = useMemo(
 		() =>
 			convertToReactFlowNodes(nodes).filter(
-				node => node.data.node.project_id === selectedProject?.id,
+				node => node.data.project_id === selectedProject?.id,
 			),
 		[nodes, selectedProject?.id],
 	);

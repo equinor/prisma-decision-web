@@ -8,6 +8,20 @@ export const buildDecisionTreeEdge = (
 	animated = false,
 ) => {
 	if (node.tree_node.issue.type === 'EndPoint') return;
+	const valueId =
+		node.tree_node.issue.type === 'Uncertainty'
+			? node.tree_node.issue.uncertainty.outcomes[index].id
+			: node.tree_node.issue.decision.options[index].id;
+	// Find the correct probability using the outcome name
+	const outcomeName =
+		node.tree_node.issue.type === 'Uncertainty'
+			? node.tree_node.issue.uncertainty.outcomes[index].name
+			: node.tree_node.issue.decision.options[index].name;
+	const probability = node.tree_node.probabilities
+		? node.tree_node.probabilities.find(p => p.outcome_name === outcomeName)
+				?.probability_value || 0
+		: 0;
+
 	const newEdge: Edge = {
 		id: `e${node.tree_node.id}-${child.tree_node.id}`,
 		source: node.tree_node.id,
@@ -16,13 +30,8 @@ export const buildDecisionTreeEdge = (
 		zIndex: animated ? 1 : 0,
 		animated,
 		data: {
-			probability: node.tree_node.probabilities
-				? node.tree_node.probabilities[index].probability_value
-				: 0,
-			valueId:
-				node.tree_node.issue.type === 'Uncertainty'
-					? node.tree_node.issue.uncertainty.outcomes[index].id
-					: node.tree_node.issue.decision.options[index].id,
+			probability,
+			valueId,
 		},
 	};
 	return newEdge;
