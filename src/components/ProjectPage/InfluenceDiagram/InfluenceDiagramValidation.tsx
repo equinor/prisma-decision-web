@@ -5,10 +5,10 @@ import { useState } from 'react';
 
 import { CreateIssues } from '../CreateIssue';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
-import { useSelectedScenario } from '../../../hooks/useSelectedScenario';
 import { ErrorHandlingState, InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
 import z from 'zod/v3';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 // Constants
 const INITIAL_ERROR_STATE: ErrorHandlingState = {
@@ -231,8 +231,8 @@ const parseDecisionTreeError = (error: unknown, isError: boolean) => {
 export const InfluenceDiagramValidation = () => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [showValidation, setShowValidation] = useState(false);
-	const selectedScenario = useSelectedScenario();
-	const { error, isError } = useGetDecisionTree(selectedScenario?.id);
+	const selectedProject = useSelectedProject();
+	const { error, isError } = useGetDecisionTree(selectedProject?.id);
 	const parsedError = parseDecisionTreeError(error, isError);
 
 	// Event Handlers
