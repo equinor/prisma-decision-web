@@ -134,28 +134,38 @@ const highlightLoops = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
 
 // Validation Rule Item Component
 interface ValidationRuleItemProps {
-	nodes: Node<InfluenceNodeType>[];
-	edges: ReactFlowEdge[];
 	title: string;
 	message: { warning: string; fix: string };
 	isError: boolean;
 	isExpanded: boolean;
-	onShowMissingEdges?: () => void;
-	onShowMissingOptions?: () => void;
-	onShowMissingOutcomes?: () => void;
-	onShowLoop?: () => void;
 }
 
-const ValidationRuleItem = ({
-	title,
-	message,
-	isError,
-	isExpanded,
-	onShowMissingEdges,
-	onShowMissingOptions,
-	onShowMissingOutcomes,
-	onShowLoop,
-}: ValidationRuleItemProps) => {
+const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationRuleItemProps) => {
+	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
+	const issues = useSelectedProjectIssues();
+
+	const handleShowMissingEdges = () => {
+		const edges = getEdges();
+		const nodes = getNodes();
+		setNodes(highlightNodesWithMissingEdges(nodes, edges));
+	};
+
+	const handleShowMissingOptions = () => {
+		const edges = getEdges();
+		const nodes = getNodes();
+		setNodes(highlightDecisionsWithoutOptions(nodes, edges, issues));
+	};
+
+	const handleShowMissingOutcomes = () => {
+		const edges = getEdges();
+		const nodes = getNodes();
+		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges, issues));
+	};
+
+	const handleShowLoop = () => {
+		const edges = getEdges();
+		setEdges(highlightLoops(edges));
+	};
 	return (
 		<Accordion.Item isExpanded={isError && isExpanded}>
 			<Accordion.Header headerLevel='h3'>
@@ -181,14 +191,16 @@ const ValidationRuleItem = ({
 					<div>
 						{title === 'Issues' && <CreateIssues />}
 						{title === 'Edges' && (
-							<Button onClick={onShowMissingEdges}>Show Missing Edges</Button>
+							<Button onClick={handleShowMissingEdges}>Show Missing Edges</Button>
 						)}
 						{title === 'DecisionOptions' && (
-							<Button onClick={onShowMissingOptions}>Show Missing Options</Button>
+							<Button onClick={handleShowMissingOptions}>Show Missing Options</Button>
 						)}
-						{title === 'NoLoops' && <Button onClick={onShowLoop}>Show Loop</Button>}
+						{title === 'NoLoops' && <Button onClick={handleShowLoop}>Show Loop</Button>}
 						{title === 'UncertaintyOutcomes' && (
-							<Button onClick={onShowMissingOutcomes}>Show Missing Outcomes</Button>
+							<Button onClick={handleShowMissingOutcomes}>
+								Show Missing Outcomes
+							</Button>
 						)}
 					</div>
 				</div>
@@ -221,8 +233,6 @@ export const InfluenceDiagramValidation = () => {
 	const [showValidation, setShowValidation] = useState(false);
 	const selectedScenario = useSelectedScenario();
 	const { error, isError } = useGetDecisionTree(selectedScenario?.id);
-	const issues = useSelectedProjectIssues();
-	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
 	const parsedError = parseDecisionTreeError(error, isError);
 
 	// Event Handlers
@@ -232,29 +242,6 @@ export const InfluenceDiagramValidation = () => {
 
 	const handleToggleValidation = () => {
 		setShowValidation(prev => !prev);
-	};
-
-	const handleShowMissingEdges = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
-		setNodes(highlightNodesWithMissingEdges(nodes, edges));
-	};
-
-	const handleShowMissingOptions = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
-		setNodes(highlightDecisionsWithoutOptions(nodes, edges, issues));
-	};
-
-	const handleShowMissingOutcomes = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
-		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges, issues));
-	};
-
-	const handleShowLoop = () => {
-		const edges = getEdges();
-		setEdges(highlightLoops(edges));
 	};
 
 	const hasError = parsedError.message !== '';
@@ -299,17 +286,11 @@ export const InfluenceDiagramValidation = () => {
 						{/* Validation Rules */}
 						{Object.entries(VALIDATION_MESSAGES).map(([key, message]) => (
 							<ValidationRuleItem
-								nodes={getNodes()}
-								edges={getEdges()}
 								key={key}
 								title={key}
 								message={message}
 								isError={parsedError.message.includes(key)}
 								isExpanded={showValidation}
-								onShowMissingEdges={handleShowMissingEdges}
-								onShowMissingOptions={handleShowMissingOptions}
-								onShowMissingOutcomes={handleShowMissingOutcomes}
-								onShowLoop={handleShowLoop}
 							/>
 						))}
 
