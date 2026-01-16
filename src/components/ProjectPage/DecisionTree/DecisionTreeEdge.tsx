@@ -27,7 +27,7 @@ export const DecisionTreeEdge = ({
 	target,
 	animated,
 	data,
-}: EdgeProps<Edge<{ probability: number; valueId: string }>>) => {
+}: EdgeProps<Edge<{ probability: number; outcomeName: string; utility: number }>>) => {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
@@ -43,14 +43,7 @@ export const DecisionTreeEdge = ({
 	const { expanded, toggleExpanded } = useExpandedTreeNodes(target);
 
 	if (!issue) return null;
-	let outcomeName: string | undefined;
 
-	if (issue.type === 'Uncertainty') {
-		outcomeName = issue.uncertainty.outcomes.find(o => o.id === data?.valueId)?.name;
-	}
-	if (issue.type === 'Decision') {
-		outcomeName = issue.decision.options.find(o => o.id === data?.valueId)?.name;
-	}
 	return (
 		<>
 			<BaseEdge
@@ -68,18 +61,29 @@ export const DecisionTreeEdge = ({
 						transform: `translate(calc(-100% - 20px), -100%) translate(${targetX}px, ${targetY}px)`,
 					}}
 				>
-					{outcomeName}
+					{data?.outcomeName}
 				</div>
-				{issue.type === 'Uncertainty' && (
-					<div
-						className='nodrag pointer-events-auto absolute origin-center'
-						style={{
-							transform: `translate(calc(-100% - 20px), 0%) translate(${targetX}px, ${targetY}px)`,
-						}}
-					>
-						{Math.round((data?.probability || 0) * 100) / 100}
+				<div
+					className='nodrag pointer-events-auto absolute origin-center text-end'
+					style={{
+						transform: `translate(calc(-100% - 20px), 5%) translate(${targetX}px, ${targetY}px)`,
+					}}
+				>
+					{issue.type === 'Uncertainty' && (
+						<div>
+							<p>
+								<span className='font-semibold'>Prob: </span>
+								{Math.round((data?.probability || 0) * 100) / 100}
+							</p>
+						</div>
+					)}
+					<div>
+						<p>
+							<span className='font-semibold'>Utility:</span>{' '}
+							{Math.round(data?.utility || 0)}
+						</p>
 					</div>
-				)}
+				</div>
 				{expanded && (
 					<div
 						className='nodrag nopan pointer-events-auto absolute z-2 origin-center'
