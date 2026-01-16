@@ -7,20 +7,28 @@ export const buildDecisionTreeEdge = (
 	index: number,
 	animated = false,
 ) => {
-	if (node.tree_node.issue.type === 'EndPoint') return;
-	const valueId =
-		node.tree_node.issue.type === 'Uncertainty'
+	const nodeType = node.tree_node.issue.type;
+	if (nodeType === 'EndPoint') return;
+
+	const outcomeId =
+		nodeType === 'Uncertainty'
 			? node.tree_node.issue.uncertainty.outcomes[index].id
 			: node.tree_node.issue.decision.options[index].id;
-	// Find the correct probability using the outcome name
-	const outcomeName =
-		node.tree_node.issue.type === 'Uncertainty'
-			? node.tree_node.issue.uncertainty.outcomes[index].name
-			: node.tree_node.issue.decision.options[index].name;
+
 	const probability = node.tree_node.probabilities
-		? node.tree_node.probabilities.find(p => p.outcome_name === outcomeName)
-				?.probability_value || 0
+		? node.tree_node.probabilities.find(p => p.outcome_id === outcomeId)?.probability_value || 0
 		: 0;
+
+	const utility = node.tree_node.utilities
+		? node.tree_node.utilities.find(
+				u => u.outcome_id === outcomeId || u.option_id === outcomeId,
+			)?.utility_value || 0
+		: 0;
+
+	const outcomeName =
+		nodeType === 'Uncertainty'
+			? node.tree_node.issue.uncertainty.outcomes.find(o => o.id === outcomeId)?.name
+			: node.tree_node.issue.decision.options.find(o => o.id === outcomeId)?.name;
 
 	const newEdge: Edge = {
 		id: `e${node.tree_node.id}-${child.tree_node.id}`,
@@ -31,7 +39,8 @@ export const buildDecisionTreeEdge = (
 		animated,
 		data: {
 			probability,
-			valueId,
+			utility,
+			outcomeName,
 		},
 	};
 	return newEdge;
