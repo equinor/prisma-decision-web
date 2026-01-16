@@ -11,7 +11,7 @@ export const SideBar = () => {
 	if (!project) return <div />;
 	return (
 		<EdsSideBar
-			className='h-[calc(100vh-64px)] !overflow-x-hidden !border-r-0'
+			className='h-[calc(100vh-64px)] overflow-x-hidden! border-r-0!'
 			open={isOpen}
 			onToggle={() => setIsOpen(prev => !prev)}
 		>
@@ -67,6 +67,13 @@ export const SideBar = () => {
 					className='[&_svg]:fill-primary-resting border-b-0!'
 					icon={share}
 					to={`/project/${project.id}/decision-tree`}
+				/>
+				<EdsSideBar.Link
+					as={Link}
+					label='Solution Tree'
+					className='[&_svg]:fill-primary-resting border-b-0!'
+					icon={share}
+					to={`/project/${project.id}/solution-tree`}
 				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>

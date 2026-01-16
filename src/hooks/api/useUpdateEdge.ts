@@ -20,6 +20,7 @@ export const useUpdateEdge = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _updatedEdge, context) => {

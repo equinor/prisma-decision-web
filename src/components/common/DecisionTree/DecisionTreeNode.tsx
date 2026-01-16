@@ -2,9 +2,9 @@ import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useAtom } from 'jotai';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { Issue } from '../../../validators';
-import { DecisionCard } from '../../common/Cards/DecisionCard';
-import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
-import { testAtom } from './useDecisionTree';
+import { DecisionCard } from '../Cards/DecisionCard';
+import { UncertaintyCard } from '../Cards/UncertaintyCard';
+import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
 
 const handlePositions = [Position.Left, Position.Right];
 

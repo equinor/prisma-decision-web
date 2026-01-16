@@ -18,6 +18,7 @@ export const useCreateEdge = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['edges'] });
 			queryClient.invalidateQueries({ queryKey: ['issues'] });
 		},

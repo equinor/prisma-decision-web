@@ -2,15 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 
-export const useGetDecisionTree = (scenarioId?: string) => {
+export const useGetDecisionTree = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
-		queryKey: ['decisionTree', scenarioId],
+		queryKey: ['decisionTree', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
-			const res = await apiClient.get<DecisionTree>(`/structure/${scenarioId}/decision_tree`);
+			const res = await apiClient.get<DecisionTree>(`/structure/${projectId}/decision_tree`);
 			return res.data;
 		},
 
-		enabled: !!scenarioId,
+		enabled: !!projectId,
 	});
 	return { data, ...rest };
 };

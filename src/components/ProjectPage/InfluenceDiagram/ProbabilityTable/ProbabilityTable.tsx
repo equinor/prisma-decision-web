@@ -13,7 +13,7 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 
 	if (!childOutcomes.length) {
 		return (
-			<div className='border-background-medium bg-background-default text-text-tertiary absolute mt-2 max-w-[350px] rounded-sm border border-dashed px-3 py-2 text-xs'>
+			<div className='border-background-medium bg-background-default text-text-tertiary absolute mt-2 max-w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>
 				Add at least one outcome to this uncertainty to configure probabilities.
 			</div>
 		);

@@ -12,6 +12,7 @@ export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			onSuccess?.();
 		},
 	});

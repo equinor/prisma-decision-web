@@ -37,7 +37,7 @@ export const InfluenceNode = ({ data, selected }: NodeProps<Node<InfluenceNodeTy
 				className={handleClassName}
 			/>
 			<div
-				className={`h-full max-w-[350px]
+				className={`h-full max-w-87.5
 				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 			>
 				{issue.type === 'Fact' && <FactCard issue={issue} />}
