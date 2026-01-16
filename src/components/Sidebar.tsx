@@ -1,5 +1,12 @@
 import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
-import { assignment_important, info_circle, measure, share, timeline } from '@equinor/eds-icons';
+import {
+	assignment_important,
+	info_circle,
+	measure,
+	share,
+	functions,
+	timeline,
+} from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
@@ -72,7 +79,7 @@ export const SideBar = () => {
 					as={Link}
 					label='Solution Tree'
 					className='[&_svg]:fill-primary-resting border-b-0!'
-					icon={share}
+					icon={functions}
 					to={`/project/${project.id}/solution-tree`}
 				/>
 			</EdsSideBar.Content>
