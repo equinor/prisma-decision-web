@@ -10,13 +10,6 @@ export type RoleType = (typeof roleTypes)[number];
 export const decisionTypes = ['Policy', 'Focus', 'Tactical'] as const;
 export type DecisionType = (typeof decisionTypes)[number];
 
-export const opportunitySchema = z.object({
-	id: uuid(),
-	name: z.string().min(1, 'Opportunity name is required'),
-	description: z.string().min(1, 'Description is required'),
-	project_id: uuid(),
-});
-
 export const objectiveSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Objective name is required'),
@@ -154,7 +147,6 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export type Project = z.infer<typeof projectSchema>;
-export type Opportunity = z.infer<typeof opportunitySchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;
