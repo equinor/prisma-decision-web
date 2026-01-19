@@ -1,15 +1,13 @@
 import { atom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
-import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
+import { useGetSolutionDecisionTree } from '../../../hooks/api/useGetSolutionDecisionTree';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { convertDecisionTreeToNodesAndEdges } from '../../../utils/convertDecisionTreeToNodesAndEdges';
 import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
-export const useDecisionTree = () => {
+export const useSolutionDecisionTree = () => {
 	const project = useSelectedProject();
-	const { data: decisionTree, isError } = useGetDecisionTree(project?.id);
-	const expanded = useAtomValue(expandedDecisionTreeNodes);
+	const { data: decisionTree, isError } = useGetSolutionDecisionTree(project?.id);
 	const selected = useAtomValue(testAtom);
 
 	const { nodes, edges } = useMemo(() => {
@@ -18,11 +16,11 @@ export const useDecisionTree = () => {
 		}
 		const { nodes, edges } = convertDecisionTreeToNodesAndEdges({
 			tree: decisionTree,
-			expanded,
 			selected,
+			expandable: false,
 		});
 		return getDecisionTreeLayout(nodes, edges);
-	}, [decisionTree, expanded, selected]);
+	}, [decisionTree, selected]);
 
 	return {
 		nodes,

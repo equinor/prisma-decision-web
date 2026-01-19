@@ -11,6 +11,7 @@ export const useUpdateIssues = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 		},
 	});
 };
@@ -36,6 +37,7 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['issues'] });
 		},
 	});

@@ -2,7 +2,7 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { mail_unread } from '@equinor/eds-icons';
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useSetAtom } from 'jotai';
-import { testAtom } from './useDecisionTree';
+import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
 
 export const OutputNode = ({ data }: NodeProps<Node<{ path: Set<string> }>>) => {
 	const setSelectedNodes = useSetAtom(testAtom);

@@ -4,19 +4,25 @@ import { convertToDecisionTreeNode } from './convertToDecisionTreeNode';
 import { convertToOutputNode } from './convertToOutputNode';
 import { Node, Edge } from '@xyflow/react';
 
-export const convertDecisionTreeToNodesAndEdges = (
-	tree: DecisionTree,
-	expanded: Set<string>,
-	selected: Set<string>,
+export const convertDecisionTreeToNodesAndEdges = ({
+	selected,
+	tree,
 	depth = 0,
-) => {
+	expandable = true,
+	expanded,
+}: ConvertDecisionTreeToNodesAndEdgesArgs) => {
 	const nodes: Node[] = [];
 	const edges: Edge[] = [];
 	const walk = (node: DecisionTree, depth = 0, path: Set<string> = new Set<string>()) => {
 		const issue = node.tree_node.issue;
 		const nodeId = node.tree_node.id;
 		const isEndPoint = issue.type === 'EndPoint';
-		const isCollapsed = !expanded.has(node.tree_node.id) && depth !== 0 && !isEndPoint;
+		const isCollapsed =
+			expandable &&
+			expanded &&
+			!expanded.has(node.tree_node.id) &&
+			depth !== 0 &&
+			!isEndPoint;
 
 		if (isEndPoint) {
 			const newNode = convertToOutputNode(node.tree_node.id, path);
@@ -40,4 +46,12 @@ export const convertDecisionTreeToNodesAndEdges = (
 	};
 	walk(tree, depth);
 	return { nodes, edges };
+};
+
+type ConvertDecisionTreeToNodesAndEdgesArgs = {
+	tree: DecisionTree;
+	expanded?: Set<string>;
+	selected: Set<string>;
+	depth?: number;
+	expandable?: boolean;
 };

@@ -1,11 +1,10 @@
 import { Background, ReactFlow } from '@xyflow/react';
 import { EDGE_TYPES, NODE_TYPES, REACT_FLOW_CONFIG } from '../../../config/decisionTree';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
-import { useDecisionTree } from './useDecisionTree';
+import { useSolutionDecisionTree } from './useSolutionDecisionTree';
 
-export const DecisionTree = () => {
-	const { isError, nodes, edges } = useDecisionTree();
-
+export const SolutionTree = () => {
+	const { isError, nodes, edges } = useSolutionDecisionTree();
 	if (isError) return <InvalidDiagramDialog />;
 	return (
 		<div className='bg-background-light absolute inset-0 rounded-sm'>

@@ -11,6 +11,7 @@ export const useDeleteIssue = () => {
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 		},
 	});
 };
@@ -35,6 +36,7 @@ export const useDeleteIssueOptimistic = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 		},
 	});
 };
