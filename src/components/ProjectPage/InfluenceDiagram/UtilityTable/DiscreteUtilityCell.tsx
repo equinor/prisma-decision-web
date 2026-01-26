@@ -16,7 +16,7 @@ export const DiscreteUtilityCell = ({ utilityId, discreteUtilities }: DiscretePr
 					mutate({ ...du, utility_value: newValue });
 				}}
 				inputMode='decimal'
-				className='nopan nodrag [&_input]:bg-background-default! w-24!'
+				className='nopan nodrag [&_input]:bg-background-default! w-full'
 				defaultValue={Math.round((du.utility_value || 0) * 100) / 100}
 				data-probability-id={du?.id}
 			/>

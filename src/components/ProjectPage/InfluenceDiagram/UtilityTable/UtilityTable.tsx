@@ -82,19 +82,11 @@ export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) =>
 					<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
 						<thead>
 							<tr className='text-left text-[0.7rem]'>
-								{[{ id: 'test', name: 'test' }].map(valueMetric => (
-									<th
-										key={valueMetric.id}
-										className='bg-background-default rounded-sm px-2 py-1 font-normal'
-									>
-										<div className='text-text-tertiary text-[10px]'>
-											{issue.name}
-										</div>
-										<div className='max-w-20 truncate text-sm font-bold'>
-											{valueMetric.name}
-										</div>
-									</th>
-								))}
+								<th className='bg-background-default rounded-sm px-2 py-1 font-normal'>
+									<div className='flex h-9.25 items-center truncate text-sm font-bold'>
+										Default metric
+									</div>
+								</th>
 							</tr>
 						</thead>
 						<tbody>
