@@ -6,6 +6,7 @@ import { Issue } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { DeleteIssueDialog } from '../../DeleteIssueDialog';
 import { EditIssueModal } from '../../EditIssueModal';
+import { format } from 'date-fns/format';
 
 export const IssueRow = ({ issue }: IssueRowProps) => {
 	const [editOpen, setEditOpen] = useState(false);
@@ -42,7 +43,14 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 					<BoundaryLabel boundary={issue.boundary} />
 				</div>
 			</Table.Cell>
-			<Table.Cell className='whitespace-nowrap'>1 Nov 2025</Table.Cell>
+			<Table.Cell className='whitespace-nowrap'>
+				{' '}
+				{issue.created_at ? format(issue.created_at, 'yyyy-MM-dd') : '-'}
+			</Table.Cell>
+			<Table.Cell className='whitespace-nowrap'>
+				{' '}
+				{issue.updated_at ? format(issue.updated_at, 'yyyy-MM-dd') : '-'}
+			</Table.Cell>
 			<EditIssueModal issue={issue} onClose={setEditOpen} open={editOpen} />
 			<DeleteIssueDialog issue={issue} onClose={setDeleteOpen} open={deleteOpen} />
 		</Table.Row>

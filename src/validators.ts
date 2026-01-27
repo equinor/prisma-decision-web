@@ -141,6 +141,8 @@ export const issueSchema = z.object({
 	utility: utilitySchema,
 	uncertainty: uncertaintySchema,
 	node: influenceNodeSchema,
+	created_at: z.iso.datetime().optional(),
+	updated_at: z.iso.datetime().optional(),
 });
 export type ErrorHandlingState = {
 	message: string;
