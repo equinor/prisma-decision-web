@@ -10,6 +10,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const path = __dirname + '/';
 const port = 3000;
 
+// Trust the first proxy (Radix/ingress) for accurate client IP detection
+app.set('trust proxy', 1);
+
 const limiter = rateLimit({
 	windowMs: 60 * 1000,
 	max: 100,
