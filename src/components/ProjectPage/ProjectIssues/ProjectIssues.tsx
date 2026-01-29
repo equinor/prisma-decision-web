@@ -6,9 +6,12 @@ import { CreateIssues } from '../CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
 import { ToggleExpandAll } from '../ToggleExpandAll';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { BottomNavigation } from '../../common/BottomNavigation';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
+	const project = useSelectedProject();
 	let IssueView = ListView;
 	let activeView = 0;
 	if (issueView === 'table') {
@@ -17,22 +20,36 @@ export const ProjectIssues = () => {
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex w-full items-center justify-between'>
-				<div className='flex items-center gap-4'>
-					<CreateIssues />
-					{activeView !== 0 && <ToggleExpandAll />}
-					<Button.Toggle selectedIndexes={[activeView]}>
-						<Button onClick={() => setIssuesView('list')}>
-							<Icon data={view_list} />
-						</Button>
-						<Button onClick={() => setIssuesView('table')}>
-							<Icon data={view_column} />
-						</Button>
-					</Button.Toggle>
+		<div className='flex min-h-screen flex-col'>
+			<div className='flex-grow'>
+				<div className='flex flex-col gap-4'>
+					<div className='flex w-full items-center justify-between'>
+						<div className='flex items-center gap-4'>
+							<CreateIssues />
+							{activeView !== 0 && <ToggleExpandAll />}
+							<Button.Toggle selectedIndexes={[activeView]}>
+								<Button onClick={() => setIssuesView('list')}>
+									<Icon data={view_list} />
+								</Button>
+								<Button onClick={() => setIssuesView('table')}>
+									<Icon data={view_column} />
+								</Button>
+							</Button.Toggle>
+						</div>
+					</div>
+					<IssueView />
 				</div>
 			</div>
-			<IssueView />
+			<BottomNavigation
+				back={{
+					label: 'Back to Objectives',
+					to: `/project/${project?.id}/objectives`,
+				}}
+				next={{
+					label: 'Create Influence Diagram',
+					to: `/project/${project?.id}/influence-diagram`,
+				}}
+			/>
 		</div>
 	);
 };

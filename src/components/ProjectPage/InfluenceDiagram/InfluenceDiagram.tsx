@@ -6,11 +6,16 @@ import { InfluenceEdge } from './InfluenceEdge';
 import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { BottomNavigation } from '../../common/BottomNavigation';
+import { useDecisionTree } from '../DecisionTree/useDecisionTree';
 
 const nodeTypes = { issue: InfluenceNode };
 const edgeTypes = { issue: InfluenceEdge };
 
 export const InfluenceDiagram = () => {
+	const project = useSelectedProject();
+	const { isError } = useDecisionTree();
 	const {
 		nodes,
 		edges,
@@ -29,10 +34,7 @@ export const InfluenceDiagram = () => {
 	} = useInfluenceDiagram();
 
 	return (
-		<div
-			className='bg-background-light absolute
-			inset-0 rounded-sm'
-		>
+		<div className='bg-background-light fixed top-[64px] right-0 bottom-[72px] left-[64px] rounded-sm'>
 			<ReactFlow
 				minZoom={0.1}
 				nodes={nodes}
@@ -71,6 +73,17 @@ export const InfluenceDiagram = () => {
 				<DraggableToolbar
 					onClickPanMode={onClickPanMode}
 					onClickSelectionMode={onClickSelectionMode}
+				/>
+				<BottomNavigation
+					back={{
+						label: 'Back to Issues',
+						to: `/project/${project?.id}/issues`,
+					}}
+					next={{
+						label: 'Go to decision tree',
+						to: `/project/${project?.id}/decision-tree`,
+						disabled: isError,
+					}}
 				/>
 			</ReactFlow>
 		</div>

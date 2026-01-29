@@ -12,6 +12,7 @@ import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { UserSection } from './UserSection';
 import { parseISO } from 'date-fns';
+import { BottomNavigation } from '../BottomNavigation';
 
 export const ProjectInformation = () => {
 	const { formMethods, isPending, handleSubmit } = useProjectForm();
@@ -26,66 +27,84 @@ export const ProjectInformation = () => {
 		name: 'endDate',
 		control: formMethods.control,
 	});
+	const { id } = formMethods.getValues();
 
 	return (
-		<FormProvider {...formMethods}>
-			<form
-				onSubmit={handleSubmit}
-				className='bg-background-default shadow-tile flex w-full flex-col
-            	items-start gap-4 rounded-sm p-4'
-			>
-				<div>
-					<h2 className='text-2xl font-semibold'>Project Information</h2>
-					<p className='text-text-tertiary'>
-						Enter the basic information about your decision optimization project
-					</p>
-				</div>
-				<div className='grid w-full grid-cols-1 gap-4 md:grid-cols-2'>
-					<div>
-						<TextField
-							label='Project Name'
-							placeholder='Enter project name...'
-							{...register('name')}
-						/>
-						<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
-					</div>
-					<div>
-						<DatePicker
-							label='Select End Date'
-							value={parseISO(endDate)}
-							onChange={endDate => {
-								if (endDate) {
-									onChangeEndDate(endDate.toISOString());
-								}
-							}}
-						/>
-						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
-					</div>
-					<Switch label='Make Project Public' {...register('public')} />
-					<div className='col-span-1 md:col-span-2'>
-						<Textarea
-							rows={5}
-							label='Opportunity Statement'
-							placeholder='Enter opportunity statement...'
-							{...register('opportunityStatement')}
-						/>
-						<ErrorMessage
-							as={FormErrorMessage}
-							name='opportunityStatement'
-							errors={errors}
-						/>
-					</div>
-				</div>
+		<div className='flex min-h-screen flex-col'>
+			<div className='flex-grow'>
+				<FormProvider {...formMethods}>
+					<form
+						onSubmit={handleSubmit}
+						className='bg-background-default shadow-tile flex w-full flex-col
+				items-start gap-4 rounded-sm p-4'
+					>
+						<div>
+							<h2 className='text-2xl font-semibold'>Project Information</h2>
+							<p className='text-text-tertiary'>
+								Enter the basic information about your decision optimization project
+							</p>
+						</div>
+						<div className='grid w-full grid-cols-1 gap-4 md:grid-cols-2'>
+							<div>
+								<TextField
+									label='Project Name'
+									placeholder='Enter project name...'
+									{...register('name')}
+								/>
+								<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
+							</div>
+							<div>
+								<DatePicker
+									label='Select End Date'
+									value={parseISO(endDate)}
+									onChange={endDate => {
+										if (endDate) {
+											onChangeEndDate(endDate.toISOString());
+										}
+									}}
+								/>
+								<ErrorMessage
+									as={FormErrorMessage}
+									name='endDate'
+									errors={errors}
+								/>
+							</div>
+							<Switch label='Make Project Public' {...register('public')} />
+							<div className='col-span-1 md:col-span-2'>
+								<Textarea
+									rows={5}
+									label='Opportunity Statement'
+									placeholder='Enter opportunity statement...'
+									{...register('opportunityStatement')}
+								/>
+								<ErrorMessage
+									as={FormErrorMessage}
+									name='opportunityStatement'
+									errors={errors}
+								/>
+							</div>
+						</div>
 
-				<UserSection />
-				<Button
-					className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'
-					type='submit'
-					disabled={isPending}
-				>
-					{isPending ? <CircularProgress size={24} /> : 'Save'}
-				</Button>
-			</form>
-		</FormProvider>
+						<UserSection />
+
+						<Button
+							className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'
+							type='submit'
+							disabled={isPending}
+						>
+							{isPending ? <CircularProgress size={24} /> : 'Save'}
+						</Button>
+					</form>
+				</FormProvider>
+			</div>
+			{id && (
+				<BottomNavigation
+					next={{
+						label: 'Set Objective',
+						to: `/project/${id}/objectives`,
+					}}
+				/>
+			)}
+		</div>
 	);
 };
