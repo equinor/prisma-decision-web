@@ -18,19 +18,17 @@ export const ProjectIssues = () => {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex w-full items-center justify-between'>
-				<div className='flex items-center gap-4'>
-					<CreateIssues />
-					{activeView !== 0 && <ToggleExpandAll />}
-					<Button.Toggle selectedIndexes={[activeView]}>
-						<Button onClick={() => setIssuesView('list')}>
-							<Icon data={view_list} />
-						</Button>
-						<Button onClick={() => setIssuesView('table')}>
-							<Icon data={view_column} />
-						</Button>
-					</Button.Toggle>
-				</div>
+			<div className='flex w-full items-center justify-end gap-4'>
+				<CreateIssues />
+				{activeView !== 0 && <ToggleExpandAll />}
+				<Button.Toggle selectedIndexes={[activeView]}>
+					<Button onClick={() => setIssuesView('list')}>
+						<Icon data={view_list} />
+					</Button>
+					<Button onClick={() => setIssuesView('table')}>
+						<Icon data={view_column} />
+					</Button>
+				</Button.Toggle>
 			</div>
 			<IssueView />
 		</div>

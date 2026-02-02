@@ -35,7 +35,7 @@ export const HomePage = () => {
 				<div className='flex flex-col gap-4'>
 					<div className='flex justify-between'>
 						<Search
-							className='xl:w-[350px]'
+							className='xl:w-87.5'
 							placeholder='Search projects...'
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}

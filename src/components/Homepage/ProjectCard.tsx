@@ -12,14 +12,14 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 		<Link to={`/project/${project.id}/`}>
 			<div
 				className='bg-background-default outline-background-medium
-                hover:bg-background-light shadow-tile grid h-auto cursor-pointer
-                grid-rows-[auto_auto] overflow-hidden rounded-sm transition-all duration-1000
+                hover:bg-background-light shadow-tile grid h-full cursor-pointer
+                grid-rows-[1fr_auto] overflow-hidden rounded-sm transition-all duration-1000
                 hover:outline'
 			>
 				<div className='overflow-hidden p-4'>
-					<h2 className='text-lg font-semibold break-words'>{project.name}</h2>
+					<h2 className='text-lg font-semibold wrap-break-word'>{project.name}</h2>
 					{project.parent_project_name && (
-						<p className='text-text-secondary text-sm break-words'>
+						<p className='text-text-secondary text-sm wrap-break-word'>
 							This is the child project of{' '}
 							<button
 								type='button'

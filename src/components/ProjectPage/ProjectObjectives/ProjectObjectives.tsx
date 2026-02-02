@@ -10,10 +10,8 @@ export const ProjectObjectives = () => {
 	const objectives = project?.objectives || [];
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex w-full items-center justify-between'>
-				<div className='flex items-center gap-4'>
-					<CreateObjective />
-				</div>
+			<div className='flex w-full items-center justify-end'>
+				<CreateObjective />
 			</div>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
