@@ -6,7 +6,9 @@ export const useGetDecisionTree = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
-			const res = await apiClient.get<DecisionTree>(`/structure/${projectId}/decision_tree`);
+			const res = await apiClient.get<DecisionTree>(
+				`/structure/${projectId}/decision_tree/v2`,
+			);
 			return res.data;
 		},
 
@@ -15,12 +17,12 @@ export const useGetDecisionTree = (projectId?: string) => {
 	return { data, ...rest };
 };
 export type DecisionTree = {
-	children: DecisionTree[] | null;
 	tree_node: {
 		id: string;
 		issue: Issue | EndNodeIssue;
 		probabilities: DecisionTreeProbability[] | null;
 		utilities: DecisionTreeUtility[] | null;
+		children: DecisionTree[] | null;
 	};
 };
 
@@ -39,9 +41,10 @@ export type DecisionTreeUtility = {
 	utility_value: number;
 };
 
-type EndNodeIssue = {
+export type EndNodeIssue = {
 	id: string;
 	scenario_id: string;
+	value: number;
 	type: 'EndPoint';
 };
 

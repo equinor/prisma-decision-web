@@ -1,6 +1,7 @@
 import { Node } from '@xyflow/react';
+import { EndNodeIssue } from '../hooks/api/useGetDecisionTree';
 
-export const convertToOutputNode = (id: string, path: Set<string>): Node => {
+export const convertToOutputNode = (issue: EndNodeIssue, id: string, path: Set<string>): Node => {
 	return {
 		id,
 		type: 'outputNode',
@@ -12,6 +13,7 @@ export const convertToOutputNode = (id: string, path: Set<string>): Node => {
 		},
 		data: {
 			path,
+			value: issue.value,
 		},
 	};
 };

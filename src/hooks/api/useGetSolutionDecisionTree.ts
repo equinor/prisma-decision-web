@@ -7,7 +7,7 @@ export const useGetSolutionDecisionTree = (projectId?: string) => {
 		queryKey: ['solutionDecisionTree', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
 			const res = await apiClient.get<DecisionTree>(
-				`/solvers/project/${projectId}/decision_tree`,
+				`/solvers/project/${projectId}/decision_tree/v2`,
 			);
 			return res.data;
 		},

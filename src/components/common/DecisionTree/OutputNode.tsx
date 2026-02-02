@@ -4,7 +4,7 @@ import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useSetAtom } from 'jotai';
 import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
 
-export const OutputNode = ({ data }: NodeProps<Node<{ path: Set<string> }>>) => {
+export const OutputNode = ({ data }: NodeProps<Node<{ value: number; path: Set<string> }>>) => {
 	const setSelectedNodes = useSetAtom(testAtom);
 	return (
 		<div className='pan flex h-full items-center'>
@@ -21,6 +21,9 @@ export const OutputNode = ({ data }: NodeProps<Node<{ path: Set<string> }>>) => 
 			>
 				<Icon data={mail_unread} />
 			</Button>
+			<p className='ml-4 whitespace-nowrap'>
+				<span className='font-semibold'>Value: </span> {data.value}
+			</p>
 		</div>
 	);
 };
