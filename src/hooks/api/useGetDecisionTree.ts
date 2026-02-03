@@ -11,7 +11,7 @@ export const useGetDecisionTree = (projectId?: string) => {
 			);
 			return res.data;
 		},
-
+		retry: false,
 		enabled: !!projectId,
 	});
 	return { data, ...rest };

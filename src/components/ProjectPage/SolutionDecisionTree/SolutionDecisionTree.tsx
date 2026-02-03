@@ -5,7 +5,6 @@ import { useSolutionDecisionTree } from './useSolutionDecisionTree';
 
 export const SolutionTree = () => {
 	const { isError, nodes, edges } = useSolutionDecisionTree();
-	if (isError) return <InvalidDiagramDialog />;
 	return (
 		<div className='bg-background-light absolute inset-0 rounded-sm'>
 			<ReactFlow
@@ -16,6 +15,7 @@ export const SolutionTree = () => {
 				edgeTypes={EDGE_TYPES}
 			>
 				<Background />
+				{isError && <InvalidDiagramDialog />}
 			</ReactFlow>
 		</div>
 	);
