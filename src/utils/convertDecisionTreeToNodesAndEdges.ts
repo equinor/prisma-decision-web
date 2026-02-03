@@ -25,7 +25,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 			!isEndPoint;
 
 		if (isEndPoint) {
-			const newNode = convertToOutputNode(node.tree_node.id, path);
+			const newNode = convertToOutputNode(issue, node.tree_node.id, path);
 			return nodes.push(newNode);
 		}
 		if (isCollapsed) {
@@ -35,8 +35,8 @@ export const convertDecisionTreeToNodesAndEdges = ({
 		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path);
 		nodes.push(newNode);
 
-		if (!node.children) return;
-		node.children.forEach((child, index) => {
+		if (!node.tree_node.children) return;
+		node.tree_node.children.forEach((child, index) => {
 			const isSelected = selected.has(child.tree_node.id);
 			const newEdge = buildDecisionTreeEdge(node, child, index, isSelected);
 			if (!newEdge) return;

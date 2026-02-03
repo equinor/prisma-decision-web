@@ -20,7 +20,7 @@ export const HomePage = () => {
 	return (
 		<div className='mx-auto w-[min(1600px,90%)]'>
 			<div className='flex flex-col gap-12'>
-				<div className='max-w-[1000px]'>
+				<div className='max-w-250'>
 					<h1 className='text-3xl font-bold'>
 						Welcome to the Decision Optimization Tool!
 					</h1>
