@@ -6,12 +6,9 @@ import { CreateIssues } from '../CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
 import { ToggleExpandAll } from '../ToggleExpandAll';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { BottomNavigation } from '../../common/BottomNavigation';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
-	const project = useSelectedProject();
 	let IssueView = ListView;
 	let activeView = 0;
 	if (issueView === 'table') {
@@ -40,16 +37,6 @@ export const ProjectIssues = () => {
 					<IssueView />
 				</div>
 			</div>
-			<BottomNavigation
-				back={{
-					label: 'Back to Objectives',
-					to: `/project/${project?.id}/objectives`,
-				}}
-				next={{
-					label: 'Create Influence Diagram',
-					to: `/project/${project?.id}/influence-diagram`,
-				}}
-			/>
 		</div>
 	);
 };

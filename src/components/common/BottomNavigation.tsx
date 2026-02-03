@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 interface NavButton {
 	label: string;
 	to: string;
-	disabled?: boolean;
+	invisible?: boolean;
 }
 
 interface BottomNavigationProps {
@@ -21,8 +21,8 @@ export const BottomNavigation = ({ back, next }: BottomNavigationProps) => {
 			{back ? (
 				<Button
 					variant='outlined'
-					disabled={back.disabled}
 					onClick={() => navigate(back.to)}
+					style={{ visibility: back.invisible ? 'hidden' : 'visible' }}
 				>
 					<Icon data={arrow_back} />
 					{back.label}
@@ -33,8 +33,8 @@ export const BottomNavigation = ({ back, next }: BottomNavigationProps) => {
 			{next ? (
 				<Button
 					variant='outlined'
-					disabled={next.disabled}
 					onClick={() => navigate(next.to)}
+					style={{ visibility: next.invisible ? 'hidden' : 'visible' }}
 				>
 					{next.label}
 					<Icon data={arrow_forward} />
