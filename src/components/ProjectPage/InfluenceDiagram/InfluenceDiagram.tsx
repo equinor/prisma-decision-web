@@ -29,7 +29,11 @@ export const InfluenceDiagram = () => {
 	} = useInfluenceDiagram();
 
 	return (
-		<div className='bg-background-light fixed top-[64px] right-0 bottom-[72px] left-[64px] rounded-sm'>
+		<div
+			className='bg-background-light absolute
+			inset-0 rounded-sm'
+		>
+			{' '}
 			<ReactFlow
 				minZoom={0.1}
 				nodes={nodes}

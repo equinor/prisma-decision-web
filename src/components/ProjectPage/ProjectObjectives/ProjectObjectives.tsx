@@ -7,7 +7,6 @@ import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectObjectives = () => {
 	const project = useSelectedProject();
-
 	const objectives = project?.objectives || [];
 	return (
 		<div className='flex flex-col gap-4'>

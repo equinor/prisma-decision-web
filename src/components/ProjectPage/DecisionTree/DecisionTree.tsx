@@ -8,6 +8,7 @@ export const DecisionTree = () => {
 	if (isError) return <InvalidDiagramDialog />;
 	return (
 		<div className='bg-background-light fixed top-[64px] right-0 bottom-[72px] left-[64px] rounded-sm'>
+			{' '}
 			<ReactFlow
 				{...REACT_FLOW_CONFIG}
 				nodes={nodes}
