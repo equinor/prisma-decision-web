@@ -1,7 +1,8 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-    name: dot-web
+    name: prisma-decision-web
+
 spec:
     build:
     environments:
