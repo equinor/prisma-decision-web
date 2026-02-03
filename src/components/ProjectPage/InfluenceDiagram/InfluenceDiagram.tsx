@@ -33,7 +33,6 @@ export const InfluenceDiagram = () => {
 			className='bg-background-light absolute
 			inset-0 rounded-sm'
 		>
-			{' '}
 			<ReactFlow
 				minZoom={0.1}
 				nodes={nodes}
