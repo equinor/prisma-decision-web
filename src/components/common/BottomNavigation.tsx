@@ -66,9 +66,10 @@ export const BottomNavigation = () => {
 	}
 
 	return (
-		<div className='absolute right-0 bottom-0 left-0 flex flex-row justify-between p-3'>
+		<>
 			{back ? (
 				<Button
+					className='absolute! bottom-8 left-8'
 					variant='outlined'
 					onClick={() => navigate(back.to)}
 					style={{ visibility: back.invisible ? 'hidden' : 'visible' }}
@@ -81,6 +82,7 @@ export const BottomNavigation = () => {
 			)}
 			{next ? (
 				<Button
+					className='absolute! right-8 bottom-8'
 					variant='outlined'
 					onClick={() => navigate(next.to)}
 					style={{ visibility: next.invisible ? 'hidden' : 'visible' }}
@@ -91,6 +93,6 @@ export const BottomNavigation = () => {
 			) : (
 				<div />
 			)}
-		</div>
+		</>
 	);
 };
