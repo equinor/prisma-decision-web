@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 import { TopBar } from './TopBar';
 import { SideBar } from './Sidebar';
+import { BottomNavigation } from './common/BottomNavigation';
 
 export const Layout = () => {
 	return (
@@ -9,6 +10,7 @@ export const Layout = () => {
 			<SideBar />
 			<div className='relative h-full min-w-[320px] overflow-y-auto py-10'>
 				<Outlet />
+				<BottomNavigation />
 			</div>
 		</div>
 	);
