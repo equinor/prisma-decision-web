@@ -9,6 +9,7 @@ import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/Pr
 import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
 import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree';
 import { SolutionTree } from './components/ProjectPage/SolutionDecisionTree/SolutionDecisionTree';
+import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
 				<Route path='influence-diagram' element={<InfluenceDiagram />} />
 				<Route path='decision-tree' element={<DecisionTree />} />
 				<Route path='solution-tree' element={<SolutionTree />} />
+				<Route path='strategies' element={<Strategies />} />
 			</Route>
 		</Route>,
 	),

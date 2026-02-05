@@ -6,24 +6,27 @@ import { useExpandCard } from '../../../hooks/useExpandCard';
 import { percentageIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Issue } from '../../../validators';
-import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+import { DeleteIssueDialog } from '../DeleteIssueDialog';
+import { EditIssueModal } from '../EditIssueModal';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
 import { UncertaintyLabel } from './IssueLabel';
 
 export const UncertaintyCard = ({
 	issue,
-	isDecisionTree,
+	canExpand,
 	onClickOpenProbabilities,
 	...rest
 }: UncertaintyCardProps) => {
 	const hasOutcomes = issue.uncertainty.outcomes.length > 0;
-	const { expanded, toggle } = useExpandCard(issue.id);
+	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+
+	const expanded = rest.expanded ?? _expanded;
+
 	return (
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
@@ -59,15 +62,11 @@ export const UncertaintyCard = ({
 			</div>
 			<div>
 				<h3 className='font-semibold '>{issue.name}</h3>
-				<p
-					className={cn('text-text-tertiary  overflow-hidden text-sm', {
-						'line-clamp-3': !expanded,
-					})}
-				>
+				<p className={cn('text-text-tertiary  text-sm, line-clamp-2 overflow-hidden')}>
 					{issue.description}
 				</p>
 			</div>
-			{!isDecisionTree && (
+			{(canExpand || rest.expanded) && (
 				<Collapsible open={expanded} onOpenChange={toggle} className='pb-7'>
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOutcomes && (
@@ -85,17 +84,19 @@ export const UncertaintyCard = ({
 						)}
 					</CollapsibleContent>
 					<EdsProvider density='compact'>
-						<CollapsibleTrigger asChild>
-							<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
-								<p className='text-text-tertiary text-sm'>
-									{issue.uncertainty.outcomes.length} Outcomes
-								</p>
-								<Icon
-									className='fill-primary-resting'
-									data={expanded ? chevron_up : chevron_down}
-								/>
-							</button>
-						</CollapsibleTrigger>
+						{(!canExpand || !rest.expanded) && (
+							<CollapsibleTrigger asChild>
+								<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
+									<p className='text-text-tertiary text-sm'>
+										{issue.uncertainty.outcomes.length} Outcomes
+									</p>
+									<Icon
+										className='fill-primary-resting'
+										data={expanded ? chevron_up : chevron_down}
+									/>
+								</button>
+							</CollapsibleTrigger>
+						)}
 					</EdsProvider>
 				</Collapsible>
 			)}
@@ -112,6 +113,7 @@ export const UncertaintyCard = ({
 type UncertaintyCardProps = {
 	issue: Issue;
 	className?: string;
-	isDecisionTree?: boolean;
+	canExpand?: boolean;
 	onClickOpenProbabilities?: () => void;
+	expanded?: boolean;
 };

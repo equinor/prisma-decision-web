@@ -3,9 +3,9 @@ import { add, close } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { useIssueForm } from '../../hooks/useIssueForm';
-import { DecisionFormSection } from './ProjectIssues/IssueFormSections/DecisionFormSection';
-import { IssueFormSection } from './ProjectIssues/IssueFormSections/IssueFormSection';
-import { UncertaintyFormSection } from './ProjectIssues/IssueFormSections/UncertaintyFormSection';
+import { DecisionFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/DecisionFormSection';
+import { IssueFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/IssueFormSection';
+import { UncertaintyFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/UncertaintyFormSection';
 
 export const CreateIssues = () => {
 	const [isOpen, setIsOpen] = useState(false);

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { getIssueLabel } from '../../../../utils/getIssueLabel';
 import { Issue } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
-import { DeleteIssueDialog } from '../../DeleteIssueDialog';
-import { EditIssueModal } from '../../EditIssueModal';
+import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
+import { EditIssueModal } from '../../../common/EditIssueModal';
 import { format } from 'date-fns/format';
 
 export const IssueRow = ({ issue }: IssueRowProps) => {

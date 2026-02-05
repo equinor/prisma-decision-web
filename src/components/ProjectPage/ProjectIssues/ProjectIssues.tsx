@@ -2,7 +2,7 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import '@xyflow/react/dist/style.css';
-import { CreateIssues } from '../CreateIssue';
+import { CreateIssues } from '../../common/CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
 import { ToggleExpandAll } from '../ToggleExpandAll';

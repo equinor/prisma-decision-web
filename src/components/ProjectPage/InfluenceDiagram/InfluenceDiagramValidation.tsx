@@ -3,7 +3,7 @@ import { warning_outlined, check_circle_outlined } from '@equinor/eds-icons';
 import { Node, useReactFlow, Edge as ReactFlowEdge, MarkerType } from '@xyflow/react';
 import { useState } from 'react';
 
-import { CreateIssues } from '../CreateIssue';
+import { CreateIssues } from '../../common/CreateIssue';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { ErrorHandlingState, InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
 import z from 'zod/v3';
