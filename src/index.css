@@ -124,6 +124,10 @@
 	color: rgb(255, 255, 255) !important;
 }
 
+input::placeholder {
+	color: rgba(var(--eds_text_tertiary), 1);
+}
+
 html,
 body {
 	font-family: equinor, sans-serif;

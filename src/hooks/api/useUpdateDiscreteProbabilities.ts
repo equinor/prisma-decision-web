@@ -12,7 +12,7 @@ export const useUpdateDiscreteProbabilities = () => {
 		},
 		onSettled: () => {
 			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
+			queryClient.refetchQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});

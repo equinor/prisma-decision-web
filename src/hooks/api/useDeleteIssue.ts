@@ -8,20 +8,6 @@ export const useDeleteIssue = () => {
 		mutationFn: async (issueId: string) => {
 			await apiClient.delete(`/issues/${issueId}`);
 		},
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['issues'] });
-			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
-		},
-	});
-};
-
-export const useDeleteIssueOptimistic = () => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async (issueId: string) => {
-			await apiClient.delete(`/issues/${issueId}`);
-		},
 		onMutate: (issueId: string) => {
 			queryClient.cancelQueries({ queryKey: ['issues'] });
 			const previousIssues = queryClient.getQueryData<Issue[]>(['issues']) || [];

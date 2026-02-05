@@ -6,7 +6,8 @@ import { useSelectedProject } from '../../hooks/useSelectedProject';
 const NAV_STEPS = [
 	{ path: '', nextLabel: 'Set Objectives' },
 	{ path: '/objectives', nextLabel: 'View Issues' },
-	{ path: '/issues', nextLabel: 'Create Influence Diagram' },
+	{ path: '/issues', nextLabel: 'Create Strategies' },
+	{ path: '/strategies', nextLabel: 'Create Influence Diagram' },
 	{
 		path: '/influence-diagram',
 		nextLabel: 'Calculate Decision Tree',
@@ -36,8 +37,8 @@ const getNavigation = (pathname: string, basePath: string) => {
 			? {
 					label:
 						prevStep.path === ''
-							? 'Back to Project Details'
-							: `Back to ${prevStep.path.replace('/', '')}`,
+							? 'Project Details'
+							: `${prevStep.path.replace('/', '').split('-').join(' ')}`,
 					to: `${basePath}${prevStep.path}`,
 					invisible: false,
 				}
@@ -64,34 +65,23 @@ export const BottomNavigation = () => {
 	if (hideNavigation) {
 		return null;
 	}
-
 	return (
 		<>
-			{back ? (
-				<Button
-					className='absolute! bottom-8 left-8'
-					variant='outlined'
-					onClick={() => navigate(back.to)}
-					style={{ visibility: back.invisible ? 'hidden' : 'visible' }}
-				>
-					<Icon data={arrow_back} />
-					{back.label}
-				</Button>
-			) : (
-				<div />
+			{!back.invisible && (
+				<div className='bg-background-default shadow-tile fixed! bottom-6 left-26 rounded-md p-2 **:capitalize!'>
+					<Button variant='outlined' onClick={() => navigate(back.to)}>
+						<Icon data={arrow_back} />
+						{back.label}
+					</Button>
+				</div>
 			)}
-			{next ? (
-				<Button
-					className='absolute! right-8 bottom-8'
-					variant='outlined'
-					onClick={() => navigate(next.to)}
-					style={{ visibility: next.invisible ? 'hidden' : 'visible' }}
-				>
-					{next.label}
-					<Icon data={arrow_forward} />
-				</Button>
-			) : (
-				<div />
+			{!next.invisible && (
+				<div className='bg-background-default shadow-tile fixed! right-6 bottom-6 rounded-md p-2'>
+					<Button variant='outlined' onClick={() => navigate(next.to)}>
+						{next.label}
+						<Icon data={arrow_forward} />
+					</Button>
+				</div>
 			)}
 		</>
 	);

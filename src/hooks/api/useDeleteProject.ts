@@ -8,18 +8,6 @@ export const useDeleteProject = () => {
 		mutationFn: async (id: string) => {
 			await apiClient.delete(`/projects/${id}`);
 		},
-		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['projects'] });
-		},
-	});
-};
-
-export const useDeleteProjectOptimistic = () => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async (id: string) => {
-			await apiClient.delete(`/projects/${id}`);
-		},
 		onMutate: (id: string) => {
 			queryClient.cancelQueries({ queryKey: ['projects'] });
 			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
