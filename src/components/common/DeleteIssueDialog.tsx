@@ -1,9 +1,9 @@
 import { Button, Dialog, DialogContent } from '@equinor/eds-core-react';
-import { useDeleteIssueOptimistic } from '../../hooks/api/useDeleteIssue';
+import { useDeleteIssue } from '../../hooks/api/useDeleteIssue';
 import { Issue } from '../../validators';
 
 export const DeleteIssueDialog = ({ issue, open = false, onClose }: DeleteIssueDialogProps) => {
-	const { mutate: deleteIssue } = useDeleteIssueOptimistic();
+	const { mutate: deleteIssue } = useDeleteIssue();
 	return (
 		<Dialog
 			open={open}

@@ -2,23 +2,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
 
-export const useDeleteProject = () => {
+export const useUpdateStrategy = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (id: string) => {
-			await apiClient.delete(`/projects/${id}`);
+		mutationFn: async (project: Project) => {
+			await apiClient.put('/projects', [project]);
 		},
-		onMutate: (id: string) => {
-			queryClient.cancelQueries({ queryKey: ['projects'] });
+		onMutate: async (project: Project) => {
+			await queryClient.cancelQueries({ queryKey: ['projects'] });
 			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
-			const updatedProjects = previousProjects.filter(project => project.id !== id);
+			const updatedProjects = previousProjects.map(p => (p.id === project.id ? project : p));
 			queryClient.setQueryData(['projects'], updatedProjects);
 			return { previousProjects };
 		},
-		onError: (_err, _id, context) => {
+		onError: (_err, _project, context) => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
+		},
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
 		},
 	});
 };

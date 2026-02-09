@@ -18,8 +18,8 @@ export const ProjectPage = () => {
 	if (!selectedProject) return;
 
 	return (
-		<div className='mx-auto w-[min(2400px,_90%)]'>
-			<div className='mb-4 max-w-[1000px]'>
+		<div className='mx-auto w-[min(2400px,90%)]'>
+			<div className='mb-4 max-w-250'>
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 			</div>
 			<Outlet />

@@ -62,6 +62,9 @@ export const IssuesNotInDiagramTable = () => {
 								<Table.Cell className='w-34 whitespace-nowrap'>
 									Date Added
 								</Table.Cell>
+								<Table.Cell className='w-34 whitespace-nowrap'>
+									Date Updated
+								</Table.Cell>
 							</Table.Row>
 						</Table.Head>
 						<Table.Body>

@@ -1,12 +1,12 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteIssueOptimistic } from '../../hooks/api/useDeleteIssue';
+import { useDeleteIssue } from '../../hooks/api/useDeleteIssue';
 import { ReactFlowInfluenceNode } from '../../types';
 
 export const DeleteIssuesDialog = ({ nodes }: DeleteIssueDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { mutate: deleteIssue } = useDeleteIssueOptimistic();
+	const { mutate: deleteIssue } = useDeleteIssue();
 
 	const handleDelete = () => {
 		nodes.forEach(node => deleteIssue(node.data.issue_id));

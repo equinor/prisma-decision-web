@@ -3,8 +3,8 @@ import { Issue } from '../../../validators';
 
 import { delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { DeleteIssueDialog } from '../../ProjectPage/DeleteIssueDialog';
-import { EditIssueModal } from '../../ProjectPage/EditIssueModal';
+import { DeleteIssueDialog } from '../DeleteIssueDialog';
+import { EditIssueModal } from '../EditIssueModal';
 import { CardContainer } from './CardContainer';
 import { UnassignedLabel } from './IssueLabel';
 import { BoundaryLabel } from './BoundaryLabel';

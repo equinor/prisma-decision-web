@@ -7,7 +7,7 @@ import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer
 
 export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps) => {
 	return (
-		<div className='flex min-w-[257px] basis-full flex-col gap-2'>
+		<div className='flex min-w-64.25 basis-full flex-col gap-2'>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>

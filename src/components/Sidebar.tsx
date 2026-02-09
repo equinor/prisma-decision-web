@@ -1,15 +1,16 @@
 import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
 import {
 	assignment_important,
+	functions,
 	info_circle,
 	measure,
 	share,
-	functions,
 	timeline,
 } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
+import { ChessIcon } from '../icons';
 import { EquinorStar } from './EquinorStar';
 
 export const SideBar = () => {
@@ -54,6 +55,13 @@ export const SideBar = () => {
 					icon={assignment_important}
 					to={`/project/${project.id}/issues`}
 				/>
+				<EdsSideBar.Link
+					label='Strategies'
+					as={Link}
+					className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:ml-0.5! [&_svg]:size-5!'
+					icon={ChessIcon}
+					to={`/project/${project.id}/strategies`}
+				/>
 				<Divider className='my-0!' />
 				<p
 					data-open={isOpen}
@@ -64,7 +72,7 @@ export const SideBar = () => {
 				<EdsSideBar.Link
 					as={Link}
 					label='Influence Diagram'
-					className='[&_svg]:fill-primary-resting border-b-0!'
+					className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:w-full!'
 					icon={timeline}
 					to={`/project/${project.id}/influence-diagram`}
 				/>

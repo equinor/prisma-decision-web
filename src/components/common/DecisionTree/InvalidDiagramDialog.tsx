@@ -1,4 +1,5 @@
-import { Dialog, DialogContent, Button } from '@equinor/eds-core-react';
+import { Dialog, DialogContent, Button, Icon } from '@equinor/eds-core-react';
+import { arrow_forward } from '@equinor/eds-icons';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -22,20 +23,23 @@ export const InvalidDiagramDialog = () => {
 			className='nodrag nopan nowheel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 		>
 			<DialogContent>
-				<div className='flex flex-col gap-4 text-center'>
-					<h2 className='text-2xl font-semibold'>Invalid influence diagram</h2>
-					<p className='text-text-tertiary'>
-						Your influence diagram is invalid. The decision tree cannot be calculated.
-						Open Validation to see how you can fix it.
-					</p>
-				</div>
 				<div className='flex flex-col gap-2'>
-					<Button variant='outlined' onClick={handleStayOnDecisionTree}>
-						Stay on Decision Tree
-					</Button>
-					<Button color='danger' onClick={handleNavigateToValidation}>
-						Open Validation
-					</Button>
+					<div className='flex flex-col gap-2 text-center'>
+						<h2 className='text-2xl font-semibold'>Invalid influence diagram</h2>
+						<p className='text-text-tertiary'>
+							Your influence diagram is invalid. The decision tree cannot be
+							calculated. Open Validation to see how you can fix it.
+						</p>
+					</div>
+					<div className='flex flex-col gap-2'>
+						<Button variant='ghost' onClick={handleStayOnDecisionTree}>
+							Stay on Decision Tree
+						</Button>
+						<Button variant='outlined' onClick={handleNavigateToValidation}>
+							Go to influence diagram
+							<Icon data={arrow_forward} />
+						</Button>
+					</div>
 				</div>
 			</DialogContent>
 		</Dialog>

@@ -1,12 +1,12 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteProjectOptimistic } from '../../hooks/api/useDeleteProject';
+import { useDeleteProject } from '../../hooks/api/useDeleteProject';
 import { Project } from '../../validators';
 
 export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { mutate: deleteProject } = useDeleteProjectOptimistic();
+	const { mutate: deleteProject } = useDeleteProject();
 	return (
 		<>
 			<Button

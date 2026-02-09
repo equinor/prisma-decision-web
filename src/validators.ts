@@ -32,6 +32,22 @@ export const projectRoleSchema = z.object({
 	role: z.enum(roleTypes, { error: 'Role is required' }),
 });
 
+const optionSchema = z.object({
+	name: z.string().min(1, 'Option name is required'),
+	id: uuid(),
+	decision_id: uuid(),
+	utility: z.number().optional(),
+});
+
+export const strategySchema = z.object({
+	id: uuid(),
+	name: z.string().min(1, 'Strategy name is required'),
+	description: z.string().min(1, 'Description is required'),
+	project_id: uuid(),
+	rationale: z.string().min(1, 'Rational is required'),
+	options: z.array(optionSchema),
+});
+
 export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
@@ -43,6 +59,7 @@ export const projectSchema = z.object({
 	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
+	strategies: z.array(strategySchema),
 	users: z.array(projectRoleSchema),
 });
 
@@ -50,14 +67,7 @@ export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
 	type: z.enum(decisionTypes),
-	options: z.array(
-		z.object({
-			name: z.string().min(1, 'Option name is required'),
-			id: uuid(),
-			decision_id: uuid(),
-			utility: z.number().optional(),
-		}),
-	),
+	options: z.array(optionSchema),
 });
 
 export const valueMetricSchema = z.object({
@@ -149,6 +159,8 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export type Project = z.infer<typeof projectSchema>;
+export type Strategy = z.infer<typeof strategySchema>;
+export type Option = z.infer<typeof optionSchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;

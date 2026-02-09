@@ -42,4 +42,5 @@ const defaultValues: Project = {
 	id: crypto.randomUUID(),
 	parent_project_id: null,
 	users: [],
+	strategies: [],
 };
