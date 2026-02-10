@@ -14,7 +14,7 @@ import { UncertaintyLabel } from './IssueLabel';
 
 export const UncertaintyCard = ({
 	issue,
-	canExpand,
+	canExpand = true,
 	onClickOpenProbabilities,
 	...rest
 }: UncertaintyCardProps) => {
@@ -67,7 +67,13 @@ export const UncertaintyCard = ({
 				</p>
 			</div>
 			{(canExpand || rest.expanded) && (
-				<Collapsible open={expanded} onOpenChange={toggle} className='pb-7'>
+				<Collapsible
+					open={expanded}
+					onOpenChange={toggle}
+					className={cn({
+						'pb-7': !rest.expanded,
+					})}
+				>
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOutcomes && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>

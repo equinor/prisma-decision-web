@@ -10,7 +10,7 @@ export const convertToDecisionTreeNode = (
 	return {
 		id,
 		type,
-		height: 150,
+		height: 80,
 		width: type === 'treeNode' ? 250 : 1,
 		position: {
 			x: issue.node.node_style.x_position,

@@ -5,7 +5,7 @@ export const convertToOutputNode = (issue: EndNodeIssue, id: string, path: Set<s
 	return {
 		id,
 		type: 'outputNode',
-		height: 150,
+		height: 80,
 		width: 1,
 		position: {
 			x: 0,

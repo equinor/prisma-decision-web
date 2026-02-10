@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useAtom } from 'jotai';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
@@ -22,9 +23,8 @@ export const DecisionTreeNode = ({
 			}}
 		>
 			{handlePositions.map(position => (
-				<>
+				<Fragment key={`${id}-${position}`}>
 					<Handle
-						key={`source-${position}`}
 						type='source'
 						position={position}
 						id={position}
@@ -32,14 +32,13 @@ export const DecisionTreeNode = ({
 						isConnectable={false}
 					/>
 					<Handle
-						key={`target-${position}`}
 						type='target'
 						position={position}
 						id={position}
 						className='bg-primary-resting! z-1 h-3! w-3!'
 						isConnectable={false}
 					/>
-				</>
+				</Fragment>
 			))}
 			<div
 				className={`h-full max-w-87.5
@@ -48,7 +47,7 @@ export const DecisionTreeNode = ({
 				<IssueCard
 					canExpand={false}
 					issue={data.issue}
-					className={`h-32.5 w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+					className={`h-20 w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
 				/>
 			</div>
 		</div>

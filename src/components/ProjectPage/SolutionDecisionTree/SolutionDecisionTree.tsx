@@ -1,7 +1,8 @@
 import { Background, ReactFlow } from '@xyflow/react';
-import { EDGE_TYPES, NODE_TYPES, REACT_FLOW_CONFIG } from '../../../config/decisionTree';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
 import { useSolutionDecisionTree } from './useSolutionDecisionTree';
+import { EDGE_TYPES, NODE_TYPES } from '../../../config/solutionTree';
+import { REACT_FLOW_CONFIG } from '../../../config/decisionTree';
 
 export const SolutionTree = () => {
 	const { isError, nodes, edges } = useSolutionDecisionTree();

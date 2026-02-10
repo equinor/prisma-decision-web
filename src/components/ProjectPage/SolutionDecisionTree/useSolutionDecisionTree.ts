@@ -2,7 +2,7 @@ import { atom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useGetSolutionDecisionTree } from '../../../hooks/api/useGetSolutionDecisionTree';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { convertDecisionTreeToNodesAndEdges } from '../../../utils/convertDecisionTreeToNodesAndEdges';
+import { convertSolutionTreeToNodesAndEdges } from '../../../utils/convertSolutionTreeToNodesAndEdges';
 import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
 
 export const useSolutionDecisionTree = () => {
@@ -14,10 +14,9 @@ export const useSolutionDecisionTree = () => {
 		if (!decisionTree) {
 			return { nodes: [], edges: [] };
 		}
-		const { nodes, edges } = convertDecisionTreeToNodesAndEdges({
+		const { nodes, edges } = convertSolutionTreeToNodesAndEdges({
 			tree: decisionTree,
 			selected,
-			expandable: false,
 		});
 		return getDecisionTreeLayout(nodes, edges);
 	}, [decisionTree, selected]);
