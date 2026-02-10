@@ -6,6 +6,8 @@ export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (objective: Objective) => {
+			console.log(objective);
+
 			await apiClient.put('/objectives', [objective]);
 			return objective;
 		},

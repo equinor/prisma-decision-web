@@ -35,7 +35,7 @@ export const useProjectForm = () => {
 
 const defaultValues: Project = {
 	name: '',
-	opportunityStatement: '',
+	opportunity_statement: '',
 	public: false,
 	endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // default to 30 days from now
 	objectives: [],

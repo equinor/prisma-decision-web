@@ -1,29 +1,22 @@
-import {
-	Button,
-	Icon,
-	CircularProgress,
-	Popover,
-	TextField,
-	Textarea,
-} from '@equinor/eds-core-react';
+import { Button, Icon, CircularProgress, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
-import { ErrorMessage } from '@hookform/error-message';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
-import { FormErrorMessage } from '../../common/FormErrorMessage';
 import { useRef, useState } from 'react';
+import { ObjectiveFormFields } from './ObjectiveFormFields';
 
 export const CreateObjective = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const referenceElement = useRef<HTMLButtonElement>(null);
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 		isPending,
+		control,
 	} = useObjectiveForm({
 		onSuccess: () => setIsOpen(false),
 	});
-
 	return (
 		<>
 			<Button
@@ -57,27 +50,12 @@ export const CreateObjective = () => {
 						>
 							<Icon data={close} />
 						</Button>
-						<div>
-							<TextField
-								label='Name'
-								placeholder='Enter objective name...'
-								{...register('name')}
-							/>
-							<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
-						</div>
-						<div>
-							<Textarea
-								label='Description'
-								placeholder='Enter objective description...'
-								rows={6}
-								{...register('description')}
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name='description'
-								errors={errors}
-							/>
-						</div>
+						<ObjectiveFormFields
+							register={register}
+							errors={errors}
+							control={control}
+						/>
+
 						<Button
 							className='w-max justify-self-end'
 							type='submit'
