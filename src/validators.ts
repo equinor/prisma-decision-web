@@ -136,6 +136,8 @@ export const edgeSchema = z.object({
 	head_id: uuid(),
 	tail_id: uuid(),
 	project_id: uuid(),
+	head_issue_id: uuid().optional(),
+	tail_issue_id: uuid().optional(),
 });
 
 export const issueSchema = z.object({
