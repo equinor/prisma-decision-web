@@ -24,7 +24,7 @@ export const useUpdateProject = () => {
 
 			return { previousProjects };
 		},
-		onError: (err, _project, context) => {
+		onError: (_err, _project, context) => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}

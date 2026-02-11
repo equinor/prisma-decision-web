@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, Button, Icon } from '@equinor/eds-core-react';
+import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { arrow_forward } from '@equinor/eds-icons';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -13,7 +13,9 @@ export const InvalidDiagramDialog = () => {
 
 	const handleNavigateToValidation = useCallback(() => {
 		const validationPath = getInfluenceDiagramPath(window.location.pathname);
-		navigate(validationPath);
+		navigate(validationPath, {
+			state: { fromInvalidDiagramDialog: true },
+		});
 	}, [navigate]);
 
 	return (
