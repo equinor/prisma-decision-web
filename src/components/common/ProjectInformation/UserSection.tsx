@@ -6,7 +6,11 @@ import { useGetUsers } from '../../../hooks/api/useGetUsers';
 import { useProjectFormContext } from '../../../hooks/useProjectForm';
 import { ProjectRole, RoleType, roleTypes, User } from '../../../validators';
 
-export const UserSection = () => {
+type UserSectionProps = {
+	handleSubmit: () => void;
+};
+
+export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control, getValues } = useProjectFormContext();
 	const [selectedUsers, setSelectedUser] = useState<User[]>([]);
 	const [selectedRole, setSelectedRole] = useState<RoleType>();
@@ -25,6 +29,7 @@ export const UserSection = () => {
 
 	const handleDeleteUser = (user: ProjectRole) => {
 		setUser(usersValue.filter(u => u.user_id !== user.user_id));
+		handleSubmit();
 	};
 	const handleRoleCreate = () => {
 		if (selectedRole && selectedUsers.length > 0) {
@@ -44,6 +49,7 @@ export const UserSection = () => {
 			setUser(mergeUser);
 			setSelectedUser([]);
 			setSelectedRole(undefined);
+			handleSubmit();
 		}
 	};
 

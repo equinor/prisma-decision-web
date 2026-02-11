@@ -24,10 +24,10 @@ export const DeleteObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 				>
 					<DialogContent>
 						<div className='flex flex-col gap-4 text-center'>
-							<h2 className='text-2xl font-semibold'>Delete Opportunity</h2>
+							<h2 className='text-2xl font-semibold'>Delete Objective</h2>
 							<p className='text-text-tertiary'>
-								Are you sure you want to delete the opportunity &quot;
-								{objective.name}&quot;?
+								Are you sure you want to delete the objective &quot;{objective.name}
+								&quot;?
 							</p>
 							<div className='flex flex-col gap-2'>
 								<Button variant='outlined' onClick={() => setIsOpen(prev => !prev)}>
@@ -37,6 +37,7 @@ export const DeleteObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 									color='danger'
 									onClick={() => {
 										deleteObjective(objective);
+										setIsOpen(false);
 									}}
 								>
 									Delete

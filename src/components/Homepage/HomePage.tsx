@@ -1,12 +1,12 @@
-import { Button, Icon, Search } from '@equinor/eds-core-react';
+import { Search } from '@equinor/eds-core-react';
 import { useState } from 'react';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
-import { Link } from 'react-router';
-import { add } from '@equinor/eds-icons';
+
 import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
+import { CreateProject } from '../common/ProjectInformation/CreateProject';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -40,10 +40,7 @@ export const HomePage = () => {
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}
 						/>
-						<Button as={Link} to='/create-project' variant='outlined'>
-							<Icon data={add} />
-							Create Project
-						</Button>
+						<CreateProject />
 					</div>
 					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
 						{filteredProjects.map(project => (

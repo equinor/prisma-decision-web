@@ -1,7 +1,7 @@
 import { Accordion, Button, Divider, Icon } from '@equinor/eds-core-react';
 import { warning_outlined, check_circle_outlined } from '@equinor/eds-icons';
 import { Node, useReactFlow, Edge as ReactFlowEdge, MarkerType } from '@xyflow/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { CreateIssues } from '../../common/CreateIssue';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
@@ -245,6 +245,12 @@ export const InfluenceDiagramValidation = () => {
 	};
 
 	const hasError = parsedError.message !== '';
+
+	useEffect(() => {
+		if (!hasError) {
+			setIsExpanded(true);
+		}
+	}, [hasError]);
 
 	return (
 		<div className='absolute top-1 right-1 z-10 w-1/3'>

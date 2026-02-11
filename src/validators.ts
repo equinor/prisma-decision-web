@@ -59,7 +59,7 @@ export const projectSchema = z.object({
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
-	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
+	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
 	strategies: z.array(strategySchema),

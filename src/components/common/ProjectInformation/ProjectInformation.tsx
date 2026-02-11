@@ -1,20 +1,14 @@
-import {
-	Button,
-	CircularProgress,
-	DatePicker,
-	Switch,
-	Textarea,
-	TextField,
-} from '@equinor/eds-core-react';
+import { DatePicker, Switch, Textarea } from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
+import { ProjectNameField } from './ProjectNameField';
 import { UserSection } from './UserSection';
 import { parseISO } from 'date-fns';
 
 export const ProjectInformation = () => {
-	const { formMethods, isPending, handleSubmit } = useProjectForm();
+	const { formMethods, handleSubmit } = useProjectForm();
 	const {
 		register,
 		formState: { errors },
@@ -23,14 +17,12 @@ export const ProjectInformation = () => {
 	const {
 		field: { value: endDate, onChange: onChangeEndDate },
 	} = useController({
-		name: 'endDate',
+		name: 'end_date',
 		control: formMethods.control,
 	});
-
 	return (
 		<FormProvider {...formMethods}>
 			<form
-				onSubmit={handleSubmit}
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
 			>
@@ -41,14 +33,13 @@ export const ProjectInformation = () => {
 					</p>
 				</div>
 				<div className='grid w-full grid-cols-1 gap-4 md:grid-cols-2'>
-					<div>
-						<TextField
-							label='Project Name'
-							placeholder='Enter project name...'
-							{...register('name')}
-						/>
-						<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
-					</div>
+					<ProjectNameField
+						register={register}
+						errors={errors}
+						onBlur={() => {
+							handleSubmit();
+						}}
+					/>
 					<div>
 						<DatePicker
 							label='Select End Date'
@@ -56,12 +47,17 @@ export const ProjectInformation = () => {
 							onChange={endDate => {
 								if (endDate) {
 									onChangeEndDate(endDate.toISOString());
+									handleSubmit();
 								}
 							}}
 						/>
-						<ErrorMessage as={FormErrorMessage} name='endDate' errors={errors} />
+						<ErrorMessage as={FormErrorMessage} name='end_date' errors={errors} />
 					</div>
-					<Switch label='Make Project Public' {...register('public')} />
+					<Switch
+						label='Make Project Public'
+						{...register('public')}
+						onChange={() => handleSubmit()}
+					/>
 					<div className='col-span-1 md:col-span-2'>
 						<Textarea
 							rows={5}
@@ -77,14 +73,7 @@ export const ProjectInformation = () => {
 					</div>
 				</div>
 
-				<UserSection />
-				<Button
-					className='col-span-1 md:col-span-2 md:-col-end-1 md:w-max md:place-self-end'
-					type='submit'
-					disabled={isPending}
-				>
-					{isPending ? <CircularProgress size={24} /> : 'Save'}
-				</Button>
+				<UserSection handleSubmit={handleSubmit} />
 			</form>
 		</FormProvider>
 	);
