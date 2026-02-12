@@ -4,8 +4,6 @@ import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { ProjectNameField } from './ProjectNameField';
-import { ProjectNameField } from './ProjectNameField';
-import { ProjectNameField } from './ProjectNameField';
 import { UserSection } from './UserSection';
 import { parseISO } from 'date-fns';
 
