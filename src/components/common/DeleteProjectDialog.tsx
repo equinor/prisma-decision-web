@@ -29,10 +29,10 @@ export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 					className='nodrag fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 				>
 					<DialogContent>
-						<div className='flex flex-col gap-4 text-center'>
-							<h2 className='text-2xl font-semibold'>Delete Issue</h2>
-							<p className='text-text-tertiary'>
-								Are you sure you want to delete the issue &quot;{project.name}
+						<div className='flex flex-col gap-4 px-4'>
+							<h2 className='text-center text-2xl font-semibold'>Delete Project</h2>
+							<p className='text-text-tertiary text-center [overflow-wrap:anywhere] break-words'>
+								Are you sure you want to delete the Project &quot;{project.name}
 								&quot;?
 							</p>
 							<div className='flex flex-col gap-2'>
@@ -43,6 +43,7 @@ export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 									color='danger'
 									onClick={() => {
 										deleteProject(project.id);
+										setIsOpen(false);
 									}}
 								>
 									Delete

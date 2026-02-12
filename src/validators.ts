@@ -54,12 +54,12 @@ export const strategySchema = z.object({
 export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
-	opportunity_statement: z.string().min(1, 'Opportunity statement is required'),
+	opportunity_statement: z.string().optional(),
 	objectives: z.array(objectiveSchema),
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
-	endDate: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
+	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
 	strategies: z.array(strategySchema),
