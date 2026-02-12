@@ -15,6 +15,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 	const edges: Edge[] = [];
 	const walk = (node: DecisionTree, depth = 0, path: Set<string> = new Set<string>()) => {
 		const issue = node.tree_node.issue;
+		const expectedValue = node.tree_node.expected_value;
 		const nodeId = node.tree_node.id;
 		const isEndPoint = issue.type === 'EndPoint';
 		const isCollapsed =
@@ -32,7 +33,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 			const newNode = convertToDecisionTreeNode(issue, 'expandNode', nodeId, path);
 			return nodes.push(newNode);
 		}
-		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path);
+		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path, expectedValue);
 		nodes.push(newNode);
 
 		if (!node.tree_node.children) return;

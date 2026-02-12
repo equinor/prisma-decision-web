@@ -23,6 +23,7 @@ export type DecisionTree = {
 		probabilities: DecisionTreeProbability[] | null;
 		utilities: DecisionTreeUtility[] | null;
 		children: DecisionTree[] | null;
+		expected_value: number | null;
 	};
 };
 

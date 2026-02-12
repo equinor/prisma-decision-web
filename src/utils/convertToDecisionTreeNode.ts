@@ -6,7 +6,8 @@ export const convertToDecisionTreeNode = (
 	type: 'treeNode' | 'expandNode',
 	id: string,
 	path: Set<string> = new Set<string>(),
-): Node<{ issue: Issue; path: Set<string> }> => {
+	expectedValue?: number | null,
+): Node<{ issue: Issue; path: Set<string>; expectedValue?: number | null }> => {
 	return {
 		id,
 		type,
@@ -18,6 +19,7 @@ export const convertToDecisionTreeNode = (
 		},
 		data: {
 			issue: issue,
+			expectedValue,
 			path,
 		},
 	};
