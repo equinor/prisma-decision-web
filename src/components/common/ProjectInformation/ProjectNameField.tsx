@@ -8,16 +8,10 @@ type ProjectNameFieldProps = {
 	register: UseFormRegister<Project>;
 	errors: FieldErrors<Project>;
 	onBlur?: () => void;
-	className?: string;
 };
 
-export const ProjectNameField = ({
-	register,
-	errors,
-	onBlur,
-	className,
-}: ProjectNameFieldProps) => (
-	<div className={className}>
+export const ProjectNameField = ({ register, errors, onBlur }: ProjectNameFieldProps) => (
+	<div className='w-full'>
 		<TextField
 			label='Project Name'
 			placeholder='Enter project name...'
