@@ -6,7 +6,9 @@ import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 
 export const Strategy = ({ strategy }: { strategy: StrategyType }) => {
-	const issues = useSelectedProjectIssues().filter(x => x.type === 'Decision');
+	const issues = useSelectedProjectIssues().filter(
+		x => x.type === 'Decision' && x.decision.type === 'Focus' && x.boundary === 'in',
+	);
 	const project = useSelectedProject();
 	const { mutate: updateStrategy } = useUpdateStrategy();
 	if (!project) return;
