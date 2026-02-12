@@ -248,6 +248,12 @@ export const InfluenceDiagramValidation = () => {
 
 	const hasError = parsedError.message !== '';
 
+	useEffect(() => {
+		if (!hasError) {
+			setIsExpanded(true);
+		}
+	}, [hasError]);
+
 	return (
 		<div className='absolute top-1 right-1 z-10 w-1/3'>
 			<Accordion>

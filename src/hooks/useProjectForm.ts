@@ -6,6 +6,18 @@ import { useSelectedProject } from './useSelectedProject';
 import { useCreateProject } from './api/useCreateProject';
 import { useUpdateProject } from './api/useUpdateProject';
 
+const getDefaultValues = (): Project => ({
+	name: '',
+	opportunity_statement: '',
+	public: false,
+	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+	objectives: [],
+	id: crypto.randomUUID(),
+	parent_project_id: null,
+	users: [],
+	strategies: [],
+});
+
 export const useProjectFormContext = () => useFormContext<Project>();
 export const useProjectForm = () => {
 	const selectedProject = useSelectedProject();
@@ -40,14 +52,14 @@ export const useProjectForm = () => {
 	};
 };
 
-const getDefaultValues = (): Project => ({
+const defaultValues: Project = {
 	name: '',
 	opportunity_statement: '',
 	public: false,
-	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // default to 30 days from now
 	objectives: [],
 	id: crypto.randomUUID(),
 	parent_project_id: null,
 	users: [],
 	strategies: [],
-});
+};
