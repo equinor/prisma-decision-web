@@ -67,11 +67,11 @@ export const ProjectInformation = () => {
 							rows={5}
 							label='Opportunity Statement'
 							placeholder='Enter opportunity statement...'
-							{...register('opportunityStatement')}
+							{...register('opportunity_statement')}
 						/>
 						<ErrorMessage
 							as={FormErrorMessage}
-							name='opportunityStatement'
+							name='opportunity_statement'
 							errors={errors}
 						/>
 					</div>

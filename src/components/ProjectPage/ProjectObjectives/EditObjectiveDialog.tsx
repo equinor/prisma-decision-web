@@ -1,20 +1,11 @@
-import {
-	Button,
-	Dialog,
-	CircularProgress,
-	DialogContent,
-	Icon,
-	TextField,
-	Textarea,
-} from '@equinor/eds-core-react';
+import { Button, Dialog, CircularProgress, DialogContent, Icon } from '@equinor/eds-core-react';
 import { useState } from 'react';
 import { Objective } from '../../../validators';
-import { ErrorMessage } from '@hookform/error-message';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
-import { FormErrorMessage } from '../../common/FormErrorMessage';
 import { close, edit } from '@equinor/eds-icons';
+import { ObjectiveFormFields } from './ObjectiveFormFields';
 
-export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
+export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const formMethods = useObjectiveForm({
 		objective,
@@ -25,6 +16,7 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 		handleSubmit,
 		isPending,
 		formState: { errors },
+		control,
 	} = formMethods;
 
 	return (
@@ -54,27 +46,11 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 							>
 								<Icon data={close} />
 							</Button>
-							<div>
-								<TextField
-									label='Name'
-									placeholder='Enter objective name...'
-									{...register('name')}
-								/>
-								<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
-							</div>
-							<div>
-								<Textarea
-									label='Description'
-									placeholder='Enter objective description...'
-									rows={6}
-									{...register('description')}
-								/>
-								<ErrorMessage
-									as={FormErrorMessage}
-									name='description'
-									errors={errors}
-								/>
-							</div>
+							<ObjectiveFormFields
+								register={register}
+								errors={errors}
+								control={control}
+							/>
 							<Button
 								className='w-max justify-self-end'
 								type='submit'
@@ -90,6 +66,6 @@ export const EditObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 	);
 };
 
-type DeleteObjectiveProps = {
+type EditObjectiveProps = {
 	objective: Objective;
 };

@@ -8,16 +8,14 @@ import { useSelectedProject } from './useSelectedProject';
 
 export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
 	const selectedProject = useSelectedProject();
+
 	const defaultValues = useMemo(
-		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-		[selectedProject?.id],
+		() => objective || getDefaultValues(selectedProject?.id || crypto.randomUUID()),
+		[selectedProject?.id, objective],
 	);
 
 	const formMethods = useForm({
-		values: {
-			...defaultValues,
-			...objective,
-		},
+		defaultValues,
 		resolver: zodResolver(objectiveSchema),
 	});
 
@@ -56,6 +54,7 @@ const getDefaultValues = (projectId: string): Objective => ({
 	project_id: projectId,
 	name: '',
 	description: '',
+	type: 'Fundamental',
 	id: crypto.randomUUID(),
 });
 

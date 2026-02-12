@@ -38,6 +38,7 @@ export const ProjectObjectives = () => {
 									<Table.Cell className='w-20'></Table.Cell>
 									<Table.Cell className='w-2/9'>Name</Table.Cell>
 									<Table.Cell className='w-5/9'>Description</Table.Cell>
+									<Table.Cell className='w-2/9'>Type</Table.Cell>
 									<Table.Cell className='w-1/9 truncate'>Date Created</Table.Cell>
 									<Table.Cell className='w-1/9 truncate'>Date Updated</Table.Cell>
 								</Table.Row>
@@ -53,6 +54,9 @@ export const ProjectObjectives = () => {
 										</Table.Cell>
 										<Table.Cell>{objectives.name}</Table.Cell>
 										<Table.Cell>{objectives.description}</Table.Cell>
+										<Table.Cell className='truncate'>
+											{objectives.type}
+										</Table.Cell>
 										<Table.Cell className='truncate'>
 											{objectives.created_at
 												? format(objectives.created_at, 'yyyy-MM-dd')
