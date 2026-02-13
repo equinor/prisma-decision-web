@@ -16,7 +16,7 @@ import {
 } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
 import { getDiscreteProbabiltyRows } from '../../../utils/getDiscreteProbabiltyRows';
-import { calculateRowSum, isRowSumValid } from './ProbabilityTable/utils';
+import { calculateRowSum } from './ProbabilityTable/utils';
 
 // Validation Rule Item Component
 interface ValidationRuleItemProps {
@@ -201,8 +201,6 @@ const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
 };
 
 const ValidateProbabilityTable = (issues: Issue[]): boolean => {
-	console.log(getIssuesWithInvalidProbabilityTable(issues));
-
 	return getIssuesWithInvalidProbabilityTable(issues).length > 0;
 };
 
