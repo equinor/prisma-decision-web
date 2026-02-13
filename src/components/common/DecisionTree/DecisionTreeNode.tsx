@@ -12,44 +12,52 @@ const handlePositions = [Position.Left, Position.Right];
 export const DecisionTreeNode = ({
 	data,
 	id,
-}: NodeProps<Node<{ issue: Issue; path: Set<string> }>>) => {
+}: NodeProps<Node<{ issue: Issue; path: Set<string>; expectedValue?: number | null }>>) => {
 	const IssueCard = data.issue.type === 'Decision' ? DecisionCard : UncertaintyCard;
 	const [selectedNodes, setSelectedNodes] = useAtom(testAtom);
 	const selected = selectedNodes.has(id) || (data.path.size === 0 && selectedNodes.size > 0);
 	return (
-		<div
-			onClick={() => {
-				setSelectedNodes(new Set(data.path));
-			}}
-		>
-			{handlePositions.map(position => (
-				<Fragment key={`${id}-${position}`}>
-					<Handle
-						type='source'
-						position={position}
-						id={position}
-						className='bg-primary-resting! z-1 h-3! w-3!'
-						isConnectable={false}
-					/>
-					<Handle
-						type='target'
-						position={position}
-						id={position}
-						className='bg-primary-resting! z-1 h-3! w-3!'
-						isConnectable={false}
-					/>
-				</Fragment>
-			))}
+		<>
 			<div
-				className={`h-full max-w-87.5
-				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				onClick={() => {
+					setSelectedNodes(new Set(data.path));
+				}}
 			>
-				<IssueCard
-					canExpand={false}
-					issue={data.issue}
-					className={`h-20 w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-				/>
+				{handlePositions.map(position => (
+					<Fragment key={`${id}-${position}`}>
+						<Handle
+							type='source'
+							position={position}
+							id={position}
+							className='bg-primary-resting! z-1 h-3! w-3!'
+							isConnectable={false}
+						/>
+						<Handle
+							type='target'
+							position={position}
+							id={position}
+							className='bg-primary-resting! z-1 h-3! w-3!'
+							isConnectable={false}
+						/>
+					</Fragment>
+				))}
+				<div
+					className={`h-full max-w-87.5
+				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+				>
+					<IssueCard
+						canExpand={false}
+						issue={data.issue}
+						className={`h-20 w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+					/>
+				</div>
 			</div>
-		</div>
+			<div className='absolute top-1/2 -right-3 translate-x-full -translate-y-full '>
+				<p>
+					<span className='font-semibold'>EV: </span>
+					{data.expectedValue}
+				</p>
+			</div>
+		</>
 	);
 };

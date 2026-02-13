@@ -13,6 +13,7 @@ export const convertSolutionTreeToNodesAndEdges = ({
 	const walk = (node: DecisionTree, path: Set<string> = new Set<string>()) => {
 		const issue = node.tree_node.issue;
 		const nodeId = node.tree_node.id;
+		const expectedValue = node.tree_node.expected_value;
 		const isEndPoint = issue.type === 'EndPoint';
 
 		if (isEndPoint) {
@@ -20,7 +21,7 @@ export const convertSolutionTreeToNodesAndEdges = ({
 			return nodes.push(newNode);
 		}
 
-		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path);
+		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path, expectedValue);
 		nodes.push(newNode);
 
 		if (!node.tree_node.children) return;
