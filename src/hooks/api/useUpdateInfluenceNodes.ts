@@ -17,9 +17,9 @@ export const useUpdateInfluenceNodesOptimistic = () => {
 				});
 				return updatedNodes
 					? {
-							...node,
+							...updatedNodes,
 							node_style: {
-								...node.node_style,
+								...updatedNodes.node_style,
 							},
 						}
 					: node;

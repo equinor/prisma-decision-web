@@ -32,9 +32,9 @@ export const CreateObjective = () => {
 				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
 			>
-				<Popover.Content className='relative w-[min(520px,_90vw)]'>
+				<Popover.Content className='relative w-[min(520px,90vw)]'>
 					<form className='grid w-full grid-cols-1 gap-4' onSubmit={handleSubmit}>
-						<div className='w-full cursor-pointer pr-16'>
+						<div className='w-full pr-16'>
 							<h2 className='text-2xl font-semibold'>Create Objective</h2>
 							<p className='text-text-tertiary'>
 								Add objectives that will help achieve the desired outcome

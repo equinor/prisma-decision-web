@@ -44,7 +44,7 @@ export const CreateStrategy = () => {
 						>
 							<Icon data={close} />
 						</Button>
-						<div className='w-full cursor-pointer pr-16'>
+						<div className='w-full pr-16'>
 							<h2 className='text-2xl font-semibold'>Create Strategy</h2>
 							<p className='text-text-tertiary'>
 								Create strategies for your decision optimization project

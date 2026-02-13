@@ -6,9 +6,11 @@ import { CreateIssues } from '../../common/CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
 import { ToggleExpandAll } from '../ToggleExpandAll';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
+	const selectedProject = useSelectedProject();
 	let IssueView = ListView;
 	let activeView = 0;
 	if (issueView === 'table') {
@@ -18,17 +20,20 @@ export const ProjectIssues = () => {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex w-full items-center justify-end gap-4'>
-				<CreateIssues />
-				{activeView !== 0 && <ToggleExpandAll />}
-				<Button.Toggle selectedIndexes={[activeView]}>
-					<Button onClick={() => setIssuesView('list')}>
-						<Icon data={view_list} />
-					</Button>
-					<Button onClick={() => setIssuesView('table')}>
-						<Icon data={view_column} />
-					</Button>
-				</Button.Toggle>
+			<div className='flex items-center justify-between'>
+				<h1 className='text-3xl font-bold'>{selectedProject?.name}</h1>
+				<div className='flex items-center gap-4'>
+					<CreateIssues />
+					{activeView !== 0 && <ToggleExpandAll />}
+					<Button.Toggle selectedIndexes={[activeView]}>
+						<Button onClick={() => setIssuesView('list')}>
+							<Icon data={view_list} />
+						</Button>
+						<Button onClick={() => setIssuesView('table')}>
+							<Icon data={view_column} />
+						</Button>
+					</Button.Toggle>
+				</div>
 			</div>
 			<IssueView />
 		</div>
