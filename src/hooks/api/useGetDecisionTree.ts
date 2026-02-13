@@ -44,7 +44,7 @@ export type DecisionTreeUtility = {
 
 export type EndNodeIssue = {
 	id: string;
-	scenario_id: string;
+	cumulative_probability: number;
 	value: number;
 	type: 'EndPoint';
 };

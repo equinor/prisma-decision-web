@@ -4,7 +4,9 @@ import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { useSetAtom } from 'jotai';
 import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
 
-export const OutputNode = ({ data }: NodeProps<Node<{ value: number; path: Set<string> }>>) => {
+export const OutputNode = ({
+	data,
+}: NodeProps<Node<{ value: number; path: Set<string>; cumulativeProbability: number }>>) => {
 	const setSelectedNodes = useSetAtom(testAtom);
 	return (
 		<div className='pan flex h-full items-center'>
@@ -21,9 +23,15 @@ export const OutputNode = ({ data }: NodeProps<Node<{ value: number; path: Set<s
 			>
 				<Icon data={mail_unread} />
 			</Button>
-			<p className='ml-4 whitespace-nowrap'>
-				<span className='font-semibold'>Value: </span> {data.value}
-			</p>
+			<div>
+				<p className='ml-4 whitespace-nowrap'>
+					<span className='font-semibold'>Value: </span> {data.value}
+				</p>
+				<p className='ml-4 whitespace-nowrap'>
+					<span className='font-semibold'>Cumulative probability: </span>{' '}
+					{data.cumulativeProbability.toFixed(2)}
+				</p>
+			</div>
 		</div>
 	);
 };
