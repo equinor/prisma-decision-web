@@ -8,8 +8,30 @@ import z from 'zod/v3';
 import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { ErrorHandlingState, InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
+import {
+	DiscreteProbability,
+	ErrorHandlingState,
+	InfluenceNode as InfluenceNodeType,
+	Issue,
+} from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
+import { getDiscreteProbabiltyRows } from '../../../utils/getDiscreteProbabiltyRows';
+import { calculateRowSum } from './ProbabilityTable/utils';
+
+// Validation Rule Item Component
+interface ValidationRuleItemProps {
+	title: string;
+	message: { warning: string; fix: string };
+	isError: boolean;
+	isExpanded: boolean;
+}
+const errorValidator = z.object({
+	response: z.object({
+		data: z.object({
+			detail: z.string(),
+		}),
+	}),
+});
 
 // Constants
 const INITIAL_ERROR_STATE: ErrorHandlingState = {
@@ -42,6 +64,10 @@ const VALIDATION_MESSAGES = {
 	UncertaintyOutcomes: {
 		warning: 'One or more uncertainties have no outcomes.',
 		fix: 'Fix: Add possible outcomes to represent what could happen.',
+	},
+	ProbalilityTable: {
+		warning: 'Sum of the Outcomes must be 1.',
+		fix: 'Fix: Add the Outcomes values that sum up to 1 .',
 	},
 };
 
@@ -122,6 +148,29 @@ const highlightUncertaintiesWithoutOutcomes = (
 		return node;
 	});
 };
+const highlightUncertaintiesWithUnvalidatedPT = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+	issues: Issue[],
+): Node<InfluenceNodeType>[] => {
+	const invalidIssues = getIssuesWithInvalidProbabilityTable(issues);
+	const invalidIssueIds = new Set(invalidIssues.map(i => i.id));
+
+	return nodes.map(node => {
+		const isConnected = getNodeConnectivity(node.id, edges);
+		const nodeIssueId = node.data.issue_id;
+		const hasInvalidPT = invalidIssueIds.has(nodeIssueId);
+
+		if (hasInvalidPT && isConnected) {
+			return {
+				...node,
+				style: VALIDATION_STYLE,
+			};
+		}
+
+		return node;
+	});
+};
 
 const highlightLoops = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
 	return edges.map(edge => ({
@@ -133,40 +182,52 @@ const highlightLoops = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
 	}));
 };
 
-// Validation Rule Item Component
-interface ValidationRuleItemProps {
-	title: string;
-	message: { warning: string; fix: string };
-	isError: boolean;
-	isExpanded: boolean;
-}
+const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
+	return issues.filter(i => {
+		const isUncertainty = i.type === 'Uncertainty';
+		const hasDiscreteProbability = i.uncertainty?.discrete_probabilities?.length > 0;
+		if (!isUncertainty || !hasDiscreteProbability) return false;
+
+		const discreteProbabilities: DiscreteProbability[] = i.uncertainty.discrete_probabilities;
+		const { rows } = getDiscreteProbabiltyRows(discreteProbabilities, issues);
+
+		return rows.some(({ probabilities }) => {
+			const sum = calculateRowSum(probabilities);
+
+			// Skip unfilled rows (sum === 0)
+			if (sum !== 1) return true;
+		});
+	});
+};
+
+const ValidateProbabilityTable = (issues: Issue[]): boolean => {
+	return getIssuesWithInvalidProbabilityTable(issues).length > 0;
+};
 
 const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationRuleItemProps) => {
 	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
 	const issues = useSelectedProjectIssues();
-
+	const edges = getEdges();
+	const nodes = getNodes();
 	const handleShowMissingEdges = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
 		setNodes(highlightNodesWithMissingEdges(nodes, edges));
 	};
 
 	const handleShowMissingOptions = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
 		setNodes(highlightDecisionsWithoutOptions(nodes, edges, issues));
 	};
 
 	const handleShowMissingOutcomes = () => {
-		const edges = getEdges();
-		const nodes = getNodes();
 		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges, issues));
 	};
 
 	const handleShowLoop = () => {
-		const edges = getEdges();
 		setEdges(highlightLoops(edges));
 	};
+	const handleProbabilityTable = () => {
+		setNodes(highlightUncertaintiesWithUnvalidatedPT(nodes, edges, issues));
+	};
+
 	return (
 		<Accordion.Item isExpanded={isError && isExpanded}>
 			<Accordion.Header headerLevel='h3'>
@@ -174,6 +235,7 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 					<div className='flex flex-col'>
 						<div className='flex flex-row items-center gap-2'>
 							<p className='text-sm'>{title}</p>
+
 							{isError ? (
 								<Icon data={warning_outlined} size={18} color='#FF9200' />
 							) : (
@@ -202,20 +264,19 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 							<Button onClick={handleShowMissingOutcomes}>
 								Show Missing Outcomes
 							</Button>
-						)}
-					</div>
-				</div>
+						)}{' '}
+						{
+							<Button onClick={handleProbabilityTable}>
+								{' '}
+								Show Probability Table{' '}
+							</Button>
+						}{' '}
+					</div>{' '}
+				</div>{' '}
 			</Accordion.Panel>
 		</Accordion.Item>
 	);
 };
-const errorValidator = z.object({
-	response: z.object({
-		data: z.object({
-			detail: z.string(),
-		}),
-	}),
-});
 
 const parseDecisionTreeError = (error: unknown, isError: boolean) => {
 	if (!error || !isError) return INITIAL_ERROR_STATE;
@@ -234,10 +295,11 @@ export const InfluenceDiagramValidation = () => {
 	const [isExpanded, setIsExpanded] = useState(location.state?.fromInvalidDiagramDialog || false);
 	const [showValidation, setShowValidation] = useState(false);
 	const selectedProject = useSelectedProject();
+	const issues = useSelectedProjectIssues();
 	const { error, isError } = useGetDecisionTree(selectedProject?.id);
 	const parsedError = parseDecisionTreeError(error, isError);
+	const isInValidPT = ValidateProbabilityTable(issues);
 
-	// Event Handlers
 	const handleToggleAccordion = (expanded: boolean) => {
 		setIsExpanded(expanded);
 	};
@@ -246,7 +308,7 @@ export const InfluenceDiagramValidation = () => {
 		setShowValidation(prev => !prev);
 	};
 
-	const hasError = parsedError.message !== '';
+	const hasError = parsedError.message !== '' || isInValidPT;
 
 	return (
 		<div className='absolute top-1 right-1 z-10 w-1/3'>
@@ -291,7 +353,11 @@ export const InfluenceDiagramValidation = () => {
 								key={key}
 								title={key}
 								message={message}
-								isError={parsedError.message.includes(key)}
+								isError={
+									key === 'ProbalilityTable'
+										? isInValidPT
+										: parsedError.message.includes(key)
+								}
 								isExpanded={showValidation}
 							/>
 						))}
