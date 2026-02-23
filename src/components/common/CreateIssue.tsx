@@ -40,7 +40,7 @@ export const CreateIssues = () => {
 							onSubmit={onSubmit}
 							className='flex flex-col items-start gap-4 rounded-sm'
 						>
-							<div className='w-full cursor-pointer pr-16'>
+							<div className='w-full pr-16'>
 								<h2 className='text-2xl font-semibold'>Create Issue</h2>
 								<p className='text-text-tertiary'>
 									Add issues related to decisions, uncertainties, and value

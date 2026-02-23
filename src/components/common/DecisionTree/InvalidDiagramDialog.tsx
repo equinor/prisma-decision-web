@@ -49,5 +49,5 @@ export const InvalidDiagramDialog = () => {
 };
 
 const getInfluenceDiagramPath = (currentPath: string): string => {
-	return currentPath.replace(/\/decision-tree$/, '/influence-diagram');
+	return currentPath.replace(/\/(decision-tree|solution-tree)$/, '/influence-diagram');
 };

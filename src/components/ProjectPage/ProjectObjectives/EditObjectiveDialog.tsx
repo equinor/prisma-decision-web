@@ -29,11 +29,11 @@ export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 					data-no-dnd
 					open
 					className='fixed top-1/2 left-1/2 max-h-[90vh]
-					 w-[min(700px,_90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
+					 w-[min(700px,90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
 				>
 					<DialogContent>
 						<form className='grid w-full grid-cols-1 gap-4' onSubmit={handleSubmit}>
-							<div className='w-full cursor-pointer pr-16'>
+							<div className='w-full pr-16'>
 								<h2 className='text-2xl font-semibold'>Edit Objective</h2>
 							</div>
 							<Button

@@ -3,25 +3,31 @@ import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 
 export const Strategies = () => {
-	const project = useSelectedProject();
+	const selectedProject = useSelectedProject();
 
-	if (!project) return;
+	if (!selectedProject) return;
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex w-full items-center justify-end'>
+			<div className='flex items-center justify-between'>
+				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateStrategy />
 			</div>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
-            	    items-start gap-4 rounded-sm p-4'
+            	items-start gap-4 rounded-sm p-4'
 			>
 				<div>
-					<h2 className='text-2xl font-semibold'>Strategies</h2>
+					<div className='flex gap-2'>
+						<h2 className='text-2xl font-semibold'>Strategies</h2>
+						<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+							{selectedProject.strategies.length}
+						</span>
+					</div>
 					<p className='text-text-tertiary'>
 						Define and manage strategies for your decision optimization project
 					</p>
 				</div>
-				{project.strategies.map(strategy => {
+				{selectedProject.strategies.map(strategy => {
 					return <Strategy key={strategy.id} strategy={strategy} />;
 				})}
 			</div>

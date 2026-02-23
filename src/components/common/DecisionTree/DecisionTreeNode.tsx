@@ -43,13 +43,9 @@ export const DecisionTreeNode = ({
 				))}
 				<div
 					className={`h-full max-w-87.5
-				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+					overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
 				>
-					<IssueCard
-						canExpand={false}
-						issue={data.issue}
-						className={`h-20 w-full overflow-hidden rounded-sm outline-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
-					/>
+					<IssueCard canExpand={false} issue={data.issue} className={'h-20'} />
 				</div>
 			</div>
 			<div className='absolute top-1/2 -right-3 translate-x-full -translate-y-full '>
