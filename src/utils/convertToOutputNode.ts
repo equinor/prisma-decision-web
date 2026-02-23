@@ -14,6 +14,7 @@ export const convertToOutputNode = (issue: EndNodeIssue, id: string, path: Set<s
 		data: {
 			path,
 			value: issue.value,
+			cumulativeProbability: issue.cumulative_probability,
 		},
 	};
 };
