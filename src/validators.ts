@@ -154,14 +154,13 @@ export const issueSchema = z.object({
 	type: z.enum(issueTypes),
 	boundary: z.enum(['in', 'on', 'out']),
 	decision: decisionSchema,
-	value_metric: valueMetricSchema,
+	value_metric: valueMetricSchema.optional(),
 	utility: utilitySchema,
 	uncertainty: uncertaintySchema,
 	node: influenceNodeSchema,
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
 });
-
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
@@ -174,3 +173,5 @@ export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
 export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
+export type ProjectImportFile = z.infer<typeof projectImportFile>;
+export type ProjectImportData = z.infer<typeof projectImportSchema>;
