@@ -2,16 +2,13 @@ import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { download } from '@equinor/eds-icons';
 import { DecisionTree, useGetDecisionTree } from '../../hooks/api/useGetDecisionTree';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
-import { useGetSolutionDecisionTree } from '../../hooks/api/useGetSolutionDecisionTree';
 import { Edge, Issue, Project } from '../../validators';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
 
-export const DownloadProjectJsonButton = ({ project }: DownloadProjectJsonButtonProps) => {
+export const ExportProject = ({ project }: DownloadProjectJsonButtonProps) => {
 	const { issues } = useGetIssues();
 	const { edges } = useGetEdges();
-
 	const { data: decisionTree } = useGetDecisionTree(project.id);
-	const { data: solutionTree } = useGetSolutionDecisionTree(project.id);
 	const projectIssues: Issue[] = issues.filter(issue => issue.project_id === project.id);
 	const projectEdges = edges.filter(edge => edge.project_id === project.id);
 
@@ -19,7 +16,6 @@ export const DownloadProjectJsonButton = ({ project }: DownloadProjectJsonButton
 		projects: Project;
 		issues: Issue[];
 		decisionTree: DecisionTree | null;
-		solutionTree: DecisionTree | null;
 		edges: Edge[];
 	}) => {
 		const json = JSON.stringify(data, null, 2);
@@ -35,7 +31,7 @@ export const DownloadProjectJsonButton = ({ project }: DownloadProjectJsonButton
 		<Tooltip title='Click to download project as JSON format'>
 			<Button
 				variant='ghost_icon'
-				label='Download project as JSON'
+				label='Download project as JSON format'
 				onClick={async e => {
 					e.preventDefault();
 					e.stopPropagation();
@@ -44,7 +40,6 @@ export const DownloadProjectJsonButton = ({ project }: DownloadProjectJsonButton
 						projects: project,
 						issues: projectIssues,
 						decisionTree: decisionTree ?? null,
-						solutionTree: solutionTree ?? null,
 						edges: projectEdges,
 					});
 				}}

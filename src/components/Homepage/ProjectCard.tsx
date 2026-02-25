@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { Project } from '../../validators';
 import { DeleteProjectDialog } from '../common/DeleteProjectDialog';
 import { DuplicateProjectDialog } from '../common/DuplicateProjectDialog';
-import { DownloadProjectJsonButton } from '../common/DownloadProjectJsonButton';
+import { ExportProject } from '../common/ExportProject';
 
 export const ProjectCard = ({ project }: ProjectCardProps) => {
 	const navigate = useNavigate();
@@ -47,7 +47,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 							<DuplicateProjectDialog project={project} />
 						</div>
 					</Tooltip>
-					<DownloadProjectJsonButton project={project} />
+					<ExportProject project={project} />
 					<Tooltip title='Click to delete project'>
 						<div onClick={e => e.stopPropagation()}>
 							<DeleteProjectDialog project={project} />

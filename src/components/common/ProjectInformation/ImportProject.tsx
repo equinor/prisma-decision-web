@@ -5,7 +5,8 @@ import { FormProvider } from 'react-hook-form';
 import { useProjectImportForm } from '../../../hooks/useProjectImportForm';
 export const ImportProject = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { formMethods, isPending, handleSubmit, isSuccess } = useProjectImportForm();
+	const { formMethods, isPending, handleSubmit, validatedFiles, failedFiles } =
+		useProjectImportForm();
 	const {
 		register,
 		watch,
@@ -16,7 +17,7 @@ export const ImportProject = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { ref: projectJsonFileRef, ...projectJsonFileField } = register('projectJsonFile');
 	const selectedFileName = (watch('projectJsonFile') as FileList | undefined) ?? null;
-
+	console.log(validatedFiles, failedFiles);
 	return (
 		<>
 			<Button
@@ -28,7 +29,7 @@ export const ImportProject = () => {
 				Import Project
 			</Button>
 			<Popover
-				open={isOpen && !isSuccess}
+				open={isOpen || failedFiles.length > 0}
 				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
 			>
@@ -114,6 +115,16 @@ export const ImportProject = () => {
 								<p className='text-sm text-red-500'>
 									{errors.projectJsonFile.message}
 								</p>
+							)}
+							{validatedFiles.length > 0 && (
+								<div className='w-full rounded-sm bg-green-100 p-2 text-sm text-green-800'>
+									<p className='font-medium'>Successfully imported:</p>
+									<ul className='list-disc pl-5'>
+										{validatedFiles.map((file, index) => (
+											<li key={index}>{file} are created successfully</li>
+										))}
+									</ul>
+								</div>
 							)}
 							<Button
 								variant='ghost_icon'
