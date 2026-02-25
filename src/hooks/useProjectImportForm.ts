@@ -17,7 +17,6 @@ const parseFileContent = async (file: File): Promise<ProjectImportData> => {
 	const json = JSON.parse(text);
 	return projectImportSchema.parse(json);
 };
-
 const formatErrorMessage = (error: unknown, fileName: string): string[] => {
 	const errors: string[] = [];
 
@@ -110,7 +109,10 @@ export const useProjectImportForm = () => {
 				});
 			}
 		},
-		errors => console.error('Form errors:', errors),
+		errors => {
+			// eslint-disable-next-line no-console
+			console.error('Form errors:', errors);
+		},
 	);
 
 	return {

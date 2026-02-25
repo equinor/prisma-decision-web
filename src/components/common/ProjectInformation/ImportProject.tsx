@@ -17,7 +17,6 @@ export const ImportProject = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const { ref: projectJsonFileRef, ...projectJsonFileField } = register('projectJsonFile');
 	const selectedFileName = (watch('projectJsonFile') as FileList | undefined) ?? null;
-	console.log(validatedFiles, failedFiles);
 	return (
 		<>
 			<Button
