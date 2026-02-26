@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import { useGetIssues } from './api/useGetIssues';
 import { useSelectedProject } from './useSelectedProject';
+import { Issue } from '../validators';
+
+const defaultValue: Issue[] = [];
 
 export const useSelectedProjectIssues = () => {
 	const selectedProject = useSelectedProject();
@@ -9,6 +12,6 @@ export const useSelectedProjectIssues = () => {
 		() => issues.filter(issue => issue.project_id === selectedProject?.id),
 		[issues, selectedProject?.id],
 	);
-	if (!selectedProject) return [];
+	if (!selectedProject) return defaultValue;
 	return projectIssues;
 };

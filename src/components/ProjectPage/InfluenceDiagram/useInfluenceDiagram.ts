@@ -9,7 +9,7 @@ import {
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useUpdateInfluenceNodesOptimistic } from '../../../hooks/api/useUpdateInfluenceNodes';
@@ -22,9 +22,23 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const useInfluenceDiagram = () => {
-	const nodes = useSelectedProjectInfluenceNodes();
-
 	const issues = useSelectedProjectIssues();
+	const filteredIssues = useMemo(
+		() =>
+			issues.filter(issue => {
+				const inOrOnBoundary = issue.boundary === 'in' || issue.boundary === 'on';
+				if (issue.type === 'Decision')
+					return inOrOnBoundary && issue.decision.type === 'Focus';
+				if (issue.type === 'Uncertainty') return inOrOnBoundary && issue.uncertainty.is_key;
+				if (issue.type === 'Utility') return inOrOnBoundary;
+				return false;
+			}),
+		[issues],
+	);
+	const nodes = useSelectedProjectInfluenceNodes();
+	const filteredNodes = useMemo(() => {
+		return nodes.filter(node => filteredIssues.some(issue => issue.id === node.data.issue_id));
+	}, [nodes, filteredIssues]);
 	const edges = useSelectedProjectEdges();
 	const selectedProject = useSelectedProject();
 	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
@@ -37,18 +51,18 @@ export const useInfluenceDiagram = () => {
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
 	useEffect(() => {
-		setLocalNodes(nodes);
-	}, [nodes]);
+		setLocalNodes(filteredNodes);
+	}, [filteredNodes]);
 
 	useEffect(() => {
-		setEdges(convertToInfluenceEdges(edges, nodes));
-	}, [edges, nodes]);
+		setEdges(convertToInfluenceEdges(edges, filteredNodes));
+	}, [edges, filteredNodes]);
 
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
 		const sourceNode = localNodes.find(node => node.id === sourceId);
 		const targetNode = localNodes.find(node => node.id === targetId);
-		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
-		const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
+		const sourceIssue = filteredIssues.find(issue => issue.id === sourceNode?.data.issue_id);
+		const targetIssue = filteredIssues.find(issue => issue.id === targetNode?.data.issue_id);
 		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
 	};
 

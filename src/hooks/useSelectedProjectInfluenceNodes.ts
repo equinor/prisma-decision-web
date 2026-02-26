@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { useGetInfluenceNodes } from './api/useGetInfluenceNodes';
 import { convertToReactFlowNodes } from '../utils/convertToReactFlowNodes';
 import { useSelectedProject } from './useSelectedProject';
+import { ReactFlowInfluenceNode } from '../types';
+
+const defaultValue: ReactFlowInfluenceNode[] = [];
 
 export const useSelectedProjectInfluenceNodes = () => {
 	const selectedProject = useSelectedProject();
@@ -13,6 +16,6 @@ export const useSelectedProjectInfluenceNodes = () => {
 			),
 		[nodes, selectedProject?.id],
 	);
-	if (!selectedProject) return [];
+	if (!selectedProject) return defaultValue;
 	return reactFlowNodes;
 };
