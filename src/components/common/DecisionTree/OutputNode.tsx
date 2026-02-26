@@ -29,7 +29,7 @@ export const OutputNode = ({
 				</p>
 				<p className='ml-4 whitespace-nowrap'>
 					<span className='font-semibold'>Cumulative probability: </span>{' '}
-					{data.cumulativeProbability.toFixed(2)}
+					{parseFloat(data.cumulativeProbability.toFixed(2))}
 				</p>
 			</div>
 		</div>
