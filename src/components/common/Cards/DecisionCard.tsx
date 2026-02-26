@@ -56,7 +56,7 @@ export const DecisionCard = ({
 			</div>
 			<div>
 				<h3 className='font-semibold '>{issue.name}</h3>
-				<p className={cn('text-text-tertiary  text-sm, line-clamp-2 overflow-hidden')}>
+				<p className='text-text-tertiary line-clamp-2 overflow-hidden text-sm'>
 					{issue.description}
 				</p>
 			</div>

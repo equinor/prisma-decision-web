@@ -9,7 +9,7 @@ export const DeleteIssueDialog = ({ issue, open = false, onClose }: DeleteIssueD
 			open={open}
 			data-no-dnd
 			className='nodrag nopan nowheel fixed top-1/2
-					left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
+			left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 		>
 			<DialogContent>
 				<div className='flex flex-col gap-4 text-center'>

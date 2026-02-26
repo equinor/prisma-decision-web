@@ -1,5 +1,6 @@
 import { int, uuid, z } from 'zod/v4';
 import { parseISO } from 'date-fns';
+import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
@@ -45,7 +46,8 @@ const optionSchema = z.object({
 export const strategySchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Strategy name is required'),
-	description: z.string().min(1, 'Description is required'),
+	icon: z.enum(strategyIconKeys, { error: 'Strategy icon is required' }),
+	description: z.string().optional(),
 	project_id: uuid(),
 	rationale: z.string().min(1, 'Rational is required'),
 	options: z.array(optionSchema),

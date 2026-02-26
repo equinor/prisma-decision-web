@@ -1,13 +1,28 @@
+import { Checkbox, Icon } from '@equinor/eds-core-react';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
+import { IconData } from '@equinor/eds-icons';
 
-export const Strategy = ({ strategy }: { strategy: StrategyType }) => {
+export const Strategy = ({
+	strategy,
+	onClickAddToStrategyTable,
+	selectedStrategyIds,
+	strategyIcon,
+}: {
+	strategy: StrategyType;
+	onClickAddToStrategyTable: (id: string) => void;
+	selectedStrategyIds: Set<string>;
+	strategyIcon: IconData;
+}) => {
 	const issues = useSelectedProjectIssues().filter(
-		x => x.type === 'Decision' && x.decision.type === 'Focus' && x.boundary === 'in',
+		x =>
+			x.type === 'Decision' &&
+			x.decision.type === 'Focus' &&
+			(x.boundary === 'in' || x.boundary === 'on'),
 	);
 	const project = useSelectedProject();
 	const { mutate: updateStrategy } = useUpdateStrategy();
@@ -15,11 +30,20 @@ export const Strategy = ({ strategy }: { strategy: StrategyType }) => {
 	return (
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>
-				<div>
-					<h3 className='text-xl font-semibold'>{strategy.name}</h3>
-					<h4 className='text-text-tertiary text-sm '>{strategy.rationale}</h4>
+				<div className='flex items-center gap-4'>
+					<div>
+						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
+						<h4 className='text-text-tertiary text-sm '>{strategy.rationale}</h4>
+					</div>
+					{strategyIcon && <Icon data={strategyIcon} />}
 				</div>
-				<DeleteStrategyDialog strategy={strategy} />
+				<div>
+					<Checkbox
+						checked={selectedStrategyIds?.has(strategy.id)}
+						onChange={() => onClickAddToStrategyTable(strategy.id)}
+					/>
+					<DeleteStrategyDialog strategy={strategy} />
+				</div>
 			</div>
 			<div className='bg-background-light overflow-auto rounded-sm p-2'>
 				<div className='flex min-w-max gap-2'>
