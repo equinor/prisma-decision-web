@@ -28,23 +28,21 @@ export const CreateProject = () => {
 				open={isOpen}
 				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
+				placement='bottom-end'
 			>
 				<Popover.Content className='relative w-[min(543px,90vw)]'>
 					<FormProvider {...formMethods}>
-						<form
-							onSubmit={handleSubmit}
-							className='flex flex-col items-start gap-4 rounded-sm'
-						>
-							<ProjectNameField
-								register={register}
-								errors={errors}
-								onBlur={() => {
-									handleSubmit();
-								}}
-							/>
+						<form onSubmit={handleSubmit} className='grid w-full grid-cols-1 gap-4'>
+							<div className='w-full pr-16'>
+								<h2 className='text-2xl font-semibold'>Create Project</h2>
+								<p className='text-text-tertiary'>
+									Create a new project to start oprimizing
+								</p>
+							</div>
+							<ProjectNameField register={register} errors={errors} />
 							<Button
 								variant='ghost_icon'
-								className='absolute! top-0.5 right-2'
+								className='absolute! top-2 right-2'
 								onClick={e => {
 									e.stopPropagation();
 									setIsOpen(false);
@@ -53,7 +51,11 @@ export const CreateProject = () => {
 								<Icon data={close} />
 							</Button>
 
-							<Button className='md:self-end' type='submit' disabled={isPending}>
+							<Button
+								className='w-max justify-self-end'
+								type='submit'
+								disabled={isPending}
+							>
 								{isPending ? <CircularProgress size={16} /> : 'Create Project'}
 							</Button>
 						</form>

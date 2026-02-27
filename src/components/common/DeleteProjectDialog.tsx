@@ -29,9 +29,9 @@ export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 					className='nodrag fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 				>
 					<DialogContent>
-						<div className='flex flex-col gap-4 px-4'>
+						<div className='flex flex-col gap-4'>
 							<h2 className='text-center text-2xl font-semibold'>Delete Project</h2>
-							<p className='text-text-tertiary text-center [overflow-wrap:anywhere] break-words'>
+							<p className='text-text-tertiary text-center wrap-break-word'>
 								Are you sure you want to delete the Project &quot;{project.name}
 								&quot;?
 							</p>
