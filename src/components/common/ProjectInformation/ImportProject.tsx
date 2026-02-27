@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Icon, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
-import { ZodError } from 'zod/v4';
+import z, { ZodError } from 'zod/v4';
 import { ProjectImportData, projectImportSchema, projectImportFile } from '../../../validators';
 import { useImportProject } from '../../../hooks/api/useImportProject';
 
@@ -28,7 +28,7 @@ const formatContentError = (error: unknown, fileName: string): string[] => {
 
 const validateAndParseFiles = async (
 	filesArray: File[],
-): Promise<{ validData: ProjectImportData[]; errors: string[] }> => {
+): Promise<{ validData: { fileName: string; data: ProjectImportData }[]; errors: string[] }> => {
 	// Validate file format first
 	const fileValidation = projectImportFile.safeParse(filesArray);
 	if (!fileValidation.success) {
@@ -41,14 +41,14 @@ const validateAndParseFiles = async (
 
 	// Parse file contents
 	const results = await Promise.allSettled(filesArray.map(parseFileContent));
-	const validData: ProjectImportData[] = [];
+	const validData: { fileName: string; data: ProjectImportData }[] = [];
 	const errors: string[] = [];
 
 	results.forEach((result, index) => {
 		const fileName = filesArray[index]?.name || `File ${index + 1}`;
 
 		if (result.status === 'fulfilled') {
-			validData.push(result.value);
+			validData.push({ fileName, data: result.value });
 		} else {
 			errors.push(...formatContentError(result.reason, fileName));
 		}
@@ -71,16 +71,6 @@ export const ImportProject = () => {
 		setSelectedFiles(fileList);
 	};
 
-	const handleClearFiles = () => {
-		setSelectedFiles(null);
-		setValidatedFiles([]);
-		setErrors([]);
-		if (fileInputRef.current) {
-			const dt = new DataTransfer();
-			fileInputRef.current.files = dt.files;
-		}
-	};
-
 	const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
 		e.preventDefault();
 		const files = e.dataTransfer.files;
@@ -94,36 +84,52 @@ export const ImportProject = () => {
 
 	const handleImport = async () => {
 		if (!selectedFiles || selectedFiles.length === 0) return;
-
 		setValidatedFiles([]);
 		setErrors([]);
 
 		const filesArray = Array.from(selectedFiles);
 		const { validData, errors: validationErrors } = await validateAndParseFiles(filesArray);
 
-		// Set results
-		filesArray.forEach((_, index) => {
-			const fileName = filesArray[index]?.name || `File ${index + 1}`;
-			if (validData.some((_, i) => i === index)) {
-				setValidatedFiles(prev => [...prev, fileName]);
-			}
-		});
-
+		setValidatedFiles(validData.map(item => item.fileName));
 		if (validationErrors.length > 0) {
 			setErrors(validationErrors);
 		}
 
 		if (validData.length > 0) {
-			importProject(validData);
+			importProject(validData.map(item => item.data));
 		}
 	};
 
+	const handleRemoveFile = (removeIndex: number) => {
+		if (!selectedFiles || !fileInputRef.current) return;
+		const removedFileName = selectedFiles[removeIndex]?.name;
+
+		const dt = new DataTransfer();
+		Array.from(selectedFiles).forEach((file, index) => {
+			if (index !== removeIndex) dt.items.add(file);
+		});
+
+		fileInputRef.current.files = dt.files;
+		setSelectedFiles(dt.files.length > 0 ? dt.files : null);
+		if (removedFileName) {
+			setValidatedFiles(prev => prev.filter(name => name !== removedFileName));
+			setErrors(prev =>
+				prev.filter(
+					err =>
+						!err.startsWith(`${removedFileName}:`) &&
+						!err.startsWith(`${removedFileName} - `),
+				),
+			);
+		}
+	};
 	return (
 		<>
 			<Button
 				ref={referenceElement}
 				variant='outlined'
-				onClick={() => setIsOpen(prev => !prev)}
+				onClick={() => {
+					setIsOpen(prev => !prev);
+				}}
 			>
 				<Icon data={add} />
 				Import Project
@@ -164,23 +170,28 @@ export const ImportProject = () => {
 								onChange={e => handleFileChange(e.target.files)}
 							/>
 							{selectedFiles && selectedFiles.length > 0 && (
-								<div className='mt-2 flex items-center text-xs'>
-									<p className='mr-2'>
-										File selected:{' '}
-										{Array.from(selectedFiles)
-											.map(file => file.name)
-											.join(', ')}
-									</p>
-									<Button
-										type='button'
-										variant='ghost_icon'
-										onClick={e => {
-											e.preventDefault();
-											handleClearFiles();
-										}}
-									>
-										<Icon data={close} />
-									</Button>
+								<div className='mt-2 w-full text-xs'>
+									<p className='mb-2'>Files selected:</p>
+									<ul className='flex flex-col gap-1'>
+										{Array.from(selectedFiles).map((file, index) => (
+											<li
+												key={file.name}
+												className='flex items-center justify-between'
+											>
+												<span className='truncate'>{file.name}</span>
+												<Button
+													type='button'
+													variant='ghost_icon'
+													onClick={e => {
+														e.preventDefault();
+														handleRemoveFile(index);
+													}}
+												>
+													<Icon data={close} />
+												</Button>
+											</li>
+										))}
+									</ul>
 								</div>
 							)}
 						</label>
@@ -213,6 +224,9 @@ export const ImportProject = () => {
 							onClick={e => {
 								e.stopPropagation();
 								setIsOpen(false);
+								setErrors([]);
+								setValidatedFiles([]);
+								setSelectedFiles(null);
 							}}
 						>
 							<Icon data={close} />
