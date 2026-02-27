@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Icon, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
-import z, { ZodError } from 'zod/v4';
+import { ZodError } from 'zod/v4';
 import { ProjectImportData, projectImportSchema, projectImportFile } from '../../../validators';
 import { useImportProject } from '../../../hooks/api/useImportProject';
 
@@ -18,10 +18,7 @@ const formatContentError = (error: unknown, fileName: string): string[] => {
 	if (error instanceof ZodError) {
 		return error.issues
 			.filter(issue => issue.path.length > 0)
-			.map(
-				issue =>
-					`${fileName} - "${String(issue.path[1])}" field missing in "${String(issue.path[0])}"`,
-			);
+			.map(issue => `${fileName} - "${issue.path.join('->')}": ${issue.message}`);
 	}
 	return [`${fileName}: ${error instanceof Error ? error.message : 'Unknown error'}`];
 };
