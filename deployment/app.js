@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /* eslint-disable no-console */
 import express from 'express';
 import rateLimit from 'express-rate-limit';
@@ -26,14 +27,14 @@ router.get('*', (req, res) => {
 	const nonce = randomBytes(16).toString('base64');
 
 	const csp = [
-		'default-src \'self\'',
+		"default-src 'self'",
 		`script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-		'style-src \'self\' \'unsafe-inline\' https://cdn.eds.equinor.com',
-		'font-src \'self\' https://cdn.eds.equinor.com',
-		'img-src \'self\' data: https:',
-		'connect-src \'self\' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com',
-		'base-uri \'self\'',
-		'form-action \'self\'',
+		"style-src 'self' 'unsafe-inline' https://cdn.eds.equinor.com",
+		"font-src 'self' https://cdn.eds.equinor.com",
+		"img-src 'self' data: https:",
+		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com",
+		"base-uri 'self'",
+		"form-action 'self'",
 	].join('; ');
 
 	res.setHeader('Content-Security-Policy', csp);
@@ -48,10 +49,10 @@ router.get('*', (req, res) => {
 app.use(
 	express.static(path + 'dist/', {
 		index: false,
-	})
+	}),
 );
 app.use('/', router);
 
 app.listen(port, () => {
-	console.log('Dot is running on port 3000');
+	console.log('Prisma is running on port 3000');
 });

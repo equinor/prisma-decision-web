@@ -13,15 +13,13 @@ export const TopBar = () => {
 	const isLoading = isFetching > 0 || isMutating > 0;
 
 	return (
-		<EdsTopBar sticky={false} className='col-span-2 pl-5!'>
+		<EdsTopBar sticky={false} className='col-span-2 pl-3.5!'>
 			<EdsTopBar.Header
 				className='flex! cursor-pointer items-center! justify-center'
 				onClick={() => navigate('/')}
 			>
-				<div className='flex h-8 w-8 items-center justify-center rounded-md bg-teal-600 text-[14px] font-semibold text-white'>
-					DOT
-				</div>
-				Decision Optimization Tool
+				<img src='/icon.png' alt='' className='size-12' />
+				<h1 className='font- text-lg'>Prisma</h1>
 				{isLoading && (
 					<div className='flex items-center pb-2'>
 						<StarProgress size={24} />
