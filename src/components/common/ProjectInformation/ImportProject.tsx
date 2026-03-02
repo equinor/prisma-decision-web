@@ -137,11 +137,13 @@ export const ImportProject = () => {
 				anchorEl={referenceElement.current}
 			>
 				<Popover.Content className='relative w-[min(543px,90vw)]'>
-					<div className='flex flex-col items-start gap-4 rounded-sm'>
-						<h2 className='text-lg font-semibold'>Import Project</h2>
-						<p className='text-text-secondary text-sm'>
-							Select a JSON file. Only .json files are accepted.
-						</p>
+					<div className='grid-col-1 grid gap-4'>
+						<div className='w-full pr-16'>
+							<h2 className='text-2xl font-semibold'>Import Project</h2>
+							<p className='text-text-tertiary'>
+								Select a JSON file. Only .json files are accepted.
+							</p>
+						</div>
 
 						<label
 							htmlFor='projectJsonFile'
@@ -217,7 +219,7 @@ export const ImportProject = () => {
 
 						<Button
 							variant='ghost_icon'
-							className='absolute! top-0.5 right-2'
+							className='absolute! top-2 right-2'
 							onClick={e => {
 								e.stopPropagation();
 								setIsOpen(false);
@@ -230,7 +232,7 @@ export const ImportProject = () => {
 						</Button>
 
 						<Button
-							className='md:self-end'
+							className='w-max! justify-self-end'
 							onClick={handleImport}
 							disabled={isPending || !selectedFiles || selectedFiles.length === 0}
 						>
