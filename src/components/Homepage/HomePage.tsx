@@ -7,6 +7,8 @@ import { useGetEdges } from '../../hooks/api/useGetEdges';
 
 import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
 import { CreateProject } from '../common/ProjectInformation/CreateProject';
+import { ImportProject } from '../common/ProjectInformation/ImportProject';
+import { isDev, isTest } from '../../utils/getEnvironment';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -40,7 +42,10 @@ export const HomePage = () => {
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}
 						/>
-						<CreateProject />
+						<div className='flex justify-between gap-2'>
+							<CreateProject />
+							{(isDev() || isTest()) && <ImportProject />}
+						</div>
 					</div>
 					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
 						{filteredProjects.map(project => (

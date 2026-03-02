@@ -57,15 +57,15 @@ export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunity_statement: z.string().optional(),
-	objectives: z.array(objectiveSchema),
+	objectives: z.array(objectiveSchema, 'Objectives must be an array'),
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
-	strategies: z.array(strategySchema),
-	users: z.array(projectRoleSchema),
+	strategies: z.array(strategySchema, 'Strategies must be an array'),
+	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
 
 export const decisionSchema = z.object({
@@ -154,14 +154,24 @@ export const issueSchema = z.object({
 	type: z.enum(issueTypes),
 	boundary: z.enum(['in', 'on', 'out']),
 	decision: decisionSchema,
-	value_metric: valueMetricSchema,
+	value_metric: valueMetricSchema.optional(),
 	utility: utilitySchema,
 	uncertainty: uncertaintySchema,
 	node: influenceNodeSchema,
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
 });
+export const projectImportFile = z.array(z.file().mime('application/json'));
 
+export const projectImportSchema = z.object({
+	projects: projectSchema,
+	issues: z.array(issueSchema).optional(),
+	edges: z.array(edgeSchema).optional(),
+});
+export type ErrorHandlingState = {
+	message: string;
+	showDecisionTree: boolean;
+};
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
@@ -174,3 +184,5 @@ export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
 export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
+export type ProjectImportFile = z.infer<typeof projectImportFile>;
+export type ProjectImportData = z.infer<typeof projectImportSchema>;
