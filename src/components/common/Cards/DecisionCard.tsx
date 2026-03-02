@@ -15,6 +15,8 @@ export const DecisionCard = ({
 	issue,
 	canExpand = true,
 	onClickOption,
+	selectedOption,
+	expanded: expandedProp,
 	...rest
 }: DecisionCardProps) => {
 	const hasOptions = issue.decision.options.length > 0;
@@ -24,7 +26,7 @@ export const DecisionCard = ({
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
-	const expanded = rest.expanded ?? _expanded;
+	const expanded = expandedProp ?? _expanded;
 
 	return (
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
@@ -60,12 +62,12 @@ export const DecisionCard = ({
 					{issue.description}
 				</p>
 			</div>
-			{(canExpand || rest.expanded) && (
+			{(canExpand || expanded) && (
 				<Collapsible
 					open={expanded}
 					onOpenChange={toggle}
 					className={cn({
-						'pb-7': !rest.expanded,
+						'pb-7': !expanded,
 					})}
 				>
 					<CollapsibleContent className='mb-2 w-full' asChild>
@@ -81,7 +83,7 @@ export const DecisionCard = ({
 												'hover:bg-primary-hover-alt cursor-pointer':
 													onClickOption,
 												'outline-primary-resting outline-2':
-													option.id === rest.selectedOption?.id,
+													option.id === selectedOption?.id,
 											},
 										)}
 									>
@@ -93,7 +95,7 @@ export const DecisionCard = ({
 						)}
 					</CollapsibleContent>
 					<EdsProvider density='compact'>
-						{(!canExpand || !rest.expanded) && (
+						{(!canExpand || !expanded) && (
 							<CollapsibleTrigger asChild>
 								<button className='nodrag absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
