@@ -23,9 +23,7 @@ const formatContentError = (error: unknown, fileName: string): string[] => {
 	return [`${fileName}: ${error instanceof Error ? error.message : 'Unknown error'}`];
 };
 
-const validateAndParseFiles = async (
-	filesArray: File[],
-): Promise<{ validData: { fileName: string; data: ProjectImportData }[]; errors: string[] }> => {
+const validateAndParseFiles = async (filesArray: File[]): Promise<FileValidationResult> => {
 	// Validate file format first
 	const fileValidation = projectImportFile.safeParse(filesArray);
 	if (!fileValidation.success) {
@@ -38,25 +36,25 @@ const validateAndParseFiles = async (
 
 	// Parse file contents
 	const results = await Promise.allSettled(filesArray.map(parseFileContent));
-	const validData: { fileName: string; data: ProjectImportData }[] = [];
-	const errors: string[] = [];
 
-	results.forEach((result, index) => {
-		const fileName = filesArray[index]?.name || `File ${index + 1}`;
+	return results.reduce(
+		(acc, result, index) => {
+			const fileName = filesArray[index]?.name || `File ${index + 1}`;
 
-		if (result.status === 'fulfilled') {
-			validData.push({ fileName, data: result.value });
-		} else {
-			errors.push(...formatContentError(result.reason, fileName));
-		}
-	});
-
-	return { validData, errors };
+			if (result.status === 'fulfilled') {
+				acc.validData.push({ fileName, data: result.value });
+			} else {
+				acc.errors.push(...formatContentError(result.reason, fileName));
+			}
+			return acc;
+		},
+		{ validData: [], errors: [] } as FileValidationResult,
+	);
 };
 
 export const ImportProject = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 	const [validatedFiles, setValidatedFiles] = useState<string[]>([]);
 	const [errors, setErrors] = useState<string[]>([]);
 
@@ -65,27 +63,21 @@ export const ImportProject = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileChange = (fileList: FileList | null) => {
-		setSelectedFiles(fileList);
+		setSelectedFiles(fileList ? Array.from(fileList) : []);
 	};
 
 	const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
 		e.preventDefault();
 		const files = e.dataTransfer.files;
-		if (files && fileInputRef.current) {
-			const dt = new DataTransfer();
-			Array.from(files).forEach(file => dt.items.add(file));
-			fileInputRef.current.files = dt.files;
-			handleFileChange(dt.files);
-		}
+		if (files) handleFileChange(files);
 	};
 
 	const handleImport = async () => {
-		if (!selectedFiles || selectedFiles.length === 0) return;
+		if (selectedFiles.length === 0) return;
 		setValidatedFiles([]);
 		setErrors([]);
 
-		const filesArray = Array.from(selectedFiles);
-		const { validData, errors: validationErrors } = await validateAndParseFiles(filesArray);
+		const { validData, errors: validationErrors } = await validateAndParseFiles(selectedFiles);
 
 		setValidatedFiles(validData.map(item => item.fileName));
 		if (validationErrors.length > 0) {
@@ -98,16 +90,10 @@ export const ImportProject = () => {
 	};
 
 	const handleRemoveFile = (removeIndex: number) => {
-		if (!selectedFiles || !fileInputRef.current) return;
+		if (selectedFiles.length === 0) return;
 		const removedFileName = selectedFiles[removeIndex]?.name;
-
-		const dt = new DataTransfer();
-		Array.from(selectedFiles).forEach((file, index) => {
-			if (index !== removeIndex) dt.items.add(file);
-		});
-
-		fileInputRef.current.files = dt.files;
-		setSelectedFiles(dt.files.length > 0 ? dt.files : null);
+		const newFiles = selectedFiles.filter((_, index) => index !== removeIndex);
+		setSelectedFiles(newFiles);
 		if (removedFileName) {
 			setValidatedFiles(prev => prev.filter(name => name !== removedFileName));
 			setErrors(prev =>
@@ -225,7 +211,7 @@ export const ImportProject = () => {
 								setIsOpen(false);
 								setErrors([]);
 								setValidatedFiles([]);
-								setSelectedFiles(null);
+								setSelectedFiles([]);
 							}}
 						>
 							<Icon data={close} />
@@ -243,4 +229,9 @@ export const ImportProject = () => {
 			</Popover>
 		</>
 	);
+};
+
+type FileValidationResult = {
+	validData: { fileName: string; data: ProjectImportData }[];
+	errors: string[];
 };
