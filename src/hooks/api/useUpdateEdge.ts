@@ -19,7 +19,8 @@ export const useUpdateEdge = () => {
 			return { previousEdges };
 		},
 		onSuccess: () => {
-			queryClient.refetchQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},

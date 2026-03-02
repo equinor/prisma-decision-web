@@ -161,10 +161,7 @@ export const issueSchema = z.object({
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
 });
-export type ErrorHandlingState = {
-	message: string;
-	showDecisionTree: boolean;
-};
+
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
