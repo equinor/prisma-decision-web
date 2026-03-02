@@ -22,3 +22,14 @@ spec:
           ports:
               - name: http
                 port: 3000
+    dnsAlias:
+        - alias: prisma
+          environment: prod
+          component: frontend
+        - alias: prisma-test
+          environment: test
+          component: frontend
+        - alias: prisma-dev
+          environment: dev
+          component: frontend 
+        
