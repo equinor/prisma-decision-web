@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-03-02)
+
+
+### Features
+
+* add cumulative probability to output nodes ([#419](https://github.com/equinor/prisma-decision-web/issues/419)) ([fa7cd05](https://github.com/equinor/prisma-decision-web/commit/fa7cd05c7812964d936103ed3f7febdc16a4cb8a))
+* adds strategy table ([#452](https://github.com/equinor/prisma-decision-web/issues/452)) ([7e17860](https://github.com/equinor/prisma-decision-web/commit/7e1786048cef6fe25945b9da516195f58f7a9048))
+* collection of small UI and bug fixes ([#418](https://github.com/equinor/prisma-decision-web/issues/418)) ([85b9435](https://github.com/equinor/prisma-decision-web/commit/85b9435b89051a329c65d704a600a7e964fabb0c))
+* Move influence diagram errors to toolbar ([#465](https://github.com/equinor/prisma-decision-web/issues/465)) ([3de52a1](https://github.com/equinor/prisma-decision-web/commit/3de52a13e31c39f4e2d4f7eac53a33b971b853ca))
+
+
+### Bug Fixes
+
+* only include the correct issues in the influence diagram ([0c6e854](https://github.com/equinor/prisma-decision-web/commit/0c6e854fb8a672da5a05f3689ab90809af4894cb))
+* truncate ev values in decision tree ([07ca5f5](https://github.com/equinor/prisma-decision-web/commit/07ca5f5563746677a83d55e2bf2cbba58fd3496a))
+
 ## 1.0.0 (2026-02-13)
 
 
