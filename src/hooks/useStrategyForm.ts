@@ -49,4 +49,5 @@ const getDefaultValues = (projectId: string): Strategy => ({
 	description: '',
 	options: [],
 	rationale: '',
+	icon: 'flash',
 });

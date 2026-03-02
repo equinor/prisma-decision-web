@@ -1,10 +1,32 @@
+import { useState } from 'react';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
+import { StrategyTable } from './StrategyTable';
+import { strategyIcons } from './icons';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
+	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
+	const handleClickAddToStrategyTable = (id: string) => {
+		if (selectedStrategyIds.has(id)) {
+			setSelectedStrategyIds(prev => {
+				const newSet = new Set(prev);
+				newSet.delete(id);
+				return newSet;
+			});
+		} else {
+			setSelectedStrategyIds(prev => {
+				const newSet = new Set(prev);
+				newSet.add(id);
+				return newSet;
+			});
+		}
+	};
+
+	const selelectedStrategies =
+		selectedProject?.strategies.filter(s => selectedStrategyIds.has(s.id)) ?? [];
 	if (!selectedProject) return;
 	return (
 		<div className='flex flex-col gap-4'>
@@ -12,6 +34,7 @@ export const Strategies = () => {
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateStrategy />
 			</div>
+			{selelectedStrategies.length > 0 && <StrategyTable strategies={selelectedStrategies} />}
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
@@ -28,7 +51,15 @@ export const Strategies = () => {
 					</p>
 				</div>
 				{selectedProject.strategies.map(strategy => {
-					return <Strategy key={strategy.id} strategy={strategy} />;
+					return (
+						<Strategy
+							strategyIcon={strategyIcons[strategy.icon]}
+							key={strategy.id}
+							strategy={strategy}
+							selectedStrategyIds={selectedStrategyIds}
+							onClickAddToStrategyTable={handleClickAddToStrategyTable}
+						/>
+					);
 				})}
 			</div>
 		</div>

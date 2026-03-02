@@ -1,14 +1,16 @@
 import {
 	Button,
-	Popover,
+	CircularProgress,
 	Icon,
+	Popover,
 	TextField,
 	Textarea,
-	CircularProgress,
 } from '@equinor/eds-core-react';
-import { useRef, useState } from 'react';
-import { useStrategyForm } from '../../../hooks/useStrategyForm';
 import { close } from '@equinor/eds-icons';
+import { useRef, useState } from 'react';
+import { FormProvider } from 'react-hook-form';
+import { useStrategyForm } from '../../../hooks/useStrategyForm';
+import { StrategyIconPicker } from './StrategyIconPicker';
 
 export const CreateStrategy = () => {
 	const { formMethods, handleSubmit, isPending } = useStrategyForm();
@@ -16,7 +18,7 @@ export const CreateStrategy = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<>
+		<FormProvider {...formMethods}>
 			<Button
 				ref={referenceElement}
 				variant='outlined'
@@ -28,10 +30,11 @@ export const CreateStrategy = () => {
 				open={isOpen}
 				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
+				placement='bottom-end'
 			>
 				<Popover.Content>
 					<form
-						className='flex flex-col items-start gap-4 rounded-sm'
+						className='flex w-[min(85vw,500px)] flex-col items-start gap-4 rounded-sm'
 						onSubmit={handleSubmit}
 					>
 						<Button
@@ -47,19 +50,17 @@ export const CreateStrategy = () => {
 						<div className='w-full pr-16'>
 							<h2 className='text-2xl font-semibold'>Create Strategy</h2>
 							<p className='text-text-tertiary'>
-								Create strategies for your decision optimization project
+								Create strategies for your project decisions
 							</p>
 						</div>
-						<TextField
-							{...formMethods.register('name')}
-							placeholder='Enter strategy name...'
-							label='Name'
-						/>
-						<Textarea
-							{...formMethods.register('description')}
-							placeholder='Enter strategy description...'
-							label='Description'
-						/>
+						<div className='grid w-full grid-cols-[auto_1fr] gap-2'>
+							<StrategyIconPicker />
+							<TextField
+								{...formMethods.register('name')}
+								placeholder='Enter strategy name...'
+								label='Name'
+							/>
+						</div>
 						<Textarea
 							{...formMethods.register('rationale')}
 							placeholder='Enter strategy rationale...'
@@ -71,6 +72,6 @@ export const CreateStrategy = () => {
 					</form>
 				</Popover.Content>
 			</Popover>
-		</>
+		</FormProvider>
 	);
 };
