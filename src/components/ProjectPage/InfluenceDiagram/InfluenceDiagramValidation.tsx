@@ -1,20 +1,18 @@
-import { Accordion, Button, Divider, Icon } from '@equinor/eds-core-react';
+import { Accordion, Button, Divider, Icon, Popover } from '@equinor/eds-core-react';
 import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
 import { MarkerType, Node, Edge as ReactFlowEdge, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
 
-import { useLocation } from 'react-router';
-import z from 'zod/v3';
-import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import {
 	DiscreteProbability,
-	ErrorHandlingState,
 	InfluenceNode as InfluenceNodeType,
 	Issue,
 } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
+
+import { useGetInfluenceDiagramErrors } from '../../../hooks/api/useGetInfluenceDiagramErrors';
 import { getDiscreteProbabiltyRows } from '../../../utils/getDiscreteProbabiltyRows';
 import { calculateRowSum } from './ProbabilityTable/utils';
 
@@ -25,19 +23,8 @@ interface ValidationRuleItemProps {
 	isError: boolean;
 	isExpanded: boolean;
 }
-const errorValidator = z.object({
-	response: z.object({
-		data: z.object({
-			detail: z.string(),
-		}),
-	}),
-});
 
 // Constants
-const INITIAL_ERROR_STATE: ErrorHandlingState = {
-	message: '',
-	showDecisionTree: false,
-};
 
 const VALIDATION_STYLE = {
 	border: '2px solid orange',
@@ -278,76 +265,64 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 	);
 };
 
-const parseDecisionTreeError = (error: unknown, isError: boolean) => {
-	if (!error || !isError) return INITIAL_ERROR_STATE;
-	const res = { ...INITIAL_ERROR_STATE };
-	const parsedError = errorValidator.safeParse(error);
-	if (parsedError.success) {
-		res.message = parsedError.data.response.data.detail;
-		res.showDecisionTree = true;
-	}
-	return res;
-};
-
 // Main Component
 export const InfluenceDiagramValidation = () => {
-	const location = useLocation();
-	const [isExpanded, setIsExpanded] = useState(location.state?.fromInvalidDiagramDialog || false);
 	const [showValidation, setShowValidation] = useState(false);
+	const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 	const selectedProject = useSelectedProject();
 	const issues = useSelectedProjectIssues();
-	const { error, isError } = useGetDecisionTree(selectedProject?.id);
-	const parsedError = parseDecisionTreeError(error, isError);
+	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
 	const isInValidPT = ValidateProbabilityTable(issues);
-
-	const handleToggleAccordion = (expanded: boolean) => {
-		setIsExpanded(expanded);
-	};
 
 	const handleToggleValidation = () => {
 		setShowValidation(prev => !prev);
 	};
 
-	const hasError = parsedError.message !== '' || isInValidPT;
+	const hasError = errors?.message !== '' || isInValidPT;
 
 	return (
-		<div className='absolute top-1 right-1 z-10 w-1/3'>
-			<Accordion>
-				<Accordion.Item
-					isExpanded={isExpanded}
-					onExpandedChange={handleToggleAccordion}
-					hidden={!hasError}
-				>
-					<Accordion.Header>Validation</Accordion.Header>
-					<Accordion.Panel>
-						<p>Validation and guidelines for building valid influence diagram.</p>
-						<Divider />
+		<>
+			<Button
+				className='border-warning-resting! hover:bg-warning-resting/20! px-1.5!'
+				color='danger'
+				ref={setAnchorEl}
+				variant='outlined'
+				onClick={() => setShowValidation(prev => !prev)}
+			>
+				<Icon data={warning_outlined} className='fill-warning-resting' />
+			</Button>
+			<Popover
+				open={showValidation}
+				anchorEl={anchorEl}
+				onClose={() => setShowValidation(false)}
+			>
+				<Popover.Content>
+					<p>Validation and guidelines for building valid influence diagram.</p>
+					<Divider />
 
-						{/* Error Alert */}
-						{hasError && (
-							<div
-								className='mb-4 flex items-center rounded-md p-3'
-								style={{
-									backgroundColor: '#FFE7D6',
-									border: '2px solid #FF9200',
-								}}
-							>
-								<Icon data={warning_outlined} size={40} color='#FF9200' />
-								<div className='text-text-secondary flex-1 p-3 text-sm'>
-									Invalid Influence diagrams cannot compute the decision tree.
-								</div>
-								<Button onClick={handleToggleValidation}>
-									{showValidation ? 'Hide' : 'Show'}
-								</Button>
+					{/* Error Alert */}
+					{hasError && (
+						<div className='bg-background-warning border-warning-resting mb-4 flex items-center rounded-md border p-3'>
+							<Icon
+								data={warning_outlined}
+								size={40}
+								className='fill-warning-resting'
+							/>
+							<div className='text-text-warning flex-1 p-3 text-sm'>
+								Invalid Influence diagrams cannot compute the decision tree.
 							</div>
-						)}
+							<Button onClick={handleToggleValidation}>
+								{showValidation ? 'Hide' : 'Show'}
+							</Button>
+						</div>
+					)}
 
-						<p className='mt-4 text-xl'>Influence diagram rules</p>
-						<p className='mt-4 text-sm'>
-							These must be satisfied to compute the decision tree.
-						</p>
+					<p className='mt-4 text-xl'>Influence diagram rules</p>
+					<p className='mt-4 text-sm'>
+						These must be satisfied to compute the decision tree.
+					</p>
 
-						{/* Validation Rules */}
+					<Accordion>
 						{Object.entries(VALIDATION_MESSAGES).map(([key, message]) => (
 							<ValidationRuleItem
 								key={key}
@@ -356,16 +331,14 @@ export const InfluenceDiagramValidation = () => {
 								isError={
 									key === 'ProbalilityTable'
 										? isInValidPT
-										: parsedError.message.includes(key)
+										: !!errors?.message.includes(key)
 								}
 								isExpanded={showValidation}
 							/>
 						))}
-
-						<Divider />
-					</Accordion.Panel>
-				</Accordion.Item>
-			</Accordion>
-		</div>
+					</Accordion>
+				</Popover.Content>
+			</Popover>
+		</>
 	);
 };

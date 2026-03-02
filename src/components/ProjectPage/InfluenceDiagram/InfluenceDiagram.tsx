@@ -5,7 +5,6 @@ import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
 import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
-import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 
 const nodeTypes = { issue: InfluenceNode };
 const edgeTypes = { issue: InfluenceEdge };
@@ -67,7 +66,6 @@ export const InfluenceDiagram = () => {
 				fitViewOptions={{ padding: 0.4 }}
 			>
 				<Background />
-				<InfluenceDiagramValidation />
 				<DraggableToolbar
 					onClickPanMode={onClickPanMode}
 					onClickSelectionMode={onClickSelectionMode}

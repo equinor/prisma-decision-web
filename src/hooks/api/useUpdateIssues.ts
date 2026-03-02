@@ -9,8 +9,9 @@ export const useUpdateIssues = () => {
 			await apiClient.put('/issues', issues);
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['issues'] });
+			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 		},
 	});
@@ -37,8 +38,9 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['issues'] });
+			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});
 };
