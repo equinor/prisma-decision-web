@@ -18,10 +18,7 @@ export const TopBar = () => {
 				className='flex! cursor-pointer items-center! justify-center'
 				onClick={() => navigate('/')}
 			>
-				<div className='flex h-8 w-8 items-center justify-center rounded-md bg-teal-600 text-[14px] font-semibold text-white'>
-					DOT
-				</div>
-				Decision Optimization Tool
+				Prisma Decision
 				{isLoading && (
 					<div className='flex items-center pb-2'>
 						<StarProgress size={24} />
