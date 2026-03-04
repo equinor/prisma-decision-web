@@ -8,8 +8,9 @@ import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectD
 import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
 import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
 import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree';
-import { SolutionTree } from './components/ProjectPage/SolutionDecisionTree/SolutionDecisionTree';
+import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
+import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
 				<Route path='objectives' element={<ProjectObjectives />} />
 				<Route path='influence-diagram' element={<InfluenceDiagram />} />
 				<Route path='decision-tree' element={<DecisionTree />} />
+				<Route path='compact-tree' element={<CompactTree />} />
 				<Route path='solution-tree' element={<SolutionTree />} />
 				<Route path='strategies' element={<Strategies />} />
 			</Route>

@@ -1,4 +1,4 @@
-import { Divider, SideBar as EdsSideBar } from '@equinor/eds-core-react';
+import { Button, Divider, SideBar as EdsSideBar, Icon, Popover } from '@equinor/eds-core-react';
 import {
 	assignment_important,
 	functions,
@@ -7,14 +7,16 @@ import {
 	share,
 	timeline,
 } from '@equinor/eds-icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
-import { ChessIcon } from '../icons';
+import { ChessIcon, compactTreeIcon } from '../icons';
 import { EquinorStar } from './EquinorStar';
 
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [isDecisionTreeMenuOpen, setIsDecisionTreeMenuOpen] = useState(false);
+	const decisionTreeButtonRef = useRef<HTMLButtonElement>(null);
 	const project = useSelectedProject();
 	if (!project) return <div />;
 	return (
@@ -77,19 +79,51 @@ export const SideBar = () => {
 					to={`/project/${project.id}/influence-diagram`}
 				/>
 				<EdsSideBar.Link
-					as={Link}
+					ref={decisionTreeButtonRef}
+					onClick={() => setIsDecisionTreeMenuOpen(prev => !prev)}
 					label='Decision Tree'
 					className='[&_svg]:fill-primary-resting border-b-0!'
 					icon={share}
-					to={`/project/${project.id}/decision-tree`}
 				/>
-				<EdsSideBar.Link
-					as={Link}
-					label='Solution Tree'
-					className='[&_svg]:fill-primary-resting border-b-0!'
-					icon={functions}
-					to={`/project/${project.id}/solution-tree`}
-				/>
+				<Popover
+					open={isDecisionTreeMenuOpen}
+					placement='right'
+					onClose={() => setIsDecisionTreeMenuOpen(false)}
+					anchorEl={decisionTreeButtonRef.current}
+				>
+					<Popover.Content className='flex flex-col gap-2 p-2!'>
+						<Button
+							variant='ghost'
+							className='size-16! [&>span]:flex! [&>span]:flex-col!'
+							as={Link}
+							onClick={() => setIsDecisionTreeMenuOpen(false)}
+							to={`/project/${project.id}/decision-tree`}
+						>
+							<Icon data={share} />
+							Tree
+						</Button>
+						<Button
+							variant='ghost'
+							className='size-16! [&>span]:flex! [&>span]:flex-col!'
+							as={Link}
+							onClick={() => setIsDecisionTreeMenuOpen(false)}
+							to={`/project/${project.id}/compact-tree`}
+						>
+							<Icon data={compactTreeIcon} />
+							Compact
+						</Button>
+						<Button
+							variant='ghost'
+							className='size-16! [&>span]:flex! [&>span]:flex-col!'
+							onClick={() => setIsDecisionTreeMenuOpen(false)}
+							as={Link}
+							to={`/project/${project.id}/solution-tree`}
+						>
+							<Icon data={functions} />
+							Solution
+						</Button>
+					</Popover.Content>
+				</Popover>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>
 				<div className='flex items-center justify-center py-4'>

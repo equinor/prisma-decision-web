@@ -12,10 +12,10 @@ const handlePositions = [Position.Left, Position.Right];
 export const DecisionTreeNode = ({
 	data,
 	id,
-}: NodeProps<Node<{ issue: Issue; path: Set<string>; expectedValue?: number | null }>>) => {
+}: NodeProps<Node<{ issue: Issue; path?: Set<string>; expectedValue?: number | null }>>) => {
 	const IssueCard = data.issue.type === 'Decision' ? DecisionCard : UncertaintyCard;
 	const [selectedNodes, setSelectedNodes] = useAtom(testAtom);
-	const selected = selectedNodes.has(id) || (data.path.size === 0 && selectedNodes.size > 0);
+	const selected = selectedNodes.has(id) || (data.path?.size === 0 && selectedNodes.size > 0);
 	return (
 		<>
 			<div
@@ -48,12 +48,14 @@ export const DecisionTreeNode = ({
 					<IssueCard canExpand={false} issue={data.issue} className={'h-20'} />
 				</div>
 			</div>
-			<div className='absolute top-1/2 -right-3 translate-x-full -translate-y-full '>
-				<p>
-					<span className='font-semibold'>EV: </span>
-					{parseFloat(data.expectedValue?.toFixed(2) || '0')}
-				</p>
-			</div>
+			{!!data.expectedValue && (
+				<div className='absolute top-1/2 -right-3 translate-x-full -translate-y-full '>
+					<p>
+						<span className='font-semibold'>EV: </span>
+						{parseFloat(data.expectedValue?.toFixed(2) || '0')}
+					</p>
+				</div>
+			)}
 		</>
 	);
 };
