@@ -9,7 +9,7 @@ export const useGetUsers = () => {
 			const res = await apiClient.get<UserResponse[]>('/users');
 			return res.data.map(user => ({
 				user_id: user.id,
-				user_name: user.name,
+				name: user.name,
 				azure_id: user.azure_id,
 			}));
 		},

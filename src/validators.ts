@@ -25,7 +25,7 @@ export const objectiveSchema = z.object({
 
 export const userSchema = z.object({
 	user_id: int(),
-	user_name: z.string(),
+	name: z.string(),
 	azure_id: uuid(),
 });
 
