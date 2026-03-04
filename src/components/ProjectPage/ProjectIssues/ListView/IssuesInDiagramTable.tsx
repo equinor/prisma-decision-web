@@ -14,7 +14,8 @@ export const IssuesInDiagramTable = () => {
 		const inOrOnBoundary = issue.boundary === 'in' || issue.boundary === 'on';
 		if (issue.type === 'Decision') return inOrOnBoundary && issue.decision.type === 'Focus';
 		if (issue.type === 'Uncertainty') return inOrOnBoundary && issue.uncertainty.is_key;
-		return inOrOnBoundary;
+		if (issue.type === 'Utility') return inOrOnBoundary;
+		return false;
 	});
 
 	const hasIssues = issues.length > 0;
