@@ -15,7 +15,7 @@ export const msalConfig: Configuration = {
 	},
 };
 
-export const scopes = [import.meta.env.VITE_APP_DOT_API_SCOPE];
+export const scopes = [import.meta.env.VITE_APP_PRISMA_API_SCOPE];
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 export const initializeAuth = async (msalInstance: IPublicClientApplication) => {

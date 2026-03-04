@@ -23,14 +23,12 @@ export const HomePage = () => {
 		<div className='mx-auto w-[min(1600px,90%)]'>
 			<div className='flex flex-col gap-12'>
 				<div className='max-w-250'>
-					<h1 className='text-3xl font-bold'>
-						Welcome to the Decision Optimization Tool!
-					</h1>
+					<h1 className='text-3xl font-bold'>Welcome to Prisma!</h1>
 					<p className='text-text-tertiary'>
-						DOT (Decision Optimization Tool) is a powerful platform that helps teams
-						make better decisions through structured analysis, evaluation, and
-						collaboration. It turns complex scenarios into clear, actionable
-						insights—enabling confident, informed choices.
+						Prisma is a powerful platform that helps teams make better decisions through
+						structured analysis, evaluation, and collaboration. It turns complex
+						scenarios into clear, actionable insights—enabling confident, informed
+						choices.
 					</p>
 				</div>
 

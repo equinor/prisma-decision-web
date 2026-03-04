@@ -92,7 +92,7 @@ export const UncertaintyCard = ({
 					<EdsProvider density='compact'>
 						{(!canExpand || !rest.expanded) && (
 							<CollapsibleTrigger asChild>
-								<button className='absolute right-2 bottom-2 flex cursor-pointer items-center gap-2'>
+								<button className='absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
 										{issue.uncertainty.outcomes.length} Outcomes
 									</p>
