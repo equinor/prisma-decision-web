@@ -38,13 +38,13 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 					{issues.map(issue => (
 						<div
 							key={issue.id}
-							className='bg-background-default flex min-w-60.25 flex-col gap-2 rounded-sm p-2'
+							className='bg-background-default shadow-tile flex min-w-60.25 flex-col gap-2 rounded-sm p-2'
 						>
 							<div>
 								<div className='max-w-52 text-sm font-bold whitespace-nowrap'>
 									{issue.name}
 								</div>
-								<div className='text-text-tertiary line-clamp-2 overflow-hidden text-sm'>
+								<div className='text-text-tertiary line-clamp-1 max-w-56 text-sm'>
 									{issue.description}
 								</div>
 							</div>
@@ -58,7 +58,7 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 									return (
 										<div
 											key={option.id}
-											className='bg-background-light flex items-center justify-between gap-2 rounded-sm px-2 py-1 text-sm'
+											className='bg-background-light flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1 text-sm'
 										>
 											<span>{option.name}</span>
 											<div className='flex flex-wrap items-center justify-end gap-1'>

@@ -58,7 +58,11 @@ export const DecisionCard = ({
 			</div>
 			<div>
 				<h3 className='font-semibold '>{issue.name}</h3>
-				<p className='text-text-tertiary line-clamp-2 overflow-hidden text-sm'>
+				<p
+					className={cn('text-text-tertiary line-clamp-1 text-sm', {
+						'line-clamp-none': canExpand && expanded,
+					})}
+				>
 					{issue.description}
 				</p>
 			</div>
@@ -67,7 +71,7 @@ export const DecisionCard = ({
 					open={expanded}
 					onOpenChange={toggle}
 					className={cn({
-						'pb-7': !expanded,
+						'pb-7': canExpand,
 					})}
 				>
 					<CollapsibleContent className='mb-2 w-full' asChild>
@@ -95,7 +99,7 @@ export const DecisionCard = ({
 						)}
 					</CollapsibleContent>
 					<EdsProvider density='compact'>
-						{(!canExpand || !expanded) && (
+						{canExpand && (
 							<CollapsibleTrigger asChild>
 								<button className='nodrag absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>

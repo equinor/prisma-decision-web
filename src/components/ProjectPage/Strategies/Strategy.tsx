@@ -88,6 +88,7 @@ export const Strategy = ({
 								key={issue.id}
 								issue={issue}
 								expanded={true}
+								canExpand={false}
 								className='mas max-w-24 cursor-default'
 							/>
 						);
