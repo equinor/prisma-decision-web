@@ -14,8 +14,7 @@ type UserSectionProps = {
 	handleSubmit: () => void;
 };
 
-type UserWithRole = User & { role?: RoleType };
-
+type UserWithRole = User & { id: string; role?: RoleType };
 // All Users Table Component
 const AllUsersTable = ({
 	availableUsers,
@@ -76,12 +75,12 @@ const AllUsersTable = ({
 
 // Team Members Table Component
 const TeamMembersTable = ({
-	allTeamMembers,
+	selectedUsers,
 	errors,
 	onRoleChange,
 	onDeleteUser,
 }: {
-	allTeamMembers: UserWithRole[];
+	selectedUsers: UserWithRole[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	errors: Record<string, any> | undefined;
 	onRoleChange: (user: UserWithRole, role: RoleType | undefined) => void;
@@ -96,7 +95,7 @@ const TeamMembersTable = ({
 			</Table.Row>
 		</Table.Head>
 		<Table.Body>
-			{allTeamMembers.map((user, index) => (
+			{selectedUsers.map((user, index) => (
 				<Table.Row
 					key={user.azure_id}
 					className={`hover:bg-background-light transition-colors ${
@@ -120,11 +119,13 @@ const TeamMembersTable = ({
 								selectedOptions={user.role ? [user.role] : []}
 							/>
 						</div>
-						<ErrorMessage
-							as={FormErrorMessage}
-							name={`users.${index}.role`}
-							errors={errors}
-						/>
+						{user.role === undefined && (
+							<ErrorMessage
+								as={FormErrorMessage}
+								name={`users.${index}.role`}
+								errors={errors}
+							/>
+						)}
 					</Table.Cell>
 					<Table.Cell className='px-2!'>
 						<div className='flex justify-center'>
@@ -184,7 +185,8 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			apiClient
 				.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`)
 				.then(res => {
-					setGraphUsers(res.data);
+					const result = res.data.map(user => ({ ...user }));
+					setGraphUsers(result);
 				})
 				.catch(() => {
 					// Failed to load graph users, keep empty cache
@@ -199,32 +201,16 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
 		// Remove from newly selected users
-		const updatedSelected = selectedUsers.filter(u => u.user_id !== user.user_id);
+		const updatedSelected = selectedUsers.filter(u => u.azure_id !== user.azure_id);
 		setSelectedUser(updatedSelected);
-
-		// Remove from existing team members in form
-		if (usersValue) {
-			const updatedUsers = usersValue.filter(u => u.user_id !== user.user_id);
-			setUser(updatedUsers);
-		}
 	};
 
 	// Update role for a user (handles both new and existing team members)
 	const handleRoleAssignment = (user: UserWithRole, role: RoleType | undefined) => {
-		// Check if user is in selectedUsers (newly added)
-		const inSelectedUsers = selectedUsers.some(u => u.user_id === user.user_id);
-
-		if (inSelectedUsers) {
-			// Update newly selected users
-			setSelectedUser(
-				selectedUsers.map(u => (u.user_id === user.user_id ? { ...u, role } : u)),
-			);
-		} else {
-			// Update existing team members in form
-			if (usersValue) {
-				setUser(usersValue.map(u => (u.user_id === user.user_id ? { ...u, role } : u)));
-			}
-		}
+		// Update newly selected users
+		setSelectedUser(
+			selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role } : u)),
+		);
 	};
 
 	// Assign roles and persist newly selected users
@@ -232,26 +218,27 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		if (selectedUsers.length > 0 && selectedProject) {
 			const userWithRole: ProjectRole[] = selectedUsers.map(user => {
 				return {
-					id: crypto.randomUUID(),
 					project_id: selectedProject.id,
 					role: user.role!,
 					...user,
 				};
 			});
-			const mergeUser = [...usersValue, ...userWithRole].reduce((acc, user) => {
-				if (acc.find(u => u.azure_id === user.azure_id)) return acc;
-				acc.push(user);
-				return acc;
-			}, [] as ProjectRole[]);
-
-			setUser(mergeUser);
-			setSelectedUser([]);
+			setUser(userWithRole);
 			handleSubmit();
 		}
 	};
+	useEffect(() => {
+		// Cleanup on unmount: clear selected users and search state
+		if (usersValue) {
+			setSelectedUser(
+				usersValue.map(
+					user => selectedUsers.find(su => su.azure_id === user.azure_id) || user,
+				),
+			);
+		}
+	}, [usersValue]);
 
 	// Derived state
-	const allTeamMembers = [...(usersValue || []), ...selectedUsers];
 	const existingAzureIds = new Set(users.map(u => u.azure_id));
 	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
 	const baseUsers = hasActiveSearch
@@ -259,9 +246,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		: users;
 
 	const availableUsers = baseUsers.filter(
-		user =>
-			!selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id) &&
-			!usersValue?.some(existingUser => existingUser.azure_id === user.azure_id),
+		user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
 	);
 
 	const totalUsersCount = baseUsers.length;
@@ -327,7 +312,12 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									availableUsers={availableUsers}
 									existingAzureIds={existingAzureIds}
 									selectedUsers={selectedUsers}
-									onAddUser={user => setSelectedUser([...selectedUsers, user])}
+									onAddUser={user => {
+										setSelectedUser([
+											...selectedUsers,
+											{ ...user, id: crypto.randomUUID(), role: undefined },
+										]);
+									}}
 								/>
 							)}
 						</div>
@@ -347,7 +337,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 							<div className='flex min-h-0 flex-1 flex-col gap-3'>
 								<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
 									<TeamMembersTable
-										allTeamMembers={allTeamMembers}
+										selectedUsers={selectedUsers}
 										errors={errors}
 										onRoleChange={handleRoleAssignment}
 										onDeleteUser={handleDeleteUser}

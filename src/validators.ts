@@ -24,13 +24,12 @@ export const objectiveSchema = z.object({
 });
 
 export const userSchema = z.object({
-	user_id: int(),
+	user_id: int().nullable(),
 	name: z.string(),
 	azure_id: uuid(),
 });
 
-export const projectRoleSchema = z.object({
-	...userSchema.shape,
+export const projectRoleSchema = userSchema.extend({
 	id: uuid(),
 	project_id: uuid(),
 	role: z.enum(roleTypes, { error: 'Role is required' }),
@@ -64,7 +63,7 @@ export const projectSchema = z.object({
 	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
-	strategies: z.array(strategySchema, 'Strategies must be an array'),
+	strategies: z.array(strategySchema, 'Strategies must be an array').optional(),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
 
