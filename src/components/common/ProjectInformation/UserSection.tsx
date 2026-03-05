@@ -16,6 +16,133 @@ type UserSectionProps = {
 
 type UserWithRole = User & { role?: RoleType };
 
+// All Users Table Component
+const AllUsersTable = ({
+	availableUsers,
+	existingAzureIds,
+	selectedUsers,
+	onAddUser,
+}: {
+	availableUsers: User[];
+	existingAzureIds: Set<string>;
+	selectedUsers: UserWithRole[];
+	onAddUser: (user: User) => void;
+}) => (
+	<Table className='w-full table-fixed'>
+		<Table.Head className='bg-background-default sticky top-0 z-10'>
+			<Table.Row>
+				<Table.Cell className='w-1/2'>User Name</Table.Cell>
+				<Table.Cell className='flex justify-end'>Action</Table.Cell>
+			</Table.Row>
+		</Table.Head>
+		<Table.Body>
+			{availableUsers.map((user, index) => (
+				<Table.Row
+					key={`${user.azure_id}-${index}`}
+					className={`hover:bg-background-light transition-colors ${
+						selectedUsers.some(u => u.azure_id === user.azure_id)
+							? 'bg-background-light'
+							: ''
+					}`}
+				>
+					<Table.Cell className='font-medium'>
+						<div className='flex items-center gap-2'>
+							{user.name}
+							{!existingAzureIds.has(user.azure_id) && (
+								<Icon
+									data={lock}
+									title='User does not have access'
+									className='text-ui-warning'
+								/>
+							)}
+						</div>
+					</Table.Cell>
+					<Table.Cell className='px-2!'>
+						<div className='flex justify-end'>
+							<Button
+								variant='outlined'
+								className='transition-all'
+								onClick={() => onAddUser(user)}
+							>
+								Add
+							</Button>
+						</div>
+					</Table.Cell>
+				</Table.Row>
+			))}
+		</Table.Body>
+	</Table>
+);
+
+// Team Members Table Component
+const TeamMembersTable = ({
+	allTeamMembers,
+	errors,
+	onRoleChange,
+	onDeleteUser,
+}: {
+	allTeamMembers: UserWithRole[];
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	errors: Record<string, any> | undefined;
+	onRoleChange: (user: UserWithRole, role: RoleType | undefined) => void;
+	onDeleteUser: (user: UserWithRole) => void;
+}) => (
+	<Table className='w-full table-fixed'>
+		<Table.Head className='bg-background-default sticky top-0 z-10'>
+			<Table.Row>
+				<Table.Cell className='w-1/2'>User Name</Table.Cell>
+				<Table.Cell className='w-1/2'>Role</Table.Cell>
+				<Table.Cell className='w-20'>Action</Table.Cell>
+			</Table.Row>
+		</Table.Head>
+		<Table.Body>
+			{allTeamMembers.map((user, index) => (
+				<Table.Row
+					key={user.azure_id}
+					className={`hover:bg-background-light transition-colors ${
+						errors?.users && !user.role ? 'bg-red-50' : ''
+					}`}
+				>
+					<Table.Cell className='font-medium'>{user.name}</Table.Cell>
+					<Table.Cell>
+						<div>
+							<Autocomplete
+								options={roleTypes}
+								label='Assign Role'
+								placeholder={'Search for roles'}
+								onOptionsChange={({
+									selectedItems,
+								}: {
+									selectedItems: RoleType[];
+								}) => {
+									onRoleChange(user, selectedItems[0]);
+								}}
+								selectedOptions={user.role ? [user.role] : []}
+							/>
+						</div>
+						<ErrorMessage
+							as={FormErrorMessage}
+							name={`users.${index}.role`}
+							errors={errors}
+						/>
+					</Table.Cell>
+					<Table.Cell className='px-2!'>
+						<div className='flex justify-center'>
+							<Button
+								variant='ghost_icon'
+								className='transition-colors hover:bg-red-50'
+								onClick={() => onDeleteUser(user)}
+							>
+								<Icon data={delete_to_trash} />
+							</Button>
+						</div>
+					</Table.Cell>
+				</Table.Row>
+			))}
+		</Table.Body>
+	</Table>
+);
+
 export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control } = useProjectFormContext();
 	const [selectedUsers, setSelectedUser] = useState<UserWithRole[]>([]);
@@ -33,6 +160,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		control: control,
 	});
 
+	// Debounce search term
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearchTerm(searchTerm);
@@ -41,6 +169,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		return () => clearTimeout(timer);
 	}, [searchTerm]);
 
+	// Fetch users based on search term
 	useEffect(() => {
 		const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
 
@@ -53,7 +182,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 
 			// Fetch graph users
 			apiClient
-				.get<User[]>(`/graph/users/${debouncedSearchTerm}`)
+				.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`)
 				.then(res => {
 					setGraphUsers(res.data);
 				})
@@ -67,13 +196,38 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		}
 	}, [debouncedSearchTerm, users]);
 
+	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
-		setSelectedUser(selectedUsers.filter(u => u.user_id !== user.user_id));
+		// Remove from newly selected users
+		const updatedSelected = selectedUsers.filter(u => u.user_id !== user.user_id);
+		setSelectedUser(updatedSelected);
+
+		// Remove from existing team members in form
+		if (usersValue) {
+			const updatedUsers = usersValue.filter(u => u.user_id !== user.user_id);
+			setUser(updatedUsers);
+		}
 	};
 
-	// Combine existing team members (usersValue) with newly added users (selectedUsers)
-	const allTeamMembers = [...(usersValue || []), ...selectedUsers];
+	// Update role for a user (handles both new and existing team members)
+	const handleRoleAssignment = (user: UserWithRole, role: RoleType | undefined) => {
+		// Check if user is in selectedUsers (newly added)
+		const inSelectedUsers = selectedUsers.some(u => u.user_id === user.user_id);
 
+		if (inSelectedUsers) {
+			// Update newly selected users
+			setSelectedUser(
+				selectedUsers.map(u => (u.user_id === user.user_id ? { ...u, role } : u)),
+			);
+		} else {
+			// Update existing team members in form
+			if (usersValue) {
+				setUser(usersValue.map(u => (u.user_id === user.user_id ? { ...u, role } : u)));
+			}
+		}
+	};
+
+	// Assign roles and persist newly selected users
 	const handleRoleCreate = async () => {
 		if (selectedUsers.length > 0 && selectedProject) {
 			const userWithRole: ProjectRole[] = selectedUsers.map(user => {
@@ -91,18 +245,25 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			}, [] as ProjectRole[]);
 
 			setUser(mergeUser);
+			setSelectedUser([]);
 			handleSubmit();
 		}
 	};
 
+	// Derived state
+	const allTeamMembers = [...(usersValue || []), ...selectedUsers];
 	const existingAzureIds = new Set(users.map(u => u.azure_id));
 	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
 	const baseUsers = hasActiveSearch
 		? [...filteredUsers, ...graphUsers.filter(gu => !existingAzureIds.has(gu.azure_id))]
 		: users;
+
 	const availableUsers = baseUsers.filter(
-		user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
+		user =>
+			!selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id) &&
+			!usersValue?.some(existingUser => existingUser.azure_id === user.azure_id),
 	);
+
 	const totalUsersCount = baseUsers.length;
 	const visibleUsersCount = availableUsers.length;
 	const countLabel = hasActiveSearch ? `${visibleUsersCount} of ${totalUsersCount} users` : '';
@@ -159,62 +320,15 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
 							{hasActiveSearch && availableUsers.length === 0 ? (
 								<div className='text-text-tertiary p-6 text-center text-sm'>
-									No users found for {`"${searchTerm}"`}.
+									loading data...
 								</div>
 							) : (
-								<Table className='w-full table-fixed'>
-									<Table.Head className='bg-background-default sticky top-0 z-10'>
-										<Table.Row>
-											<Table.Cell className='w-1/2'>User Name</Table.Cell>
-											<Table.Cell className='flex justify-end'>
-												Action
-											</Table.Cell>
-										</Table.Row>
-									</Table.Head>
-									<Table.Body>
-										{availableUsers.map((user, index) => (
-											<Table.Row
-												key={`${user.azure_id}-${index}`}
-												className={`hover:bg-background-light transition-colors ${
-													selectedUsers.some(
-														u => u.azure_id === user.azure_id,
-													)
-														? 'bg-background-light'
-														: ''
-												}`}
-											>
-												<Table.Cell className='font-medium'>
-													<div className='flex items-center gap-2'>
-														{user.name}
-														{!existingAzureIds.has(user.azure_id) && (
-															<Icon
-																data={lock}
-																title='User does not have access'
-																className='text-ui-warning'
-															/>
-														)}
-													</div>
-												</Table.Cell>
-												<Table.Cell className='px-2!'>
-													<div className='flex justify-end'>
-														<Button
-															variant='outlined'
-															className='transition-all'
-															onClick={() => {
-																setSelectedUser([
-																	...selectedUsers,
-																	user,
-																]);
-															}}
-														>
-															Add
-														</Button>
-													</div>
-												</Table.Cell>
-											</Table.Row>
-										))}
-									</Table.Body>
-								</Table>
+								<AllUsersTable
+									availableUsers={availableUsers}
+									existingAzureIds={existingAzureIds}
+									selectedUsers={selectedUsers}
+									onAddUser={user => setSelectedUser([...selectedUsers, user])}
+								/>
 							)}
 						</div>
 					</div>
@@ -232,78 +346,12 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 						{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (
 							<div className='flex min-h-0 flex-1 flex-col gap-3'>
 								<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-									<Table className='w-full table-fixed'>
-										<Table.Head className='bg-background-default sticky top-0 z-10'>
-											<Table.Row>
-												<Table.Cell className='w-1/2'>User Name</Table.Cell>
-												<Table.Cell className='w-1/2'>Role</Table.Cell>
-												<Table.Cell className='w-20'> Action</Table.Cell>
-											</Table.Row>
-										</Table.Head>
-										<Table.Body>
-											{allTeamMembers.map((user, index) => (
-												<Table.Row
-													key={user.azure_id}
-													className={`hover:bg-background-light transition-colors ${
-														errors.users && !user.role
-															? 'bg-red-50'
-															: ''
-													}`}
-												>
-													<Table.Cell className='font-medium'>
-														{user.name}
-													</Table.Cell>
-													<Table.Cell>
-														<div>
-															<Autocomplete
-																options={roleTypes}
-																label='Assign Role'
-																placeholder={'Search for roles'}
-																onOptionsChange={({
-																	selectedItems,
-																}: {
-																	selectedItems: RoleType[];
-																}) => {
-																	setSelectedUser(
-																		selectedUsers.map(u =>
-																			u.user_id ===
-																			user.user_id
-																				? {
-																						...u,
-																						role: selectedItems[0],
-																					}
-																				: u,
-																		),
-																	);
-																}}
-																selectedOptions={
-																	user.role ? [user.role] : []
-																}
-															/>
-														</div>
-														<ErrorMessage
-															as={FormErrorMessage}
-															name={`users.${index}.role`}
-															errors={errors}
-														/>
-													</Table.Cell>
-													<Table.Cell className='px-2!'>
-														<div className='flex justify-center'>
-															<Button
-																variant='ghost_icon'
-																className='transition-colors hover:bg-red-50'
-																onClick={() =>
-																	handleDeleteUser(user)
-																}
-															>
-																<Icon data={delete_to_trash} />
-															</Button>
-														</div>
-													</Table.Cell>
-												</Table.Row>
-											))}
-										</Table.Body>
-									</Table>
+									<TeamMembersTable
+										allTeamMembers={allTeamMembers}
+										errors={errors}
+										onRoleChange={handleRoleAssignment}
+										onDeleteUser={handleDeleteUser}
+									/>
 								</div>
 								<div className='flex justify-end'>
 									<Button onClick={() => handleRoleCreate()}>Assign roles</Button>
