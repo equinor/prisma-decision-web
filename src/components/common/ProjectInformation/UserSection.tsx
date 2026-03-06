@@ -15,6 +15,7 @@ type UserSectionProps = {
 };
 
 type UserWithRole = User & { id: string; role?: RoleType };
+
 // All Users Table Component
 const AllUsersTable = ({
 	availableUsers,
@@ -146,7 +147,6 @@ const TeamMembersTable = ({
 
 export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control } = useProjectFormContext();
-	const [selectedUsers, setSelectedUser] = useState<UserWithRole[]>([]);
 	const [searchTerm, setSearchTerm] = useState('');
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 	const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -160,6 +160,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		name: 'users',
 		control: control,
 	});
+	const [selectedUsers, setSelectedUser] = useState<UserWithRole[]>(usersValue || []);
 
 	// Debounce search term
 	useEffect(() => {
@@ -185,8 +186,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			apiClient
 				.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`)
 				.then(res => {
-					const result = res.data.map(user => ({ ...user }));
-					setGraphUsers(result);
+					setGraphUsers(res.data);
 				})
 				.catch(() => {
 					// Failed to load graph users, keep empty cache
@@ -197,7 +197,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			setGraphUsers([]);
 		}
 	}, [debouncedSearchTerm, users]);
-
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
 		// Remove from newly selected users
@@ -227,16 +226,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			handleSubmit();
 		}
 	};
-	useEffect(() => {
-		// Cleanup on unmount: clear selected users and search state
-		if (usersValue) {
-			setSelectedUser(
-				usersValue.map(
-					user => selectedUsers.find(su => su.azure_id === user.azure_id) || user,
-				),
-			);
-		}
-	}, [usersValue]);
 
 	// Derived state
 	const existingAzureIds = new Set(users.map(u => u.azure_id));
@@ -251,7 +240,12 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 
 	const totalUsersCount = baseUsers.length;
 	const visibleUsersCount = availableUsers.length;
-	const countLabel = hasActiveSearch ? `${visibleUsersCount} of ${totalUsersCount} users` : '';
+	const countLabel = hasActiveSearch
+		? `${visibleUsersCount} of ${totalUsersCount} users`
+		: `${visibleUsersCount} users`;
+	const showEmptySearch = hasActiveSearch && availableUsers.length === 0;
+	const showIdleEmpty = !hasActiveSearch && availableUsers.length === 0;
+	const teamCountLabel = selectedUsers.length > 0 ? `${selectedUsers.length} members` : '';
 
 	return (
 		<div className='flex flex-col gap-4'>
@@ -268,7 +262,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 							<div>
 								<h3 className='mb-1 text-lg font-semibold'>All Users</h3>
 								<p className='text-text-tertiary text-sm'>
-									Select users to add to the project
+									Search and add users to the project
 								</p>
 							</div>
 							<span className='text-text-tertiary text-sm'>{countLabel}</span>
@@ -284,6 +278,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									setSearchTerm(nextSearch);
 									// Filtering will happen after debounce completes
 								}}
+								aria-label='Search users'
 							/>
 
 							{searchTerm && (
@@ -303,9 +298,13 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 						</div>
 
 						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-							{hasActiveSearch && availableUsers.length === 0 ? (
+							{showEmptySearch ? (
 								<div className='text-text-tertiary p-6 text-center text-sm'>
-									loading data...
+									No users found. Try a different search.
+								</div>
+							) : showIdleEmpty ? (
+								<div className='text-text-tertiary p-6 text-center text-sm'>
+									Search to add users from your tenant.
 								</div>
 							) : (
 								<AllUsersTable
@@ -330,7 +329,9 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									Assign roles to team members
 								</p>
 							</div>
-							{selectedUsers.length > 0 && <span>{selectedUsers.length} new</span>}
+							{teamCountLabel && (
+								<span className='text-text-tertiary text-sm'>{teamCountLabel}</span>
+							)}
 						</div>
 
 						{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (

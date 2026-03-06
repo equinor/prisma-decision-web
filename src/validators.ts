@@ -63,7 +63,7 @@ export const projectSchema = z.object({
 	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
 		message: 'End date must be in the future',
 	}),
-	strategies: z.array(strategySchema, 'Strategies must be an array').optional(),
+	strategies: z.array(strategySchema, 'Strategies must be an array'),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
 

@@ -8,7 +8,7 @@ export const useGetUsers = () => {
 		queryFn: async (): Promise<User[]> => {
 			const res = await apiClient.get<UserResponse[]>('/users');
 			return res.data.map(user => ({
-				user_id: user.id,
+				user_id: user.user_id,
 				name: user.name,
 				azure_id: user.azure_id,
 			}));
@@ -22,7 +22,7 @@ export const useGetUsers = () => {
 };
 
 type UserResponse = {
-	id: number;
+	user_id: number;
 	name: string;
 	azure_id: string;
 };
