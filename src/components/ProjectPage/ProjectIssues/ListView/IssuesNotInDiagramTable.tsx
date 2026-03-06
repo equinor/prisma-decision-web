@@ -18,7 +18,10 @@ export const IssuesNotInDiagramTable = () => {
 		if (issue.type === 'Uncertainty') {
 			return inOrOnBoundary || !issue.uncertainty.is_key;
 		}
-		return inOrOnBoundary;
+		if (issue.type === 'Utility') {
+			return inOrOnBoundary;
+		}
+		return true;
 	});
 
 	const hasIssues = issues.length > 0;
