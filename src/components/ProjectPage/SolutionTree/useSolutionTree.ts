@@ -1,13 +1,13 @@
 import { atom, useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { useGetSolutionDecisionTree } from '../../../hooks/api/useGetSolutionDecisionTree';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { convertSolutionTreeToNodesAndEdges } from '../../../utils/convertSolutionTreeToNodesAndEdges';
 import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
+import { useGetSolutionTree } from '../../../hooks/api/useGetSolutionTree';
 
-export const useSolutionDecisionTree = () => {
+export const useSolutionTree = () => {
 	const project = useSelectedProject();
-	const { data: decisionTree, isError } = useGetSolutionDecisionTree(project?.id);
+	const { data: decisionTree, isError } = useGetSolutionTree(project?.id);
 	const selected = useAtomValue(testAtom);
 
 	const { nodes, edges } = useMemo(() => {

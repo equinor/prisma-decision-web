@@ -1,16 +1,13 @@
 import { MarkerType } from '@xyflow/react';
+import { CompactTreeEdge } from '../components/ProjectPage/CompactTree/CompactTreeEdge';
 import { DecisionTreeNode } from '../components/common/DecisionTree/DecisionTreeNode';
-import { OutputNode } from '../components/common/DecisionTree/OutputNode';
-import { SolutionTreeEdge } from '../components/ProjectPage/SolutionTree/SolutionTreeEdge';
-
-// Constants
-export const NODE_TYPES = {
-	treeNode: DecisionTreeNode,
-	outputNode: OutputNode,
-};
 
 export const EDGE_TYPES = {
-	solutionTreeEdge: SolutionTreeEdge,
+	compactTreeEdge: CompactTreeEdge,
+};
+
+export const NODE_TYPES = {
+	treeNode: DecisionTreeNode,
 };
 
 export const REACT_FLOW_CONFIG = {

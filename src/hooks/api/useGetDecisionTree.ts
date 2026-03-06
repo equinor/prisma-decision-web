@@ -4,7 +4,7 @@ import { Issue } from '../../validators';
 
 export const useGetDecisionTree = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
-		queryKey: ['decisionTree', projectId],
+		queryKey: ['decisionTree', 'full', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
 			const res = await apiClient.get<DecisionTree>(
 				`/structure/${projectId}/decision_tree/v2`,

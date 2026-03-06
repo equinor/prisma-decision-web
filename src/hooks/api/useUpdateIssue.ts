@@ -13,7 +13,6 @@ export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			onSuccess?.();
 		},
 	});

@@ -31,7 +31,6 @@ export const useDeleteIssue = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.refetchQueries({ queryKey: ['edges'] });
 		},
 	});

@@ -12,7 +12,6 @@ export const useUpdateIssues = () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 		},
 	});
 };
@@ -39,7 +38,6 @@ export const useUpdateIssuesOptimistic = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.invalidateQueries({ queryKey: ['solutionDecisionTree'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});
