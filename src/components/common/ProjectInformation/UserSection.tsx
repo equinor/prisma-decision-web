@@ -3,12 +3,12 @@ import { delete_to_trash, lock } from '@equinor/eds-icons';
 import { useEffect, useState } from 'react';
 import { useController } from 'react-hook-form';
 import { useGetUsers } from '../../../hooks/api/useGetUsers';
+import { useSearchUsers } from '../../../hooks/api/useSearchUsers';
 import { useProjectFormContext } from '../../../hooks/useProjectForm';
 import { ProjectRole, RoleType, roleTypes, User } from '../../../validators';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { apiClient } from '../../../api';
 
 type UserSectionProps = {
 	handleSubmit: () => void;
@@ -149,8 +149,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control } = useProjectFormContext();
 	const [searchTerm, setSearchTerm] = useState('');
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-	const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-	const [graphUsers, setGraphUsers] = useState<User[]>([]);
 	const { users } = useGetUsers();
 	const selectedProject = useSelectedProject();
 	const {
@@ -160,7 +158,11 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		name: 'users',
 		control: control,
 	});
-	const [selectedUsers, setSelectedUser] = useState<UserWithRole[]>(usersValue || []);
+	const selectedUsers = usersValue || [];
+	const { filteredUsers, graphUsers, hasActiveSearch } = useSearchUsers(
+		debouncedSearchTerm,
+		users,
+	);
 
 	// Debounce search term
 	useEffect(() => {
@@ -171,57 +173,25 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		return () => clearTimeout(timer);
 	}, [searchTerm]);
 
-	// Fetch users based on search term
-	useEffect(() => {
-		const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
-
-		if (hasActiveSearch) {
-			// Filter local users
-			const filtered = users.filter(user =>
-				user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-			);
-			setFilteredUsers(filtered);
-
-			// Fetch graph users
-			apiClient
-				.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`)
-				.then(res => {
-					setGraphUsers(res.data);
-				})
-				.catch(() => {
-					// Failed to load graph users, keep empty cache
-					setGraphUsers([]);
-				});
-		} else {
-			setFilteredUsers([]);
-			setGraphUsers([]);
-		}
-	}, [debouncedSearchTerm, users]);
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
-		// Remove from newly selected users
 		const updatedSelected = selectedUsers.filter(u => u.azure_id !== user.azure_id);
-		setSelectedUser(updatedSelected);
+		setUser(updatedSelected);
 	};
 
-	// Update role for a user (handles both new and existing team members)
+	// Update role for a user
 	const handleRoleAssignment = (user: UserWithRole, role: RoleType | undefined) => {
-		// Update newly selected users
-		setSelectedUser(
-			selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role } : u)),
-		);
+		setUser(selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role } : u)));
 	};
 
-	// Assign roles and persist newly selected users
+	// Persist selected users with roles
 	const handleRoleCreate = async () => {
 		if (selectedUsers.length > 0 && selectedProject) {
-			const userWithRole: ProjectRole[] = selectedUsers.map(user => {
-				return {
-					project_id: selectedProject.id,
-					role: user.role!,
-					...user,
-				};
-			});
+			const userWithRole: ProjectRole[] = selectedUsers.map(user => ({
+				...user,
+				role: user.role!,
+				project_id: selectedProject.id,
+			}));
 			setUser(userWithRole);
 			handleSubmit();
 		}
@@ -229,7 +199,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 
 	// Derived state
 	const existingAzureIds = new Set(users.map(u => u.azure_id));
-	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
 	const baseUsers = hasActiveSearch
 		? [...filteredUsers, ...graphUsers.filter(gu => !existingAzureIds.has(gu.azure_id))]
 		: users;
@@ -288,8 +257,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									onClick={() => {
 										setSearchTerm('');
 										setDebouncedSearchTerm('');
-										setFilteredUsers([]);
-										setGraphUsers([]);
 									}}
 								>
 									✕
@@ -312,7 +279,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									existingAzureIds={existingAzureIds}
 									selectedUsers={selectedUsers}
 									onAddUser={user => {
-										setSelectedUser([
+										setUser([
 											...selectedUsers,
 											{ ...user, id: crypto.randomUUID(), role: undefined },
 										]);
