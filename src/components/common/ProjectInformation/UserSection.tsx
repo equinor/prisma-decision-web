@@ -1,6 +1,6 @@
 import { Autocomplete, Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_to_trash, lock } from '@equinor/eds-icons';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useController } from 'react-hook-form';
 import { useGetUsers } from '../../../hooks/api/useGetUsers';
 import { useSearchUsers } from '../../../hooks/api/useSearchUsers';
@@ -9,6 +9,7 @@ import { ProjectRole, RoleType, roleTypes, User } from '../../../validators';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useDebounce } from '@uidotdev/usehooks';
 
 type UserSectionProps = {
 	handleSubmit: () => void;
@@ -148,7 +149,6 @@ const TeamMembersTable = ({
 export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control } = useProjectFormContext();
 	const [searchTerm, setSearchTerm] = useState('');
-	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 	const { users } = useGetUsers();
 	const selectedProject = useSelectedProject();
 	const {
@@ -159,19 +159,12 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 		control: control,
 	});
 	const selectedUsers = usersValue || [];
+	const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
 	const { filteredUsers, graphUsers, hasActiveSearch } = useSearchUsers(
 		debouncedSearchTerm,
 		users,
 	);
-
-	// Debounce search term
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebouncedSearchTerm(searchTerm);
-		}, 500);
-
-		return () => clearTimeout(timer);
-	}, [searchTerm]);
 
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
@@ -256,7 +249,6 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 									className='text-text-tertiary hover:text-text-primary absolute top-1/2 right-3 -translate-y-1/2 text-sm'
 									onClick={() => {
 										setSearchTerm('');
-										setDebouncedSearchTerm('');
 									}}
 								>
 									✕
