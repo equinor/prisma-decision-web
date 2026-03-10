@@ -35,7 +35,6 @@ export const useSearchUsers = (debouncedSearchTerm: string) => {
 			});
 			return combinedUsers;
 		},
-		enabled: debouncedSearchTerm.trim().length > 0,
 	});
 
 	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
