@@ -1,24 +1,39 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import { apiClient } from '../../api';
 import { User } from '../../validators';
 
-export const useSearchUsers = (debouncedSearchTerm: string, users: User[]) => {
-	// Filter local users
-	const filteredUsers = useMemo(() => {
-		if (!debouncedSearchTerm.trim()) return [];
-		return users.filter(user =>
-			user.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
-		);
-	}, [debouncedSearchTerm, users]);
-
+export const useSearchUsers = (debouncedSearchTerm: string) => {
 	// Fetch graph users
-	const { data: graphUsers = [] } = useQuery({
+	const { data: users = [] } = useQuery({
 		queryKey: ['graphUsers', debouncedSearchTerm],
 		queryFn: async () => {
 			if (!debouncedSearchTerm.trim()) return [];
-			const res = await apiClient.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`);
-			return res.data;
+			const [graphUsersResponse, prismaUsersResponse] = await Promise.all([
+				apiClient.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`),
+				apiClient.get<User[]>('/users'),
+			]);
+			const prismaUsers = prismaUsersResponse.data.map(({ user_id, name, azure_id }) => ({
+				user_id,
+				name,
+				azure_id,
+			}));
+
+			const graphUsers = graphUsersResponse.data.map(({ name, azure_id }) => ({
+				name,
+				azure_id,
+			}));
+
+			const combinedUsers = graphUsers.map(graphUser => {
+				const matchingPrismaUser = prismaUsers.find(
+					prismaUser => prismaUser.azure_id === graphUser.azure_id,
+				);
+				return {
+					...graphUser,
+					user_id: matchingPrismaUser ? matchingPrismaUser.user_id : null,
+					hasAccess: !!matchingPrismaUser,
+				};
+			});
+			return combinedUsers;
 		},
 		enabled: debouncedSearchTerm.trim().length > 0,
 	});
@@ -26,8 +41,7 @@ export const useSearchUsers = (debouncedSearchTerm: string, users: User[]) => {
 	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
 
 	return {
-		filteredUsers,
-		graphUsers,
+		users,
 		hasActiveSearch,
 	};
 };

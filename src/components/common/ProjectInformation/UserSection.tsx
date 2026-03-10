@@ -1,11 +1,10 @@
 import { Autocomplete, Button, Icon, Search, Table } from '@equinor/eds-core-react';
-import { delete_to_trash, lock } from '@equinor/eds-icons';
+import { check_circle_outlined, delete_to_trash, lock } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useController } from 'react-hook-form';
-import { useGetUsers } from '../../../hooks/api/useGetUsers';
 import { useSearchUsers } from '../../../hooks/api/useSearchUsers';
 import { useProjectFormContext } from '../../../hooks/useProjectForm';
-import { ProjectRole, RoleType, roleTypes, User } from '../../../validators';
+import { RoleType, roleTypes, User } from '../../../validators';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
@@ -14,26 +13,25 @@ import { useDebounce } from '@uidotdev/usehooks';
 type UserSectionProps = {
 	handleSubmit: () => void;
 };
+const LimitUserDisplay = 100; // Limit the number of users displayed to prevent performance issues
 
 type UserWithRole = User & { id: string; role?: RoleType };
 
 // All Users Table Component
 const AllUsersTable = ({
 	availableUsers,
-	existingAzureIds,
 	selectedUsers,
-	onAddUser,
+	handleCreateMemberRole,
 }: {
-	availableUsers: User[];
-	existingAzureIds: Set<string>;
+	availableUsers: (User & { hasAccess: boolean })[];
 	selectedUsers: UserWithRole[];
-	onAddUser: (user: User) => void;
+	handleCreateMemberRole: (user: UserWithRole) => void;
 }) => (
 	<Table className='w-full table-fixed'>
 		<Table.Head className='bg-background-default sticky top-0 z-10'>
 			<Table.Row>
-				<Table.Cell className=''>User Name</Table.Cell>
-				<Table.Cell className='w-19'>Action</Table.Cell>
+				<Table.Cell className='w-1/2'>User Name</Table.Cell>
+				<Table.Cell className='flex justify-end'>Action</Table.Cell>
 			</Table.Row>
 		</Table.Head>
 		<Table.Body>
@@ -49,11 +47,17 @@ const AllUsersTable = ({
 					<Table.Cell className='font-medium'>
 						<div className='flex items-center gap-2'>
 							{user.name}
-							{!existingAzureIds.has(user.azure_id) && (
+							{user.hasAccess ? (
+								<Icon
+									data={check_circle_outlined}
+									title='User has access'
+									className='text-text-success'
+								/>
+							) : (
 								<Icon
 									data={lock}
 									title='User does not have access'
-									className='text-ui-warning'
+									className='text-text-danger'
 								/>
 							)}
 						</div>
@@ -63,7 +67,13 @@ const AllUsersTable = ({
 							<Button
 								variant='outlined'
 								className='transition-all'
-								onClick={() => onAddUser(user)}
+								onClick={() =>
+									handleCreateMemberRole({
+										...user,
+										id: crypto.randomUUID(),
+										role: roleTypes[0],
+									})
+								}
 							>
 								Add
 							</Button>
@@ -79,13 +89,13 @@ const AllUsersTable = ({
 const TeamMembersTable = ({
 	selectedUsers,
 	errors,
-	onRoleChange,
+	handleRoleChange,
 	onDeleteUser,
 }: {
 	selectedUsers: UserWithRole[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	errors: Record<string, any> | undefined;
-	onRoleChange: (user: UserWithRole, role: RoleType | undefined) => void;
+	handleRoleChange: (user: UserWithRole, role: RoleType) => void;
 	onDeleteUser: (user: UserWithRole) => void;
 }) => (
 	<Table className='w-full table-fixed'>
@@ -101,7 +111,7 @@ const TeamMembersTable = ({
 				<Table.Row
 					key={user.azure_id}
 					className={`hover:bg-background-light transition-colors ${
-						errors?.users && !user.role ? 'bg-background-warning' : ''
+						errors?.users && !user.role ? 'bg-warning' : ''
 					}`}
 				>
 					<Table.Cell className='font-medium'>{user.name}</Table.Cell>
@@ -111,8 +121,12 @@ const TeamMembersTable = ({
 								options={roleTypes}
 								label=''
 								placeholder={'Search for roles'}
-								onOptionsChange={({ selectedItems }) => {
-									onRoleChange(user, selectedItems[0]);
+								onOptionsChange={({
+									selectedItems,
+								}: {
+									selectedItems: RoleType[];
+								}) => {
+									handleRoleChange(user, selectedItems[0]);
 								}}
 								selectedOptions={user.role ? [user.role] : []}
 							/>
@@ -145,7 +159,6 @@ const TeamMembersTable = ({
 export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const { control } = useProjectFormContext();
 	const [searchTerm, setSearchTerm] = useState('');
-	const { users } = useGetUsers();
 	const selectedProject = useSelectedProject();
 	const {
 		field: { value: usersValue, onChange: setUser },
@@ -157,159 +170,151 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const selectedUsers = usersValue || [];
 	const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-	const { filteredUsers, graphUsers, hasActiveSearch } = useSearchUsers(
-		debouncedSearchTerm,
-		users,
-	);
+	const { users, hasActiveSearch } = useSearchUsers(debouncedSearchTerm);
 
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
 		const updatedSelected = selectedUsers.filter(u => u.azure_id !== user.azure_id);
 		setUser(updatedSelected);
+		handleSubmit();
 	};
 
 	// Update role for a user
-	const handleRoleAssignment = (user: UserWithRole, role: RoleType | undefined) => {
-		setUser(selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role } : u)));
+	const handleRoleChange = (user: UserWithRole, role: RoleType) => {
+		setUser(selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role: role } : u)));
+		handleSubmit();
 	};
 
 	// Persist selected users with roles
-	const handleRoleCreate = async () => {
-		if (selectedUsers.length > 0 && selectedProject) {
-			const userWithRole: ProjectRole[] = selectedUsers.map(user => ({
-				...user,
-				role: user.role!,
-				project_id: selectedProject.id,
-			}));
-			setUser(userWithRole);
+	const handleCreateMemberRole = async (user: UserWithRole) => {
+		if (user.role && selectedProject) {
+			setUser([...usersValue, { ...user, project_id: selectedProject.id }]);
 			handleSubmit();
 		}
 	};
 
 	// Derived state
-	const existingAzureIds = new Set(users.map(u => u.azure_id));
+	const teamMembersAzureIds = new Set(usersValue.map(u => u.azure_id));
 	const baseUsers = hasActiveSearch
-		? [...filteredUsers, ...graphUsers.filter(gu => !existingAzureIds.has(gu.azure_id))]
+		? [...users.filter(gu => !teamMembersAzureIds.has(gu.azure_id))]
 		: users;
+	const availableUsers = baseUsers
+		.filter(
+			user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
+		)
+		.slice(0, LimitUserDisplay);
 
-	const availableUsers = baseUsers.filter(
-		user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
-	);
-
-	const totalUsersCount = baseUsers.length;
-	const visibleUsersCount = availableUsers.length;
-	const countLabel = hasActiveSearch
-		? `${visibleUsersCount} of ${totalUsersCount} users`
-		: `${visibleUsersCount} users`;
-	const showEmptySearch = hasActiveSearch && availableUsers.length === 0;
-	const showIdleEmpty = !hasActiveSearch && availableUsers.length === 0;
-	const teamCountLabel = selectedUsers.length > 0 ? `${selectedUsers.length} members` : '';
+	const availableUsersCount = availableUsers.length;
+	const teamMembersCount = selectedUsers.length;
+	const showEmptySearch = hasActiveSearch && availableUsersCount === 0;
+	const showIdleEmpty = !hasActiveSearch && availableUsersCount === 0;
 
 	return (
-		<div className='flex flex-col gap-2'>
-			<div className=''>
-				<h2 className='text-2xl font-semibold'>Users</h2>
+		<div className='flex flex-col gap-4'>
+			<div className='space-y-2'>
+				<h2 className='text-2xl font-semibold'>Roles</h2>
 				<p className='text-text-tertiary'>
 					Manage users that have access to the project and their roles
 				</p>
 			</div>
-			<div className='grid gap-4 2xl:grid-cols-[600px_1fr]'>
-				<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
-					<div className='flex items-center justify-between'>
-						<div>
-							<h3 className='text-lg font-semibold'>Add Users</h3>
-							<p className='text-text-tertiary text-sm'>
-								Search and add users to the project
-							</p>
-						</div>
-						<span className='text-text-tertiary text-sm'>{countLabel}</span>
-					</div>
-					<Search
-						placeholder='Search users within equinor...'
-						value={searchTerm}
-						onChange={e => {
-							const nextSearch = e.target.value;
-							setSearchTerm(nextSearch);
-							// Filtering will happen after debounce completes
-						}}
-						aria-label='Search users'
-					/>
-
-					<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-						{showEmptySearch ? (
-							<div className='text-text-tertiary p-6 text-center text-sm'>
-								No users found. Try a different search.
+			<div className='w-full overflow-x-auto'>
+				<div className='grid min-w-[980px] grid-cols-[600px_minmax(560px,1fr)] gap-4'>
+					<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
+						<div className='flex items-center justify-between'>
+							<div>
+								<div className='flex gap-2'>
+									<h2 className='text-2xl font-semibold'>All Users</h2>
+									<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+										{availableUsersCount}
+									</span>
+								</div>
+								<p className='text-text-tertiary text-sm'>
+									Search and add users to the project
+								</p>
 							</div>
-						) : showIdleEmpty ? (
-							<div className='text-text-tertiary p-6 text-center text-sm'>
-								Search to add users from your tenant.
+						</div>
+						<div className='relative'>
+							<Search
+								placeholder='Search users within equinor...'
+								value={searchTerm}
+								onChange={e => {
+									const nextSearch = e.target.value;
+									setSearchTerm(nextSearch);
+									// Filtering will happen after debounce completes
+								}}
+								aria-label='Search users'
+							/>
+						</div>
+
+						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
+							{showEmptySearch ? (
+								<div className='text-text-tertiary p-6 text-center text-sm'>
+									No users found. Try a different search.
+								</div>
+							) : showIdleEmpty ? (
+								<div className='text-text-tertiary p-6 text-center text-sm'>
+									Search to add users from your tenant.
+								</div>
+							) : (
+								<AllUsersTable
+									availableUsers={availableUsers}
+									selectedUsers={selectedUsers}
+									handleCreateMemberRole={handleCreateMemberRole}
+								/>
+							)}
+						</div>
+					</div>
+					<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
+						<div className='flex items-center justify-between'>
+							<div>
+								<div className='flex gap-2'>
+									<h2 className='text-2xl font-semibold'>Team members</h2>
+									<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+										{teamMembersCount}
+									</span>
+								</div>
+								<p className='text-text-tertiary text-sm'>
+									Assign roles to team members
+								</p>
+							</div>
+						</div>
+
+						{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (
+							<div className='flex min-h-0 flex-1 flex-col gap-3'>
+								<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
+									<TeamMembersTable
+										selectedUsers={selectedUsers}
+										errors={errors}
+										handleRoleChange={handleRoleChange}
+										onDeleteUser={handleDeleteUser}
+									/>
+								</div>
 							</div>
 						) : (
-							<AllUsersTable
-								availableUsers={availableUsers}
-								existingAzureIds={existingAzureIds}
-								selectedUsers={selectedUsers}
-								onAddUser={user => {
-									setUser([
-										...selectedUsers,
-										{ ...user, id: crypto.randomUUID(), role: undefined },
-									]);
-								}}
-							/>
-						)}
-					</div>
-				</div>
-				<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
-					<div className='flex items-center justify-between'>
-						<div>
-							<h3 className='text-lg font-semibold'>Team members</h3>
-							<p className='text-text-tertiary text-sm'>
-								Assign roles to team members
-							</p>
-						</div>
-						{teamCountLabel && (
-							<span className='text-text-tertiary text-sm'>{teamCountLabel}</span>
-						)}
-					</div>
-
-					{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (
-						<div className='flex min-h-0 flex-1 flex-col gap-3'>
 							<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-								<TeamMembersTable
-									selectedUsers={selectedUsers}
-									errors={errors}
-									onRoleChange={handleRoleAssignment}
-									onDeleteUser={handleDeleteUser}
-								/>
+								<Table className='w-full table-fixed'>
+									<Table.Head className='bg-background-default sticky top-0 z-10'>
+										<Table.Row>
+											<Table.Cell className='w-1/2'>User Name</Table.Cell>
+											<Table.Cell className='w-1/2'>Role</Table.Cell>
+											<Table.Cell className='w-20'> Action</Table.Cell>
+										</Table.Row>
+									</Table.Head>
+									<Table.Body>
+										<Table.Row>
+											<Table.Cell
+												className='text-text-tertiary py-6 text-center text-sm'
+												colSpan={3}
+											>
+												No team members yet. Add users from the left to get
+												started.
+											</Table.Cell>
+										</Table.Row>
+									</Table.Body>
+								</Table>
 							</div>
-							<div className='flex justify-end'>
-								<Button onClick={() => handleRoleCreate()}>Assign roles</Button>
-							</div>
-						</div>
-					) : (
-						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-							<Table className='w-full table-fixed'>
-								<Table.Head className='bg-background-default sticky top-0 z-10'>
-									<Table.Row>
-										<Table.Cell className='w-1/2'>User Name</Table.Cell>
-										<Table.Cell className='w-1/2'>Role</Table.Cell>
-										<Table.Cell className='w-20'> Action</Table.Cell>
-									</Table.Row>
-								</Table.Head>
-								<Table.Body>
-									<Table.Row>
-										<Table.Cell
-											className='text-text-tertiary py-6 text-center text-sm'
-											colSpan={3}
-										>
-											No team members yet. Add users from the left to get
-											started.
-										</Table.Cell>
-									</Table.Row>
-								</Table.Body>
-							</Table>
-						</div>
-					)}
+						)}
+					</div>
 				</div>
 			</div>
 		</div>
