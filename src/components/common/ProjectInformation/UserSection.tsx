@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Icon, Table } from '@equinor/eds-core-react';
+import { Autocomplete, Button, Icon, Search, Table } from '@equinor/eds-core-react';
 import { delete_to_trash, lock } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useController } from 'react-hook-form';
@@ -32,8 +32,8 @@ const AllUsersTable = ({
 	<Table className='w-full table-fixed'>
 		<Table.Head className='bg-background-default sticky top-0 z-10'>
 			<Table.Row>
-				<Table.Cell className='w-1/2'>User Name</Table.Cell>
-				<Table.Cell className='flex justify-end'>Action</Table.Cell>
+				<Table.Cell className=''>User Name</Table.Cell>
+				<Table.Cell className='w-19'>Action</Table.Cell>
 			</Table.Row>
 		</Table.Head>
 		<Table.Body>
@@ -101,7 +101,7 @@ const TeamMembersTable = ({
 				<Table.Row
 					key={user.azure_id}
 					className={`hover:bg-background-light transition-colors ${
-						errors?.users && !user.role ? 'bg-red-50' : ''
+						errors?.users && !user.role ? 'bg-background-warning' : ''
 					}`}
 				>
 					<Table.Cell className='font-medium'>{user.name}</Table.Cell>
@@ -109,13 +109,9 @@ const TeamMembersTable = ({
 						<div>
 							<Autocomplete
 								options={roleTypes}
-								label='Assign Role'
+								label=''
 								placeholder={'Search for roles'}
-								onOptionsChange={({
-									selectedItems,
-								}: {
-									selectedItems: RoleType[];
-								}) => {
+								onOptionsChange={({ selectedItems }) => {
 									onRoleChange(user, selectedItems[0]);
 								}}
 								selectedOptions={user.role ? [user.role] : []}
@@ -210,128 +206,110 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const teamCountLabel = selectedUsers.length > 0 ? `${selectedUsers.length} members` : '';
 
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='space-y-2'>
-				<h2 className='text-2xl font-semibold'>Roles</h2>
+		<div className='flex flex-col gap-2'>
+			<div className=''>
+				<h2 className='text-2xl font-semibold'>Users</h2>
 				<p className='text-text-tertiary'>
 					Manage users that have access to the project and their roles
 				</p>
 			</div>
-			<div className='w-full overflow-x-auto'>
-				<div className='grid min-w-[980px] grid-cols-[600px_minmax(560px,1fr)] gap-4'>
-					<div className='border-background-medium flex h-[36rem] flex-col gap-4 rounded-lg border p-4 shadow-sm'>
-						<div className='flex items-center justify-between'>
-							<div>
-								<h3 className='mb-1 text-lg font-semibold'>All Users</h3>
-								<p className='text-text-tertiary text-sm'>
-									Search and add users to the project
-								</p>
-							</div>
-							<span className='text-text-tertiary text-sm'>{countLabel}</span>
+			<div className='grid gap-4 2xl:grid-cols-[600px_1fr]'>
+				<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
+					<div className='flex items-center justify-between'>
+						<div>
+							<h3 className='text-lg font-semibold'>Add Users</h3>
+							<p className='text-text-tertiary text-sm'>
+								Search and add users to the project
+							</p>
 						</div>
-						<div className='relative'>
-							<input
-								type='text'
-								placeholder='Search users within equinor...'
-								value={searchTerm}
-								className='border-background-medium bg-background-default focus:ring-primary-resting focus:border-primary-resting w-full rounded-md border px-3 py-2 pr-10 text-sm transition-all focus:ring-2 focus:outline-none'
-								onChange={e => {
-									const nextSearch = e.target.value;
-									setSearchTerm(nextSearch);
-									// Filtering will happen after debounce completes
-								}}
-								aria-label='Search users'
-							/>
-
-							{searchTerm && (
-								<button
-									type='button'
-									className='text-text-tertiary hover:text-text-primary absolute top-1/2 right-3 -translate-y-1/2 text-sm'
-									onClick={() => {
-										setSearchTerm('');
-									}}
-								>
-									✕
-								</button>
-							)}
-						</div>
-
-						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-							{showEmptySearch ? (
-								<div className='text-text-tertiary p-6 text-center text-sm'>
-									No users found. Try a different search.
-								</div>
-							) : showIdleEmpty ? (
-								<div className='text-text-tertiary p-6 text-center text-sm'>
-									Search to add users from your tenant.
-								</div>
-							) : (
-								<AllUsersTable
-									availableUsers={availableUsers}
-									existingAzureIds={existingAzureIds}
-									selectedUsers={selectedUsers}
-									onAddUser={user => {
-										setUser([
-											...selectedUsers,
-											{ ...user, id: crypto.randomUUID(), role: undefined },
-										]);
-									}}
-								/>
-							)}
-						</div>
+						<span className='text-text-tertiary text-sm'>{countLabel}</span>
 					</div>
-					<div className='border-background-medium flex h-[36rem] flex-col gap-4 rounded-lg border p-4 shadow-sm'>
-						<div className='flex items-center justify-between'>
-							<div>
-								<h3 className='mb-1 text-lg font-semibold'>Team members</h3>
-								<p className='text-text-tertiary text-sm'>
-									Assign roles to team members
-								</p>
-							</div>
-							{teamCountLabel && (
-								<span className='text-text-tertiary text-sm'>{teamCountLabel}</span>
-							)}
-						</div>
+					<Search
+						placeholder='Search users within equinor...'
+						value={searchTerm}
+						onChange={e => {
+							const nextSearch = e.target.value;
+							setSearchTerm(nextSearch);
+							// Filtering will happen after debounce completes
+						}}
+						aria-label='Search users'
+					/>
 
-						{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (
-							<div className='flex min-h-0 flex-1 flex-col gap-3'>
-								<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-									<TeamMembersTable
-										selectedUsers={selectedUsers}
-										errors={errors}
-										onRoleChange={handleRoleAssignment}
-										onDeleteUser={handleDeleteUser}
-									/>
-								</div>
-								<div className='flex justify-end'>
-									<Button onClick={() => handleRoleCreate()}>Assign roles</Button>
-								</div>
+					<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
+						{showEmptySearch ? (
+							<div className='text-text-tertiary p-6 text-center text-sm'>
+								No users found. Try a different search.
+							</div>
+						) : showIdleEmpty ? (
+							<div className='text-text-tertiary p-6 text-center text-sm'>
+								Search to add users from your tenant.
 							</div>
 						) : (
-							<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
-								<Table className='w-full table-fixed'>
-									<Table.Head className='bg-background-default sticky top-0 z-10'>
-										<Table.Row>
-											<Table.Cell className='w-1/2'>User Name</Table.Cell>
-											<Table.Cell className='w-1/2'>Role</Table.Cell>
-											<Table.Cell className='w-20'> Action</Table.Cell>
-										</Table.Row>
-									</Table.Head>
-									<Table.Body>
-										<Table.Row>
-											<Table.Cell
-												className='text-text-tertiary py-6 text-center text-sm'
-												colSpan={3}
-											>
-												No team members yet. Add users from the left to get
-												started.
-											</Table.Cell>
-										</Table.Row>
-									</Table.Body>
-								</Table>
-							</div>
+							<AllUsersTable
+								availableUsers={availableUsers}
+								existingAzureIds={existingAzureIds}
+								selectedUsers={selectedUsers}
+								onAddUser={user => {
+									setUser([
+										...selectedUsers,
+										{ ...user, id: crypto.randomUUID(), role: undefined },
+									]);
+								}}
+							/>
 						)}
 					</div>
+				</div>
+				<div className='border-background-medium flex h-144 flex-col gap-4 rounded-lg border p-4 shadow-sm'>
+					<div className='flex items-center justify-between'>
+						<div>
+							<h3 className='text-lg font-semibold'>Team members</h3>
+							<p className='text-text-tertiary text-sm'>
+								Assign roles to team members
+							</p>
+						</div>
+						{teamCountLabel && (
+							<span className='text-text-tertiary text-sm'>{teamCountLabel}</span>
+						)}
+					</div>
+
+					{selectedUsers.length > 0 || (usersValue && usersValue.length > 0) ? (
+						<div className='flex min-h-0 flex-1 flex-col gap-3'>
+							<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
+								<TeamMembersTable
+									selectedUsers={selectedUsers}
+									errors={errors}
+									onRoleChange={handleRoleAssignment}
+									onDeleteUser={handleDeleteUser}
+								/>
+							</div>
+							<div className='flex justify-end'>
+								<Button onClick={() => handleRoleCreate()}>Assign roles</Button>
+							</div>
+						</div>
+					) : (
+						<div className='border-background-medium min-h-0 flex-1 overflow-y-auto rounded-md border'>
+							<Table className='w-full table-fixed'>
+								<Table.Head className='bg-background-default sticky top-0 z-10'>
+									<Table.Row>
+										<Table.Cell className='w-1/2'>User Name</Table.Cell>
+										<Table.Cell className='w-1/2'>Role</Table.Cell>
+										<Table.Cell className='w-20'> Action</Table.Cell>
+									</Table.Row>
+								</Table.Head>
+								<Table.Body>
+									<Table.Row>
+										<Table.Cell
+											className='text-text-tertiary py-6 text-center text-sm'
+											colSpan={3}
+										>
+											No team members yet. Add users from the left to get
+											started.
+										</Table.Cell>
+									</Table.Row>
+								</Table.Body>
+							</Table>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
