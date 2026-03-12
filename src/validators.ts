@@ -24,13 +24,12 @@ export const objectiveSchema = z.object({
 });
 
 export const userSchema = z.object({
-	user_id: int(),
-	user_name: z.string(),
+	user_id: int().nullable(),
+	name: z.string(),
 	azure_id: uuid(),
 });
 
-export const projectRoleSchema = z.object({
-	...userSchema.shape,
+export const projectRoleSchema = userSchema.extend({
 	id: uuid(),
 	project_id: uuid(),
 	role: z.enum(roleTypes, { error: 'Role is required' }),
