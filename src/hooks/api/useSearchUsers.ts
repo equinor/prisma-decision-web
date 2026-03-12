@@ -3,28 +3,15 @@ import { apiClient } from '../../api';
 import { User } from '../../validators';
 
 export const useSearchUsers = (debouncedSearchTerm: string) => {
-	// Fetch graph users
 	const { data: users = [] } = useQuery({
 		queryKey: ['graphUsers', debouncedSearchTerm],
 		queryFn: async () => {
-			if (!debouncedSearchTerm.trim()) return [];
 			const [graphUsersResponse, prismaUsersResponse] = await Promise.all([
 				apiClient.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`),
 				apiClient.get<User[]>('/users'),
 			]);
-			const prismaUsers = prismaUsersResponse.data.map(({ user_id, name, azure_id }) => ({
-				user_id,
-				name,
-				azure_id,
-			}));
-
-			const graphUsers = graphUsersResponse.data.map(({ name, azure_id }) => ({
-				name,
-				azure_id,
-			}));
-
-			const combinedUsers = graphUsers.map(graphUser => {
-				const matchingPrismaUser = prismaUsers.find(
+			const combinedUsers = graphUsersResponse.data.map(graphUser => {
+				const matchingPrismaUser = prismaUsersResponse.data.find(
 					prismaUser => prismaUser.azure_id === graphUser.azure_id,
 				);
 				return {
@@ -35,6 +22,7 @@ export const useSearchUsers = (debouncedSearchTerm: string) => {
 			});
 			return combinedUsers;
 		},
+		enabled: !!debouncedSearchTerm.trim(),
 	});
 
 	const hasActiveSearch = debouncedSearchTerm.trim().length > 0;
