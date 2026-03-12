@@ -13,7 +13,6 @@ import { useDebounce } from '@uidotdev/usehooks';
 type UserSectionProps = {
 	handleSubmit: () => void;
 };
-const LimitUserDisplay = 100; // Limit the number of users displayed to prevent performance issues
 
 type UserWithRole = User & { id: string; role?: RoleType };
 
@@ -198,11 +197,9 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const baseUsers = hasActiveSearch
 		? [...users.filter(gu => !teamMembersAzureIds.has(gu.azure_id))]
 		: users;
-	const availableUsers = baseUsers
-		.filter(
-			user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
-		)
-		.slice(0, LimitUserDisplay);
+	const availableUsers = baseUsers.filter(
+		user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
+	);
 
 	const availableUsersCount = availableUsers.length;
 	const teamMembersCount = selectedUsers.length;
