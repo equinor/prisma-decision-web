@@ -19,7 +19,6 @@ export const useCreateEdge = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _newEdge, context) => {
 			if (context?.previousEdges) {

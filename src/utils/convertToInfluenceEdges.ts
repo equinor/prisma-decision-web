@@ -1,21 +1,30 @@
 import { Node } from '@xyflow/react';
 import { Edge } from '../validators';
-import { calculateBestHandles } from './calculateBestHandles';
+
+export type InfluenceEdgeRoute = {
+	path: string;
+	labelX: number;
+	labelY: number;
+};
+
+export type InfluenceEdgeData = {
+	hovered?: boolean;
+	route?: InfluenceEdgeRoute;
+};
 
 export const convertToInfluenceEdges = (edges: Edge[], nodes: Node[]) => {
-	return edges.map(edge => {
+	return edges.flatMap(edge => {
 		const sourceNode = nodes.find(node => node.id === edge.tail_id);
 		const targetNode = nodes.find(node => node.id === edge.head_id);
+		if (!sourceNode || !targetNode) return [];
 
-		const { sourceHandle, targetHandle } = calculateBestHandles(sourceNode!, targetNode!);
-
-		return {
-			...edge,
-			id: edge.id,
-			source: edge.tail_id,
-			target: edge.head_id,
-			sourceHandle,
-			targetHandle,
-		};
+		return [
+			{
+				...edge,
+				id: edge.id,
+				source: edge.tail_id,
+				target: edge.head_id,
+			},
+		];
 	});
 };
