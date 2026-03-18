@@ -1,25 +1,25 @@
 import {
 	Connection,
+	EdgeMouseHandler,
 	Edge as FlowEdge,
 	IsValidConnection,
 	NodeChange,
 	OnConnect,
 	OnReconnect,
-	EdgeMouseHandler,
 	useEdgesState,
 	useNodesState,
 } from '@xyflow/react';
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
-import { useUpdateInfluenceNodesOptimistic } from '../../../hooks/api/useUpdateInfluenceNodes';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 import { useSelectedProjectInfluenceNodes } from '../../../hooks/useSelectedProjectInfluenceNodes';
-import { ReactFlowInfluenceNode } from '../../../types';
-import { convertNodeToInfluenceNode } from '../../../utils/convertNodeToInfluenceNode';
-import { convertToInfluenceEdges } from '../../../utils/convertToInfluenceEdges';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { ReactFlowInfluenceNode } from '../../../types';
+import { convertToInfluenceEdges, InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
+import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
+import { Edge } from '../../../validators';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
@@ -41,22 +41,36 @@ export const useInfluenceDiagram = () => {
 	}, [nodes, filteredIssues]);
 	const edges = useSelectedProjectEdges();
 	const selectedProject = useSelectedProject();
-	const { mutate: updateNodes } = useUpdateInfluenceNodesOptimistic();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const [localNodes, setLocalNodes, onLocalNodesChange] = useNodesState(
 		[] as ReactFlowInfluenceNode[],
 	);
-	const [localEdges, setEdges, onEdgesChange] = useEdgesState([] as FlowEdge[]);
+	const [localEdges, setEdges, onEdgesChange] = useEdgesState(
+		[] as FlowEdge<InfluenceEdgeData>[],
+	);
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
-	useEffect(() => {
-		setLocalNodes(filteredNodes);
-	}, [filteredNodes]);
+	const runLayout = async (nodesToLayout: ReactFlowInfluenceNode[], edgesToLayout: Edge[]) => {
+		const nextEdges = convertToInfluenceEdges(edgesToLayout, nodesToLayout);
+		if (nodesToLayout.length < 2) {
+			setLocalNodes(nodesToLayout);
+			setEdges(nextEdges);
+			return;
+		}
+
+		const { nodes: layoutedNodes, edges: layoutedEdges } = await getInfluenceDiagramLayout(
+			nodesToLayout,
+			nextEdges,
+		);
+
+		setLocalNodes(layoutedNodes);
+		setEdges(layoutedEdges);
+	};
 
 	useEffect(() => {
-		setEdges(convertToInfluenceEdges(edges, filteredNodes));
-	}, [edges, filteredNodes]);
+		runLayout(filteredNodes, edges);
+	}, [filteredNodes, edges]);
 
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
 		const sourceNode = localNodes.find(node => node.id === sourceId);
@@ -69,31 +83,36 @@ export const useInfluenceDiagram = () => {
 	const onConnect: OnConnect = params => {
 		if (sourceAndTargetAreUtility(params.source, params.target)) return;
 		if (!selectedProject) return;
-		createEdge({
+		const newEdge = {
 			head_id: params.target,
 			tail_id: params.source,
 			project_id: selectedProject.id,
 			id: crypto.randomUUID(),
-		});
+		};
+
+		createEdge(newEdge);
+		runLayout(localNodes, [...edges, newEdge]);
 	};
 
 	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
 		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
 		if (!selectedProject) return;
-		updateEdge({
+		const updatedEdge = {
 			id: oldEdge.id,
 			tail_id: newConnection.source,
 			head_id: newConnection.target,
 			project_id: selectedProject.id,
-		});
+		};
+
+		updateEdge(updatedEdge);
+		runLayout(
+			localNodes,
+			edges.map(edge => (edge.id === oldEdge.id ? updatedEdge : edge)),
+		);
 	};
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
 		draggingEdge.current = edge;
-	};
-
-	const onNodeDragStop = async () => {
-		await updateNodes(convertNodeToInfluenceNode(localNodes));
 	};
 
 	const onClickSelectionMode = () => {
@@ -136,8 +155,6 @@ export const useInfluenceDiagram = () => {
 
 	const onNodesChange = (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
 		onLocalNodesChange(changes);
-		const updatedEdges = convertToInfluenceEdges(edges, localNodes);
-		setEdges(updatedEdges);
 	};
 
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {
@@ -157,7 +174,6 @@ export const useInfluenceDiagram = () => {
 		onConnect,
 		onReconnect,
 		onReconnectStart,
-		onNodeDragStop,
 		onNodesChange,
 		onEdgesChange,
 		isValidConnection,
