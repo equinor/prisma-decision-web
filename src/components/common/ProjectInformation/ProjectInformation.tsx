@@ -56,6 +56,7 @@ export const ProjectInformation = () => {
 						</div>
 						<Switch
 							label='Make Project Public'
+							className='w-max!'
 							{...register('public')}
 							onChange={() => handleSubmit()}
 						/>
