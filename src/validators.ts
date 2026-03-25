@@ -1,4 +1,4 @@
-import { int, uuid, z } from 'zod/v4';
+import { uuid, z } from 'zod/v4';
 import { parseISO } from 'date-fns';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
