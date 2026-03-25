@@ -1,5 +1,13 @@
-import { useMemo } from 'react';
-import { Table } from '@equinor/eds-core-react';
+import { useMemo, useRef, useState } from 'react';
+import {
+	Button,
+	CircularProgress,
+	Icon,
+	Popover,
+	Table,
+	TextField,
+	Tooltip as EdsTooltip,
+} from '@equinor/eds-core-react';
 import {
 	CartesianGrid,
 	Legend,
@@ -14,8 +22,15 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts';
-import { DEFAULT_EVALUATION_METRICS, useEvaluations } from '../../../hooks/useEvaluations';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { add, close } from '@equinor/eds-icons';
+import { useAssessmentForm } from '../../../hooks/useAssessmentForm';
+import { ErrorMessage } from '@hookform/error-message';
+import { FormErrorMessage } from '../../common/FormErrorMessage';
+import { SpiderAssessmentForm } from './SpiderAssessmentForm';
+import { evaluationMetrics, SpiderAssessment } from '../../../validators';
+import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
+import { useGetSpiderAssessments } from '../../../hooks/api/useGetSpiderAssessments';
 
 const METRIC_LINE_COLORS: Record<string, string> = {
 	value: 'rgba(var(--eds_primary_resting), 1)',
@@ -26,19 +41,42 @@ const METRIC_LINE_COLORS: Record<string, string> = {
 };
 
 export const Assessments = () => {
-	const { evaluations } = useEvaluations();
+	const { spiderAssessments } = useGetSpiderAssessments();
+	const { assessments } = useGetAssessments();
 	const selectedProject = useSelectedProject();
 
+	const assessmentNameById = useMemo(
+		() => new Map(assessments.map(a => [a.id, a.name])),
+		[assessments],
+	);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		isPending,
+	} = useAssessmentForm({
+		onSuccess: data => {
+			setIsOpen(false);
+			setActiveAssessment({ id: data.id, name: data.name });
+		},
+	});
+	const [isOpen, setIsOpen] = useState(false);
+	const [activeAssessment, setActiveAssessment] = useState<{
+		id: string;
+		name: string;
+	} | null>(null);
+
+	const referenceElement = useRef<HTMLButtonElement>(null);
 	const sortedEvaluations = useMemo(
 		() =>
-			[...evaluations].sort(
-				(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+			[...spiderAssessments].sort(
+				(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 			),
-		[evaluations],
+		[spiderAssessments],
 	);
 
 	const toChartData = (metrics: Record<string, number>) =>
-		DEFAULT_EVALUATION_METRICS.map(m => ({
+		evaluationMetrics.map(m => ({
 			metric: m.label,
 			score: metrics[m.key],
 			fullMark: 10,
@@ -46,92 +84,177 @@ export const Assessments = () => {
 
 	const metricTrendData = useMemo(
 		() =>
-			sortedEvaluations.map(ev => {
-				const values = DEFAULT_EVALUATION_METRICS.reduce<Record<string, number>>(
-					(acc, metric) => {
-						acc[metric.key] = ev.metrics[metric.key] ?? 0;
-						return acc;
-					},
-					{},
-				);
+			sortedEvaluations.map((ev, i) => {
+				const values = evaluationMetrics.reduce<Record<string, number>>((acc, metric) => {
+					acc[metric.key] = (ev[metric.key as keyof SpiderAssessment] as number) ?? 0;
+					return acc;
+				}, {});
 
 				return {
-					evaluation: ev.name,
+					evaluation: ev.created_at
+						? new Date(ev.created_at).toLocaleDateString(undefined, {
+								month: 'short',
+								day: 'numeric',
+							})
+						: `#${i + 1}`,
 					...values,
 				};
 			}),
 		[sortedEvaluations],
 	);
 
-	const hasEvaluations = evaluations.length > 0;
+	const hasEvaluations = spiderAssessments.length > 0;
 	if (!selectedProject) return;
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex items-center justify-between'>
+		<div className='flex flex-col gap-6'>
+			<div className='flex w-full items-center justify-between'>
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
+				<EdsTooltip
+					title={activeAssessment ? 'Complete or close the active assessment first' : ''}
+				>
+					<Button
+						ref={referenceElement}
+						variant='outlined'
+						disabled={!!activeAssessment}
+						onClick={() => setIsOpen(prev => !prev)}
+					>
+						<Icon data={add} />
+						Create Assessment
+					</Button>
+				</EdsTooltip>
 			</div>
-			<div className='grid grid-cols-1 gap-6 2xl:grid-cols-2'>
-				{hasEvaluations ? (
-					<>
-						<div className='bg-background-default shadow-tile rounded-sm p-4 2xl:col-span-2'>
-							<div className='mb-3 font-semibold'>Metric trends over evaluations</div>
-							<div className='h-80'>
-								<ResponsiveContainer
-									width='100%'
-									height='100%'
-									className='[&_.recharts-cartesian-axis-tick-value]:fill-text-default
-								[&_.recharts-default-legend]:text-text-default
-								[&_.recharts-cartesian-axis-tick-value]:font-medium
-								[&_.recharts-surface]:outline-0!'
-								>
-									<LineChart
-										data={metricTrendData}
-										margin={{ left: 12, right: 12, top: 8, bottom: 8 }}
-									>
-										<CartesianGrid
-											className='stroke-gray-500/30'
-											vertical={false}
-										/>
-										<XAxis
-											dataKey='evaluation'
-											tickLine={false}
-											axisLine={false}
-											tickMargin={8}
-										/>
-										<YAxis domain={[0, 10]} tickLine={false} axisLine={false} />
-										<Tooltip cursor={false} />
-										<Legend />
-										{DEFAULT_EVALUATION_METRICS.map(metric => (
-											<Line
-												key={metric.key}
-												type='monotone'
-												dataKey={metric.key}
-												name={metric.label}
-												stroke={
-													METRIC_LINE_COLORS[metric.key] ??
-													'rgba(var(--eds_primary_resting), 1)'
-												}
-												strokeWidth={3}
-												dot={false}
-												isAnimationActive={false}
-											/>
-										))}
-									</LineChart>
-								</ResponsiveContainer>
-							</div>
+
+			<Popover
+				open={isOpen}
+				onClose={() => setIsOpen(false)}
+				anchorEl={referenceElement.current}
+			>
+				<Popover.Content className='relative w-[min(520px,90vw)]'>
+					<form className='grid w-full grid-cols-1 gap-4' onSubmit={handleSubmit}>
+						<div className='w-full pr-16'>
+							<h2 className='text-xl font-semibold'>Create Assessment</h2>
+							<p className='text-text-tertiary text-sm'>
+								Add an assessment to evaluate your project decisions over time.
+							</p>
 						</div>
-						{evaluations.map(ev => (
-							<div
-								key={ev.id}
-								className='bg-background-default shadow-tile grid w-full
-                            grid-cols-2 items-start gap-2 rounded-sm p-4'
+						<Button
+							variant='ghost_icon'
+							className='absolute! top-2 right-2'
+							onClick={e => {
+								e.stopPropagation();
+								setIsOpen(false);
+							}}
+						>
+							<Icon data={close} />
+						</Button>
+						<div>
+							<TextField
+								label='Name'
+								placeholder='Enter assessment name...'
+								{...register('name')}
+							/>
+							<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
+						</div>
+						<div className='flex justify-end'>
+							<Button type='submit' disabled={isPending}>
+								{isPending ? <CircularProgress size={16} /> : 'Add Assessment'}
+							</Button>
+						</div>
+					</form>
+				</Popover.Content>
+			</Popover>
+			{hasEvaluations && (
+				<section className='bg-background-default shadow-tile rounded-md p-5'>
+					<h2 className='mb-1 text-lg font-semibold'>Metric Trends</h2>
+					<p className='text-text-tertiary mb-4 text-sm'>
+						How metrics have changed across evaluations.
+					</p>
+					<div className='h-72'>
+						<ResponsiveContainer
+							width='100%'
+							height='100%'
+							className='[&_.recharts-cartesian-axis-tick-value]:fill-text-default
+							[&_.recharts-default-legend]:text-text-default
+							[&_.recharts-cartesian-axis-tick-value]:text-xs
+							[&_.recharts-cartesian-axis-tick-value]:font-medium
+							[&_.recharts-surface]:outline-0!'
+						>
+							<LineChart
+								data={metricTrendData}
+								margin={{ left: 12, right: 12, top: 8, bottom: 8 }}
 							>
-								<div className='col-span-2'>
-									<div className='font-semibold'>{ev.name}</div>
-									<div className='text-text-tertiary text-sm'>
-										{new Date(ev.createdAt).toLocaleString()}
-									</div>
-								</div>
+								<CartesianGrid className='stroke-gray-500/30' vertical={false} />
+								<XAxis
+									dataKey='evaluation'
+									tickLine={false}
+									axisLine={false}
+									tickMargin={8}
+								/>
+								<YAxis domain={[0, 10]} tickLine={false} axisLine={false} />
+								<Tooltip cursor={false} />
+								<Legend />
+								{evaluationMetrics.map(metric => (
+									<Line
+										key={metric.key}
+										type='monotone'
+										dataKey={metric.key}
+										name={metric.label}
+										stroke={
+											METRIC_LINE_COLORS[metric.key] ??
+											'rgba(var(--eds_primary_resting), 1)'
+										}
+										strokeWidth={2}
+										dot={false}
+										isAnimationActive={false}
+									/>
+								))}
+							</LineChart>
+						</ResponsiveContainer>
+					</div>
+				</section>
+			)}
+
+			<div className='grid grid-cols-1 gap-6 2xl:grid-cols-2'>
+				{activeAssessment && (
+					<section className='bg-background-default shadow-tile rounded-md p-5'>
+						<SpiderAssessmentForm
+							assessmentId={activeAssessment.id}
+							assessmentName={activeAssessment.name}
+							onClose={() => setActiveAssessment(null)}
+						/>
+					</section>
+				)}
+
+				{sortedEvaluations.map(ev => {
+					const metrics = evaluationMetrics.reduce<Record<string, number>>((acc, m) => {
+						acc[m.key] = (ev[m.key as keyof SpiderAssessment] as number) ?? 0;
+						return acc;
+					}, {});
+					return (
+						<section
+							key={ev.id}
+							className='bg-background-default shadow-tile rounded-md p-5'
+						>
+							<div className='mb-4'>
+								<h3 className='text-lg font-semibold'>
+									{assessmentNameById.get(ev.assessment_id) ?? 'Evaluation'}
+								</h3>
+								{ev.created_at && (
+									<p className='text-text-tertiary text-sm'>
+										{new Date(ev.created_at).toLocaleDateString(undefined, {
+											year: 'numeric',
+											month: 'short',
+											day: 'numeric',
+										})}{' '}
+										&middot;{' '}
+										{new Date(ev.created_at).toLocaleTimeString(undefined, {
+											hour: '2-digit',
+											minute: '2-digit',
+										})}
+									</p>
+								)}
+							</div>
+							<div className='grid grid-cols-2 items-start gap-4'>
 								<div className='outline-background-medium rounded-sm outline-1'>
 									<Table className='w-full table-fixed'>
 										<Table.Head>
@@ -141,59 +264,71 @@ export const Assessments = () => {
 											</Table.Row>
 										</Table.Head>
 										<Table.Body>
-											{DEFAULT_EVALUATION_METRICS.map(m => (
+											{evaluationMetrics.map(m => (
 												<Table.Row key={m.key}>
 													<Table.Cell>{m.label}</Table.Cell>
 													<Table.Cell>
-														{ev.metrics[m.key] ?? '-'}
+														<span className='font-medium'>
+															{metrics[m.key] ?? '-'}
+														</span>
+														<span className='text-text-tertiary text-xs'>
+															{' '}
+															/ 10
+														</span>
 													</Table.Cell>
 												</Table.Row>
 											))}
 										</Table.Body>
 									</Table>
 								</div>
-								<ResponsiveContainer
-									width='100%'
-									height='100%'
-									className='[&_.recharts-polar-angle-axis-tick-value]:fill-text-default
-								[&_.recharts-polar-angle-axis-tick-value]:font-medium
-    							[&_.recharts-surface]:outline-0!'
-								>
-									<RadarChart data={toChartData(ev.metrics)}>
-										<PolarGrid
-											radialLines={false}
-											className='stroke-gray-500/50 stroke-2'
-										/>
-										<PolarAngleAxis dataKey='metric' />
-										<Tooltip
-											content={({ active, payload }) => {
-												if (active && payload && payload.length) {
-													return (
-														<div className='rounded-sm bg-black p-2 font-medium text-white'>{`${payload[0].value}/10`}</div>
-													);
-												}
-												return null;
-											}}
-											cursor={false}
-										/>
-										<Radar
-											className='stroke-primary-resting fill-primary-resting stroke-3'
-											name='Score'
-											dataKey='score'
-											fillOpacity={0.5}
-											isAnimationActive={false}
-										/>
-									</RadarChart>
-								</ResponsiveContainer>
+								<div className='h-52'>
+									<ResponsiveContainer
+										width='100%'
+										height='100%'
+										className='[&_.recharts-polar-angle-axis-tick-value]:fill-text-default
+									[&_.recharts-polar-angle-axis-tick-value]:text-xs
+									[&_.recharts-polar-angle-axis-tick-value]:font-medium
+									[&_.recharts-surface]:outline-0!'
+									>
+										<RadarChart data={toChartData(metrics)}>
+											<PolarGrid
+												radialLines={false}
+												className='stroke-gray-500/50 stroke-2'
+											/>
+											<PolarAngleAxis dataKey='metric' />
+											<Tooltip
+												content={({ active, payload }) => {
+													if (active && payload && payload.length) {
+														return (
+															<div className='rounded-sm bg-black p-2 text-sm font-medium text-white'>{`${payload[0].value}/10`}</div>
+														);
+													}
+													return null;
+												}}
+												cursor={false}
+											/>
+											<Radar
+												className='stroke-primary-resting fill-primary-resting stroke-3'
+												name='Score'
+												dataKey='score'
+												fillOpacity={0.5}
+												isAnimationActive={false}
+											/>
+										</RadarChart>
+									</ResponsiveContainer>
+								</div>
 							</div>
-						))}
-					</>
-				) : (
-					<p className='text-text-tertiary'>
-						No evaluations yet. Use the header button to start one.
-					</p>
-				)}
+						</section>
+					);
+				})}
 			</div>
+
+			{/* Empty state */}
+			{!hasEvaluations && (
+				<p className='text-text-tertiary text-center text-sm'>
+					No evaluations yet. Use the form above to submit your first evaluation.
+				</p>
+			)}
 		</div>
 	);
 };

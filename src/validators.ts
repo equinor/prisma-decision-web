@@ -168,10 +168,33 @@ export const projectImportSchema = z.object({
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
 });
+export const assessmentSchema = z.object({
+	id: uuid(),
+	name: z.string().min(1, 'Assessment name is required'),
+	project_id: uuid(),
+});
+export const spiderAssessmentSchema = z.object({
+	id: uuid(),
+	value: z.number(),
+	risk: z.number(),
+	cost: z.number(),
+	feasibility: z.number(),
+	impact: z.number(),
+	comment: z.string().optional(),
+	assessment_id: uuid(),
+	created_at: z.iso.datetime().refine(date => parseISO(date)),
+});
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
 };
+export const evaluationMetrics: { key: string; label: string }[] = [
+	{ key: 'value', label: 'Value' },
+	{ key: 'risk', label: 'Risk' },
+	{ key: 'cost', label: 'Cost' },
+	{ key: 'feasibility', label: 'Feasibility' },
+	{ key: 'impact', label: 'Impact' },
+];
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
@@ -186,3 +209,5 @@ export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
 export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
+export type Assessment = z.infer<typeof assessmentSchema>;
+export type SpiderAssessment = z.infer<typeof spiderAssessmentSchema>;
