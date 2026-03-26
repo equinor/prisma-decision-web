@@ -1,16 +1,5 @@
-import {
-	Background,
-	ConnectionMode,
-	MarkerType,
-	ReactFlow,
-	SelectionMode,
-	useNodesInitialized,
-	useReactFlow,
-} from '@xyflow/react';
+import { Background, ConnectionMode, MarkerType, ReactFlow, SelectionMode } from '@xyflow/react';
 
-import { useEffect } from 'react';
-import { ReactFlowInfluenceNode } from '../../../types';
-import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
 import { ConnectionLine } from './ConnectingLine';
 import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
@@ -19,26 +8,6 @@ import { useInfluenceDiagram } from './useInfluenceDiagram';
 
 const nodeTypes = { issue: InfluenceNode };
 const edgeTypes = { issue: InfluenceEdge };
-
-const Test = () => {
-	const ready = useNodesInitialized();
-	const { getNodes, setNodes, getEdges, setEdges } = useReactFlow<ReactFlowInfluenceNode>();
-	const edgesToLayout = getEdges();
-	const nodesToLayout = getNodes();
-	useEffect(() => {
-		if (!ready) return;
-		(async () => {
-			const { nodes: layoutedNodes, edges: layoutedEdges } = await getInfluenceDiagramLayout(
-				nodesToLayout,
-				edgesToLayout,
-			);
-			setNodes(layoutedNodes);
-			setEdges(layoutedEdges);
-		})();
-	}, [ready]);
-
-	return null;
-};
 
 export const InfluenceDiagram = () => {
 	const {
@@ -74,7 +43,7 @@ export const InfluenceDiagram = () => {
 					},
 				}}
 				selectionMode={SelectionMode.Partial}
-				connectionMode={ConnectionMode.Loose}
+				connectionMode={ConnectionMode.Strict}
 				zoomOnDoubleClick={false}
 				panOnDrag={!isSelecting}
 				nodesDraggable={false}
@@ -96,7 +65,6 @@ export const InfluenceDiagram = () => {
 				fitView
 				fitViewOptions={{ padding: 0.4 }}
 			>
-				<Test />
 				<Background />
 				<DraggableToolbar
 					onClickPanMode={onClickPanMode}

@@ -8,19 +8,23 @@ import { useProbablityTable } from './useProbablityTable';
 import { calculateRowSum, getParentLabel, isRowSumValid } from './utils';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
 
-export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableProps) => {
+export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityTableProps) => {
 	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
 
 	if (!childOutcomes.length) {
 		return (
-			<div className='border-background-medium bg-background-default text-text-tertiary absolute mt-2 max-w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>
+			<div
+				ref={ref}
+				className='border-background-medium bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'
+			>
 				Add at least one outcome to this uncertainty to configure probabilities.
 			</div>
 		);
 	}
 	return (
 		<CardContainer
-			className={`absolute top-0 left-[calc(100%+8px)] w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
+			ref={ref}
+			className={`w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
 		>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>
@@ -142,6 +146,7 @@ export const ProbabilityTable = ({ issue, selected, onClose }: ProbabilityTableP
 };
 
 type ProbabilityTableProps = {
+	ref?: React.Ref<HTMLDivElement>;
 	issue: Issue;
 	selected: boolean | undefined;
 	onClose: (value: boolean) => void;

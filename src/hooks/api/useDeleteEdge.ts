@@ -19,6 +19,7 @@ export const useDeleteEdge = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
+			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _updatedEdge, context) => {
 			if (context?.previousEdges) {

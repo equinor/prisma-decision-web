@@ -1,4 +1,5 @@
 import {
+	applyNodeChanges,
 	Connection,
 	EdgeMouseHandler,
 	Edge as FlowEdge,
@@ -43,9 +44,7 @@ export const useInfluenceDiagram = () => {
 	const selectedProject = useSelectedProject();
 	const { mutate: createEdge } = useCreateEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
-	const [localNodes, setLocalNodes, onLocalNodesChange] = useNodesState(
-		[] as ReactFlowInfluenceNode[],
-	);
+	const [localNodes, setLocalNodes] = useNodesState([] as ReactFlowInfluenceNode[]);
 	const [localEdges, setEdges, onEdgesChange] = useEdgesState(
 		[] as FlowEdge<InfluenceEdgeData>[],
 	);
@@ -154,7 +153,8 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onNodesChange = (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
-		onLocalNodesChange(changes);
+		const s = applyNodeChanges(changes, localNodes);
+		runLayout(s, edges);
 	};
 
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {

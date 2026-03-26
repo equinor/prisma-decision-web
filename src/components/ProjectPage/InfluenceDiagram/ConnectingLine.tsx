@@ -1,34 +1,29 @@
-import { ConnectionLineComponentProps, getSmoothStepPath, useConnection } from '@xyflow/react';
+import { ConnectionLineComponentProps, getStraightPath } from '@xyflow/react';
 
-export const ConnectionLine = ({
-	fromX,
-	fromY,
-	toX,
-	toY,
-	fromPosition,
-	toPosition,
-}: ConnectionLineComponentProps) => {
-	const { fromHandle } = useConnection();
-
-	const [edgePath] = getSmoothStepPath({
+export const ConnectionLine = ({ toX, toY, fromX, fromY }: ConnectionLineComponentProps) => {
+	const [edgePath] = getStraightPath({
 		sourceX: fromX,
 		sourceY: fromY,
 		targetX: toX,
 		targetY: toY,
-		sourcePosition: fromPosition,
-		targetPosition: toPosition,
 	});
-	if (!fromHandle?.id) return null;
+
 	return (
 		<g>
 			<path
 				fill='none'
-				stroke={fromHandle.id}
 				strokeWidth={1.5}
 				className='animated stroke-primary-resting stroke-4'
 				d={edgePath}
 			/>
-			<circle cx={toX} cy={toY} fill='#fff' r={3} stroke={fromHandle.id} strokeWidth={1.5} />
+			<circle
+				cx={toX}
+				cy={toY}
+				fill='#fff'
+				r={3}
+				className='stroke-primary-resting'
+				strokeWidth={1.5}
+			/>
 		</g>
 	);
 };

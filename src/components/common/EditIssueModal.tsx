@@ -26,8 +26,8 @@ export const EditIssueModal = ({ issue, onClose, open = false }: EditIssueModalP
 		<Dialog
 			data-no-dnd
 			open={open}
-			className='nodrag nopan nowheel fixed top-1/2 left-1/2 max-h-[90vh]
-			w-[min(700px,90vw)]! -translate-x-1/2 -translate-y-1/2 transform overflow-auto'
+			className='nodrag nopan nowheel pointer-events-auto fixed top-1/2 left-1/2 max-h-[90vh]
+			w-[min(700px,90vw)]! -translate-x-1/2 -translate-y-1/2 transform cursor-auto overflow-auto'
 		>
 			<DialogContent>
 				<FormProvider {...formMethods}>
