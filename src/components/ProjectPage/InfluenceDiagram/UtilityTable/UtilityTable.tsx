@@ -12,7 +12,7 @@ export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) =>
 	const { parents, parentRowSpans, rows, lookups } = useUtilityTable(issue);
 	return (
 		<CardContainer
-			className={`absolute top-0 left-[calc(100%+8px)] w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
+			className={`w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
 		>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>

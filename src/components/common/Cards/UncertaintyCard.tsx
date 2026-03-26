@@ -40,6 +40,7 @@ export const UncertaintyCard = ({
 						ref={setAnchorEl}
 						onClick={() => setMenuOpen(true)}
 						variant='ghost_icon'
+						className='nodrag nopan pointer-events-auto'
 					>
 						<Icon data={more_vertical} />
 					</Button>
@@ -97,7 +98,7 @@ export const UncertaintyCard = ({
 					<EdsProvider density='compact'>
 						{canExpand && (
 							<CollapsibleTrigger asChild>
-								<button className='absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
+								<button className='nodrag nopan pointer-events-auto absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
 										{issue.uncertainty.outcomes.length} Outcomes
 									</p>

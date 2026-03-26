@@ -31,6 +31,7 @@ export const UtilityCard = ({
 						ref={setAnchorEl}
 						onClick={() => setMenuOpen(true)}
 						variant='ghost_icon'
+						className='nodrag nopan pointer-events-auto'
 					>
 						<Icon data={more_vertical} />
 					</Button>

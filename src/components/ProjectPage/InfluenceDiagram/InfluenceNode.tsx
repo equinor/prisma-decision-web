@@ -1,6 +1,7 @@
-import { Handle, Node, NodeProps, Position, useEdges } from '@xyflow/react';
+import { Handle, Node, NodeProps, Position, useConnection, useEdges } from '@xyflow/react';
 import { useState } from 'react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { cn } from '../../../utils/cn';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { InfluenceNode as InfluenceNodeType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
@@ -11,62 +12,79 @@ import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { UtilityCard } from '../../common/Cards/UtilityCard';
 import { UtilityTable } from './UtilityTable/UtilityTable';
 
-export const InfluenceNode = ({ data, selected }: NodeProps<Node<InfluenceNodeType>>) => {
+export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNodeType>>) => {
 	const issue = useSelectedProjectIssues().find(issue => issue.id === data.issue_id);
 	const edges = useEdges();
+	const { inProgress, isTarget } = useConnection<
+		Node<InfluenceNodeType>,
+		{ inProgress: boolean; isTarget: boolean }
+	>(connection => ({
+		inProgress: connection.inProgress,
+		isTarget: connection.inProgress && connection.fromNode?.id !== id,
+	}));
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
+
 	if (!issue) return null;
-	const handleClassName = data.handleClassName || 'bg-primary-resting! z-1 h-3! w-3!';
 
 	return (
-		<>
-			<Handle type='source' position={Position.Top} id='top' className={handleClassName} />
-			<Handle
-				type='source'
-				position={Position.Bottom}
-				id='bottom'
-				className={handleClassName}
-			/>
-			<Handle type='source' position={Position.Left} id='left' className={handleClassName} />
-			<Handle
-				type='source'
-				position={Position.Right}
-				id='right'
-				className={handleClassName}
-			/>
-			<div
-				className={`h-full max-w-87.5
-				overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
-			>
-				{issue.type === 'Fact' && <FactCard issue={issue} />}
-				{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
-				{issue.type === 'Decision' && <DecisionCard issue={issue} />}
-				{issue.type === 'Utility' && (
-					<UtilityCard
-						issue={issue}
-						hasTwoOrMoreParents={hasTwoOrMoreParents}
-						onClickOpenUtilityTable={() => setUtilityTableOpen(true)}
-					/>
-				)}
-				{issue.type === 'Uncertainty' && (
-					<UncertaintyCard
-						issue={issue}
-						onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
-					/>
-				)}
-			</div>
-			{probabilityTableOpen && (
-				<ProbabilityTable
-					issue={issue}
-					selected={selected}
-					onClose={setProbabilityTableOpen}
+		<div className='relative flex flex-col gap-2'>
+			{!inProgress && (
+				<Handle
+					type='source'
+					position={Position.Right}
+					id='node-source'
+					className='top-0! left-0! h-full! w-full! -translate-x-1/2! translate-y-1/2! rounded-none! border-none! bg-transparent! opacity-0!'
 				/>
 			)}
-			{utilityTableOpen && (
-				<UtilityTable issue={issue} selected={selected} onClose={setUtilityTableOpen} />
+			{(!inProgress || isTarget) && (
+				<Handle
+					type='target'
+					position={Position.Left}
+					id='node-target'
+					isConnectableStart={false}
+					className='top-0! left-0! h-full! w-full! translate-x-1/2! translate-y-1/2! rounded-none! border-none! bg-transparent! opacity-0!'
+				/>
 			)}
-		</>
+			<div
+				className={cn(
+					'pointer-events-none relative z-10 flex flex-col gap-2 [&_button]:pointer-events-auto [&_li]:pointer-events-auto',
+				)}
+			>
+				<div
+					className={`h-full max-w-87.5 overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+				>
+					{issue.type === 'Fact' && <FactCard issue={issue} />}
+					{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
+					{issue.type === 'Decision' && <DecisionCard issue={issue} />}
+					{issue.type === 'Utility' && (
+						<UtilityCard
+							issue={issue}
+							hasTwoOrMoreParents={hasTwoOrMoreParents}
+							onClickOpenUtilityTable={() => setUtilityTableOpen(true)}
+						/>
+					)}
+					{issue.type === 'Uncertainty' && (
+						<UncertaintyCard
+							issue={issue}
+							onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
+						/>
+					)}
+				</div>
+			</div>
+			<div>
+				{probabilityTableOpen && (
+					<ProbabilityTable
+						issue={issue}
+						selected={selected}
+						onClose={setProbabilityTableOpen}
+					/>
+				)}
+				{utilityTableOpen && (
+					<UtilityTable issue={issue} selected={selected} onClose={setUtilityTableOpen} />
+				)}
+			</div>
+		</div>
 	);
 };
