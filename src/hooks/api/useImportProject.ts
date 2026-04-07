@@ -5,7 +5,7 @@ export const useImportProject = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (projectImportData: ProjectImportData[]) => {
-			const res = await apiClient.post<Project[]>('/project/import', projectImportData);
+			const res = await apiClient.post<Project[]>('/projects/import', projectImportData);
 			return res.data[0];
 		},
 		onSuccess: async () => {

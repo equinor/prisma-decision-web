@@ -36,9 +36,9 @@ const AllUsersTable = ({
 		<Table.Body>
 			{availableUsers.map((user, index) => (
 				<Table.Row
-					key={`${user.azure_id}-${index}`}
+					key={`${user.user_id}-${index}`}
 					className={`hover:bg-background-light transition-colors ${
-						selectedUsers.some(u => u.azure_id === user.azure_id)
+						selectedUsers.some(u => u.user_id === user.user_id)
 							? 'bg-background-light'
 							: ''
 					}`}
@@ -108,7 +108,7 @@ const TeamMembersTable = ({
 		<Table.Body>
 			{selectedUsers.map((user, index) => (
 				<Table.Row
-					key={user.azure_id}
+					key={user.user_id}
 					className={`hover:bg-background-light transition-colors ${
 						errors?.users && !user.role ? 'bg-warning' : ''
 					}`}
@@ -173,14 +173,14 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 
 	// Delete user from team members
 	const handleDeleteUser = (user: UserWithRole) => {
-		const updatedSelected = selectedUsers.filter(u => u.azure_id !== user.azure_id);
+		const updatedSelected = selectedUsers.filter(u => u.user_id !== user.user_id);
 		setUser(updatedSelected);
 		handleSubmit();
 	};
 
 	// Update role for a user
 	const handleRoleChange = (user: UserWithRole, role: RoleType) => {
-		setUser(selectedUsers.map(u => (u.azure_id === user.azure_id ? { ...u, role: role } : u)));
+		setUser(selectedUsers.map(u => (u.user_id === user.user_id ? { ...u, role: role } : u)));
 		handleSubmit();
 	};
 
@@ -193,12 +193,12 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	};
 
 	// Derived state
-	const teamMembersAzureIds = new Set(usersValue.map(u => u.azure_id));
+	const teamMembersUserIds = new Set(usersValue.map(u => u.user_id));
 	const baseUsers = hasActiveSearch
-		? [...users.filter(gu => !teamMembersAzureIds.has(gu.azure_id))]
+		? [...users.filter(gu => !teamMembersUserIds.has(gu.user_id))]
 		: users;
 	const availableUsers = baseUsers.filter(
-		user => !selectedUsers.some(selectedUser => selectedUser.azure_id === user.azure_id),
+		user => !selectedUsers.some(selectedUser => selectedUser.user_id === user.user_id),
 	);
 
 	const availableUsersCount = availableUsers.length;

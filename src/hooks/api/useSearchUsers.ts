@@ -7,16 +7,15 @@ export const useSearchUsers = (debouncedSearchTerm: string) => {
 		queryKey: ['graphUsers', debouncedSearchTerm],
 		queryFn: async () => {
 			const [graphUsersResponse, prismaUsersResponse] = await Promise.all([
-				apiClient.get<User[]>(`/graph/users?search=${debouncedSearchTerm}`),
+				apiClient.get<User[]>(`/graph/users/search?query=${debouncedSearchTerm}`),
 				apiClient.get<User[]>('/users'),
 			]);
 			const combinedUsers = graphUsersResponse.data.map(graphUser => {
 				const matchingPrismaUser = prismaUsersResponse.data.find(
-					prismaUser => prismaUser.azure_id === graphUser.azure_id,
+					prismaUser => prismaUser.user_id === graphUser.user_id,
 				);
 				return {
 					...graphUser,
-					user_id: matchingPrismaUser ? matchingPrismaUser.user_id : null,
 					hasAccess: !!matchingPrismaUser,
 				};
 			});
