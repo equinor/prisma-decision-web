@@ -9,6 +9,7 @@ import {
 	useReactFlow,
 } from '@xyflow/react';
 import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
+import { InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
 
 export const InfluenceEdge = ({
 	id,
@@ -20,8 +21,8 @@ export const InfluenceEdge = ({
 	targetPosition,
 	markerEnd,
 	data,
-}: EdgeProps<Edge<{ hovered?: boolean }>>) => {
-	const [edgePath, labelX, labelY] = getSmoothStepPath({
+}: EdgeProps<Edge<InfluenceEdgeData>>) => {
+	const [fallbackPath, fallbackLabelX, fallbackLabelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
 		targetX,
@@ -31,9 +32,12 @@ export const InfluenceEdge = ({
 		borderRadius: 25,
 	});
 
+	const edgePath = data?.route?.path ?? fallbackPath;
+	const labelX = data?.route?.labelX ?? fallbackLabelX;
+	const labelY = data?.route?.labelY ?? fallbackLabelY;
+
 	const { mutate: deleteEdge } = useDeleteEdge();
 	const { setEdges } = useReactFlow();
-
 	const handleDelete = () => {
 		deleteEdge(id);
 		setEdges([]);

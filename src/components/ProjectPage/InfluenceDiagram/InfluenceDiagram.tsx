@@ -16,7 +16,6 @@ export const InfluenceDiagram = () => {
 		onConnect,
 		isValidConnection,
 		onEdgesChange,
-		onNodeDragStop,
 		onNodesChange,
 		onReconnect,
 		onReconnectStart,
@@ -44,13 +43,14 @@ export const InfluenceDiagram = () => {
 					},
 				}}
 				selectionMode={SelectionMode.Partial}
-				connectionMode={ConnectionMode.Loose}
+				connectionMode={ConnectionMode.Strict}
+				zoomOnDoubleClick={false}
 				panOnDrag={!isSelecting}
+				nodesDraggable={false}
 				selectNodesOnDrag={isSelecting}
 				selectionKeyCode={['Control']}
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
-				onNodeDragStop={onNodeDragStop}
 				onNodesChange={onNodesChange}
 				onReconnectStart={onReconnectStart}
 				onEdgeMouseEnter={onEdgeMouseEnter}

@@ -40,7 +40,7 @@ export const DecisionCard = ({
 						ref={setAnchorEl}
 						onClick={() => setMenuOpen(true)}
 						variant='ghost_icon'
-						className='nodrag'
+						className='nodrag nopan pointer-events-auto'
 					>
 						<Icon data={more_vertical} />
 					</Button>
@@ -82,7 +82,7 @@ export const DecisionCard = ({
 										onClick={() => onClickOption && onClickOption(option)}
 										key={option.id}
 										className={cn(
-											'bg-background-light flex justify-between rounded-sm px-2 py-1',
+											'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',
 											{
 												'hover:bg-primary-hover-alt cursor-pointer':
 													onClickOption,
@@ -101,7 +101,7 @@ export const DecisionCard = ({
 					<EdsProvider density='compact'>
 						{canExpand && (
 							<CollapsibleTrigger asChild>
-								<button className='nodrag absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
+								<button className='nodrag nopan pointer-events-auto absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
 										{issue.decision.options.length} Options
 									</p>

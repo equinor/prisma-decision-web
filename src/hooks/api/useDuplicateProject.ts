@@ -6,7 +6,7 @@ export const useDuplicateProject = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (id: string): Promise<Project> => {
-			const response = await apiClient.post(`/project/duplicate/${id}`);
+			const response = await apiClient.post(`/projects/${id}/duplicate`);
 			return response.data;
 		},
 		onSuccess: () => {
