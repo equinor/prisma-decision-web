@@ -10,7 +10,7 @@ export const useCreateAssessment = () => {
 			return res.data[0];
 		},
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['assessments'] });
+			await queryClient.refetchQueries({ queryKey: ['projects'] });
 		},
 	});
 };

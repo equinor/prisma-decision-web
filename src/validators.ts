@@ -174,11 +174,11 @@ export const assessmentSchema = z.object({
 });
 export const spiderAssessmentSchema = z.object({
 	id: uuid(),
-	value: z.number(),
-	risk: z.number(),
-	cost: z.number(),
-	feasibility: z.number(),
-	impact: z.number(),
+	appropriate_frame: z.number(),
+	trade_off_analysis: z.number(),
+	reasoning_correctness: z.number(),
+	information_reliability: z.number(),
+	commitment_to_action: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
 	created_at: z.iso.datetime().refine(date => parseISO(date)),
@@ -188,11 +188,11 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export const evaluationMetrics: { key: string; label: string }[] = [
-	{ key: 'value', label: 'Value' },
-	{ key: 'risk', label: 'Risk' },
-	{ key: 'cost', label: 'Cost' },
-	{ key: 'feasibility', label: 'Feasibility' },
-	{ key: 'impact', label: 'Impact' },
+	{ key: 'appropriate_frame', label: 'Appropriate Frame' },
+	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
+	{ key: 'information_reliability', label: 'Information Reliability' },
+	{ key: 'commitment_to_action', label: 'Commitment to Action' },
 ];
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;

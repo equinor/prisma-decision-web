@@ -35,7 +35,17 @@ export const useAssessmentForm = ({ assessment, onSuccess }: UseAssessmentFormAr
 	const handleSubmit = formMethods.handleSubmit(
 		data => {
 			const mutationFn = assessment ? updateAssessment : createAssessment;
-			return mutationFn({ ...data }, { onSuccess: () => onSuccess?.(data) });
+			return mutationFn(
+				{ ...data },
+				{
+					onSuccess: () => {
+						formMethods.reset(
+							getDefaultValues(selectedProject?.id || crypto.randomUUID()),
+						);
+						onSuccess?.(data);
+					},
+				},
+			);
 		},
 		errors => {
 			// eslint-disable-next-line no-console

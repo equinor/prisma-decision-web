@@ -6,7 +6,7 @@ export const useCreateSpiderAssessment = ({ onSuccess }: { onSuccess?: () => voi
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: SpiderAssessment) => {
-			const res = await apiClient.post('/spider-assessments', [data]);
+			const res = await apiClient.post('/spiderassessments', [data]);
 			return res.data[0];
 		},
 		onSuccess: async () => {

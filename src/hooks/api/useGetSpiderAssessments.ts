@@ -6,7 +6,7 @@ export const useGetSpiderAssessments = () => {
 	const { data } = useQuery({
 		queryKey: ['assessments', 'spider'],
 		queryFn: async () => {
-			const res = await apiClient.get<SpiderAssessment[]>('/spider-assessments');
+			const res = await apiClient.get<SpiderAssessment[]>('/spiderassessments');
 			return res.data;
 		},
 	});

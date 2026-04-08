@@ -10,11 +10,11 @@ type UseSpiderAssessmentFormArgs = {
 
 const getDefaultValues = (assessmentId: string): SpiderAssessment => ({
 	id: crypto.randomUUID(),
-	value: 5,
-	risk: 5,
-	cost: 5,
-	feasibility: 5,
-	impact: 5,
+	appropriate_frame: 5,
+	trade_off_analysis: 5,
+	reasoning_correctness: 5,
+	information_reliability: 5,
+	commitment_to_action: 5,
 	comment: '',
 	assessment_id: assessmentId,
 	created_at: new Date().toISOString(),
