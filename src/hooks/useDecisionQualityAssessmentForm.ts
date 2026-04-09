@@ -15,7 +15,7 @@ const getDefaultValues = (assessmentId: string): DecisionQualityAssessment => ({
 	reasoning_correctness: 5,
 	information_reliability: 5,
 	commitment_to_action: 5,
-	doable_alternative: 5,
+	doable_alternatives: 5,
 	comment: '',
 	assessment_id: assessmentId,
 	created_at: new Date().toISOString(),

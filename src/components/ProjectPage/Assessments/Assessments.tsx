@@ -30,6 +30,7 @@ import { FormErrorMessage } from '../../common/FormErrorMessage';
 import { evaluationMetrics, DecisionQualityAssessment } from '../../../validators';
 import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
 import { DecisionQualityAssessmentForm } from './DecisionQualityAssessmentForm';
+import { useGetSignUser } from '../../../hooks/api/useGetSignUser';
 
 const METRIC_LINE_COLORS: Record<string, string> = {
 	value: 'rgba(var(--eds_primary_resting), 1)',
@@ -41,6 +42,7 @@ const METRIC_LINE_COLORS: Record<string, string> = {
 
 export const Assessments = () => {
 	const { assessments } = useGetAssessments();
+	const { signuser } = useGetSignUser();
 	const selectedProject = useSelectedProject();
 	const {
 		register,
@@ -60,14 +62,25 @@ export const Assessments = () => {
 	} | null>(null);
 
 	const referenceElement = useRef<HTMLButtonElement>(null);
+
+	const projectAssessments = useMemo(
+		() => (assessments ?? []).filter(a => a.project_id === selectedProject?.id),
+		[assessments, selectedProject?.id],
+	);
+
+	const assessmentNameById = useMemo(
+		() => new Map(projectAssessments.map(a => [a.id, a.name])),
+		[projectAssessments],
+	);
+
 	const sortedEvaluations = useMemo(
 		() =>
-			assessments
+			projectAssessments
 				.flatMap(a => a.decision_quality_assessments ?? [])
 				.sort(
 					(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
 				),
-		[assessments],
+		[projectAssessments],
 	);
 
 	const toChartData = (metrics: Record<string, number>) =>
@@ -81,8 +94,7 @@ export const Assessments = () => {
 		() =>
 			sortedEvaluations.map((ev, i) => {
 				const values = evaluationMetrics.reduce<Record<string, number>>((acc, metric) => {
-					acc[metric.key] =
-						(ev[metric.key as keyof DecisionQualityAssessment] as number) ?? 0;
+					acc[metric.key] = ev[metric.key as keyof DecisionQualityAssessment] as number;
 					return acc;
 				}, {});
 
@@ -99,8 +111,10 @@ export const Assessments = () => {
 		[sortedEvaluations],
 	);
 
-	const hasEvaluations = (sortedEvaluations.length ?? 0) > 0;
+	const hasEvaluations = sortedEvaluations.length > 0;
 	if (!selectedProject) return;
+	const isFacilitator =
+		selectedProject.users.find(u => u.user_id === signuser?.user_id)?.role === 'Facilitator';
 	return (
 		<div className='flex flex-col gap-6'>
 			<div className='flex w-full items-center justify-between'>
@@ -111,7 +125,7 @@ export const Assessments = () => {
 					<Button
 						ref={referenceElement}
 						variant='outlined'
-						disabled={!!activeAssessment}
+						disabled={!!activeAssessment || !isFacilitator}
 						onClick={() => setIsOpen(prev => !prev)}
 					>
 						<Icon data={add} />
@@ -216,6 +230,7 @@ export const Assessments = () => {
 						<DecisionQualityAssessmentForm
 							assessmentId={activeAssessment.id}
 							assessmentName={activeAssessment.name}
+							isFacilitator={isFacilitator}
 							onClose={() => setActiveAssessment(null)}
 						/>
 					</section>
@@ -233,7 +248,7 @@ export const Assessments = () => {
 						>
 							<div className='mb-4'>
 								<h3 className='text-lg font-semibold'>
-									{assessments.find(a => a.id === ev.assessment_id)?.name ??
+									{assessmentNameById.get(ev.assessment_id) ??
 										'Unnamed Assessment'}
 								</h3>
 								{ev.created_at && (

@@ -13,12 +13,14 @@ import { useDecisionQualityAssessmentForm } from '../../../hooks/useDecisionQual
 type DecisionQualityAssessmentFormProps = {
 	assessmentId: string;
 	assessmentName?: string;
+	isFacilitator?: boolean;
 	onClose: () => void;
 };
 
 export const DecisionQualityAssessmentForm = ({
 	assessmentId,
 	assessmentName,
+	isFacilitator,
 	onClose,
 }: DecisionQualityAssessmentFormProps) => {
 	const { handleSubmit, isPending, watch, setValue } = useDecisionQualityAssessmentForm({
@@ -27,7 +29,6 @@ export const DecisionQualityAssessmentForm = ({
 	});
 
 	const metrics = watch();
-
 	const chartData = evaluationMetrics.map(m => ({
 		metric: m.label,
 		score: metrics[m.key as keyof typeof metrics] ?? 0,
@@ -111,7 +112,7 @@ export const DecisionQualityAssessmentForm = ({
 			</div>
 
 			<div className='mt-4 flex justify-end'>
-				<Button type='submit' disabled={isPending}>
+				<Button type='submit' disabled={isPending || !isFacilitator}>
 					{isPending ? <CircularProgress size={16} /> : 'Submit Evaluation'}
 				</Button>
 			</div>

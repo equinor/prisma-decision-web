@@ -1,7 +1,6 @@
 import { uuid, z } from 'zod/v4';
 import { parseISO } from 'date-fns';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
-import { update } from '@equinor/eds-icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
@@ -175,7 +174,7 @@ export const DecisionQualityAssessmentSchema = z.object({
 	reasoning_correctness: z.number(),
 	information_reliability: z.number(),
 	commitment_to_action: z.number(),
-	doable_alternative: z.number(),
+	doable_alternatives: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
 	created_at: z.iso.datetime().refine(date => parseISO(date)),
@@ -201,7 +200,7 @@ export const evaluationMetrics: { key: string; label: string }[] = [
 	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
 	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
 	{ key: 'information_reliability', label: 'Information Reliability' },
-	{ key: 'doable_alternative', label: 'Doable Alternative' },
+	{ key: 'doable_alternatives', label: 'Doable Alternatives' },
 	{ key: 'commitment_to_action', label: 'Commitment to Action' },
 ];
 export type Project = z.infer<typeof projectSchema>;
