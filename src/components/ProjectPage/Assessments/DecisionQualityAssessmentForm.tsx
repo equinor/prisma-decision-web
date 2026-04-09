@@ -7,21 +7,21 @@ import {
 	ResponsiveContainer,
 	Tooltip,
 } from 'recharts';
-import { useSpiderAssessmentForm } from '../../../hooks/useSpiderAssessmentForm';
 import { evaluationMetrics } from '../../../validators';
+import { useDecisionQualityAssessmentForm } from '../../../hooks/useDecisionQualityAssessmentForm';
 
-type SpiderAssessmentFormProps = {
+type DecisionQualityAssessmentFormProps = {
 	assessmentId: string;
 	assessmentName?: string;
 	onClose: () => void;
 };
 
-export const SpiderAssessmentForm = ({
+export const DecisionQualityAssessmentForm = ({
 	assessmentId,
 	assessmentName,
 	onClose,
-}: SpiderAssessmentFormProps) => {
-	const { handleSubmit, isPending, watch, setValue } = useSpiderAssessmentForm({
+}: DecisionQualityAssessmentFormProps) => {
+	const { handleSubmit, isPending, watch, setValue } = useDecisionQualityAssessmentForm({
 		assessmentId,
 		onSuccess: onClose,
 	});

@@ -1,6 +1,7 @@
 import { uuid, z } from 'zod/v4';
 import { parseISO } from 'date-fns';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
+import { update } from '@equinor/eds-icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
@@ -167,22 +168,30 @@ export const projectImportSchema = z.object({
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
 });
-export const assessmentSchema = z.object({
-	id: uuid(),
-	name: z.string().min(1, 'Assessment name is required'),
-	project_id: uuid(),
-});
-export const spiderAssessmentSchema = z.object({
+export const DecisionQualityAssessmentSchema = z.object({
 	id: uuid(),
 	appropriate_frame: z.number(),
 	trade_off_analysis: z.number(),
 	reasoning_correctness: z.number(),
 	information_reliability: z.number(),
 	commitment_to_action: z.number(),
+	doable_alternative: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
 	created_at: z.iso.datetime().refine(date => parseISO(date)),
+	updated_at: z.iso
+		.datetime()
+		.refine(date => parseISO(date))
+		.optional(),
 });
+
+export const assessmentSchema = z.object({
+	id: uuid(),
+	name: z.string().min(1, 'Assessment name is required'),
+	project_id: uuid(),
+	decision_quality_assessments: z.array(DecisionQualityAssessmentSchema).optional(),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -192,6 +201,7 @@ export const evaluationMetrics: { key: string; label: string }[] = [
 	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
 	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
 	{ key: 'information_reliability', label: 'Information Reliability' },
+	{ key: 'doable_alternative', label: 'Doable Alternative' },
 	{ key: 'commitment_to_action', label: 'Commitment to Action' },
 ];
 export type Project = z.infer<typeof projectSchema>;
@@ -209,4 +219,4 @@ export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
 export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
-export type SpiderAssessment = z.infer<typeof spiderAssessmentSchema>;
+export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;

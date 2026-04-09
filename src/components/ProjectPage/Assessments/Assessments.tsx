@@ -27,10 +27,9 @@ import { add, close } from '@equinor/eds-icons';
 import { useAssessmentForm } from '../../../hooks/useAssessmentForm';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
-import { SpiderAssessmentForm } from './SpiderAssessmentForm';
-import { evaluationMetrics, SpiderAssessment } from '../../../validators';
+import { evaluationMetrics, DecisionQualityAssessment } from '../../../validators';
 import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
-import { useGetSpiderAssessments } from '../../../hooks/api/useGetSpiderAssessments';
+import { DecisionQualityAssessmentForm } from './DecisionQualityAssessmentForm';
 
 const METRIC_LINE_COLORS: Record<string, string> = {
 	value: 'rgba(var(--eds_primary_resting), 1)',
@@ -41,14 +40,8 @@ const METRIC_LINE_COLORS: Record<string, string> = {
 };
 
 export const Assessments = () => {
-	const { spiderAssessments } = useGetSpiderAssessments();
 	const { assessments } = useGetAssessments();
 	const selectedProject = useSelectedProject();
-
-	const assessmentNameById = useMemo(
-		() => new Map(assessments.map(a => [a.id, a.name])),
-		[assessments],
-	);
 	const {
 		register,
 		handleSubmit,
@@ -69,10 +62,12 @@ export const Assessments = () => {
 	const referenceElement = useRef<HTMLButtonElement>(null);
 	const sortedEvaluations = useMemo(
 		() =>
-			[...spiderAssessments].sort(
-				(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-			),
-		[spiderAssessments],
+			assessments
+				.flatMap(a => a.decision_quality_assessments ?? [])
+				.sort(
+					(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+				),
+		[assessments],
 	);
 
 	const toChartData = (metrics: Record<string, number>) =>
@@ -86,7 +81,8 @@ export const Assessments = () => {
 		() =>
 			sortedEvaluations.map((ev, i) => {
 				const values = evaluationMetrics.reduce<Record<string, number>>((acc, metric) => {
-					acc[metric.key] = (ev[metric.key as keyof SpiderAssessment] as number) ?? 0;
+					acc[metric.key] =
+						(ev[metric.key as keyof DecisionQualityAssessment] as number) ?? 0;
 					return acc;
 				}, {});
 
@@ -103,7 +99,7 @@ export const Assessments = () => {
 		[sortedEvaluations],
 	);
 
-	const hasEvaluations = spiderAssessments.length > 0;
+	const hasEvaluations = (sortedEvaluations.length ?? 0) > 0;
 	if (!selectedProject) return;
 	return (
 		<div className='flex flex-col gap-6'>
@@ -217,7 +213,7 @@ export const Assessments = () => {
 			<div className='grid grid-cols-1 gap-6 2xl:grid-cols-2'>
 				{activeAssessment && (
 					<section className='bg-background-default shadow-tile rounded-md p-5'>
-						<SpiderAssessmentForm
+						<DecisionQualityAssessmentForm
 							assessmentId={activeAssessment.id}
 							assessmentName={activeAssessment.name}
 							onClose={() => setActiveAssessment(null)}
@@ -227,7 +223,7 @@ export const Assessments = () => {
 
 				{sortedEvaluations.map(ev => {
 					const metrics = evaluationMetrics.reduce<Record<string, number>>((acc, m) => {
-						acc[m.key] = (ev[m.key as keyof SpiderAssessment] as number) ?? 0;
+						acc[m.key] = (ev[m.key as keyof DecisionQualityAssessment] as number) ?? 0;
 						return acc;
 					}, {});
 					return (
@@ -237,7 +233,8 @@ export const Assessments = () => {
 						>
 							<div className='mb-4'>
 								<h3 className='text-lg font-semibold'>
-									{assessmentNameById.get(ev.assessment_id) ?? 'Evaluation'}
+									{assessments.find(a => a.id === ev.assessment_id)?.name ??
+										'Unnamed Assessment'}
 								</h3>
 								{ev.created_at && (
 									<p className='text-text-tertiary text-sm'>

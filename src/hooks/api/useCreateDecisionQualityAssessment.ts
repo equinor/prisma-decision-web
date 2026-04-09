@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { SpiderAssessment } from '../../validators';
+import { DecisionQualityAssessment } from '../../validators';
 
-export const useCreateSpiderAssessment = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useCreateDecisionQualityAssessment = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (data: SpiderAssessment) => {
-			const res = await apiClient.post('/spiderassessments', [data]);
+		mutationFn: async (data: DecisionQualityAssessment) => {
+			const res = await apiClient.post('/dqassessments', [data]);
 			return res.data[0];
 		},
 		onSuccess: async () => {

@@ -1,17 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { SpiderAssessment } from '../../validators';
+import { DecisionQualityAssessment } from '../../validators';
 
-export const useGetSpiderAssessments = () => {
+export const useGetDecisionQualityAssessments = () => {
 	const { data } = useQuery({
-		queryKey: ['assessments', 'spider'],
+		queryKey: ['assessments', 'DecisionQuality'],
 		queryFn: async () => {
-			const res = await apiClient.get<SpiderAssessment[]>('/spiderassessments');
+			const res = await apiClient.get<DecisionQualityAssessment[]>(
+				'/DecisionQualityassessments',
+			);
 			return res.data;
 		},
 	});
 
 	return {
-		spiderAssessments: data || [],
+		DecisionQualityAssessments: data || [],
 	};
 };
