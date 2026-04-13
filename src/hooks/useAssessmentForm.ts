@@ -9,6 +9,7 @@ import { useUpdateAssessment } from './api/useUpdateAssessment';
 const getDefaultValues = (projectId: string): Assessment => ({
 	id: crypto.randomUUID(),
 	name: '',
+	is_completed: false,
 	project_id: projectId,
 });
 type UseAssessmentFormArgs = {

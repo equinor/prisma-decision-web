@@ -6,9 +6,7 @@ export const useGetDecisionQualityAssessments = () => {
 	const { data } = useQuery({
 		queryKey: ['assessments', 'DecisionQuality'],
 		queryFn: async () => {
-			const res = await apiClient.get<DecisionQualityAssessment[]>(
-				'/DecisionQualityassessments',
-			);
+			const res = await apiClient.get<DecisionQualityAssessment[]>('/dq_assessments');
 			return res.data;
 		},
 	});

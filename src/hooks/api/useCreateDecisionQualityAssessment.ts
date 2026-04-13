@@ -6,7 +6,7 @@ export const useCreateDecisionQualityAssessment = ({ onSuccess }: { onSuccess?: 
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: DecisionQualityAssessment) => {
-			const res = await apiClient.post('/dqassessments', [data]);
+			const res = await apiClient.post('/dq_assessments', [data]);
 			return res.data[0];
 		},
 		onSuccess: async () => {

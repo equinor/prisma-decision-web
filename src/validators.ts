@@ -177,6 +177,7 @@ export const DecisionQualityAssessmentSchema = z.object({
 	doable_alternatives: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
+	created_by_id: z.string().optional(),
 	created_at: z.iso.datetime().refine(date => parseISO(date)),
 	updated_at: z.iso
 		.datetime()
@@ -188,6 +189,7 @@ export const assessmentSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Assessment name is required'),
 	project_id: uuid(),
+	is_completed: z.boolean(),
 	decision_quality_assessments: z.array(DecisionQualityAssessmentSchema).optional(),
 });
 
@@ -198,9 +200,9 @@ export type ErrorHandlingState = {
 export const evaluationMetrics: { key: string; label: string }[] = [
 	{ key: 'appropriate_frame', label: 'Appropriate Frame' },
 	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
-	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
-	{ key: 'information_reliability', label: 'Information Reliability' },
 	{ key: 'doable_alternatives', label: 'Doable Alternatives' },
+	{ key: 'information_reliability', label: 'Information Reliability' },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
 	{ key: 'commitment_to_action', label: 'Commitment to Action' },
 ];
 export type Project = z.infer<typeof projectSchema>;

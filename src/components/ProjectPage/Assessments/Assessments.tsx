@@ -1,13 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import {
-	Button,
-	CircularProgress,
-	Icon,
-	Popover,
-	Table,
-	TextField,
-	Tooltip as EdsTooltip,
-} from '@equinor/eds-core-react';
+import { Button, CircularProgress, Icon, Popover, Table, TextField } from '@equinor/eds-core-react';
 import {
 	CartesianGrid,
 	Legend,
@@ -23,21 +15,29 @@ import {
 	YAxis,
 } from 'recharts';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { add, close } from '@equinor/eds-icons';
+import { add, check_circle_outlined, close } from '@equinor/eds-icons';
 import { useAssessmentForm } from '../../../hooks/useAssessmentForm';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
-import { evaluationMetrics, DecisionQualityAssessment } from '../../../validators';
+import {
+	evaluationMetrics,
+	DecisionQualityAssessment,
+	Assessment,
+	ProjectRole,
+} from '../../../validators';
 import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
 import { DecisionQualityAssessmentForm } from './DecisionQualityAssessmentForm';
 import { useGetSignUser } from '../../../hooks/api/useGetSignUser';
+import { getAveragedMetrics } from '../../../utils/getAveragedMetrics';
+import { useUpdateAssessment } from '../../../hooks/api/useUpdateAssessment';
 
 const METRIC_LINE_COLORS: Record<string, string> = {
-	value: 'rgba(var(--eds_primary_resting), 1)',
-	risk: 'rgba(var(--eds_warning_resting), 1)',
-	cost: 'rgba(var(--eds_text_success), 1)',
-	feasibility: 'rgba(var(--eds_danger_text), 1)',
-	impact: 'rgba(var(--eds_text_secondary), 1)',
+	appropriate_frame: 'rgba(var(--eds_primary_resting), 1)',
+	trade_off_analysis: 'rgba(var(--eds_warning_resting), 1)',
+	reasoning_correctness: 'rgba(var(--eds_text_success), 1)',
+	information_reliability: 'rgba(var(--eds_danger_text), 1)',
+	doable_alternatives: 'rgba(var(--eds_text_secondary), 1)',
+	commitment_to_action: '#6366f1',
 };
 
 export const Assessments = () => {
@@ -50,37 +50,17 @@ export const Assessments = () => {
 		formState: { errors },
 		isPending,
 	} = useAssessmentForm({
-		onSuccess: data => {
+		onSuccess: () => {
 			setIsOpen(false);
-			setActiveAssessment({ id: data.id, name: data.name });
 		},
 	});
 	const [isOpen, setIsOpen] = useState(false);
-	const [activeAssessment, setActiveAssessment] = useState<{
-		id: string;
-		name: string;
-	} | null>(null);
 
 	const referenceElement = useRef<HTMLButtonElement>(null);
 
 	const projectAssessments = useMemo(
 		() => (assessments ?? []).filter(a => a.project_id === selectedProject?.id),
 		[assessments, selectedProject?.id],
-	);
-
-	const assessmentNameById = useMemo(
-		() => new Map(projectAssessments.map(a => [a.id, a.name])),
-		[projectAssessments],
-	);
-
-	const sortedEvaluations = useMemo(
-		() =>
-			projectAssessments
-				.flatMap(a => a.decision_quality_assessments ?? [])
-				.sort(
-					(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-				),
-		[projectAssessments],
 	);
 
 	const toChartData = (metrics: Record<string, number>) =>
@@ -90,48 +70,36 @@ export const Assessments = () => {
 			fullMark: 10,
 		}));
 
-	const metricTrendData = useMemo(
-		() =>
-			sortedEvaluations.map((ev, i) => {
-				const values = evaluationMetrics.reduce<Record<string, number>>((acc, metric) => {
-					acc[metric.key] = ev[metric.key as keyof DecisionQualityAssessment] as number;
-					return acc;
-				}, {});
-
-				return {
-					evaluation: ev.created_at
-						? new Date(ev.created_at).toLocaleDateString(undefined, {
-								month: 'short',
-								day: 'numeric',
-							})
-						: `#${i + 1}`,
-					...values,
-				};
-			}),
-		[sortedEvaluations],
-	);
-
-	const hasEvaluations = sortedEvaluations.length > 0;
-	if (!selectedProject) return;
+	const totalUsers = selectedProject?.users.length ?? 0;
 	const isFacilitator =
-		selectedProject.users.find(u => u.user_id === signuser?.user_id)?.role === 'Facilitator';
+		selectedProject?.users.find(u => u.user_id === signuser?.user_id)?.role === 'Facilitator';
+
+	const completedAssessmentTrends = useMemo(() => {
+		return projectAssessments
+			.filter(a => (a.decision_quality_assessments ?? []).length >= totalUsers)
+			.map(a => {
+				const avg = getAveragedMetrics(a.decision_quality_assessments ?? []);
+				return avg ? { name: a.name, ...avg } : null;
+			})
+			.filter(Boolean) as (Record<string, number> & { name: string })[];
+	}, [projectAssessments, totalUsers]);
+
+	if (!selectedProject) return;
+
 	return (
 		<div className='flex flex-col gap-6'>
 			<div className='flex w-full items-center justify-between'>
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
-				<EdsTooltip
-					title={activeAssessment ? 'Complete or close the active assessment first' : ''}
-				>
+				{isFacilitator && (
 					<Button
 						ref={referenceElement}
 						variant='outlined'
-						disabled={!!activeAssessment || !isFacilitator}
 						onClick={() => setIsOpen(prev => !prev)}
 					>
 						<Icon data={add} />
 						Create Assessment
 					</Button>
-				</EdsTooltip>
+				)}
 			</div>
 
 			<Popover
@@ -173,11 +141,12 @@ export const Assessments = () => {
 					</form>
 				</Popover.Content>
 			</Popover>
-			{hasEvaluations && (
+
+			{completedAssessmentTrends.length > 1 && (
 				<section className='bg-background-default shadow-tile rounded-md p-5'>
 					<h2 className='mb-1 text-lg font-semibold'>Metric Trends</h2>
 					<p className='text-text-tertiary mb-4 text-sm'>
-						How metrics have changed across evaluations.
+						Averaged scores across completed assessments.
 					</p>
 					<div className='h-72'>
 						<ResponsiveContainer
@@ -190,12 +159,12 @@ export const Assessments = () => {
 							[&_.recharts-surface]:outline-0!'
 						>
 							<LineChart
-								data={metricTrendData}
+								data={completedAssessmentTrends}
 								margin={{ left: 12, right: 12, top: 8, bottom: 8 }}
 							>
 								<CartesianGrid className='stroke-gray-500/30' vertical={false} />
 								<XAxis
-									dataKey='evaluation'
+									dataKey='name'
 									tickLine={false}
 									axisLine={false}
 									tickMargin={8}
@@ -224,123 +193,257 @@ export const Assessments = () => {
 				</section>
 			)}
 
-			<div className='grid grid-cols-1 gap-6 2xl:grid-cols-2'>
-				{activeAssessment && (
-					<section className='bg-background-default shadow-tile rounded-md p-5'>
-						<DecisionQualityAssessmentForm
-							assessmentId={activeAssessment.id}
-							assessmentName={activeAssessment.name}
-							isFacilitator={isFacilitator}
-							onClose={() => setActiveAssessment(null)}
-						/>
-					</section>
-				)}
-
-				{sortedEvaluations.map(ev => {
-					const metrics = evaluationMetrics.reduce<Record<string, number>>((acc, m) => {
-						acc[m.key] = (ev[m.key as keyof DecisionQualityAssessment] as number) ?? 0;
-						return acc;
-					}, {});
-					return (
-						<section
-							key={ev.id}
-							className='bg-background-default shadow-tile rounded-md p-5'
-						>
-							<div className='mb-4'>
-								<h3 className='text-lg font-semibold'>
-									{assessmentNameById.get(ev.assessment_id) ??
-										'Unnamed Assessment'}
-								</h3>
-								{ev.created_at && (
-									<p className='text-text-tertiary text-sm'>
-										{new Date(ev.created_at).toLocaleDateString(undefined, {
-											year: 'numeric',
-											month: 'short',
-											day: 'numeric',
-										})}{' '}
-										&middot;{' '}
-										{new Date(ev.created_at).toLocaleTimeString(undefined, {
-											hour: '2-digit',
-											minute: '2-digit',
-										})}
-									</p>
-								)}
-							</div>
-							<div className='grid grid-cols-2 items-start gap-4'>
-								<div className='outline-background-medium rounded-sm outline-1'>
-									<Table className='w-full table-fixed'>
-										<Table.Head>
-											<Table.Row>
-												<Table.Cell className='w-2/3'>Metric</Table.Cell>
-												<Table.Cell className='w-1/3'>Score</Table.Cell>
-											</Table.Row>
-										</Table.Head>
-										<Table.Body>
-											{evaluationMetrics.map(m => (
-												<Table.Row key={m.key}>
-													<Table.Cell>{m.label}</Table.Cell>
-													<Table.Cell>
-														<span className='font-medium'>
-															{metrics[m.key] ?? '-'}
-														</span>
-														<span className='text-text-tertiary text-xs'>
-															{' '}
-															/ 10
-														</span>
-													</Table.Cell>
-												</Table.Row>
-											))}
-										</Table.Body>
-									</Table>
-								</div>
-								<div className='h-52'>
-									<ResponsiveContainer
-										width='100%'
-										height='100%'
-										className='[&_.recharts-polar-angle-axis-tick-value]:fill-text-default
-									[&_.recharts-polar-angle-axis-tick-value]:text-xs
-									[&_.recharts-polar-angle-axis-tick-value]:font-medium
-									[&_.recharts-surface]:outline-0!'
-									>
-										<RadarChart data={toChartData(metrics)}>
-											<PolarGrid
-												radialLines={false}
-												className='stroke-gray-500/50 stroke-2'
-											/>
-											<PolarAngleAxis dataKey='metric' />
-											<Tooltip
-												content={({ active, payload }) => {
-													if (active && payload && payload.length) {
-														return (
-															<div className='rounded-sm bg-black p-2 text-sm font-medium text-white'>{`${payload[0].value}/10`}</div>
-														);
-													}
-													return null;
-												}}
-												cursor={false}
-											/>
-											<Radar
-												className='stroke-primary-resting fill-primary-resting stroke-3'
-												name='Score'
-												dataKey='score'
-												fillOpacity={0.5}
-												isAnimationActive={false}
-											/>
-										</RadarChart>
-									</ResponsiveContainer>
-								</div>
-							</div>
-						</section>
-					);
-				})}
-			</div>
-
-			{/* Empty state */}
-			{!hasEvaluations && (
+			{projectAssessments.length === 0 && (
 				<p className='text-text-tertiary text-center text-sm'>
-					No evaluations yet. Use the form above to submit your first evaluation.
+					No assessments yet.{' '}
+					{isFacilitator
+						? 'Create one to start evaluating.'
+						: 'The facilitator will create one.'}
 				</p>
 			)}
+
+			<div className='flex flex-col gap-6'>
+				{projectAssessments.map(assessment => (
+					<AssessmentCard
+						key={assessment.id}
+						assessment={assessment}
+						currentUserId={signuser?.user_id ?? ''}
+						isFacilitator={!!isFacilitator}
+						totalUsers={totalUsers}
+						projectUsers={selectedProject.users}
+						toChartData={toChartData}
+					/>
+				))}
+			</div>
 		</div>
+	);
+};
+
+const AssessmentCard = ({
+	assessment,
+	currentUserId,
+	isFacilitator,
+	totalUsers,
+	toChartData,
+}: {
+	assessment: Assessment;
+	currentUserId: string;
+	isFacilitator: boolean;
+	totalUsers: number;
+	projectUsers: ProjectRole[];
+	toChartData: (
+		metrics: Record<string, number>,
+	) => { metric: string; score: number; fullMark: number }[];
+}) => {
+	const submissions = assessment.decision_quality_assessments ?? [];
+	const isCompleted = assessment.is_completed;
+	const responseCount = submissions.length;
+	const allResponded = isCompleted || responseCount >= totalUsers;
+	const userSubmission = submissions.find(s => s.created_by_id === currentUserId);
+	const [justSubmitted, setJustSubmitted] = useState(false);
+	const hasSubmitted = isCompleted || !!userSubmission || justSubmitted;
+	const canSubmit = !isCompleted;
+	const averagedMetrics = submissions.length > 0 ? getAveragedMetrics(submissions) : null;
+
+	const { mutate: updateAssessment, isPending: isCompleting } = useUpdateAssessment();
+
+	const handleMarkComplete = () => {
+		updateAssessment({ ...assessment, is_completed: true });
+	};
+
+	const [showIndividual, setShowIndividual] = useState(false);
+
+	const showForm = !hasSubmitted && !allResponded && canSubmit;
+
+	return (
+		<section
+			className={`bg-background-default shadow-tile rounded-md p-5 ${showForm ? 'ring-primary-resting ring-2' : ''}`}
+		>
+			{' '}
+			<div className='mb-4 flex items-start justify-between'>
+				<div>
+					<h3 className='text-lg font-semibold'>
+						{assessment.name}
+						{isCompleted && (
+							<span className='ml-2 inline-block rounded-full bg-green-100 px-2 py-0.5 align-middle text-xs font-medium text-green-800'>
+								Completed
+							</span>
+						)}
+					</h3>
+					<p className='text-text-tertiary text-sm'>
+						{isCompleted
+							? `Assessment completed • ${responseCount} responses`
+							: `${responseCount} of ${totalUsers} users responded`}
+					</p>
+				</div>
+				{isFacilitator && responseCount > 0 && (
+					<Button
+						variant='outlined'
+						color='primary'
+						disabled={isCompleting}
+						onClick={handleMarkComplete}
+					>
+						{isCompleting ? (
+							<CircularProgress size={16} />
+						) : isCompleted ? (
+							<>
+								<Icon data={check_circle_outlined} />
+								Completed
+							</>
+						) : (
+							'Mark as Complete'
+						)}
+					</Button>
+				)}
+			</div>
+			{/* Form: show if not yet submitted and user can submit */}
+			{showForm && (
+				<DecisionQualityAssessmentForm
+					assessmentId={assessment.id}
+					assessmentName={assessment.name}
+					onSubmitted={() => setJustSubmitted(true)}
+				/>
+			)}
+			{/* Waiting message */}
+			{!allResponded && (hasSubmitted || !canSubmit) && (
+				<div className='bg-background-light rounded-md p-4'>
+					<p className='text-text-tertiary text-sm'>
+						You submitted your evaluation. Waiting for all users to respond before
+						results are visible.
+					</p>
+				</div>
+			)}
+			{/* Averaged results: only when all users responded */}
+			{allResponded && averagedMetrics && (
+				<div className='mt-4'>
+					<h4 className='mb-2 text-base font-semibold'>Averaged Results</h4>
+					<div className='grid grid-cols-2 items-start gap-4'>
+						<div className='outline-background-medium rounded-sm outline-1'>
+							<Table className='w-full table-fixed'>
+								<Table.Head>
+									<Table.Row>
+										<Table.Cell className='w-2/3'>Metric</Table.Cell>
+										<Table.Cell className='w-1/3'>Avg Score</Table.Cell>
+									</Table.Row>
+								</Table.Head>
+								<Table.Body>
+									{evaluationMetrics.map(m => (
+										<Table.Row key={m.key}>
+											<Table.Cell>{m.label}</Table.Cell>
+											<Table.Cell>
+												<span className='font-medium'>
+													{averagedMetrics[m.key] ?? '-'}
+												</span>
+												<span className='text-text-tertiary text-xs'>
+													{' '}
+													/ 10
+												</span>
+											</Table.Cell>
+										</Table.Row>
+									))}
+								</Table.Body>
+							</Table>
+						</div>
+						<div className='h-52'>
+							<ResponsiveContainer
+								width='100%'
+								height='100%'
+								className='[&_.recharts-polar-angle-axis-tick-value]:fill-text-default
+								[&_.recharts-polar-angle-axis-tick-value]:text-xs
+								[&_.recharts-polar-angle-axis-tick-value]:font-medium
+								[&_.recharts-surface]:outline-0!'
+							>
+								<RadarChart data={toChartData(averagedMetrics)}>
+									<PolarGrid
+										radialLines={false}
+										className='stroke-gray-500/50 stroke-2'
+									/>
+									<PolarAngleAxis dataKey='metric' />
+									<Tooltip
+										content={({ active, payload }) => {
+											if (active && payload && payload.length) {
+												return (
+													<div className='rounded-sm bg-black p-2 text-sm font-medium text-white'>{`${payload[0].value}/10`}</div>
+												);
+											}
+											return null;
+										}}
+										cursor={false}
+									/>
+									<Radar
+										className='stroke-primary-resting fill-primary-resting stroke-3'
+										name='Score'
+										dataKey='score'
+										fillOpacity={0.5}
+										isAnimationActive={false}
+									/>
+								</RadarChart>
+							</ResponsiveContainer>
+						</div>
+					</div>
+				</div>
+			)}
+			{/* Individual responses: facilitator only, after all responded */}
+			{isFacilitator && (
+				<div className='mt-4'>
+					<button
+						type='button'
+						className='text-primary-resting mb-2 text-sm font-medium underline'
+						onClick={() => setShowIndividual(prev => !prev)}
+					>
+						{showIndividual
+							? 'Hide individual responses'
+							: `Show individual responses (${submissions.length})`}
+					</button>
+					{showIndividual && (
+						<div className='outline-background-medium overflow-x-auto rounded-sm outline-1'>
+							<Table className='w-full'>
+								<Table.Head>
+									<Table.Row>
+										<Table.Cell>Metric</Table.Cell>
+										{submissions.map(sub => (
+											<Table.Cell key={sub.id}>{'user'}</Table.Cell>
+										))}
+									</Table.Row>
+								</Table.Head>
+								<Table.Body>
+									{evaluationMetrics.map(m => (
+										<Table.Row key={m.key}>
+											<Table.Cell>{m.label}</Table.Cell>
+											{submissions.map(sub => (
+												<Table.Cell key={sub.id}>
+													<span className='font-medium'>
+														{(sub[
+															m.key as keyof DecisionQualityAssessment
+														] as number) ?? '-'}
+													</span>
+													<span className='text-text-tertiary text-xs'>
+														{' '}
+														/ 10
+													</span>
+												</Table.Cell>
+											))}
+										</Table.Row>
+									))}
+									{submissions.some(s => s.comment) && (
+										<Table.Row>
+											<Table.Cell className='italic'>Comment</Table.Cell>
+											{submissions.map(sub => (
+												<Table.Cell
+													key={sub.id}
+													className='text-text-tertiary text-xs italic'
+												>
+													{sub.comment || '-'}
+												</Table.Cell>
+											))}
+										</Table.Row>
+									)}
+								</Table.Body>
+							</Table>
+						</div>
+					)}
+				</div>
+			)}
+		</section>
 	);
 };

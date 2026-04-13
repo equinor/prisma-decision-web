@@ -10,7 +10,10 @@ export const useUpdateAssessment = () => {
 			return assessment;
 		},
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['projects'] });
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: ['projects'] }),
+				queryClient.refetchQueries({ queryKey: ['assessments'] }),
+			]);
 		},
 	});
 };
