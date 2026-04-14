@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 import { msalInstance, scopes } from './auth/config';
 
 export const apiClient = axios.create({
@@ -8,9 +8,7 @@ export const apiClient = axios.create({
 	},
 });
 
-// Optional: request/response interceptors
-apiClient.interceptors.request.use(config => {
-	// Example: attach token
+export const msalInterceptor = (config: InternalAxiosRequestConfig) => {
 	return msalInstance
 		.acquireTokenSilent({
 			account: msalInstance.getAllAccounts()[0],
@@ -26,4 +24,15 @@ apiClient.interceptors.request.use(config => {
 					scopes: scopes,
 				}) as never,
 		);
-});
+};
+
+export const publicInterceptor = (config: InternalAxiosRequestConfig) => {
+	const username = localStorage.getItem('username');
+	if (username) {
+		config.headers.authorization = `Bearer ${username}`;
+	}
+	return config;
+};
+
+// Optional: request/response interceptors
+apiClient.interceptors.request.use(publicInterceptor);

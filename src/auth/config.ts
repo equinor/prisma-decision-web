@@ -1,5 +1,4 @@
-import { Configuration, IPublicClientApplication } from '@azure/msal-browser';
-import { PublicClientApplication } from '@azure/msal-browser';
+import { Configuration, PublicClientApplication } from '@azure/msal-browser';
 
 const REDIRECT_URI = import.meta.env.VITE_APP_REDIRECT_URI;
 const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID;
@@ -18,7 +17,7 @@ export const msalConfig: Configuration = {
 export const scopes = [import.meta.env.VITE_APP_PRISMA_API_SCOPE];
 
 export const msalInstance = new PublicClientApplication(msalConfig);
-export const initializeAuth = async (msalInstance: IPublicClientApplication) => {
+export const initializeMsalAuth = async () => {
 	await msalInstance.initialize?.();
 
 	const response = await msalInstance.handleRedirectPromise();
@@ -41,4 +40,11 @@ export const initializeAuth = async (msalInstance: IPublicClientApplication) => 
 				scopes: scopes,
 			});
 		});
+};
+
+export const initializePublicAuth = async () => {
+	const user = localStorage.getItem('username');
+	if (user) return;
+	const username = prompt('Enter your username:');
+	if (username) localStorage.setItem('username', username);
 };

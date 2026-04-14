@@ -6,15 +6,9 @@ metadata:
 spec:
     build:
     environments:
-        - name: prod
+        - name: public
           build:
-            from: PROD
-        - name: test
-          build:
-            from: TEST   
-        - name: dev
-          build:
-              from: main
+            from: PUBLIC
     components:
         - name: frontend
           src: .
@@ -24,12 +18,6 @@ spec:
                 port: 3000
     dnsAlias:
         - alias: prisma
-          environment: prod
+          environment: public
           component: frontend
-        - alias: prisma-test
-          environment: test
-          component: frontend
-        - alias: prisma-dev
-          environment: dev
-          component: frontend 
         
