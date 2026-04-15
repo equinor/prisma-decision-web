@@ -2,8 +2,8 @@ import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-qu
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import { initializePublicAuth } from './auth/config.ts';
 import { showErrorToast } from './components/ShowToast.tsx';
+import { initializePublicAuth, initializeMsalAuth } from './auth/config.ts';
 import { isPublic } from './utils/getEnvironment';
 import './index.css';
 
@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
 	}),
 });
 
-const initAuth = isPublic() ? initializePublicAuth : initializePublicAuth;
+const initAuth = isPublic() ? initializePublicAuth : initializeMsalAuth;
 initAuth().then(() => {
 	return createRoot(document.getElementById('root')!).render(
 		<StrictMode>
