@@ -1,5 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { msalInstance, scopes } from './auth/config';
+import { isPublic } from './utils/getEnvironment';
 
 export const apiClient = axios.create({
 	baseURL: import.meta.env.VITE_APP_PRISMA_API_URL,
@@ -29,10 +30,10 @@ export const msalInterceptor = (config: InternalAxiosRequestConfig) => {
 export const publicInterceptor = (config: InternalAxiosRequestConfig) => {
 	const username = localStorage.getItem('username');
 	if (username) {
-		config.headers.authorization = `Bearer ${username}`;
+		config.headers['X-Username'] = username;
 	}
 	return config;
 };
 
 // Optional: request/response interceptors
-apiClient.interceptors.request.use(publicInterceptor);
+apiClient.interceptors.request.use(isPublic() ? publicInterceptor : publicInterceptor);

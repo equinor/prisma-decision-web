@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { initializePublicAuth } from './auth/config.ts';
 import { showErrorToast } from './components/ShowToast.tsx';
+import { isPublic } from './utils/getEnvironment';
 import './index.css';
 
 const queryClient = new QueryClient({
@@ -23,7 +24,8 @@ const queryClient = new QueryClient({
 	}),
 });
 
-initializePublicAuth().then(() => {
+const initAuth = isPublic() ? initializePublicAuth : initializePublicAuth;
+initAuth().then(() => {
 	return createRoot(document.getElementById('root')!).render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
