@@ -16,7 +16,7 @@ spec:
               - name: http
                 port: 3000
     dnsAlias:
-        - alias: prisma
+        - alias: prisma-public
           environment: public
           component: frontend
         
