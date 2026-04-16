@@ -1,10 +1,9 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-    name: prisma-decision-web
+    name: prisma-decision-web-public
 
 spec:
-    build:
     environments:
         - name: public
           build:

@@ -3,7 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { showErrorToast } from './components/ShowToast.tsx';
-import { initializePublicAuth, initializeMsalAuth } from './auth/config.ts';
+import { initializeMsalAuth } from './auth/config.ts';
 import { isPublic } from './utils/getEnvironment';
 import './index.css';
 
@@ -24,8 +24,8 @@ const queryClient = new QueryClient({
 	}),
 });
 
-const initAuth = isPublic() ? initializePublicAuth : initializeMsalAuth;
-initAuth().then(() => {
+const initAuth = isPublic() ? Promise.resolve() : initializeMsalAuth();
+initAuth.then(() => {
 	return createRoot(document.getElementById('root')!).render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>

@@ -41,10 +41,3 @@ export const initializeMsalAuth = async () => {
 			});
 		});
 };
-
-export const initializePublicAuth = async () => {
-	const user = localStorage.getItem('username');
-	if (user) return;
-	const username = prompt('Enter your username:');
-	if (username) localStorage.setItem('username', username);
-};

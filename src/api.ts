@@ -28,7 +28,7 @@ export const msalInterceptor = (config: InternalAxiosRequestConfig) => {
 };
 
 export const publicInterceptor = (config: InternalAxiosRequestConfig) => {
-	const username = localStorage.getItem('username');
+	const username = sessionStorage.getItem('username');
 	if (username) {
 		config.headers['X-Username'] = username;
 	}
@@ -36,4 +36,4 @@ export const publicInterceptor = (config: InternalAxiosRequestConfig) => {
 };
 
 // Optional: request/response interceptors
-apiClient.interceptors.request.use(isPublic() ? publicInterceptor : publicInterceptor);
+apiClient.interceptors.request.use(isPublic() ? publicInterceptor : msalInterceptor);

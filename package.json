@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"public": "VITE_APP_IS_PUBLIC=true vite",
+		"public": "vite --mode public",
 		"build": "tsc && vite build",
 		"build:dev": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode development",
 		"build:public": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode production",

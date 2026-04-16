@@ -1,4 +1,10 @@
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router';
+import {
+	createBrowserRouter,
+	createRoutesFromElements,
+	Navigate,
+	Route,
+	RouterProvider,
+} from 'react-router';
 import { CreateProjectPage } from './components/CreateProjectPage/CreateProjectPage';
 import { HomePage } from './components/Homepage/HomePage';
 import { Layout } from './components/Layout';
@@ -11,29 +17,43 @@ import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree
 import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
-import { Assessments } from './components/ProjectPage/Assessments/Assessments';
+import { PublicLoginPage } from './components/PublicLoginPage';
+import { isPublic } from './utils/getEnvironment';
+
+const RequirePublicAuth = ({ children }: { children: React.ReactNode }) => {
+	if (isPublic() && !sessionStorage.getItem('username')) {
+		return <Navigate to='/login' replace />;
+	}
+	return children;
+};
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
-		<Route element={<Layout />}>
-			<Route path='/' element={<HomePage />} />
-			<Route path='/create-project' element={<CreateProjectPage />} />
-			<Route path='/project/:projectId/' element={<ProjectPage />}>
-				<Route index element={<ProjectDetails />} />
-				<Route path='issues' element={<ProjectIssues />} />
-				<Route path='objectives' element={<ProjectObjectives />} />
-				<Route path='influence-diagram' element={<InfluenceDiagram />} />
-				<Route path='decision-tree' element={<DecisionTree />} />
-				<Route path='compact-tree' element={<CompactTree />} />
-				<Route path='solution-tree' element={<SolutionTree />} />
-				<Route path='strategies' element={<Strategies />} />
-				<Route path='assessments' element={<Assessments />} />
+		<>
+			{isPublic() && <Route path='/login' element={<PublicLoginPage />} />}
+			<Route
+				element={
+					<RequirePublicAuth>
+						<Layout />
+					</RequirePublicAuth>
+				}
+			>
+				<Route path='/' element={<HomePage />} />
+				<Route path='/create-project' element={<CreateProjectPage />} />
+				<Route path='/project/:projectId/' element={<ProjectPage />}>
+					<Route index element={<ProjectDetails />} />
+					<Route path='issues' element={<ProjectIssues />} />
+					<Route path='objectives' element={<ProjectObjectives />} />
+					<Route path='influence-diagram' element={<InfluenceDiagram />} />
+					<Route path='decision-tree' element={<DecisionTree />} />
+					<Route path='compact-tree' element={<CompactTree />} />
+					<Route path='solution-tree' element={<SolutionTree />} />
+					<Route path='strategies' element={<Strategies />} />
+				</Route>
 			</Route>
-		</Route>,
+		</>,
 	),
 );
-
-
 
 function App() {
 	return <RouterProvider router={router} />;
