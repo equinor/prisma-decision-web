@@ -14,6 +14,10 @@ export const PublicLoginPage = () => {
 			setError('Username is required');
 			return;
 		}
+		if (trimmed.length < 3 || trimmed.length > 50) {
+			setError('Username must be between 3 and 50 characters');
+			return;
+		}
 		sessionStorage.setItem('username', trimmed);
 		navigate('/');
 	};
@@ -25,17 +29,24 @@ export const PublicLoginPage = () => {
 					<h1 className='text-3xl font-bold'>Welcome to Prisma</h1>
 					<p className='text-text-tertiary'>Enter a username to get started.</p>
 				</div>
-				<Input
-					label='Username'
-					value={username}
-					onChange={e => {
-						setUsername(e.target.value);
-						setError('');
-					}}
-					variant={error ? 'error' : undefined}
-					helperText={error}
-					autoFocus
-				/>
+				<div>
+					<Input
+						label='Username'
+						value={username}
+						maxLength={50}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							setUsername(e.target.value);
+							setError('');
+						}}
+						variant={error ? 'error' : undefined}
+						helperText={error}
+						autoFocus
+					/>
+					<p className='text-text-tertiary mt-2 text-xs'>
+						Do not use your real email or personal information. This username is stored
+						in the database. By continuing, you acknowledge this at your own risk.
+					</p>
+				</div>
 				<Button type='submit'>Continue</Button>
 			</form>
 		</div>
