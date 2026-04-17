@@ -32,7 +32,7 @@ router.get('*', (req, res) => {
 		"style-src 'self' 'unsafe-inline' https://cdn.eds.equinor.com",
 		"font-src 'self' https://cdn.eds.equinor.com",
 		"img-src 'self' data: https:",
-		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com",
+		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com https://api-prisma-decision-api-public-public.radix.equinor.com",
 		"base-uri 'self'",
 		"form-action 'self'",
 	].join('; ');
