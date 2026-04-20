@@ -26,7 +26,8 @@ export const PublicLoginPage = () => {
 		<div className='flex h-screen items-center justify-center'>
 			<form onSubmit={handleSubmit} className='flex w-[min(400px,90%)] flex-col gap-6'>
 				<div>
-					<h1 className='text-3xl font-bold'>Welcome to Prisma</h1>
+					<h1 className='text-3xl font-bold'>Prisma Login</h1>
+					<br />
 					<p className='text-text-tertiary'>Enter a username to get started.</p>
 				</div>
 				<div>
