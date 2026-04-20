@@ -9,6 +9,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../FormErrorMessage';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useDebounce } from '@uidotdev/usehooks';
+import { isPublic } from '../../../utils/getEnvironment';
 
 type UserSectionProps = {
 	handleSubmit: () => void;
@@ -205,6 +206,9 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	const teamMembersCount = selectedUsers.length;
 	const showEmptySearch = hasActiveSearch && availableUsersCount === 0;
 	const showIdleEmpty = !hasActiveSearch && availableUsersCount === 0;
+	const searchPlaceholder = isPublic()
+		? 'Search users to add to project...'
+		: 'Search users within Equinor organization...';
 
 	return (
 		<div
@@ -214,20 +218,15 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 			<div className='grid gap-4 2xl:grid-cols-[600px_1fr]'>
 				<div className='border-background-medium flex h-144 flex-col gap-4'>
 					<div className='flex items-center justify-between'>
-						<div>
-							<div className='flex gap-2'>
-								<h2 className='text-2xl font-semibold'>All Users</h2>
-								<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-									{availableUsersCount}
-								</span>
-							</div>
-							<p className='text-text-tertiary text-sm'>
-								Search and add users to the project
-							</p>
+						<div className='flex gap-2'>
+							<h2 className='text-2xl font-semibold'>All Users</h2>
+							<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+								{availableUsersCount}
+							</span>
 						</div>
 					</div>
 					<Search
-						placeholder='Search users within equinor...'
+						placeholder={searchPlaceholder}
 						value={searchTerm}
 						className='mb'
 						onChange={e => {
@@ -245,7 +244,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 							</div>
 						) : showIdleEmpty ? (
 							<div className='text-text-tertiary p-6 text-center text-sm'>
-								Search to add users from your tenant.
+								No users to display. Use the search above to find users.
 							</div>
 						) : (
 							<AllUsersTable
