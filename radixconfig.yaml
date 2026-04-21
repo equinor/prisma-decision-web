@@ -15,8 +15,9 @@ spec:
           ports:
               - name: http
                 port: 3000
-    dnsAlias:
-        - alias: prisma-public
-          environment: public
-          component: frontend
+    dnsExternalAlias:
+      - alias: prisma-demo.equinor.com
+        environment: public
+        component: frontend 
+        useCertificateAutomation: true
         
