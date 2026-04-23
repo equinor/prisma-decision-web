@@ -9,11 +9,24 @@ export const useUpdateAssessment = () => {
 			await apiClient.put('/assessments', [assessment]);
 			return assessment;
 		},
+		onMutate: (updatedAssessment: Assessment) => {
+			queryClient.cancelQueries({ queryKey: ['assessments'] });
+			const previousAssessments =
+				queryClient.getQueryData<Assessment[]>(['assessments']) || [];
+			const updatedAssessments = previousAssessments.map(a =>
+				a.id === updatedAssessment.id ? updatedAssessment : a,
+			);
+			queryClient.setQueryData(['assessments'], updatedAssessments);
+			return { previousAssessments };
+		},
 		onSuccess: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: ['projects'] }),
-				queryClient.refetchQueries({ queryKey: ['assessments'] }),
-			]);
+			queryClient.refetchQueries({ queryKey: ['projects'] });
+			queryClient.refetchQueries({ queryKey: ['assessments'] });
+		},
+		onError: (_err, _updatedAssessment, context) => {
+			if (context?.previousAssessments) {
+				queryClient.setQueryData(['assessments'], context.previousAssessments);
+			}
 		},
 	});
 };

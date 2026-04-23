@@ -11,6 +11,7 @@ const getDefaultValues = (projectId: string): Assessment => ({
 	name: '',
 	is_completed: false,
 	project_id: projectId,
+	created_at: new Date().toISOString(),
 });
 type UseAssessmentFormArgs = {
 	assessment?: Assessment;

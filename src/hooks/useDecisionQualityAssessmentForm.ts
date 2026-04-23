@@ -11,12 +11,12 @@ type UseDecisionQualityAssessmentFormArgs = {
 
 const getDefaultValues = (assessmentId: string, userId: string): DecisionQualityAssessment => ({
 	id: crypto.randomUUID(),
-	appropriate_frame: 5,
-	trade_off_analysis: 5,
-	reasoning_correctness: 5,
-	information_reliability: 5,
-	commitment_to_action: 5,
-	doable_alternatives: 5,
+	appropriate_frame: 50,
+	trade_off_analysis: 50,
+	reasoning_correctness: 50,
+	information_reliability: 50,
+	commitment_to_action: 50,
+	doable_alternatives: 50,
 	comment: '',
 	assessment_id: assessmentId,
 	created_by_id: userId,

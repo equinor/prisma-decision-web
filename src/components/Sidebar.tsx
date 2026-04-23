@@ -13,7 +13,9 @@ import { Link } from 'react-router';
 import { useSelectedProject } from '../hooks/useSelectedProject';
 import { ChessIcon, compactTreeIcon } from '../icons';
 import { EquinorStar } from './EquinorStar';
-import { usePendingAssessmentCount } from '../hooks/usePendingAssessmentCount';
+
+import { cn } from '../utils/cn';
+import { usePendingAssessmentCount } from '../hooks/api/usePendingAssessmentCount';
 
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -134,20 +136,19 @@ export const SideBar = () => {
 				>
 					EVALUATE
 				</p>
-				<div className='relative'>
-					<EdsSideBar.Link
-						as={Link}
-						label='Assessments'
-						className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:w-full!'
-						icon={star_outlined}
-						to={`/project/${project.id}/assessments`}
-					/>
-					{pendingCount > 0 && (
-						<span className='absolute top-1 right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white'>
-							{pendingCount}
-						</span>
+				<EdsSideBar.Link
+					as={Link}
+					label='Assessments'
+					className={cn(
+						'[&_svg]:fill-primary-resting relative border-b-0! [&_svg]:w-full!',
+						{
+							'after:absolute after:top-6.5 after:right-6.5 after:size-2.5 after:animate-pulse after:rounded-full after:bg-red-600':
+								pendingCount > 0,
+						},
 					)}
-				</div>
+					icon={star_outlined}
+					to={`/project/${project.id}/assessments`}
+				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>
 				<div className='flex items-center justify-center py-4'>
