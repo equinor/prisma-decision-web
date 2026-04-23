@@ -75,7 +75,7 @@ export const DecisionFormSection = () => {
 								})}
 								className='flex-1'
 								type='number'
-								pattern='[0-9]*'
+								step={0.01}
 							/>
 							<ErrorMessage
 								as={FormErrorMessage}

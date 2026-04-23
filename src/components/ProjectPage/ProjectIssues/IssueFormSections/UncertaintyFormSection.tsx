@@ -48,6 +48,7 @@ export const UncertaintyFormSection = () => {
 										return isNaN(num) ? 0 : num;
 									},
 								})}
+								step={0.01}
 							/>
 							<ErrorMessage
 								as={FormErrorMessage}
