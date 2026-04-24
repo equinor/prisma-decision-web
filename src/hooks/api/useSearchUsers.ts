@@ -7,7 +7,7 @@ export const useSearchUsers = (debouncedSearchTerm: string) => {
 		queryKey: ['graphUsers', debouncedSearchTerm],
 		queryFn: async () => {
 			const [graphUsersResponse, prismaUsersResponse] = await Promise.all([
-				apiClient.get<User[]>(`/graph/users/search?query=${debouncedSearchTerm}`),
+				apiClient.get<User[]>(`/users/search?query=${debouncedSearchTerm}`),
 				apiClient.get<User[]>('/users'),
 			]);
 			const combinedUsers = graphUsersResponse.data.map(graphUser => {
