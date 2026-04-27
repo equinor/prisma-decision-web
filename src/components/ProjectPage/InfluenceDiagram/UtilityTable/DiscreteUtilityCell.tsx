@@ -19,6 +19,7 @@ export const DiscreteUtilityCell = ({ utilityId, discreteUtilities }: DiscretePr
 				className='nopan nodrag [&_input]:bg-background-default! w-full'
 				defaultValue={Math.round((du.utility_value || 0) * 100) / 100}
 				data-probability-id={du?.id}
+				step={0.01}
 			/>
 		</td>
 	);
