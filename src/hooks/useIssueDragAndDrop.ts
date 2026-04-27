@@ -1,5 +1,5 @@
 import { move } from '@dnd-kit/helpers';
-import { DragDropEvents } from '@dnd-kit/react';
+import { DragDropEventHandlers } from '@dnd-kit/react';
 import { useState } from 'react';
 import { groupByIssueType } from '../utils/groupByIssueType';
 import { IssueType, Issue } from '../validators';
@@ -17,7 +17,7 @@ export const useIssueDragAndDrop = () => {
 	> | null>(null);
 	const localIssues = tempIssues ? tempIssues : issues;
 
-	const onDragOver: DragDropEvents['dragover'] = event => {
+	const onDragOver: DragDropEventHandlers['onDragOver'] = event => {
 		if (event.operation?.target?.type === 'column' && event.operation.source) {
 			event.operation.source.data.issue.type = event.operation.target.id;
 		}
@@ -29,7 +29,7 @@ export const useIssueDragAndDrop = () => {
 		setTempIssues(move(newTempIssues, event));
 	};
 
-	const onDragEnd: DragDropEvents['dragend'] = () => {
+	const onDragEnd: DragDropEventHandlers['onDragEnd'] = () => {
 		if (!tempIssues) return;
 		Object.keys(tempIssues).forEach(key => {
 			tempIssues[key as Exclude<IssueType, 'Utility'>].forEach((issue, index) => {
@@ -42,7 +42,7 @@ export const useIssueDragAndDrop = () => {
 		updateIssues(updatedIssues);
 	};
 
-	const onBeforeDragStart: DragDropEvents['beforedragstart'] = event => {
+	const onBeforeDragStart: DragDropEventHandlers['onBeforeDragStart'] = event => {
 		if (!canDndStartFrom(event.operation.activatorEvent?.target)) {
 			event.preventDefault();
 		}
