@@ -5,6 +5,7 @@ import {
 	info_circle,
 	measure,
 	share,
+	star_outlined,
 	timeline,
 } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
@@ -13,11 +14,15 @@ import { useSelectedProject } from '../hooks/useSelectedProject';
 import { ChessIcon, compactTreeIcon } from '../icons';
 import { EquinorStar } from './EquinorStar';
 
+import { cn } from '../utils/cn';
+import { usePendingAssessmentCount } from '../hooks/api/usePendingAssessmentCount';
+
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isDecisionTreeMenuOpen, setIsDecisionTreeMenuOpen] = useState(false);
 	const decisionTreeButtonRef = useRef<HTMLButtonElement>(null);
 	const project = useSelectedProject();
+	const pendingCount = usePendingAssessmentCount();
 	if (!project) return <div />;
 	return (
 		<EdsSideBar
@@ -124,6 +129,26 @@ export const SideBar = () => {
 						</Button>
 					</Popover.Content>
 				</Popover>
+				<Divider className='my-0!' />
+				<p
+					data-open={isOpen}
+					className='pt-3 pb-2 text-xs data-[open="false"]:text-center data-[open="true"]:pl-6'
+				>
+					EVALUATE
+				</p>
+				<EdsSideBar.Link
+					as={Link}
+					label='Assessments'
+					className={cn(
+						'[&_svg]:fill-primary-resting relative border-b-0! [&_svg]:w-full!',
+						{
+							'after:absolute after:top-6.5 after:right-6.5 after:size-2.5 after:animate-pulse after:rounded-full after:bg-red-600':
+								pendingCount > 0,
+						},
+					)}
+					icon={star_outlined}
+					to={`/project/${project.id}/assessments`}
+				/>
 			</EdsSideBar.Content>
 			<EdsSideBar.Footer>
 				<div className='flex items-center justify-center py-4'>

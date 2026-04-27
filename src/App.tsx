@@ -11,6 +11,7 @@ import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree
 import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
+import { Assessments } from './components/ProjectPage/Assessments/Assessments';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -26,6 +27,7 @@ const router = createBrowserRouter(
 				<Route path='compact-tree' element={<CompactTree />} />
 				<Route path='solution-tree' element={<SolutionTree />} />
 				<Route path='strategies' element={<Strategies />} />
+				<Route path='assessments' element={<Assessments />} />
 			</Route>
 		</Route>,
 	),

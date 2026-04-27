@@ -167,10 +167,43 @@ export const projectImportSchema = z.object({
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
 });
+export const DecisionQualityAssessmentSchema = z.object({
+	id: uuid(),
+	appropriate_frame: z.number(),
+	trade_off_analysis: z.number(),
+	reasoning_correctness: z.number(),
+	information_reliability: z.number(),
+	commitment_to_action: z.number(),
+	doable_alternatives: z.number(),
+	comment: z.string().optional(),
+	assessment_id: uuid(),
+	created_by_id: z.string().optional(),
+	created_at: z.iso.datetime(),
+	updated_at: z.iso.datetime().optional(),
+});
+
+export const assessmentSchema = z.object({
+	id: uuid(),
+	name: z.string().min(1, 'Assessment name is required'),
+	project_id: uuid(),
+	is_completed: z.boolean(),
+	decision_quality_assessments: z.array(DecisionQualityAssessmentSchema).optional(),
+	created_at: z.iso.datetime(),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
 };
+export const evaluationMetrics = [
+	{ key: 'appropriate_frame', label: 'Appropriate Frame' },
+	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
+	{ key: 'doable_alternatives', label: 'Doable Alternatives' },
+	{ key: 'information_reliability', label: 'Information Reliability' },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
+	{ key: 'commitment_to_action', label: 'Commitment to Action' },
+] as const;
+
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
@@ -185,3 +218,5 @@ export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
 export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
+export type Assessment = z.infer<typeof assessmentSchema>;
+export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
