@@ -1,15 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useGetDecisionTree = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
-			const res = await apiClient.get<DecisionTree>(
-				`/structure/${projectId}/decision_tree/v2`,
-			);
-			return res.data;
+			try {
+				const res = await apiClient.get<DecisionTree>(
+					`/structure/${projectId}/decision_tree/v2`,
+				);
+				return res.data;
+			} catch (error) {
+				showErrorToast('Failed to fetch decision tree');
+				throw error as AxiosError;
+			}
 		},
 		retry: false,
 		enabled: !!projectId,

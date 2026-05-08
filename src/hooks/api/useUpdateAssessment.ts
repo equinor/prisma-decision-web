@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Assessment } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateAssessment = () => {
 	const queryClient = useQueryClient();
@@ -27,6 +28,7 @@ export const useUpdateAssessment = () => {
 			if (context?.previousAssessments) {
 				queryClient.setQueryData(['assessments'], context.previousAssessments);
 			}
+			showErrorToast('Failed to update assessment');
 		},
 	});
 };

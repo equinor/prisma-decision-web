@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project, ProjectImportData } from '../../validators';
+import { showErrorToast, showSuccessToast } from '../../components/ShowToast';
+
 export const useImportProject = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -9,6 +11,7 @@ export const useImportProject = () => {
 			return res.data[0];
 		},
 		onSuccess: async () => {
+			showSuccessToast('Project imported successfully');
 			Promise.all([
 				queryClient.refetchQueries({ queryKey: ['projects'] }),
 				queryClient.refetchQueries({ queryKey: ['issues'] }),
@@ -19,6 +22,9 @@ export const useImportProject = () => {
 				queryClient.refetchQueries({ queryKey: ['assessments'] }),
 				queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] }),
 			]);
+		},
+		onError: () => {
+			showErrorToast('Failed to import project');
 		},
 	});
 };

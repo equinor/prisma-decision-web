@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useDeleteProject } from '../../hooks/api/useDeleteProject';
 import { Project } from '../../validators';
 
-export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
+export const DeleteProjectDialog = ({ project, showLabel }: DeleteProjectDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { mutate: deleteProject } = useDeleteProject();
 	return (
 		<>
 			<Button
-				variant='ghost_icon'
+				variant={showLabel ? 'outlined' : 'ghost_icon'}
+				color={showLabel ? 'danger' : undefined}
 				onClick={e => {
 					e.stopPropagation();
 					e.preventDefault();
@@ -18,6 +19,7 @@ export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 				}}
 			>
 				<Icon data={delete_to_trash} />
+				{showLabel && 'Delete'}
 			</Button>
 			{isOpen && (
 				<Dialog
@@ -59,4 +61,5 @@ export const DeleteProjectDialog = ({ project }: DeleteProjectDialogProps) => {
 
 type DeleteProjectDialogProps = {
 	project: Project;
+	showLabel?: boolean;
 };

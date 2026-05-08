@@ -4,7 +4,7 @@ import { useGetEdges } from '../../hooks/api/useGetEdges';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { Edge, Issue, Project } from '../../validators';
 
-export const ExportProject = ({ project }: DownloadProjectJsonButtonProps) => {
+export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonProps) => {
 	const { issues } = useGetIssues();
 	const { edges } = useGetEdges();
 	const projectIssues: Issue[] = issues.filter(issue => issue.project_id === project.id);
@@ -23,7 +23,7 @@ export const ExportProject = ({ project }: DownloadProjectJsonButtonProps) => {
 	return (
 		<Tooltip title='Click to download project as JSON format'>
 			<Button
-				variant='ghost_icon'
+				variant={showLabel ? 'outlined' : 'ghost_icon'}
 				label='Download project as JSON format'
 				onClick={async e => {
 					e.preventDefault();
@@ -37,6 +37,7 @@ export const ExportProject = ({ project }: DownloadProjectJsonButtonProps) => {
 				}}
 			>
 				<Icon data={download} />
+				{showLabel && 'Download'}
 			</Button>
 		</Tooltip>
 	);
@@ -44,4 +45,5 @@ export const ExportProject = ({ project }: DownloadProjectJsonButtonProps) => {
 
 type DownloadProjectJsonButtonProps = {
 	project: Project;
+	showLabel?: boolean;
 };

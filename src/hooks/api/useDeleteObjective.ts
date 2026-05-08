@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective, Project } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useDeleteObjective = () => {
 	const queryClient = useQueryClient();
@@ -28,6 +29,7 @@ export const useDeleteObjective = () => {
 			return { previousProjects };
 		},
 		onError: (_err, _deletedObjective, context) => {
+			showErrorToast('Failed to delete objective');
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}

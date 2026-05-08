@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import z from 'zod/v4';
-
 export const useGetInfluenceDiagramErrors = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['influenceDiagramErrors', projectId],
@@ -9,7 +8,14 @@ export const useGetInfluenceDiagramErrors = (projectId?: string) => {
 			try {
 				await apiClient.get(`/structure/${projectId}/influence_diagram`);
 			} catch (error) {
-				return parseDecisionTreeError(error);
+				const parsed = parseDecisionTreeError(error);
+				if (parsed.message) {
+					return parsed;
+				}
+				// need a change in api but capture validation error with 400 and show toast on other types of error
+				// if (error instanceof AxiosError && error.response?.status === 400) {
+				// }
+				// showErrorToast('Failed to fetch influence diagram. Please try again later.');
 			}
 			return INITIAL_ERROR_STATE;
 		},
