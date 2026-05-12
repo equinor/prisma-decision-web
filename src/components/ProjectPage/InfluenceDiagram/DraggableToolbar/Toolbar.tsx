@@ -8,10 +8,14 @@ import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
 import {} from '../../../../utils/convertNodeToInfluenceNode';
+import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { CreateIssues } from '../../../common/CreateIssue';
 import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
-import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
+import {
+	InfluenceDiagramValidation,
+	ValidateProbabilityTable,
+} from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
@@ -27,6 +31,8 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const selectedProject = useSelectedProject();
 
 	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
+	const issues = useSelectedProjectIssues();
+	const hasValidationErrors = !!errors?.message || ValidateProbabilityTable(issues);
 	return (
 		<div
 			ref={ref}
@@ -52,7 +58,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ChangeIssueType />
 			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
-			{errors?.message && (
+			{hasValidationErrors && (
 				<>
 					<div className='bg-background-light h-9 w-0.5' />
 					<InfluenceDiagramValidation />

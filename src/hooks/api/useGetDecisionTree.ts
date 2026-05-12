@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 
-export const useGetDecisionTree = (projectId?: string) => {
+export const useGetDecisionTree = (projectId?: string, enabledGetDecisionTree?: boolean) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
@@ -12,9 +12,13 @@ export const useGetDecisionTree = (projectId?: string) => {
 			return res.data;
 		},
 		retry: false,
-		enabled: !!projectId,
+		enabled: !!projectId && enabledGetDecisionTree,
 	});
-	return { data, ...rest };
+
+	return {
+		data: data,
+		...rest,
+	};
 };
 export type DecisionTree = {
 	tree_node: {

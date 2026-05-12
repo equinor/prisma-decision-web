@@ -6,9 +6,9 @@ import { convertDecisionTreeToNodesAndEdges } from '../../../utils/convertDecisi
 import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
-export const useDecisionTree = () => {
+export const useDecisionTree = (enabledGetDecisionTree?: boolean) => {
 	const project = useSelectedProject();
-	const { data: decisionTree, isError } = useGetDecisionTree(project?.id);
+	const { data: decisionTree } = useGetDecisionTree(project?.id, enabledGetDecisionTree);
 	const expanded = useAtomValue(expandedDecisionTreeNodes);
 	const selected = useAtomValue(testAtom);
 
@@ -27,7 +27,6 @@ export const useDecisionTree = () => {
 	return {
 		nodes,
 		edges,
-		isError,
 	};
 };
 
