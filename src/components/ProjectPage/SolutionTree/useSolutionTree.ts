@@ -5,9 +5,9 @@ import { convertSolutionTreeToNodesAndEdges } from '../../../utils/convertSoluti
 import { getDecisionTreeLayout } from '../../../utils/getDecisionTreeLayout';
 import { useGetSolutionTree } from '../../../hooks/api/useGetSolutionTree';
 
-export const useSolutionTree = () => {
+export const useSolutionTree = (enabledGetSolutionTree?: boolean) => {
 	const project = useSelectedProject();
-	const { data: decisionTree, isError } = useGetSolutionTree(project?.id);
+	const { data: decisionTree } = useGetSolutionTree(project?.id, enabledGetSolutionTree);
 	const selected = useAtomValue(testAtom);
 
 	const { nodes, edges } = useMemo(() => {
@@ -24,7 +24,6 @@ export const useSolutionTree = () => {
 	return {
 		nodes,
 		edges,
-		isError,
 	};
 };
 

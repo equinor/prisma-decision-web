@@ -2,13 +2,10 @@ import { Background, ReactFlow } from '@xyflow/react';
 import { EDGE_TYPES, NODE_TYPES, REACT_FLOW_CONFIG } from '../../../config/decisionTree';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
 import { useDecisionTree } from './useDecisionTree';
-import { useGetInfluenceDiagramErrors } from '../../../hooks/api/useGetInfluenceDiagramErrors';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const DecisionTree = () => {
-	const selectedProject = useSelectedProject();
-	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
-	const hasValidationError = !!errors?.message;
+	const hasValidationError = useHasInfluenceDiagramError();
 	const { nodes, edges } = useDecisionTree(!hasValidationError);
 
 	return (

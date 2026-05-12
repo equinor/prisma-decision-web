@@ -352,7 +352,10 @@ export const InfluenceDiagramValidation = () => {
 				onClose={() => setShowValidation(false)}
 			>
 				<Popover.Content>
-					<p>Validation and guidelines for building valid influence diagram.</p>
+					<div className='m-1 flex items-center justify-between gap-4'>
+						<p>Validation and guidelines for building valid influence diagram.</p>
+						<Button onClick={() => setShowValidation(false)}> Hide</Button>
+					</div>
 					<Divider />
 
 					{/* Error Alert */}

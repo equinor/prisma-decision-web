@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { DecisionTree } from './useGetDecisionTree';
 
-export const useGetSolutionTree = (projectId?: string) => {
+export const useGetSolutionTree = (projectId?: string, enabled?: boolean) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'solution', projectId],
 		queryFn: async (): Promise<DecisionTree> => {
@@ -12,7 +12,10 @@ export const useGetSolutionTree = (projectId?: string) => {
 			return res.data;
 		},
 		retry: false,
-		enabled: !!projectId,
+		enabled: !!projectId && (enabled ?? true),
+		meta: {
+			errorMessage: 'Failed to fetch solution tree',
+		},
 	});
 	return { data, ...rest };
 };
