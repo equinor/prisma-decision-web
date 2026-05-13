@@ -7,6 +7,7 @@ import { cn } from '../../../utils/cn';
 import { Issue, Option } from '../../../validators';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { CardContainer } from './CardContainer';
 import { DecisionLabel } from './IssueLabel';
 import { BoundaryLabel } from './BoundaryLabel';
@@ -19,9 +20,7 @@ export const DecisionCard = ({
 	expanded: expandedProp,
 	...rest
 }: DecisionCardProps) => {
-	const sortedOptions = [...issue.decision.options].sort((a, b) =>
-		(a.created_at ?? '').localeCompare(b.created_at ?? ''),
-	);
+	const sortedOptions = sortByCreatedAt(issue.decision.options);
 	const hasOptions = sortedOptions.length > 0;
 	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
 	const [menuOpen, setMenuOpen] = useState(false);

@@ -7,7 +7,11 @@ import { FormErrorMessage } from '../../../common/FormErrorMessage';
 
 export const UncertaintyFormSection = () => {
 	const { control, register } = useIssueFormContext();
-	const outcomesArray = useFieldArray({
+	const {
+		fields: outcomesArray,
+		append,
+		remove,
+	} = useFieldArray({
 		control,
 		name: 'uncertainty.outcomes',
 	});
@@ -15,6 +19,8 @@ export const UncertaintyFormSection = () => {
 		control,
 		name: 'uncertainty.id',
 	});
+	console.log(outcomesArray);
+
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
@@ -25,7 +31,7 @@ export const UncertaintyFormSection = () => {
 			</div>
 
 			<div className='grid grid-cols-1 gap-4'>
-				{outcomesArray.fields.map((field, index) => (
+				{outcomesArray.map((field, index) => (
 					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
 						<div>
 							<TextField
@@ -57,7 +63,7 @@ export const UncertaintyFormSection = () => {
 						</div>
 						<Button
 							variant='ghost_icon'
-							onClick={() => outcomesArray.remove(index)}
+							onClick={() => remove(index)}
 							className='absolute top-3.5'
 						>
 							<Icon data={delete_to_trash} />
@@ -67,11 +73,12 @@ export const UncertaintyFormSection = () => {
 				<Button
 					variant='outlined'
 					onClick={() =>
-						outcomesArray.append({
+						append({
 							name: '',
 							id: crypto.randomUUID(),
 							uncertainty_id: uncertaintyId,
 							utility: 0,
+							created_at: new Date().toISOString(),
 						})
 					}
 					className='self-start'
