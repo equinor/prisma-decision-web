@@ -1,5 +1,5 @@
-import { Banner, Icon } from '@equinor/eds-core-react';
-import { check_circle_outlined, error_outlined } from '@equinor/eds-icons';
+import { Banner, Button, Icon } from '@equinor/eds-core-react';
+import { check_circle_outlined, close, error_outlined } from '@equinor/eds-icons';
 import { IconData } from '@equinor/eds-icons';
 import { toast } from 'sonner';
 
@@ -12,19 +12,22 @@ const config: Record<ToastVariant, { icon: IconData; iconVariant?: 'warning' }> 
 
 const showToast = (message: string, variant: ToastVariant) => {
 	const { icon, iconVariant } = config[variant];
-	return toast(
-		<Banner>
-			<Banner.Icon variant={iconVariant}>
-				<Icon data={icon} />
-			</Banner.Icon>
-			<Banner.Message>{message}</Banner.Message>
-		</Banner>,
+	return toast.custom(
+		id => (
+			<Banner>
+				<Banner.Icon variant={iconVariant}>
+					<Icon data={icon} />
+				</Banner.Icon>
+				<Banner.Message>{message}</Banner.Message>
+				<Banner.Actions>
+					<Button variant='ghost_icon' onClick={() => toast.dismiss(id)}>
+						<Icon data={close} />
+					</Button>
+				</Banner.Actions>
+			</Banner>
+		),
 		{
 			duration: 5000,
-			cancel: {
-				label: 'Cancel',
-				onClick: () => {},
-			},
 		},
 	);
 };
