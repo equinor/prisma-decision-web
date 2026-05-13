@@ -19,8 +19,6 @@ export const UncertaintyFormSection = () => {
 		control,
 		name: 'uncertainty.id',
 	});
-	console.log(outcomesArray);
-
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
