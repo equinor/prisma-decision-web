@@ -58,6 +58,7 @@ export const InfluenceDiagram = () => {
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}
+				connectOnClick={false}
 				onConnect={onConnect}
 				isValidConnection={isValidConnection}
 				onEdgesChange={onEdgesChange}
