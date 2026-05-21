@@ -9,6 +9,9 @@ export const useGetSignUser = () => {
 			const res = await apiClient.get<User>('user/me');
 			return res.data;
 		},
+		meta: {
+			errorMessage: 'Failed to fetch user info',
+		},
 	});
 
 	return {

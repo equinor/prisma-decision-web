@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
+import { showErrorToast, showSuccessToast } from '../../components/ShowToast';
 
 export const useDuplicateProject = () => {
 	const queryClient = useQueryClient();
@@ -10,10 +11,14 @@ export const useDuplicateProject = () => {
 			return response.data;
 		},
 		onSuccess: () => {
+			showSuccessToast('Project duplicated successfully');
 			queryClient.refetchQueries({ queryKey: ['projects'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.refetchQueries({ queryKey: ['nodes'] });
 			queryClient.refetchQueries({ queryKey: ['edges'] });
+		},
+		onError: () => {
+			showErrorToast('Failed to duplicate project');
 		},
 	});
 };

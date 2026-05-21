@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Edge } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useDeleteEdge = () => {
 	const queryClient = useQueryClient();
@@ -22,6 +23,7 @@ export const useDeleteEdge = () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _updatedEdge, context) => {
+			showErrorToast('Failed to delete edge');
 			if (context?.previousEdges) {
 				queryClient.setQueryData(['edges'], context.previousEdges);
 			}

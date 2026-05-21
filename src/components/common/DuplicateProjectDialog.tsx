@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { Project } from '../../validators';
 import { useDuplicateProject } from '../../hooks/api/useDuplicateProject';
 
-export const DuplicateProjectDialog = ({ project }: DuplicateProjectDialogProps) => {
+export const DuplicateProjectDialog = ({ project, showLabel }: DuplicateProjectDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { mutate: duplicateProject } = useDuplicateProject();
 	return (
 		<>
 			<Button
-				variant='ghost_icon'
+				variant={showLabel ? 'outlined' : 'ghost_icon'}
 				onClick={e => {
 					e.stopPropagation();
 					e.preventDefault();
@@ -18,6 +18,7 @@ export const DuplicateProjectDialog = ({ project }: DuplicateProjectDialogProps)
 				}}
 			>
 				<Icon data={copy} />
+				{showLabel && 'Duplicate'}
 			</Button>
 
 			<Dialog
@@ -58,4 +59,5 @@ export const DuplicateProjectDialog = ({ project }: DuplicateProjectDialogProps)
 
 type DuplicateProjectDialogProps = {
 	project: Project;
+	showLabel?: boolean;
 };

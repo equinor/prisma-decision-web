@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { DecisionQualityAssessment } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useCreateDecisionQualityAssessment = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -12,6 +13,9 @@ export const useCreateDecisionQualityAssessment = ({ onSuccess }: { onSuccess?: 
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['assessments'] });
 			onSuccess?.();
+		},
+		onError: () => {
+			showErrorToast('Failed to create assessment');
 		},
 	});
 };

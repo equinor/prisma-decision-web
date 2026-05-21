@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateProject = () => {
 	const queryClient = useQueryClient();
@@ -28,6 +29,7 @@ export const useUpdateProject = () => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
+			showErrorToast('Failed to update project');
 		},
 		onSuccess: async () => {
 			// Refetch to ensure we have the latest from server

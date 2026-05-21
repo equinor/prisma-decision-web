@@ -1,6 +1,6 @@
 import { Button, CircularProgress, Icon, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ZodError } from 'zod/v4';
 import { ProjectImportData, projectImportSchema, projectImportFile } from '../../../validators';
 import { useImportProject } from '../../../hooks/api/useImportProject';
@@ -55,15 +55,30 @@ const validateAndParseFiles = async (filesArray: File[]): Promise<FileValidation
 export const ImportProject = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-	const [validatedFiles, setValidatedFiles] = useState<string[]>([]);
+	const [validatedData, setValidatedData] = useState<
+		{ fileName: string; data: ProjectImportData }[]
+	>([]);
 	const [errors, setErrors] = useState<string[]>([]);
 
 	const { mutate: importProject, isPending } = useImportProject();
 	const referenceElement = useRef<HTMLButtonElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
+	const validateFiles = useCallback(async (files: File[]) => {
+		if (files.length === 0) {
+			setValidatedData([]);
+			setErrors([]);
+			return;
+		}
+		const { validData, errors: validationErrors } = await validateAndParseFiles(files);
+		setValidatedData(validData);
+		setErrors(validationErrors);
+	}, []);
+
 	const handleFileChange = (fileList: FileList | null) => {
-		setSelectedFiles(fileList ? Array.from(fileList) : []);
+		const files = fileList ? Array.from(fileList) : [];
+		setSelectedFiles(files);
+		validateFiles(files);
 	};
 
 	const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -73,37 +88,26 @@ export const ImportProject = () => {
 	};
 
 	const handleImport = async () => {
-		if (selectedFiles.length === 0) return;
-		setValidatedFiles([]);
-		setErrors([]);
+		if (validatedData.length === 0) return;
 
-		const { validData, errors: validationErrors } = await validateAndParseFiles(selectedFiles);
-
-		setValidatedFiles(validData.map(item => item.fileName));
-		if (validationErrors.length > 0) {
-			setErrors(validationErrors);
-		}
-
-		if (validData.length > 0) {
-			importProject(validData.map(item => item.data));
-		}
+		importProject(
+			validatedData.map(item => item.data),
+			{
+				onSuccess: () => {
+					setIsOpen(false);
+					setErrors([]);
+					setValidatedData([]);
+					setSelectedFiles([]);
+				},
+			},
+		);
 	};
 
 	const handleRemoveFile = (removeIndex: number) => {
 		if (selectedFiles.length === 0) return;
-		const removedFileName = selectedFiles[removeIndex]?.name;
 		const newFiles = selectedFiles.filter((_, index) => index !== removeIndex);
 		setSelectedFiles(newFiles);
-		if (removedFileName) {
-			setValidatedFiles(prev => prev.filter(name => name !== removedFileName));
-			setErrors(prev =>
-				prev.filter(
-					err =>
-						!err.startsWith(`${removedFileName}:`) &&
-						!err.startsWith(`${removedFileName} - `),
-				),
-			);
-		}
+		validateFiles(newFiles);
 	};
 	return (
 		<>
@@ -183,7 +187,7 @@ export const ImportProject = () => {
 
 						{errors.length > 0 && (
 							<div className='w-full rounded-sm bg-red-100 p-2 text-sm text-red-800'>
-								<p className='font-medium'>Import Errors:</p>
+								<p className='font-medium'>Validation Errors:</p>
 								<ul className='list-disc pl-5'>
 									{errors.map((error, index) => (
 										<li key={index}>{error}</li>
@@ -192,12 +196,12 @@ export const ImportProject = () => {
 							</div>
 						)}
 
-						{validatedFiles.length > 0 && (
+						{validatedData.length > 0 && (
 							<div className='w-full rounded-sm bg-green-100 p-2 text-sm text-green-800'>
-								<p className='font-medium'>Successfully imported:</p>
+								<p className='font-medium'>Validation Success:</p>
 								<ul className='list-disc pl-5'>
-									{validatedFiles.map((file, index) => (
-										<li key={index}>{file} created successfully</li>
+									{validatedData.map((item, index) => (
+										<li key={index}>{item.fileName} Validated successfully</li>
 									))}
 								</ul>
 							</div>
@@ -210,7 +214,7 @@ export const ImportProject = () => {
 								e.stopPropagation();
 								setIsOpen(false);
 								setErrors([]);
-								setValidatedFiles([]);
+								setValidatedData([]);
 								setSelectedFiles([]);
 							}}
 						>
@@ -220,7 +224,7 @@ export const ImportProject = () => {
 						<Button
 							className='w-max! justify-self-end'
 							onClick={handleImport}
-							disabled={isPending || !selectedFiles || selectedFiles.length === 0}
+							disabled={isPending || validatedData.length === 0}
 						>
 							{isPending ? <CircularProgress size={16} /> : 'Import'}
 						</Button>

@@ -2,6 +2,7 @@ import { Outlet } from 'react-router';
 import { TopBar } from './TopBar';
 import { SideBar } from './Sidebar';
 import { BottomNavigation } from './common/BottomNavigation';
+import { Toaster } from 'sonner';
 
 export const Layout = () => {
 	return (
@@ -12,6 +13,7 @@ export const Layout = () => {
 				<Outlet />
 				<BottomNavigation />
 			</div>
+			<Toaster />
 		</div>
 	);
 };

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Strategy } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useCreateStrategy = (onSuccess?: () => void) => {
 	const queryClient = useQueryClient();
@@ -12,6 +13,9 @@ export const useCreateStrategy = (onSuccess?: () => void) => {
 		onSuccess: async () => {
 			onSuccess?.();
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
+		},
+		onError: () => {
+			showErrorToast('Failed to create strategy');
 		},
 	});
 };

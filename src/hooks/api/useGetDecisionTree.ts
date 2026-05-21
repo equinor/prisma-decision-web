@@ -5,7 +5,7 @@ import { Issue } from '../../validators';
 export const useGetDecisionTree = (projectId?: string) => {
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
-		queryFn: async (): Promise<DecisionTree> => {
+		queryFn: async () => {
 			const res = await apiClient.get<DecisionTree>(
 				`/structure/${projectId}/decision_tree/v2`,
 			);
@@ -13,6 +13,9 @@ export const useGetDecisionTree = (projectId?: string) => {
 		},
 		retry: false,
 		enabled: !!projectId,
+		meta: {
+			errorMessage: 'Failed to fetch decision tree',
+		},
 	});
 	return { data, ...rest };
 };

@@ -10,6 +10,9 @@ export const useGetAssessments = () => {
 			const res = await apiClient.get<Assessment[]>('/assessments');
 			return res.data.toSorted((a, b) => b.created_at.localeCompare(a.created_at));
 		},
+		meta: {
+			errorMessage: 'Failed to fetch assessments',
+		},
 	});
 
 	return {
