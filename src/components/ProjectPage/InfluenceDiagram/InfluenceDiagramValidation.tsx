@@ -1,20 +1,29 @@
 import { Accordion, Button, Divider, Icon, Popover } from '@equinor/eds-core-react';
 import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
-import { MarkerType, Node, Edge as ReactFlowEdge, useReactFlow } from '@xyflow/react';
+import {
+	MarkerType,
+	Node,
+	Edge as ReactFlowEdge,
+	useEdges,
+	useNodes,
+	useReactFlow,
+} from '@xyflow/react';
 import { useState } from 'react';
 
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import {
-	DiscreteProbability,
-	InfluenceNode as InfluenceNodeType,
-	Issue,
-} from '../../../validators';
+import { InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
 
-import { useGetInfluenceDiagramErrors } from '../../../hooks/api/useGetInfluenceDiagramErrors';
-import { getDiscreteProbabiltyRows } from '../../../utils/getDiscreteProbabiltyRows';
-import { calculateRowSum } from './ProbabilityTable/utils';
+import {
+	getEdgesInCycle,
+	getIssuesWithInvalidProbabilityTable,
+	hasIssues,
+	hasLoops,
+	hasMissingEdges,
+	hasOptionsMissing,
+	hasOutcomesMissing,
+	ValidateProbabilityTable,
+} from '../../../utils/influenceDiagramValidationUtils';
 
 // Validation Rule Item Component
 interface ValidationRuleItemProps {
@@ -52,7 +61,7 @@ const VALIDATION_MESSAGES = {
 		warning: 'One or more uncertainties have no outcomes.',
 		fix: 'Add possible outcomes to represent what could happen.',
 	},
-	ProbalilityTable: {
+	ProbabilityTable: {
 		label: 'Probability Table',
 		warning: 'Sum of the outcomes must be 1.',
 		fix: 'Add the outcome values that sum up to 1.',
@@ -131,37 +140,21 @@ const highlightUncertaintiesWithUnvalidatedPT = (
 	);
 };
 
-const highlightLoops = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
-	return edges.map(edge => ({
-		...edge,
-		style: { stroke: 'orange', strokeWidth: 2 },
-		markerEnd: {
-			type: MarkerType.ArrowClosed,
-			color: 'orange',
-		},
-	}));
-};
+const highlightLoops = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+): ReactFlowEdge[] => {
+	const cycleEdgeIds = getEdgesInCycle(nodes, edges);
 
-const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
-	return issues.filter(i => {
-		const isUncertainty = i.type === 'Uncertainty';
-		const hasDiscreteProbability = i.uncertainty?.discrete_probabilities?.length > 0;
-		if (!isUncertainty || !hasDiscreteProbability) return false;
-
-		const discreteProbabilities: DiscreteProbability[] = i.uncertainty.discrete_probabilities;
-		const { rows } = getDiscreteProbabiltyRows(discreteProbabilities, issues);
-
-		return rows.some(({ probabilities }) => {
-			const sum = calculateRowSum(probabilities);
-
-			// Skip unfilled rows (sum === 0)
-			if (Number(sum) !== 1) return true;
-		});
-	});
-};
-
-export const ValidateProbabilityTable = (issues: Issue[]): boolean => {
-	return getIssuesWithInvalidProbabilityTable(issues).length > 0;
+	return edges.map(edge =>
+		cycleEdgeIds.has(edge.id)
+			? {
+					...edge,
+					style: { stroke: 'orange', strokeWidth: 2 },
+					markerEnd: { type: MarkerType.ArrowClosed, color: 'orange' },
+				}
+			: edge,
+	);
 };
 
 const removeHighlight = (node: Node<InfluenceNodeType>): Node<InfluenceNodeType> => {
@@ -246,7 +239,7 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 		},
 		NoLoops: {
 			label: 'Loop',
-			apply: () => setEdges(highlightLoops(getEdges())),
+			apply: () => setEdges(highlightLoops(getNodes(), getEdges())),
 			clear: () => setEdges(clearEdgeHighlights(getEdges())),
 		},
 		UncertaintyOutcomes: {
@@ -258,7 +251,7 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 					clearUncertaintiesWithoutOutcomesHighlight(getNodes(), getEdges(), issues),
 				),
 		},
-		ProbalilityTable: {
+		ProbabilityTable: {
 			label: 'Probability Table',
 			apply: () =>
 				setNodes(highlightUncertaintiesWithUnvalidatedPT(getNodes(), getEdges(), issues)),
@@ -328,12 +321,21 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 export const InfluenceDiagramValidation = () => {
 	const [showValidation, setShowValidation] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-	const selectedProject = useSelectedProject();
 	const issues = useSelectedProjectIssues();
-	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
-	const hasInvalidPT = ValidateProbabilityTable(issues);
+	const nodes = useNodes<Node<InfluenceNodeType>>();
+	const edges = useEdges();
+	const hasInvalidPT = ValidateProbabilityTable(nodes, issues);
 
-	const hasError = errors?.message !== '' || hasInvalidPT;
+	const validationErrors: Record<string, boolean> = {
+		Issues: !hasIssues(nodes),
+		Edges: hasMissingEdges(edges),
+		NoLoops: hasLoops(nodes, edges),
+		DecisionOptions: hasOptionsMissing(nodes, issues),
+		UncertaintyOutcomes: hasOutcomesMissing(nodes, issues),
+		ProbabilityTable: hasInvalidPT,
+	};
+
+	const hasError = Object.values(validationErrors).some(Boolean);
 
 	return (
 		<>
@@ -383,11 +385,7 @@ export const InfluenceDiagramValidation = () => {
 								key={key}
 								title={key}
 								message={message}
-								isError={
-									key === 'ProbalilityTable'
-										? hasInvalidPT
-										: !!errors?.message.includes(key)
-								}
+								isError={validationErrors[key]}
 								isExpanded={showValidation}
 							/>
 						))}

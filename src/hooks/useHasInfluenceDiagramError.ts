@@ -1,11 +1,27 @@
-import { useGetInfluenceDiagramErrors } from './api/useGetInfluenceDiagramErrors';
-import { useSelectedProject } from './useSelectedProject';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
-import { ValidateProbabilityTable } from '../components/ProjectPage/InfluenceDiagram/InfluenceDiagramValidation';
+import { useSelectedProjectInfluenceNodes } from './useSelectedProjectInfluenceNodes';
+import { useSelectedProjectEdges } from './useSelectedProjectEdges';
+import {
+	hasIssues,
+	hasLoops,
+	hasMissingEdges,
+	hasOptionsMissing,
+	hasOutcomesMissing,
+	ValidateProbabilityTable,
+} from '../utils/influenceDiagramValidationUtils';
 
 export const useHasInfluenceDiagramError = () => {
-	const selectedProject = useSelectedProject();
 	const issues = useSelectedProjectIssues();
-	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
-	return !!errors?.message || ValidateProbabilityTable(issues);
+	const nodes = useSelectedProjectInfluenceNodes();
+	const edges = useSelectedProjectEdges();
+	const reactFlowEdges = edges.map(e => ({ id: e.id, source: e.tail_id, target: e.head_id }));
+	const hasValidationErrors =
+		!hasIssues(nodes) ||
+		hasMissingEdges(edges) ||
+		hasLoops(nodes, reactFlowEdges) ||
+		hasOptionsMissing(nodes, issues) ||
+		hasOutcomesMissing(nodes, issues) ||
+		ValidateProbabilityTable(nodes, issues);
+
+	return hasValidationErrors;
 };

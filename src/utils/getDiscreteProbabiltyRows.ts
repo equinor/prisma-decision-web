@@ -2,7 +2,9 @@ import {
 	ParentDescriptor,
 	buildRowKey,
 	buildSortKey,
+	calculateRowSum,
 	getParentRowSpans,
+	isRowSumValid,
 } from '../components/ProjectPage/InfluenceDiagram/ProbabilityTable/utils';
 import { DiscreteProbability, Issue } from '../validators';
 
@@ -124,4 +126,15 @@ export const getDiscreteProbabiltyRows = (
 		parents,
 		parentRowSpans: getParentRowSpans(parents),
 	};
+};
+
+export const hasInvalidProbabilitySum = (
+	discreteProbabilities: DiscreteProbability[],
+	issues: Issue[],
+): boolean => {
+	const { rows } = getDiscreteProbabiltyRows(discreteProbabilities, issues);
+	return rows.some(({ probabilities }) => {
+		const sum = calculateRowSum(probabilities);
+		return !isRowSumValid(sum);
+	});
 };

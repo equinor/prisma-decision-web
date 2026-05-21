@@ -2,24 +2,19 @@ import { useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
-import { useGetInfluenceDiagramErrors } from '../../../../hooks/api/useGetInfluenceDiagramErrors';
-import { useSelectedProject } from '../../../../hooks/useSelectedProject';
 import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
 import {} from '../../../../utils/convertNodeToInfluenceNode';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { CreateIssues } from '../../../common/CreateIssue';
 import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
-import {
-	InfluenceDiagramValidation,
-	ValidateProbabilityTable,
-} from '../InfluenceDiagramValidation';
+import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { ZoomControls } from './ZoomControls';
+import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -27,12 +22,10 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 		id: 'toolbar',
 	});
 	const isSelecting = useStore(state => state.selectNodesOnDrag);
-	const selectedNodes = useNodes<ReactFlowInfluenceNode>().filter(node => node.selected);
-	const selectedProject = useSelectedProject();
+	const nodes = useNodes<ReactFlowInfluenceNode>();
 
-	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
-	const issues = useSelectedProjectIssues();
-	const hasValidationErrors = !!errors?.message || ValidateProbabilityTable(issues);
+	const selectedNodes = nodes.filter(node => node.selected);
+
 	return (
 		<div
 			ref={ref}
@@ -58,7 +51,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ChangeIssueType />
 			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
-			{hasValidationErrors && (
+			{useHasInfluenceDiagramError() && (
 				<>
 					<div className='bg-background-light h-9 w-0.5' />
 					<InfluenceDiagramValidation />
