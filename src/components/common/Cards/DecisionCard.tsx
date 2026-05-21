@@ -7,6 +7,7 @@ import { cn } from '../../../utils/cn';
 import { Issue, Option } from '../../../validators';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { CardContainer } from './CardContainer';
 import { DecisionLabel } from './IssueLabel';
 import { BoundaryLabel } from './BoundaryLabel';
@@ -19,7 +20,8 @@ export const DecisionCard = ({
 	expanded: expandedProp,
 	...rest
 }: DecisionCardProps) => {
-	const hasOptions = issue.decision.options.length > 0;
+	const sortedOptions = sortByCreatedAt(issue.decision.options);
+	const hasOptions = sortedOptions.length > 0;
 	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -77,7 +79,7 @@ export const DecisionCard = ({
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOptions && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>
-								{issue.decision.options.map(option => (
+								{sortedOptions.map(option => (
 									<li
 										onClick={() => onClickOption && onClickOption(option)}
 										key={option.id}
@@ -103,7 +105,7 @@ export const DecisionCard = ({
 							<CollapsibleTrigger asChild>
 								<button className='nodrag nopan pointer-events-auto absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
-										{issue.decision.options.length} Options
+										{sortedOptions.length} Options
 									</p>
 									<Icon
 										className='fill-primary-resting'
