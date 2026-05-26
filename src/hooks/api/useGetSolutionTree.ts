@@ -16,9 +16,6 @@ export const useGetSolutionTree = (projectId?: string, enabled?: boolean) => {
 		meta: {
 			errorMessage: 'Failed to fetch solution tree',
 		},
-		meta: {
-			errorMessage: 'Failed to fetch solution tree',
-		},
 	});
 	return { data, ...rest };
 };
