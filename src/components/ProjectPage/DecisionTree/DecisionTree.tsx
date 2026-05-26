@@ -5,7 +5,7 @@ import { useDecisionTree } from './useDecisionTree';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const DecisionTree = () => {
-	const hasValidationError = useHasInfluenceDiagramError();
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { nodes, edges } = useDecisionTree();
 
 	return (

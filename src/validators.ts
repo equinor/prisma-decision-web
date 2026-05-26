@@ -4,6 +4,8 @@ import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
+export const boundaryTypes = ['in', 'out', 'on'] as const;
+export type BoundaryType = (typeof boundaryTypes)[number];
 
 export const roleTypes = ['Member', 'Decision Maker', 'Facilitator'] as const;
 export type RoleType = (typeof roleTypes)[number];

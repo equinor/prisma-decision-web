@@ -1,28 +1,16 @@
 import { Accordion, Button, Divider, Icon, Popover } from '@equinor/eds-core-react';
 import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
-import {
-	MarkerType,
-	Node,
-	Edge as ReactFlowEdge,
-	useEdges,
-	useNodes,
-	useReactFlow,
-} from '@xyflow/react';
+import { MarkerType, Node, Edge as ReactFlowEdge, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
 
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
 
 import {
 	getEdgesInCycle,
 	getIssuesWithInvalidProbabilityTable,
-	hasIssues,
-	hasLoops,
-	hasMissingEdges,
-	hasOptionsMissing,
-	hasOutcomesMissing,
-	ValidateProbabilityTable,
 } from '../../../utils/influenceDiagramValidationUtils';
 
 // Validation Rule Item Component
@@ -321,21 +309,7 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 export const InfluenceDiagramValidation = () => {
 	const [showValidation, setShowValidation] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-	const issues = useSelectedProjectIssues();
-	const nodes = useNodes<Node<InfluenceNodeType>>();
-	const edges = useEdges();
-	const hasInvalidPT = ValidateProbabilityTable(nodes, issues);
-
-	const validationErrors: Record<string, boolean> = {
-		Issues: !hasIssues(nodes),
-		Edges: hasMissingEdges(edges),
-		NoLoops: hasLoops(nodes, edges),
-		DecisionOptions: hasOptionsMissing(nodes, issues),
-		UncertaintyOutcomes: hasOutcomesMissing(nodes, issues),
-		ProbabilityTable: hasInvalidPT,
-	};
-
-	const hasError = Object.values(validationErrors).some(Boolean);
+	const { hasError, validationErrors } = useHasInfluenceDiagramError();
 
 	return (
 		<>

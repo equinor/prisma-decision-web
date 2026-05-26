@@ -6,7 +6,7 @@ import { useSolutionTree } from './useSolutionTree';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const SolutionTree = () => {
-	const hasValidationError = useHasInfluenceDiagramError();
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { nodes, edges } = useSolutionTree();
 
 	return (
