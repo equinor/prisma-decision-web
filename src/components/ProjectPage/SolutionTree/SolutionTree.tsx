@@ -3,9 +3,12 @@ import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDi
 import { EDGE_TYPES, NODE_TYPES } from '../../../config/solutionTree';
 import { REACT_FLOW_CONFIG } from '../../../config/decisionTree';
 import { useSolutionTree } from './useSolutionTree';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const SolutionTree = () => {
-	const { isError, nodes, edges } = useSolutionTree();
+	const hasValidationError = useHasInfluenceDiagramError();
+	const { nodes, edges } = useSolutionTree();
+
 	return (
 		<div className='bg-background-light absolute inset-0 rounded-sm'>
 			<ReactFlow
@@ -16,7 +19,7 @@ export const SolutionTree = () => {
 				edgeTypes={EDGE_TYPES}
 			>
 				<Background />
-				{isError && <InvalidDiagramDialog />}
+				{hasValidationError && <InvalidDiagramDialog />}
 			</ReactFlow>
 		</div>
 	);

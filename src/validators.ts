@@ -131,7 +131,7 @@ export const influenceNodeSchema = z.object({
 	project_id: uuid(),
 	issue_id: uuid(),
 	name: z.string().min(1, 'Node name is required'),
-	handleClassName: z.string().optional(),
+	isHighlighted: z.string().optional(),
 	node_style: nodeStyleSchema,
 });
 

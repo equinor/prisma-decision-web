@@ -7,7 +7,7 @@ import { useGetSolutionTree } from '../../../hooks/api/useGetSolutionTree';
 
 export const useSolutionTree = () => {
 	const project = useSelectedProject();
-	const { data: decisionTree, isError } = useGetSolutionTree(project?.id);
+	const { data: decisionTree } = useGetSolutionTree(project?.id);
 	const selected = useAtomValue(testAtom);
 
 	const { nodes, edges } = useMemo(() => {
@@ -24,7 +24,6 @@ export const useSolutionTree = () => {
 	return {
 		nodes,
 		edges,
-		isError,
 	};
 };
 

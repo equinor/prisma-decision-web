@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { DecisionTree } from './useGetDecisionTree';
+import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 
 export const useGetSolutionTree = (projectId?: string) => {
+	const hasValidationError = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'solution', projectId],
 		queryFn: async () => {
@@ -12,7 +14,7 @@ export const useGetSolutionTree = (projectId?: string) => {
 			return res.data;
 		},
 		retry: false,
-		enabled: !!projectId,
+		enabled: !!projectId && !hasValidationError,
 		meta: {
 			errorMessage: 'Failed to fetch solution tree',
 		},

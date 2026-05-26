@@ -27,7 +27,6 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
 
 	if (!issue) return null;
-
 	return (
 		<div className='relative flex flex-col gap-2'>
 			{!inProgress && (
@@ -53,7 +52,13 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 				)}
 			>
 				<div
-					className={`h-full max-w-87.5 overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+					className={cn(
+						'h-full max-w-87.5 overflow-hidden rounded-sm border-2',
+						getDiagramIssueBorderColor(issue.type, selected),
+						{
+							'border-[#FF9200]': data.isHighlighted,
+						},
+					)}
 				>
 					{issue.type === 'Fact' && <FactCard issue={issue} />}
 					{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
