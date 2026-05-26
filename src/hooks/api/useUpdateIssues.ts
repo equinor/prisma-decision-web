@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateIssues = () => {
 	const queryClient = useQueryClient();
@@ -12,6 +13,9 @@ export const useUpdateIssues = () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
+		},
+		onError: () => {
+			showErrorToast('Failed to update issues');
 		},
 	});
 };
@@ -34,6 +38,7 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onError: (_err, _issues, context) => {
 			queryClient.setQueryData(['issues'], context?.previousIssues);
+			showErrorToast('Failed to update issues');
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });

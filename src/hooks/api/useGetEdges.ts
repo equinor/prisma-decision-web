@@ -11,6 +11,9 @@ export const useGetEdges = () => {
 			const res = await apiClient.get<Edge[]>('/edges');
 			return res.data;
 		},
+		meta: {
+			errorMessage: 'Failed to fetch edges',
+		},
 	});
 
 	return {

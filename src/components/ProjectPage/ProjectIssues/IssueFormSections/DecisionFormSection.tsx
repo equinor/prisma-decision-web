@@ -32,6 +32,7 @@ export const DecisionFormSection = () => {
 		control,
 		name: 'decision.type',
 	});
+
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Decision Details</h3>
@@ -100,6 +101,7 @@ export const DecisionFormSection = () => {
 							id: crypto.randomUUID(),
 							decision_id: decisionId,
 							utility: 0,
+							created_at: new Date().toISOString(),
 						})
 					}
 					className='self-start'

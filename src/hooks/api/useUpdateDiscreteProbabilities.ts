@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { DiscreteProbability } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateDiscreteProbabilities = () => {
 	const queryClient = useQueryClient();
@@ -9,6 +10,9 @@ export const useUpdateDiscreteProbabilities = () => {
 		mutationFn: async (prob: DiscreteProbability) => {
 			const res = await apiClient.put('/discrete_probabilities', [prob]);
 			return res.data[0];
+		},
+		onError: () => {
+			showErrorToast('Failed to update probabilities');
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });

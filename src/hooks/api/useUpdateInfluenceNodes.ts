@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { InfluenceNode } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateInfluenceNodesOptimistic = () => {
 	const queryClient = useQueryClient();
@@ -29,6 +30,7 @@ export const useUpdateInfluenceNodesOptimistic = () => {
 		},
 		onError: (_err, _nodes, context) => {
 			queryClient.setQueryData(['nodes'], context?.previousNodes);
+			showErrorToast('Failed to update nodes');
 		},
 	});
 };

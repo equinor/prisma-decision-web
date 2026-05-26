@@ -9,8 +9,10 @@ export const useGetIssues = () => {
 		queryKey: ['issues'],
 		queryFn: async () => {
 			const res = await apiClient.get<Issue[]>('/issues');
-
 			return res.data;
+		},
+		meta: {
+			errorMessage: 'Failed to fetch issues',
 		},
 	});
 

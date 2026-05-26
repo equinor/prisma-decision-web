@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -12,6 +13,9 @@ export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			onSuccess?.();
+		},
+		onError: () => {
+			showErrorToast('Failed to update objective');
 		},
 	});
 };

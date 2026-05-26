@@ -40,6 +40,7 @@ const optionSchema = z.object({
 	id: uuid(),
 	decision_id: uuid(),
 	utility: z.number().optional(),
+	created_at: z.iso.datetime().optional(),
 });
 
 export const strategySchema = z.object({
@@ -103,19 +104,18 @@ export const utilitySchema = z.object({
 	issue_id: uuid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
-
+export const outcomeSchema = z.object({
+	id: z.uuid(),
+	utility: z.number(),
+	name: z.string().min(1, 'Outcome name is required'),
+	uncertainty_id: z.uuid(),
+	created_at: z.iso.datetime(),
+});
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
 	is_key: z.boolean(),
-	outcomes: z.array(
-		z.object({
-			id: z.uuid(),
-			utility: z.number(),
-			name: z.string().min(1, 'Outcome name is required'),
-			uncertainty_id: z.uuid(),
-		}),
-	),
+	outcomes: z.array(outcomeSchema),
 	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 

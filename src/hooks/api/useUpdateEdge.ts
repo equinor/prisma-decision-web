@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Edge } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateEdge = () => {
 	const queryClient = useQueryClient();
@@ -27,6 +28,7 @@ export const useUpdateEdge = () => {
 			if (context?.previousEdges) {
 				queryClient.setQueryData(['edges'], context.previousEdges);
 			}
+			showErrorToast('Failed to update edge');
 		},
 	});
 };

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -14,6 +15,9 @@ export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 			onSuccess?.();
+		},
+		onError: () => {
+			showErrorToast('Failed to update issue');
 		},
 	});
 };

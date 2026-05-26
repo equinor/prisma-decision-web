@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
 import { useNavigate } from 'react-router';
+import { showErrorToast } from '../../components/ShowToast';
+
 export const useCreateProject = () => {
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
@@ -13,6 +15,9 @@ export const useCreateProject = () => {
 		onSuccess: async data => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			navigate(`/project/${data.id}`);
+		},
+		onError: () => {
+			showErrorToast('Failed to create project');
 		},
 	});
 };
