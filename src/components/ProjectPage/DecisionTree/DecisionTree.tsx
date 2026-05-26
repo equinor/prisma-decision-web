@@ -6,7 +6,7 @@ import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagr
 
 export const DecisionTree = () => {
 	const hasValidationError = useHasInfluenceDiagramError();
-	const { nodes, edges } = useDecisionTree(!hasValidationError);
+	const { nodes, edges } = useDecisionTree();
 
 	return (
 		<div className='bg-background-light absolute inset-0 rounded-sm'>

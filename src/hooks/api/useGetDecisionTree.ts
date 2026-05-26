@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
+import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 
-export const useGetDecisionTree = (projectId?: string, enabledGetDecisionTree?: boolean) => {
+export const useGetDecisionTree = (projectId?: string) => {
+	const hasValidationError = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
 		queryFn: async () => {
@@ -12,7 +14,7 @@ export const useGetDecisionTree = (projectId?: string, enabledGetDecisionTree?: 
 			return res.data;
 		},
 		retry: false,
-		enabled: !!projectId && enabledGetDecisionTree,
+		enabled: !!projectId && !hasValidationError,
 		meta: {
 			errorMessage: 'Failed to fetch decision tree',
 		},
