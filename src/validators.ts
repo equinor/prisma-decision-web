@@ -39,6 +39,7 @@ const optionSchema = z.object({
 	name: z.string().min(1, 'Option name is required'),
 	id: uuid(),
 	decision_id: uuid(),
+	project_id: uuid(),
 	utility: z.number().optional(),
 });
 
@@ -70,6 +71,7 @@ export const projectSchema = z.object({
 export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	type: z.enum(decisionTypes),
 	options: z.array(optionSchema),
 });
@@ -87,6 +89,7 @@ export const discreteProbabilitySchema = z.object({
 	probability: z.number().min(0).max(1),
 	parent_outcome_ids: z.array(uuid()),
 	uncertainty_id: uuid(),
+	project_id: uuid(),
 });
 
 export const discreteUtilitiesSchema = z.object({
@@ -96,17 +99,20 @@ export const discreteUtilitiesSchema = z.object({
 	parent_option_ids: z.array(uuid()),
 	parent_outcome_ids: z.array(uuid()),
 	utility_id: uuid(),
+	project_id: uuid(),
 });
 
 export const utilitySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	is_key: z.boolean(),
 	outcomes: z.array(
 		z.object({
@@ -114,6 +120,7 @@ export const uncertaintySchema = z.object({
 			utility: z.number(),
 			name: z.string().min(1, 'Outcome name is required'),
 			uncertainty_id: z.uuid(),
+			project_id: z.uuid(),
 		}),
 	),
 	discrete_probabilities: z.array(discreteProbabilitySchema),

@@ -21,6 +21,10 @@ export const DecisionFormSection = () => {
 		control,
 		name: 'decision.id',
 	});
+	const projectId = useWatch({
+		control,
+		name: 'project_id',
+	});
 
 	const {
 		field: {
@@ -99,6 +103,7 @@ export const DecisionFormSection = () => {
 							name: '',
 							id: crypto.randomUUID(),
 							decision_id: decisionId,
+							project_id: projectId,
 							utility: 0,
 						})
 					}
