@@ -51,7 +51,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ChangeIssueType />
 			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
-			{useHasInfluenceDiagramError() && (
+			{useHasInfluenceDiagramError().hasError && (
 				<>
 					<div className='bg-background-light h-9 w-0.5' />
 					<InfluenceDiagramValidation />

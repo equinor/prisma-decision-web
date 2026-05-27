@@ -4,7 +4,7 @@ import { Issue } from '../../validators';
 import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 
 export const useGetDecisionTree = (projectId?: string) => {
-	const hasValidationError = useHasInfluenceDiagramError();
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
 		queryFn: async () => {
