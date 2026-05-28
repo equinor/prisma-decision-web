@@ -21,7 +21,10 @@ export const getNodesInOrOnBoundary = (
 
 export const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
 	return issues.filter(i => {
-		const isUncertainty = i.type === 'Uncertainty' && i.uncertainty.is_key;
+		const isUncertainty =
+			i.type === 'Uncertainty' &&
+			i.uncertainty.is_key &&
+			(i.boundary === 'in' || i.boundary === 'on');
 		const hasDiscreteProbability = i.uncertainty?.discrete_probabilities?.length > 0;
 		if (!isUncertainty || !hasDiscreteProbability) return false;
 

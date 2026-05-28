@@ -1,5 +1,4 @@
 import { uuid, z } from 'zod/v4';
-import { parseISO } from 'date-fns';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
@@ -63,9 +62,7 @@ export const projectSchema = z.object({
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
-	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
-		message: 'End date must be in the future',
-	}),
+	end_date: z.iso.datetime(),
 	strategies: z.array(strategySchema, 'Strategies must be an array'),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });

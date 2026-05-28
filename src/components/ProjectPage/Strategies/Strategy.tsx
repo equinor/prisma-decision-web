@@ -74,6 +74,13 @@ export const Strategy = ({
 										strategies: project.strategies.map(projectStrategy => {
 											if (projectStrategy.id !== strategy.id)
 												return projectStrategy;
+											if (option.id === existingOption.id)
+												return {
+													...projectStrategy,
+													options: projectStrategy.options.filter(
+														o => o.id !== option.id,
+													),
+												};
 											return {
 												...projectStrategy,
 												options: projectStrategy.options.map(o =>
