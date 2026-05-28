@@ -184,6 +184,7 @@ export const DecisionQualityAssessmentSchema = z.object({
 	doable_alternatives: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
+	project_id: uuid(),
 	created_by_id: z.string().optional(),
 	created_at: z.iso.datetime(),
 	updated_at: z.iso.datetime().optional(),

@@ -6,10 +6,11 @@ import { useGetSignUser } from './api/useGetSignUser';
 
 type UseDecisionQualityAssessmentFormArgs = {
 	assessmentId: string;
+	projectId: string;
 	onSuccess?: () => void;
 };
 
-const getDefaultValues = (assessmentId: string, userId: string): DecisionQualityAssessment => ({
+const getDefaultValues = (assessmentId: string, userId: string, projectId: string): DecisionQualityAssessment => ({
 	id: crypto.randomUUID(),
 	appropriate_frame: 50,
 	trade_off_analysis: 50,
@@ -19,26 +20,28 @@ const getDefaultValues = (assessmentId: string, userId: string): DecisionQuality
 	doable_alternatives: 50,
 	comment: '',
 	assessment_id: assessmentId,
+	project_id: projectId,
 	created_by_id: userId,
 	created_at: new Date().toISOString(),
 });
 
 export const useDecisionQualityAssessmentForm = ({
 	assessmentId,
+	projectId,
 	onSuccess,
 }: UseDecisionQualityAssessmentFormArgs) => {
 	const { signuser } = useGetSignUser();
 	const userId = signuser?.user_id ?? '';
 
 	const formMethods = useForm<DecisionQualityAssessment>({
-		defaultValues: getDefaultValues(assessmentId, userId),
+		defaultValues: getDefaultValues(assessmentId, userId, projectId),
 		resolver: zodResolver(DecisionQualityAssessmentSchema),
 	});
 
 	const { mutate: createDecisionQualityAssessment, isPending } =
 		useCreateDecisionQualityAssessment({
 			onSuccess: () => {
-				formMethods.reset(getDefaultValues(assessmentId, userId));
+				formMethods.reset(getDefaultValues(assessmentId, userId, projectId));
 				onSuccess?.();
 			},
 		});
