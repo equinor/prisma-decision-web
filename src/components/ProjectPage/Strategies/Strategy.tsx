@@ -12,11 +12,13 @@ export const Strategy = ({
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
 	strategyIcon,
+	expected_utility: expected_utility,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
 	strategyIcon: IconData;
+	expected_utility?: number;
 }) => {
 	const issues = useSelectedProjectIssues().filter(
 		x =>
@@ -34,6 +36,11 @@ export const Strategy = ({
 					<div>
 						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
 						<h4 className='text-text-tertiary text-sm '>{strategy.rationale}</h4>
+						{expected_utility !== undefined && (
+							<p className='text-text-secondary text-sm'>
+								Expected utility: <span className='font-medium'>{expected_utility.toFixed(2)}</span>
+							</p>
+						)}
 					</div>
 					{strategyIcon && <Icon data={strategyIcon} />}
 				</div>

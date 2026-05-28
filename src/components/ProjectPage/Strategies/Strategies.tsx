@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGetSolutionsWithEvidence } from '../../../hooks/api/useGetSolutionsWithEvidence';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
@@ -8,6 +9,13 @@ import { strategyIcons } from './icons';
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
+
+	const evidence = selectedProject?.strategies.map(s => ({
+		evidence_id: s.id,
+		state_ids: s.options.map(o => o.id),
+	})) ?? [];
+
+	const { data: solutionsData } = useGetSolutionsWithEvidence(selectedProject?.id, evidence);
 
 	const handleClickAddToStrategyTable = (id: string) => {
 		if (selectedStrategyIds.has(id)) {
@@ -50,7 +58,8 @@ export const Strategies = () => {
 						Define and manage strategies for your decision optimization project
 					</p>
 				</div>
-				{selectedProject.strategies.map(strategy => {
+				{selectedProject.strategies.map((strategy) => {
+				const expected_utility = solutionsData?.find(s => s.evidence_id === strategy.id)?.expected_utility;
 					return (
 						<Strategy
 							strategyIcon={strategyIcons[strategy.icon]}
@@ -58,6 +67,7 @@ export const Strategies = () => {
 							strategy={strategy}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
+							expected_utility={expected_utility}
 						/>
 					);
 				})}
