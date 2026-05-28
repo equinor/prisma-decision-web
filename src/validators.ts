@@ -4,6 +4,8 @@ import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
 export type IssueType = (typeof issueTypes)[number];
+export const boundaryTypes = ['in', 'out', 'on'] as const;
+export type BoundaryType = (typeof boundaryTypes)[number];
 
 export const roleTypes = ['Member', 'Decision Maker', 'Facilitator'] as const;
 export type RoleType = (typeof roleTypes)[number];
@@ -41,6 +43,7 @@ const optionSchema = z.object({
 	decision_id: uuid(),
 	project_id: uuid(),
 	utility: z.number().optional(),
+	created_at: z.iso.datetime().optional(),
 });
 
 export const strategySchema = z.object({
@@ -108,21 +111,20 @@ export const utilitySchema = z.object({
 	project_id: uuid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
-
+export const outcomeSchema = z.object({
+	id: z.uuid(),
+	utility: z.number(),
+	name: z.string().min(1, 'Outcome name is required'),
+	uncertainty_id: z.uuid(),
+	created_at: z.iso.datetime(),
+	project_id: z.uuid(),
+});
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
 	project_id: uuid(),
 	is_key: z.boolean(),
-	outcomes: z.array(
-		z.object({
-			id: z.uuid(),
-			utility: z.number(),
-			name: z.string().min(1, 'Outcome name is required'),
-			uncertainty_id: z.uuid(),
-			project_id: z.uuid(),
-		}),
-	),
+	outcomes: z.array(outcomeSchema),
 	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
@@ -138,7 +140,7 @@ export const influenceNodeSchema = z.object({
 	project_id: uuid(),
 	issue_id: uuid(),
 	name: z.string().min(1, 'Node name is required'),
-	handleClassName: z.string().optional(),
+	isHighlighted: z.string().optional(),
 	node_style: nodeStyleSchema,
 });
 

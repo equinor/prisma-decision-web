@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Assessment } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useCreateAssessment = () => {
 	const queryClient = useQueryClient();
@@ -11,6 +12,9 @@ export const useCreateAssessment = () => {
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['assessments'] });
+		},
+		onError: () => {
+			showErrorToast('Failed to create assessment');
 		},
 	});
 };

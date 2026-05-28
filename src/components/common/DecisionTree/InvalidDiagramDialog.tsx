@@ -1,15 +1,10 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { arrow_forward } from '@equinor/eds-icons';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 export const InvalidDiagramDialog = () => {
 	const navigate = useNavigate();
-	const [showDialog, setShowDialog] = useState(true);
-
-	const handleStayOnDecisionTree = useCallback(() => {
-		setShowDialog(false);
-	}, []);
 
 	const handleNavigateToValidation = useCallback(() => {
 		const validationPath = getInfluenceDiagramPath(window.location.pathname);
@@ -20,7 +15,7 @@ export const InvalidDiagramDialog = () => {
 
 	return (
 		<Dialog
-			open={showDialog}
+			open={true}
 			data-no-dnd
 			className='nodrag nopan nowheel fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform'
 		>
@@ -34,9 +29,6 @@ export const InvalidDiagramDialog = () => {
 						</p>
 					</div>
 					<div className='flex flex-col gap-2'>
-						<Button variant='ghost' onClick={handleStayOnDecisionTree}>
-							Stay on Decision Tree
-						</Button>
 						<Button variant='outlined' onClick={handleNavigateToValidation}>
 							Go to influence diagram
 							<Icon data={arrow_forward} />

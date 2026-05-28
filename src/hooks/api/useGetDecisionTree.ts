@@ -1,20 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
+import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 
 export const useGetDecisionTree = (projectId?: string) => {
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: ['decisionTree', 'full', projectId],
-		queryFn: async (): Promise<DecisionTree> => {
+		queryFn: async () => {
 			const res = await apiClient.get<DecisionTree>(
 				`/structure/${projectId}/decision_tree/v2`,
 			);
 			return res.data;
 		},
 		retry: false,
-		enabled: !!projectId,
+		enabled: !!projectId && !hasValidationError,
+		meta: {
+			errorMessage: 'Failed to fetch decision tree',
+		},
 	});
-	return { data, ...rest };
+
+	return {
+		data: data,
+		...rest,
+	};
 };
 export type DecisionTree = {
 	tree_node: {

@@ -6,6 +6,7 @@ import { useCreateIssue } from './api/useCreateIssue';
 import { useUpdateIssue } from './api/useUpdateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
+import { sortByCreatedAt } from '../utils/sortByCreatedAt';
 import { useSelectedProject } from './useSelectedProject';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
@@ -15,8 +16,22 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
 		[],
 	);
+	const sortedIssue = useMemo(() => {
+		if (!issue) return undefined;
+		return {
+			...issue,
+			decision: {
+				...issue.decision,
+				options: sortByCreatedAt(issue.decision.options),
+			},
+			uncertainty: {
+				...issue.uncertainty,
+				outcomes: sortByCreatedAt(issue.uncertainty.outcomes),
+			},
+		};
+	}, [issue]);
 	const formMethods = useForm({
-		values: { ...defaultValues, ...issue },
+		values: { ...defaultValues, ...sortedIssue },
 		resolver: zodResolver(issueSchema),
 	});
 	const { issues } = useGetIssues();

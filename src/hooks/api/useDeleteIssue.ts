@@ -1,6 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Edge, Issue } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useDeleteIssue = () => {
 	const queryClient = useQueryClient();
@@ -21,6 +22,7 @@ export const useDeleteIssue = () => {
 			return { previousIssues, previousEdges };
 		},
 		onError: (_err, _issueId, context) => {
+			showErrorToast('Failed to delete issue');
 			if (context?.previousIssues) {
 				queryClient.setQueryData(['issues'], context.previousIssues);
 			}

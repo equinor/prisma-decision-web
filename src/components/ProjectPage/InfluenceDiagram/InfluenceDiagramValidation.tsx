@@ -3,58 +3,56 @@ import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
 import { MarkerType, Node, Edge as ReactFlowEdge, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
 
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import {
-	DiscreteProbability,
-	InfluenceNode as InfluenceNodeType,
-	Issue,
-} from '../../../validators';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
 
-import { useGetInfluenceDiagramErrors } from '../../../hooks/api/useGetInfluenceDiagramErrors';
-import { getDiscreteProbabiltyRows } from '../../../utils/getDiscreteProbabiltyRows';
-import { calculateRowSum } from './ProbabilityTable/utils';
+import {
+	getEdgesInCycle,
+	getIssuesWithInvalidProbabilityTable,
+} from '../../../utils/influenceDiagramValidationUtils';
 
 // Validation Rule Item Component
 interface ValidationRuleItemProps {
 	title: string;
-	message: { warning: string; fix: string };
+	message: { label: string; warning: string; fix: string };
 	isError: boolean;
 	isExpanded: boolean;
 }
 
 // Constants
 
-const VALIDATION_STYLE = {
-	border: '2px solid orange',
-	boxShadow: '0 0 8px 2px orange',
-};
-
 const VALIDATION_MESSAGES = {
 	Issues: {
+		label: 'Issues',
 		warning: 'Your influence diagram is empty.',
-		fix: 'Fix: Add issues to begin mapping your decision.',
+		fix: 'Add issues to begin mapping your decision.',
 	},
 	Edges: {
-		warning: 'Warning: None of the nodes are connected.',
-		fix: 'Fix: Add Edges to show how factors influence each other.',
+		label: 'Edges',
+		warning: 'Some or none of the nodes are connected.',
+		fix: 'Add edges to show how factors influence each other.',
 	},
 	NoLoops: {
+		label: 'No Loops',
 		warning: 'Your diagram has a loop.',
-		fix: 'Fix: Remove the cycle so influences only flow forward, not back on themselves.',
+		fix: 'Remove the cycle so influences only flow forward.',
 	},
 	DecisionOptions: {
+		label: 'Decision Options',
 		warning: 'One or more decisions have no options.',
-		fix: 'Fix: Add at least one possible choice for each decision.',
+		fix: 'Add at least one possible choice for each decision.',
 	},
 	UncertaintyOutcomes: {
+		label: 'Uncertainty Outcomes',
 		warning: 'One or more uncertainties have no outcomes.',
-		fix: 'Fix: Add possible outcomes to represent what could happen.',
+		fix: 'Add possible outcomes to represent what could happen.',
 	},
-	ProbalilityTable: {
-		warning: 'Sum of the Outcomes must be 1.',
-		fix: 'Fix: Add the Outcomes values that sum up to 1 .',
+	ProbabilityTable: {
+		label: 'Probability Table',
+		warning: 'Sum of the outcomes must be 1.',
+		fix: 'Add the outcome values that sum up to 1.',
 	},
 };
 
@@ -68,198 +66,240 @@ const getNodeConnectivity = (nodeId: string, edges: ReactFlowEdge[]): boolean =>
 	return hasIncoming || hasOutgoing;
 };
 
+const addHighlight = (node: Node<InfluenceNodeType>): Node<InfluenceNodeType> => ({
+	...node,
+	data: { ...node.data, isHighlighted: 'validation' },
+});
+
+const highlightMatchingNodes = (
+	nodes: Node<InfluenceNodeType>[],
+	shouldHighlight: (node: Node<InfluenceNodeType>) => boolean,
+): Node<InfluenceNodeType>[] => {
+	return nodes.map(node => (shouldHighlight(node) ? addHighlight(node) : node));
+};
+
 const highlightNodesWithMissingEdges = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 ): Node<InfluenceNodeType>[] => {
 	if (edges.length > 0) return nodes;
-
-	return nodes.map(node => ({
-		...node,
-		data: {
-			...node.data,
-			handleClassName: 'bg-red-500! z-1 h-4! w-4!',
-		},
-	}));
+	return highlightMatchingNodes(nodes, () => true);
 };
 
 const highlightDecisionsWithoutOptions = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
-): Node<InfluenceNodeType>[] => {
-	return nodes.map(node => {
-		const isConnected = getNodeConnectivity(node.id, edges);
-		const nodeIssueId = node.data.issue_id;
-		const issue = issues.find(i => {
-			const matchesNode = i.id === nodeIssueId;
-			const isDecision = i.type === 'Decision';
-			const hasNoOptions = i.decision?.options?.length === 0;
-
-			return matchesNode && isDecision && hasNoOptions;
-		});
-		if (issue && isConnected) {
-			return {
-				...node,
-				style: VALIDATION_STYLE,
-			};
-		}
-
-		return node;
+): Node<InfluenceNodeType>[] =>
+	highlightMatchingNodes(nodes, node => {
+		const issue = issues.find(
+			i =>
+				i.id === node.data.issue_id &&
+				i.type === 'Decision' &&
+				i.decision?.options?.length === 0,
+		);
+		return !!issue && getNodeConnectivity(node.id, edges);
 	});
-};
 
 const highlightUncertaintiesWithoutOutcomes = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
-): Node<InfluenceNodeType>[] => {
-	return nodes.map(node => {
-		const isConnected = getNodeConnectivity(node.id, edges);
-		const nodeIssueId = node.data.issue_id;
-		const issue = issues.find(i => {
-			const matchesNode = i.id === nodeIssueId;
-			const isUncertainty = i.type === 'Uncertainty';
-			const hasNoOutcomes = i.uncertainty?.outcomes?.length === 0;
-
-			return matchesNode && isUncertainty && hasNoOutcomes;
-		});
-
-		if (issue && isConnected) {
-			return {
-				...node,
-				style: VALIDATION_STYLE,
-			};
-		}
-
-		return node;
+): Node<InfluenceNodeType>[] =>
+	highlightMatchingNodes(nodes, node => {
+		const issue = issues.find(
+			i =>
+				i.id === node.data.issue_id &&
+				i.type === 'Uncertainty' &&
+				i.uncertainty?.outcomes?.length === 0,
+		);
+		return !!issue && getNodeConnectivity(node.id, edges);
 	});
-};
+
 const highlightUncertaintiesWithUnvalidatedPT = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
 ): Node<InfluenceNodeType>[] => {
-	const invalidIssues = getIssuesWithInvalidProbabilityTable(issues);
-	const invalidIssueIds = new Set(invalidIssues.map(i => i.id));
+	const invalidIssueIds = new Set(getIssuesWithInvalidProbabilityTable(issues).map(i => i.id));
+	return highlightMatchingNodes(
+		nodes,
+		node => invalidIssueIds.has(node.data.issue_id) && getNodeConnectivity(node.id, edges),
+	);
+};
 
-	return nodes.map(node => {
+const highlightLoops = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+): ReactFlowEdge[] => {
+	const cycleEdgeIds = getEdgesInCycle(nodes, edges);
+
+	return edges.map(edge =>
+		cycleEdgeIds.has(edge.id)
+			? {
+					...edge,
+					style: { stroke: 'orange', strokeWidth: 2 },
+					markerEnd: { type: MarkerType.ArrowClosed, color: 'orange' },
+				}
+			: edge,
+	);
+};
+
+const removeHighlight = (node: Node<InfluenceNodeType>): Node<InfluenceNodeType> => {
+	const { isHighlighted: _, ...restData } = node.data;
+	return { ...node, data: restData as InfluenceNodeType };
+};
+
+const clearNodeHighlights = (
+	nodes: Node<InfluenceNodeType>[],
+	shouldClear: (node: Node<InfluenceNodeType>) => boolean,
+): Node<InfluenceNodeType>[] => {
+	return nodes.map(node => (shouldClear(node) ? removeHighlight(node) : node));
+};
+
+const clearMissingEdgesHighlight = (nodes: Node<InfluenceNodeType>[]): Node<InfluenceNodeType>[] =>
+	clearNodeHighlights(nodes, () => true);
+
+const clearDecisionsWithoutOptionsHighlight = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+	issues: Issue[],
+): Node<InfluenceNodeType>[] =>
+	clearNodeHighlights(nodes, node => {
 		const isConnected = getNodeConnectivity(node.id, edges);
-		const nodeIssueId = node.data.issue_id;
-		const hasInvalidPT = invalidIssueIds.has(nodeIssueId);
-
-		if (hasInvalidPT && isConnected) {
-			return {
-				...node,
-				style: VALIDATION_STYLE,
-			};
-		}
-
-		return node;
+		const issue = issues.find(
+			i =>
+				i.id === node.data.issue_id &&
+				i.type === 'Decision' &&
+				i.decision?.options?.length === 0,
+		);
+		return !!issue && isConnected;
 	});
-};
 
-const highlightLoops = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
-	return edges.map(edge => ({
-		...edge,
-		markerEnd: {
-			type: MarkerType.ArrowClosed,
-			color: 'rgba(var(--eds_danger), 1)',
-		},
-	}));
-};
-
-const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
-	return issues.filter(i => {
-		const isUncertainty = i.type === 'Uncertainty';
-		const hasDiscreteProbability = i.uncertainty?.discrete_probabilities?.length > 0;
-		if (!isUncertainty || !hasDiscreteProbability) return false;
-
-		const discreteProbabilities: DiscreteProbability[] = i.uncertainty.discrete_probabilities;
-		const { rows } = getDiscreteProbabiltyRows(discreteProbabilities, issues);
-
-		return rows.some(({ probabilities }) => {
-			const sum = calculateRowSum(probabilities);
-
-			// Skip unfilled rows (sum === 0)
-			if (sum !== 1) return true;
-		});
+const clearUncertaintiesWithoutOutcomesHighlight = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+	issues: Issue[],
+): Node<InfluenceNodeType>[] =>
+	clearNodeHighlights(nodes, node => {
+		const isConnected = getNodeConnectivity(node.id, edges);
+		const issue = issues.find(
+			i =>
+				i.id === node.data.issue_id &&
+				i.type === 'Uncertainty' &&
+				i.uncertainty?.outcomes?.length === 0,
+		);
+		return !!issue && isConnected;
 	});
+
+const clearUnvalidatedPTHighlight = (
+	nodes: Node<InfluenceNodeType>[],
+	edges: ReactFlowEdge[],
+	issues: Issue[],
+): Node<InfluenceNodeType>[] => {
+	const invalidIssueIds = new Set(getIssuesWithInvalidProbabilityTable(issues).map(i => i.id));
+	return clearNodeHighlights(
+		nodes,
+		node => invalidIssueIds.has(node.data.issue_id) && getNodeConnectivity(node.id, edges),
+	);
 };
 
-const ValidateProbabilityTable = (issues: Issue[]): boolean => {
-	return getIssuesWithInvalidProbabilityTable(issues).length > 0;
+const clearEdgeHighlights = (edges: ReactFlowEdge[]): ReactFlowEdge[] => {
+	return edges.map(edge => ({ ...edge, style: undefined, markerEnd: undefined }));
 };
 
 const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationRuleItemProps) => {
 	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
 	const issues = useSelectedProjectIssues();
-	const edges = getEdges();
-	const nodes = getNodes();
-	const handleShowMissingEdges = () => {
-		setNodes(highlightNodesWithMissingEdges(nodes, edges));
+	const [highlighted, setHighlighted] = useState(false);
+
+	const actions: Record<string, { label: string; apply: () => void; clear: () => void }> = {
+		Edges: {
+			label: 'Missing Edges',
+			apply: () => setNodes(highlightNodesWithMissingEdges(getNodes(), getEdges())),
+			clear: () => setNodes(clearMissingEdgesHighlight(getNodes())),
+		},
+		DecisionOptions: {
+			label: 'Missing Options',
+			apply: () => setNodes(highlightDecisionsWithoutOptions(getNodes(), getEdges(), issues)),
+			clear: () =>
+				setNodes(clearDecisionsWithoutOptionsHighlight(getNodes(), getEdges(), issues)),
+		},
+		NoLoops: {
+			label: 'Loop',
+			apply: () => setEdges(highlightLoops(getNodes(), getEdges())),
+			clear: () => setEdges(clearEdgeHighlights(getEdges())),
+		},
+		UncertaintyOutcomes: {
+			label: 'Missing Outcomes',
+			apply: () =>
+				setNodes(highlightUncertaintiesWithoutOutcomes(getNodes(), getEdges(), issues)),
+			clear: () =>
+				setNodes(
+					clearUncertaintiesWithoutOutcomesHighlight(getNodes(), getEdges(), issues),
+				),
+		},
+		ProbabilityTable: {
+			label: 'Probability Table',
+			apply: () =>
+				setNodes(highlightUncertaintiesWithUnvalidatedPT(getNodes(), getEdges(), issues)),
+			clear: () => setNodes(clearUnvalidatedPTHighlight(getNodes(), getEdges(), issues)),
+		},
 	};
 
-	const handleShowMissingOptions = () => {
-		setNodes(highlightDecisionsWithoutOptions(nodes, edges, issues));
-	};
+	const action = actions[title];
 
-	const handleShowMissingOutcomes = () => {
-		setNodes(highlightUncertaintiesWithoutOutcomes(nodes, edges, issues));
-	};
-
-	const handleShowLoop = () => {
-		setEdges(highlightLoops(edges));
-	};
-	const handleProbabilityTable = () => {
-		setNodes(highlightUncertaintiesWithUnvalidatedPT(nodes, edges, issues));
+	const handleToggle = () => {
+		if (highlighted) {
+			action.clear();
+			setHighlighted(false);
+		} else {
+			action.apply();
+			setHighlighted(true);
+		}
 	};
 
 	return (
 		<Accordion.Item isExpanded={isError && isExpanded}>
 			<Accordion.Header headerLevel='h3'>
 				<Accordion.HeaderTitle className='w-full'>
-					<div className='flex flex-col'>
-						<div className='flex flex-row items-center gap-2'>
-							<p className='text-sm'>{title}</p>
-
-							{isError ? (
-								<Icon data={warning_outlined} size={18} color='#FF9200' />
-							) : (
-								<Icon data={check_circle_outlined} size={18} color='#00ff08' />
-							)}
-						</div>
+					<div className='flex w-full items-center justify-between'>
+						<p className='text-base font-bold text-current'>{message.label}</p>
+						{isError ? (
+							<span className='flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700'>
+								<Icon data={warning_outlined} color='#FF9200' />
+								Error
+							</span>
+						) : (
+							<span className='flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700'>
+								<Icon data={check_circle_outlined} color='#22c55e' />
+								Pass
+							</span>
+						)}
 					</div>
 				</Accordion.HeaderTitle>
 			</Accordion.Header>
 			<Accordion.Panel>
-				<div className='flex flex-row flex-wrap justify-between gap-4'>
-					<div>
-						<p className='text-sm'>{message.warning}</p>
-						<p className='text-sm'>{message.fix}</p>
+				{isError ? (
+					<div className='flex flex-col gap-3'>
+						<div className='rounded-md border border-orange-200 bg-orange-50 p-3'>
+							<p className='text-sm text-orange-800'>{message.warning}</p>
+						</div>
+						<div className='rounded-md border border-blue-200 bg-blue-50 p-3'>
+							<p className='text-sm text-blue-800'>Fix: {message.fix}</p>
+						</div>
+						<div className='flex justify-end'>
+							{title === 'Issues' && <CreateIssues />}
+							{action && (
+								<Button variant='outlined' onClick={handleToggle}>
+									{highlighted ? 'Hide' : 'Show'} {action.label}
+								</Button>
+							)}
+						</div>
 					</div>
-					<div>
-						{title === 'Issues' && <CreateIssues />}
-						{title === 'Edges' && (
-							<Button onClick={handleShowMissingEdges}>Show Missing Edges</Button>
-						)}
-						{title === 'DecisionOptions' && (
-							<Button onClick={handleShowMissingOptions}>Show Missing Options</Button>
-						)}
-						{title === 'NoLoops' && <Button onClick={handleShowLoop}>Show Loop</Button>}
-						{title === 'UncertaintyOutcomes' && (
-							<Button onClick={handleShowMissingOutcomes}>
-								Show Missing Outcomes
-							</Button>
-						)}{' '}
-						{
-							<Button onClick={handleProbabilityTable}>
-								{' '}
-								Show Probability Table{' '}
-							</Button>
-						}{' '}
-					</div>{' '}
-				</div>{' '}
+				) : (
+					<p className='text-sm text-green-700'>No issues found.</p>
+				)}
 			</Accordion.Panel>
 		</Accordion.Item>
 	);
@@ -269,16 +309,7 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 export const InfluenceDiagramValidation = () => {
 	const [showValidation, setShowValidation] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-	const selectedProject = useSelectedProject();
-	const issues = useSelectedProjectIssues();
-	const { data: errors } = useGetInfluenceDiagramErrors(selectedProject?.id);
-	const isInValidPT = ValidateProbabilityTable(issues);
-
-	const handleToggleValidation = () => {
-		setShowValidation(prev => !prev);
-	};
-
-	const hasError = errors?.message !== '' || isInValidPT;
+	const { hasError, validationErrors } = useHasInfluenceDiagramError();
 
 	return (
 		<>
@@ -297,7 +328,10 @@ export const InfluenceDiagramValidation = () => {
 				onClose={() => setShowValidation(false)}
 			>
 				<Popover.Content>
-					<p>Validation and guidelines for building valid influence diagram.</p>
+					<div className='m-1 flex items-center justify-between gap-4'>
+						<p>Validation and guidelines for building valid influence diagram.</p>
+						<Button onClick={() => setShowValidation(false)}> Hide</Button>
+					</div>
 					<Divider />
 
 					{/* Error Alert */}
@@ -311,9 +345,6 @@ export const InfluenceDiagramValidation = () => {
 							<div className='text-text-warning flex-1 p-3 text-sm'>
 								Invalid Influence diagrams cannot compute the decision tree.
 							</div>
-							<Button onClick={handleToggleValidation}>
-								{showValidation ? 'Hide' : 'Show'}
-							</Button>
 						</div>
 					)}
 
@@ -328,11 +359,7 @@ export const InfluenceDiagramValidation = () => {
 								key={key}
 								title={key}
 								message={message}
-								isError={
-									key === 'ProbalilityTable'
-										? isInValidPT
-										: !!errors?.message.includes(key)
-								}
+								isError={validationErrors[key]}
 								isExpanded={showValidation}
 							/>
 						))}

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective, Project } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useCreateObjective = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -12,6 +13,9 @@ export const useCreateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			onSuccess?.();
+		},
+		onError: () => {
+			showErrorToast('Failed to create objective');
 		},
 	});
 };
@@ -43,6 +47,7 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
+			showErrorToast('Failed to create objective');
 			return _err;
 		},
 		onSuccess: async () => {

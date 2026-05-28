@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useUpdateStrategy = () => {
 	const queryClient = useQueryClient();
@@ -19,6 +20,7 @@ export const useUpdateStrategy = () => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
+			showErrorToast('Failed to update strategy');
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
