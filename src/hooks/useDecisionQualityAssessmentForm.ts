@@ -10,7 +10,11 @@ type UseDecisionQualityAssessmentFormArgs = {
 	onSuccess?: () => void;
 };
 
-const getDefaultValues = (assessmentId: string, userId: string, projectId: string): DecisionQualityAssessment => ({
+const getDefaultValues = (
+	assessmentId: string,
+	userId: string,
+	projectId: string,
+): DecisionQualityAssessment => ({
 	id: crypto.randomUUID(),
 	appropriate_frame: 50,
 	trade_off_analysis: 50,
