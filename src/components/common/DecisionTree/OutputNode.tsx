@@ -1,13 +1,15 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { mail_unread } from '@equinor/eds-icons';
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
-import { useSetAtom } from 'jotai';
-import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
+import { useLocation } from 'react-router';
+import { useSelectedDecisionTreePath } from '../../../hooks/useSelectedDecisionTreePath';
 
 export const OutputNode = ({
 	data,
-}: NodeProps<Node<{ value: number; path: Set<string>; cumulativeProbability: number }>>) => {
-	const setSelectedNodes = useSetAtom(testAtom);
+}: NodeProps<Node<{ value: number; statePath: string[]; cumulativeProbability: number }>>) => {
+	const location = useLocation();
+	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
+	const { selectPath } = useSelectedDecisionTreePath(treeType);
 	return (
 		<div className='pan flex h-full items-center'>
 			<Handle
@@ -17,7 +19,7 @@ export const OutputNode = ({
 				className='bg-primary-resting! z-1 h-3! w-3! opacity-0'
 			/>
 			<Button
-				onClick={() => setSelectedNodes(new Set(data.path))}
+				onClick={() => selectPath(data.statePath.length > 0 ? data.statePath : null)}
 				variant='outlined'
 				className='size-12! border-0! outline-2!'
 			>
