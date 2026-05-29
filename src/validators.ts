@@ -161,12 +161,6 @@ export const issueSchema = z.object({
 	updated_at: z.iso.datetime().optional(),
 });
 export const projectImportFile = z.array(z.file().mime('application/json'));
-
-export const projectImportSchema = z.object({
-	projects: projectSchema,
-	issues: z.array(issueSchema).optional(),
-	edges: z.array(edgeSchema).optional(),
-});
 export const DecisionQualityAssessmentSchema = z.object({
 	id: uuid(),
 	appropriate_frame: z.number(),
@@ -189,6 +183,12 @@ export const assessmentSchema = z.object({
 	is_completed: z.boolean(),
 	decision_quality_assessments: z.array(DecisionQualityAssessmentSchema).optional(),
 	created_at: z.iso.datetime(),
+});
+export const projectImportSchema = z.object({
+	projects: projectSchema,
+	issues: z.array(issueSchema).optional(),
+	edges: z.array(edgeSchema).optional(),
+	assessments: z.array(assessmentSchema).optional(),
 });
 
 export type ErrorHandlingState = {

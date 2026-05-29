@@ -86,7 +86,6 @@ export const ImportProject = () => {
 		const files = e.dataTransfer.files;
 		if (files) handleFileChange(files);
 	};
-
 	const handleImport = async () => {
 		if (validatedData.length === 0) return;
 
