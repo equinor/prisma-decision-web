@@ -89,12 +89,14 @@ const getDefaultValues = (projectId: string): Issue => {
 		decision: {
 			id: crypto.randomUUID(),
 			issue_id: id,
+			project_id: projectId,
 			type: 'Policy',
 			options: [],
 		},
 		uncertainty: {
 			id: crypto.randomUUID(),
 			issue_id: id,
+			project_id: projectId,
 			is_key: false,
 			outcomes: [],
 			discrete_probabilities: [],
@@ -102,6 +104,7 @@ const getDefaultValues = (projectId: string): Issue => {
 		utility: {
 			id: crypto.randomUUID(),
 			issue_id: id,
+			project_id: projectId,
 			discrete_utilities: [],
 		},
 		value_metric: {

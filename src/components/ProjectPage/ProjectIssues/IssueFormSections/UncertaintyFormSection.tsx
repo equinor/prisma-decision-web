@@ -19,6 +19,10 @@ export const UncertaintyFormSection = () => {
 		control,
 		name: 'uncertainty.id',
 	});
+	const projectId = useWatch({
+		control,
+		name: 'project_id',
+	});
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
@@ -75,6 +79,7 @@ export const UncertaintyFormSection = () => {
 							name: '',
 							id: crypto.randomUUID(),
 							uncertainty_id: uncertaintyId,
+							project_id: projectId,
 							utility: 0,
 							created_at: new Date().toISOString(),
 						})
