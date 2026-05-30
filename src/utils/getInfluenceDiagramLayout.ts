@@ -6,22 +6,7 @@ import { InfluenceEdgeData, InfluenceEdgeRoute } from './convertToInfluenceEdges
 const elk = new ELK();
 
 const defaultNodeWidth = 350;
-const defaultNodeHeight = 180;
-
-const getNodeWidth = (node: ReactFlowInfluenceNode) => {
-	return node.measured?.width ?? node.width ?? defaultNodeWidth;
-};
-
-const getNodeHeight = (node: ReactFlowInfluenceNode) => {
-	return node.measured?.height ?? node.height ?? defaultNodeHeight;
-};
-
-const toSvgPath = (points: ElkPoint[]) => {
-	return points.reduce((path, point, index) => {
-		const command = index === 0 ? 'M' : 'L';
-		return `${path}${command} ${point.x} ${point.y} `;
-	}, '');
-};
+const defaultNodeHeight = 140;
 
 const getRouteLabelPosition = (points: ElkPoint[]) => {
 	if (points.length < 2) {
@@ -67,6 +52,70 @@ const getRouteLabelPosition = (points: ElkPoint[]) => {
 	};
 };
 
+function makeRoundedPath(points: ElkPoint[], bends: ElkPoint[], radius = 8) {
+	if (!points.length) return '';
+
+	const bendSet = new Set(bends.map(b => `${b.x},${b.y}`));
+
+	let d = `M ${points[0].x} ${points[0].y}`;
+
+	for (let i = 1; i < points.length - 1; i++) {
+		const prev = points[i - 1];
+		const curr = points[i];
+		const next = points[i + 1];
+
+		const isBend = bendSet.has(`${curr.x},${curr.y}`);
+
+		if (!isBend) {
+			d += ` L ${curr.x} ${curr.y}`;
+			continue;
+		}
+
+		// Incoming vector
+		const vx1 = curr.x - prev.x;
+		const vy1 = curr.y - prev.y;
+
+		// Outgoing vector
+		const vx2 = next.x - curr.x;
+		const vy2 = next.y - curr.y;
+
+		const len1 = Math.hypot(vx1, vy1);
+		const len2 = Math.hypot(vx2, vy2);
+
+		if (len1 === 0 || len2 === 0) {
+			d += ` L ${curr.x} ${curr.y}`;
+			continue;
+		}
+
+		// Prevent radius from exceeding segment lengths
+		const r = Math.min(radius, len1 / 2, len2 / 2);
+
+		// Point before the bend
+		const p1 = {
+			x: curr.x - (vx1 / len1) * r,
+			y: curr.y - (vy1 / len1) * r,
+		};
+
+		// Point after the bend
+		const p2 = {
+			x: curr.x + (vx2 / len2) * r,
+			y: curr.y + (vy2 / len2) * r,
+		};
+
+		// Straight line into rounded corner
+		d += ` L ${p1.x} ${p1.y}`;
+
+		// Rounded bend
+		d += ` Q ${curr.x} ${curr.y} ${p2.x} ${p2.y}`;
+	}
+
+	// Final line
+	const last = points[points.length - 1];
+	d += ` L ${last.x} ${last.y}`;
+
+	return d;
+}
+
 const getInfluenceEdgeRoute = (edge: ElkExtendedEdge): InfluenceEdgeRoute | undefined => {
 	const section = edge.sections?.[0];
 	if (!section) return;
@@ -76,9 +125,12 @@ const getInfluenceEdgeRoute = (edge: ElkExtendedEdge): InfluenceEdgeRoute | unde
 	);
 
 	if (points.length < 2) return;
+	const labelPositions = getRouteLabelPosition(points);
+	const path = makeRoundedPath(points, section.bendPoints ?? []);
 	return {
-		path: toSvgPath(points).trim(),
-		...getRouteLabelPosition(points),
+		path,
+		labelX: labelPositions.labelX,
+		labelY: labelPositions.labelY,
 	};
 };
 
@@ -88,8 +140,8 @@ export const getInfluenceDiagramLayout = async (
 ) => {
 	if (nodes.length < 2) {
 		return {
-			nodes,
-			edges,
+			positionedNodes: nodes,
+			positionedEdges: edges,
 		};
 	}
 
@@ -97,8 +149,11 @@ export const getInfluenceDiagramLayout = async (
 		id: 'influence-diagram',
 		layoutOptions: {
 			'elk.algorithm': 'layered',
+			'elk.interactive': 'true',
 			'elk.edgeRouting': 'ORTHOGONAL',
+			'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
 			'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+			'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
 			'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
 			'elk.layered.unnecessaryBendpoints': 'true',
 			'elk.spacing.edgeEdge': '30',
@@ -109,8 +164,8 @@ export const getInfluenceDiagramLayout = async (
 		},
 		children: nodes.map(node => ({
 			id: node.id,
-			width: getNodeWidth(node),
-			height: getNodeHeight(node),
+			width: node.measured?.width ?? defaultNodeWidth,
+			height: node.measured?.height ?? defaultNodeHeight,
 		})),
 		edges: edges.map(edge => ({
 			id: edge.id,
@@ -133,7 +188,7 @@ export const getInfluenceDiagramLayout = async (
 	);
 
 	return {
-		nodes: nodes.map(node => {
+		positionedNodes: nodes.map(node => {
 			const layoutedNode = layoutedNodesById.get(node.id);
 			if (!layoutedNode) return node;
 			return {
@@ -144,7 +199,7 @@ export const getInfluenceDiagramLayout = async (
 				},
 			};
 		}),
-		edges: edges.map(edge => ({
+		positionedEdges: edges.map(edge => ({
 			...edge,
 			data: {
 				...edge.data,

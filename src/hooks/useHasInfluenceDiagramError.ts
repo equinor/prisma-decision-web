@@ -12,8 +12,8 @@ import {
 
 export const useHasInfluenceDiagramError = () => {
 	const issues = useSelectedProjectIssues();
-	const nodes = useSelectedProjectInfluenceNodes();
-	const edges = useSelectedProjectEdges();
+	const { nodes } = useSelectedProjectInfluenceNodes();
+	const { edges } = useSelectedProjectEdges();
 	const reactFlowEdges = edges.map(e => ({ id: e.id, source: e.tail_id, target: e.head_id }));
 
 	const validationErrors: Record<string, boolean> = {

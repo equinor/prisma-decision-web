@@ -7,79 +7,42 @@ import {
 	NodeChange,
 	OnConnect,
 	OnReconnect,
-	useEdgesState,
-	useNodesState,
 } from '@xyflow/react';
-import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEvent, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
+import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
-import { useSelectedProjectInfluenceNodes } from '../../../hooks/useSelectedProjectInfluenceNodes';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowInfluenceNode } from '../../../types';
-import { convertToInfluenceEdges, InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
 import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
-import { Edge } from '../../../validators';
+import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
-	const filteredIssues = useMemo(
-		() =>
-			issues.filter(issue => {
-				const inOrOnBoundary = issue.boundary === 'in' || issue.boundary === 'on';
-				if (issue.type === 'Decision')
-					return inOrOnBoundary && issue.decision.type === 'Focus';
-				if (issue.type === 'Uncertainty') return inOrOnBoundary && issue.uncertainty.is_key;
-				if (issue.type === 'Utility') return inOrOnBoundary;
-				return false;
-			}),
-		[issues],
-	);
-	const nodes = useSelectedProjectInfluenceNodes();
-	const filteredNodes = useMemo(() => {
-		return nodes.filter(node => filteredIssues.some(issue => issue.id === node.data.issue_id));
-	}, [nodes, filteredIssues]);
-	const edges = useSelectedProjectEdges();
-	const selectedProject = useSelectedProject();
 	const { mutate: createEdge } = useCreateEdge();
+	const { mutate: deleteEdge } = useDeleteEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
-	const [localNodes, setLocalNodes] = useNodesState([] as ReactFlowInfluenceNode[]);
-	const [localEdges, setEdges, onEdgesChange] = useEdgesState(
-		[] as FlowEdge<InfluenceEdgeData>[],
-	);
+	const selectedProject = useSelectedProject();
+	const { positionedNodes, positionedEdges, updateInfluencceDiagram } =
+		useInfluenceDiagramLayout();
+
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
-	const runLayout = async (nodesToLayout: ReactFlowInfluenceNode[], edgesToLayout: Edge[]) => {
-		const nextEdges = convertToInfluenceEdges(edgesToLayout, nodesToLayout);
-		if (nodesToLayout.length < 2) {
-			setLocalNodes(nodesToLayout);
-			setEdges(nextEdges);
-			return;
-		}
-
-		const { nodes: layoutedNodes, edges: layoutedEdges } = await getInfluenceDiagramLayout(
-			nodesToLayout,
-			nextEdges,
-		);
-
-		setLocalNodes(layoutedNodes);
-		setEdges(layoutedEdges);
-	};
-
-	useEffect(() => {
-		runLayout(filteredNodes, edges);
-	}, [filteredNodes, edges]);
 
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
-		const sourceNode = localNodes.find(node => node.id === sourceId);
-		const targetNode = localNodes.find(node => node.id === targetId);
-		const sourceIssue = filteredIssues.find(issue => issue.id === sourceNode?.data.issue_id);
-		const targetIssue = filteredIssues.find(issue => issue.id === targetNode?.data.issue_id);
+		const sourceNode = positionedNodes.find(node => node.id === sourceId);
+		const targetNode = positionedNodes.find(node => node.id === targetId);
+		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
+		const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
 		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
 	};
 
-	const onConnect: OnConnect = params => {
+	const onDeleteEdges = async (edgesToDelete: FlowEdge[]) => {
+		deleteEdge(edgesToDelete[0].id);
+	};
+
+	const onConnect: OnConnect = async params => {
 		if (sourceAndTargetAreUtility(params.source, params.target)) return;
 		if (!selectedProject) return;
 		const newEdge = {
@@ -88,12 +51,10 @@ export const useInfluenceDiagram = () => {
 			project_id: selectedProject.id,
 			id: crypto.randomUUID(),
 		};
-
 		createEdge(newEdge);
-		runLayout(localNodes, [...edges, newEdge]);
 	};
 
-	const onReconnect: OnReconnect = (oldEdge, newConnection) => {
+	const onReconnect: OnReconnect = async (oldEdge, newConnection) => {
 		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
 		if (!selectedProject) return;
 		const updatedEdge = {
@@ -104,10 +65,6 @@ export const useInfluenceDiagram = () => {
 		};
 
 		updateEdge(updatedEdge);
-		runLayout(
-			localNodes,
-			edges.map(edge => (edge.id === oldEdge.id ? updatedEdge : edge)),
-		);
 	};
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
@@ -123,43 +80,55 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
-		setEdges(edges => {
-			return edges.map(e => {
-				if (e.id !== edge.id) return e;
-				return {
-					...e,
-					data: {
-						...e.data,
-						hovered: true,
-					},
-				};
-			});
+		updateInfluencceDiagram((positionedNodes, positionedEdges) => {
+			return {
+				positionedNodes: positionedNodes,
+				positionedEdges: positionedEdges.map(e => {
+					return {
+						...e,
+						data: {
+							...e.data,
+							hovered: e.id === edge.id,
+						},
+					};
+				}),
+			};
 		});
 	};
 
 	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
-		setEdges(edges => {
-			return edges.map(e => {
-				if (e.id !== edge.id) return e;
-				return {
-					...e,
-					data: {
-						...e.data,
-						hovered: false,
-					},
-				};
-			});
+		updateInfluencceDiagram((positionedNodes, positionedEdges) => {
+			return {
+				positionedNodes: positionedNodes,
+				positionedEdges: positionedEdges.map(e => {
+					return {
+						...e,
+						data: {
+							...e.data,
+							hovered: e.id === edge.id,
+						},
+					};
+				}),
+			};
 		});
 	};
 
-	const onNodesChange = (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
-		const s = applyNodeChanges(changes, localNodes);
-		runLayout(s, edges);
+	const onNodesChange = async (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
+		const { positionedNodes: newNodes, positionedEdges: newEdges } =
+			await getInfluenceDiagramLayout(
+				applyNodeChanges(changes, positionedNodes),
+				positionedEdges,
+			);
+		updateInfluencceDiagram(() => {
+			return {
+				positionedNodes: newNodes,
+				positionedEdges: newEdges,
+			};
+		});
 	};
-
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {
 		if (connection.source === connection.target) return false;
-		const edgeExists = localEdges.some(edge => {
+		const edgeExists = positionedEdges.some(edge => {
 			if (draggingEdge.current && edge.id === draggingEdge.current.id) return false;
 			return (
 				(edge.source === connection.source && edge.target === connection.target) ||
@@ -169,20 +138,18 @@ export const useInfluenceDiagram = () => {
 		return !edgeExists;
 	};
 	return {
-		nodes: localNodes,
-		edges: localEdges,
+		nodes: positionedNodes,
+		edges: positionedEdges,
 		onConnect,
 		onReconnect,
 		onReconnectStart,
 		onNodesChange,
-		onEdgesChange,
 		isValidConnection,
-		setEdges,
-		setNodes: setLocalNodes,
 		isSelecting,
 		onClickSelectionMode,
 		onClickPanMode,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
+		onDeleteEdges,
 	};
 };

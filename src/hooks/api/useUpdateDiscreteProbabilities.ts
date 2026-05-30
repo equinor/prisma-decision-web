@@ -11,12 +11,27 @@ export const useUpdateDiscreteProbabilities = () => {
 			const res = await apiClient.put('/discrete_probabilities', [prob]);
 			return res.data[0];
 		},
-		onError: () => {
-			showErrorToast('Failed to update probabilities');
+		onMutate: async newProb => {
+			await queryClient.cancelQueries({ queryKey: ['discreteProbabilities'] });
+			const previousProbs = queryClient.getQueryData<DiscreteProbability[]>([
+				'discreteProbabilities',
+			]);
+			if (previousProbs) {
+				queryClient.setQueryData(
+					['discreteProbabilities'],
+					previousProbs.map(p => (p.id === newProb.id ? newProb : p)),
+				);
+			}
+			return { previousProbs };
 		},
-		onSettled: () => {
+		onError: (_err, _newProb, context) => {
+			showErrorToast('Failed to update probabilities');
+			if (context?.previousProbs) {
+				queryClient.setQueryData(['discreteProbabilities'], context.previousProbs);
+			}
+		},
+		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});
