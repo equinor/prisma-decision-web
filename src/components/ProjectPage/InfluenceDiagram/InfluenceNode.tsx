@@ -29,7 +29,7 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 	return (
 		<div
 			className={cn('flex w-87.5 flex-col gap-2', {
-				'w-auto': probabilityTableOpen,
+				'w-auto': probabilityTableOpen || utilityTableOpen,
 			})}
 		>
 			<div

@@ -7,7 +7,7 @@ import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 
 const nodeTypes = { issue: InfluenceNode };
-const edgeTypes = { issue: InfluenceEdge };
+const edgeTypes = { 'issue-edge': InfluenceEdge };
 
 export const InfluenceDiagram = () => {
 	const {
@@ -36,7 +36,7 @@ export const InfluenceDiagram = () => {
 				nodes={nodes}
 				edges={edges}
 				defaultEdgeOptions={{
-					type: 'issue',
+					type: 'issue-edge',
 					markerEnd: {
 						type: MarkerType.ArrowClosed,
 						color: 'rgba(var(--eds_primary_resting), 1)',

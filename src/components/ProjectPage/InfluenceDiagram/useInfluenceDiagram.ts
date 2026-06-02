@@ -24,7 +24,7 @@ export const useInfluenceDiagram = () => {
 	const { mutate: deleteEdge } = useDeleteEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
-	const { positionedNodes, positionedEdges, updateInfluencceDiagram } =
+	const { positionedNodes, positionedEdges, updateInfluenceDiagram } =
 		useInfluenceDiagramLayout();
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
@@ -80,7 +80,7 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
-		updateInfluencceDiagram((positionedNodes, positionedEdges) => {
+		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
 			return {
 				positionedNodes: positionedNodes,
 				positionedEdges: positionedEdges.map(e => {
@@ -97,7 +97,7 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
-		updateInfluencceDiagram((positionedNodes, positionedEdges) => {
+		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
 			return {
 				positionedNodes: positionedNodes,
 				positionedEdges: positionedEdges.map(e => {
@@ -119,7 +119,7 @@ export const useInfluenceDiagram = () => {
 				applyNodeChanges(changes, positionedNodes),
 				positionedEdges,
 			);
-		updateInfluencceDiagram(() => {
+		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
 				positionedEdges: newEdges,

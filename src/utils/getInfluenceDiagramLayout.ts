@@ -1,7 +1,7 @@
 import { Edge as FlowEdge } from '@xyflow/react';
 import ELK, { ElkExtendedEdge, ElkNode, ElkPoint } from 'elkjs/lib/elk.bundled.js';
 import { ReactFlowInfluenceNode } from '../types';
-import { InfluenceEdgeData, InfluenceEdgeRoute } from './convertToInfluenceEdges';
+import { InfluenceEdgeData } from './convertToInfluenceEdges';
 
 const elk = new ELK();
 
@@ -116,7 +116,7 @@ function makeRoundedPath(points: ElkPoint[], bends: ElkPoint[], radius = 8) {
 	return d;
 }
 
-const getInfluenceEdgeRoute = (edge: ElkExtendedEdge): InfluenceEdgeRoute | undefined => {
+const getInfluenceEdgeRoute = (edge: ElkExtendedEdge) => {
 	const section = edge.sections?.[0];
 	if (!section) return;
 
@@ -178,13 +178,13 @@ export const getInfluenceDiagramLayout = async (
 	const layoutedNodesById = new Map(
 		(layoutedGraph.children ?? []).map(layoutedNode => [layoutedNode.id, layoutedNode]),
 	);
-	const routeByEdgeId = new Map<string, InfluenceEdgeRoute>(
+	const routeByEdgeId = new Map(
 		(layoutedGraph.edges ?? [])
 			.map(layoutedEdge => {
 				const route = getInfluenceEdgeRoute(layoutedEdge);
 				return route ? ([layoutedEdge.id, route] as const) : undefined;
 			})
-			.filter((entry): entry is readonly [string, InfluenceEdgeRoute] => entry !== undefined),
+			.filter(entry => entry !== undefined),
 	);
 
 	return {

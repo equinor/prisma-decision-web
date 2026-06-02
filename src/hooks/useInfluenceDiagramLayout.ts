@@ -47,11 +47,10 @@ export const useInfluenceDiagramLayout = () => {
 			latestLayoutNodesRef.current = layout.positionedNodes;
 			return layout;
 		},
-		enabled:
-			filteredNodes.length > 0 && edges.length > 0 && !isFetchingNodes && !isFetchingEdges,
+		enabled: filteredNodes.length > 0 && !isFetchingNodes && !isFetchingEdges,
 	});
 
-	const updateInfluencceDiagram = (
+	const updateInfluenceDiagram = (
 		cb: (
 			positionedNodes: ReactFlowInfluenceNode[],
 			positionedEdges: Edge[],
@@ -69,7 +68,7 @@ export const useInfluenceDiagramLayout = () => {
 	return {
 		positionedNodes,
 		positionedEdges,
-		updateInfluencceDiagram,
+		updateInfluenceDiagram,
 	};
 };
 
