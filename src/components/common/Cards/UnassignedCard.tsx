@@ -59,4 +59,5 @@ export const UnassignedCard = ({ issue, ...rest }: UnassignedCardProps) => {
 type UnassignedCardProps = {
 	issue: Issue;
 	className?: string;
+	canExpand?: boolean;
 };

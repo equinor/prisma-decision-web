@@ -2,12 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+          const useDarkMode = localStorage.getItem('useDarkMode') === 'true';
+          const root = document.documentElement;
+          root.classList.toggle('dark', useDarkMode);
+    </script>
+    <style>
+      html.dark {
+        background: rgb(19, 38, 52);
+      }
+    </style>
     <link rel="icon" type="image/svg+xml" href="/icon.png" />
     <link rel="stylesheet" href="https://cdn.eds.equinor.com/font/equinor-font.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prisma</title>
   </head>
-  <body class="bg-background-light text-text-default">
+  <body class="text-text-default bg-background-light">
     <div id="root" class="dark:scheme-dark"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

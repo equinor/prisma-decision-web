@@ -13,8 +13,8 @@ import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
-import { ZoomControls } from './ZoomControls';
 import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
+import { ZoomControls } from '../../ZoomControls';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');

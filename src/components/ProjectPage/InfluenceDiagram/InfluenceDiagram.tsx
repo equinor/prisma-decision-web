@@ -7,7 +7,7 @@ import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 
 const nodeTypes = { issue: InfluenceNode };
-const edgeTypes = { issue: InfluenceEdge };
+const edgeTypes = { 'issue-edge': InfluenceEdge };
 
 export const InfluenceDiagram = () => {
 	const {
@@ -15,7 +15,6 @@ export const InfluenceDiagram = () => {
 		edges,
 		onConnect,
 		isValidConnection,
-		onEdgesChange,
 		onNodesChange,
 		onReconnect,
 		onReconnectStart,
@@ -24,6 +23,7 @@ export const InfluenceDiagram = () => {
 		isSelecting,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
+		onDeleteEdges,
 	} = useInfluenceDiagram();
 
 	return (
@@ -36,7 +36,7 @@ export const InfluenceDiagram = () => {
 				nodes={nodes}
 				edges={edges}
 				defaultEdgeOptions={{
-					type: 'issue',
+					type: 'issue-edge',
 					markerEnd: {
 						type: MarkerType.ArrowClosed,
 						color: 'rgba(var(--eds_primary_resting), 1)',
@@ -46,25 +46,24 @@ export const InfluenceDiagram = () => {
 				connectionMode={ConnectionMode.Strict}
 				zoomOnDoubleClick={false}
 				panOnDrag={!isSelecting}
+				connectOnClick={false}
 				nodesDraggable={false}
 				selectNodesOnDrag={isSelecting}
 				selectionKeyCode={['Control']}
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
 				onNodesChange={onNodesChange}
+				onEdgesDelete={onDeleteEdges}
 				onReconnectStart={onReconnectStart}
 				onEdgeMouseEnter={onEdgeMouseEnter}
 				onEdgeMouseLeave={onEdgeMouseLeave}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}
-				connectOnClick={false}
 				onConnect={onConnect}
 				isValidConnection={isValidConnection}
-				onEdgesChange={onEdgesChange}
 				proOptions={{ hideAttribution: true }}
 				fitView
-				fitViewOptions={{ padding: 0.4 }}
 			>
 				<Background />
 				<DraggableToolbar

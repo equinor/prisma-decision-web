@@ -59,7 +59,7 @@ export const UtilityCard = ({
 			<div>
 				<h3 className='font-semibold '>{issue.name}</h3>
 				{!hasTwoOrMoreParents && (
-					<p className='max-w-[220px] text-xs font-medium text-[#EA580C]'>
+					<p className='max-w-55 text-xs font-medium text-[#EA580C]'>
 						Connect 2+ parent nodes to enable utility table and solver
 					</p>
 				)}
