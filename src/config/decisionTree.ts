@@ -1,5 +1,5 @@
 import { MarkerType } from '@xyflow/react';
-import { DecisionTreeEdge } from '../components/ProjectPage/DecisionTree/DecisionTreeEdge';
+import { DecisionTreeEdge } from '../components/common/DecisionTree/DecisionTreeEdge';
 import { DecisionTreeNode } from '../components/common/DecisionTree/DecisionTreeNode';
 import { ExpandNode } from '../components/common/DecisionTree/ExpandableNode';
 import { OutputNode } from '../components/common/DecisionTree/OutputNode';

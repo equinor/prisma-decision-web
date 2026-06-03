@@ -1,18 +1,18 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { collapse_screen } from '@equinor/eds-icons';
 import {
 	BaseEdge,
+	Edge,
 	EdgeLabelRenderer,
 	EdgeProps,
 	getSmoothStepPath,
-	useNodes,
 	Node,
-	Edge,
+	useNodes,
 } from '@xyflow/react';
+import { useLocation } from 'react-router';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../../../validators';
 
 export const DecisionTreeEdge = ({
 	id,
@@ -24,10 +24,9 @@ export const DecisionTreeEdge = ({
 	targetPosition,
 	markerEnd,
 	source,
-	target,
 	animated,
 	data,
-}: EdgeProps<Edge<{ probability: number; outcomeName: string; utility: number }>>) => {
+}: EdgeProps<Edge<{ probability: number; utility: number; stateId: string }>>) => {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
@@ -37,12 +36,19 @@ export const DecisionTreeEdge = ({
 		targetPosition,
 		borderRadius: 25,
 	});
-	const nodes = useNodes<Node<{ issue: Issue; path: Set<string> }>>();
+	const location = useLocation();
+	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
+	const nodes = useNodes<Node<{ issueId: string; statePath: string[] }>>();
 	const sourceNode = nodes.find(n => n.id === source);
-	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issue.id);
-	const { expanded, toggleExpanded } = useExpandedTreeNodes(target);
+	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issueId);
+	const path = sourceNode ? [...sourceNode.data.statePath, data?.stateId || ''] : [];
+	const { expanded, closePath } = useExpandedTreeNodes(path, treeType);
 
 	if (!issue) return null;
+	const outcomeName =
+		issue.type === 'Uncertainty'
+			? issue.uncertainty.outcomes.find(o => o.id === data?.stateId)?.name
+			: issue.decision.options.find(o => o.id === data?.stateId)?.name;
 
 	return (
 		<>
@@ -51,18 +57,20 @@ export const DecisionTreeEdge = ({
 				path={edgePath}
 				markerEnd={markerEnd}
 				className={cn('stroke-primary-resting! stroke-4!', {
-					'stroke-emerald-600! stroke-8!': animated,
+					'stroke-emerald-600!': animated,
 				})}
 			/>
 			<EdgeLabelRenderer>
-				<div
-					className='nodrag pointer-events-auto absolute origin-center'
-					style={{
-						transform: `translate(calc(-100% - 20px), -100%) translate(${targetX}px, ${targetY}px)`,
-					}}
-				>
-					{data?.outcomeName}
-				</div>
+				<Tooltip title={outcomeName} placement='top'>
+					<div
+						className='nodrag pointer-events-auto absolute max-w-30 origin-center truncate'
+						style={{
+							transform: `translate(calc(-100% - 20px), -100%) translate(${targetX}px, ${targetY}px)`,
+						}}
+					>
+						{outcomeName}
+					</div>
+				</Tooltip>
 				<div
 					className='nodrag pointer-events-auto absolute origin-center text-end'
 					style={{
@@ -91,7 +99,7 @@ export const DecisionTreeEdge = ({
 							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
 						}}
 					>
-						<Button className='p-1!' color='danger' onClick={toggleExpanded}>
+						<Button className='p-1!' color='danger' onClick={closePath}>
 							<Icon data={collapse_screen} />
 						</Button>
 					</div>

@@ -19,7 +19,7 @@ export const DiscreteProbabilityCell = ({ outcomeId, probabilities }: DiscretePr
 					mutate({ ...dp, probability: newValue });
 				}}
 				inputMode='decimal'
-				className='nopan nodrag [&_input]:bg-background-default! w-24!'
+				className='nopan nodrag [&_input]:bg-background-default!'
 				defaultValue={Math.round((dp?.probability || 0) * 100) / 100}
 			/>
 		</td>

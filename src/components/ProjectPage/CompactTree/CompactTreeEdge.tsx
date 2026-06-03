@@ -9,7 +9,6 @@ import {
 } from '@xyflow/react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../../../validators';
 
 export const CompactTreeEdge = ({
 	id,
@@ -34,9 +33,9 @@ export const CompactTreeEdge = ({
 		borderRadius: 10,
 		stepPosition: 0.1,
 	});
-	const nodes = useNodes<Node<{ issue: Issue; path: Set<string> }>>();
+	const nodes = useNodes<Node<{ issueId: string; path: Set<string> }>>();
 	const sourceNode = nodes.find(n => n.id === source);
-	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issue.id);
+	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issueId);
 
 	if (!issue) return null;
 

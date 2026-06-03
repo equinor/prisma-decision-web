@@ -2,6 +2,9 @@
 @plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:is(.dark *));
+[data-dnd-overlay]:not([style*='--dnd-translate']) {
+	display: none;
+}
 @theme inline {
 	--breakpoint-2xl: 100rem;
 
@@ -128,8 +131,7 @@ input::placeholder {
 	color: rgba(var(--eds_text_tertiary), 1);
 }
 
-html,
-body {
+html {
 	font-family: equinor, sans-serif;
 	height: 100%;
 	width: 100%;

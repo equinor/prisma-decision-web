@@ -1,26 +1,33 @@
-import { Fragment } from 'react';
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
-import { useAtom } from 'jotai';
+import { Fragment } from 'react';
+import { isDecisionPathSelected } from '../../../hooks/useExpandedTreeNodes';
+import { useSelectedDecisionTreePath } from '../../../hooks/useSelectedDecisionTreePath';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
-import { Issue } from '../../../validators';
 import { DecisionCard } from '../Cards/DecisionCard';
 import { UncertaintyCard } from '../Cards/UncertaintyCard';
-import { testAtom } from '../../ProjectPage/DecisionTree/useDecisionTree';
+import { useLocation } from 'react-router';
 
 const handlePositions = [Position.Left, Position.Right];
 
 export const DecisionTreeNode = ({
 	data,
 	id,
-}: NodeProps<Node<{ issue: Issue; path?: Set<string>; expectedValue?: number | null }>>) => {
-	const IssueCard = data.issue.type === 'Decision' ? DecisionCard : UncertaintyCard;
-	const [selectedNodes, setSelectedNodes] = useAtom(testAtom);
-	const selected = selectedNodes.has(id) || (data.path?.size === 0 && selectedNodes.size > 0);
+}: NodeProps<Node<{ issueId: string; statePath?: string[]; expectedValue?: number | null }>>) => {
+	const location = useLocation();
+	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
+	const issues = useSelectedProjectIssues();
+	const issue = issues.find(issue => issue.id === data.issueId);
+	const IssueCard = issue?.type === 'Decision' ? DecisionCard : UncertaintyCard;
+	const { selectedPath, selectPath } = useSelectedDecisionTreePath(treeType);
+	const statePath = data.statePath || [];
+	const selected = isDecisionPathSelected(selectedPath, statePath);
+	if (!issue) return null;
 	return (
 		<>
 			<div
 				onClick={() => {
-					setSelectedNodes(new Set(data.path));
+					selectPath(statePath.length > 0 ? statePath : null);
 				}}
 			>
 				{handlePositions.map(position => (
@@ -29,23 +36,23 @@ export const DecisionTreeNode = ({
 							type='source'
 							position={position}
 							id={position}
-							className='bg-primary-resting! z-1 h-3! w-3!'
+							className='bg-primary-resting! z-1 mr-1.5! h-3! w-3! opacity-0!'
 							isConnectable={false}
 						/>
 						<Handle
 							type='target'
 							position={position}
 							id={position}
-							className='bg-primary-resting! z-1 h-3! w-3!'
+							className='bg-primary-resting! z-1 h-3! w-3! opacity-0!'
 							isConnectable={false}
 						/>
 					</Fragment>
 				))}
 				<div
 					className={`h-full max-w-87.5
-					overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(data.issue.type, selected)}`}
+					overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 				>
-					<IssueCard canExpand={false} issue={data.issue} className={'h-20'} />
+					<IssueCard canExpand={false} issue={issue} className={'h-20'} />
 				</div>
 			</div>
 			{!!data.expectedValue && (

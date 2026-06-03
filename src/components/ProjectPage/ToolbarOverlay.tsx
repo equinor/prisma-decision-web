@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { thumb_pin } from '@equinor/eds-icons';
-import { cn } from '../../../../utils/cn';
+import { cn } from '../../utils/cn';
 
 export const ToolbarOverlay = () => {
 	const { ref: droppableTopRef, isDropTarget: isDropTargetTop } = useDroppable({

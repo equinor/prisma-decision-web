@@ -8,7 +8,7 @@ const defaultValue: ReactFlowInfluenceNode[] = [];
 
 export const useSelectedProjectInfluenceNodes = () => {
 	const selectedProject = useSelectedProject();
-	const { nodes } = useGetInfluenceNodes();
+	const { nodes, isFetching } = useGetInfluenceNodes();
 	const reactFlowNodes = useMemo(
 		() =>
 			convertToReactFlowNodes(nodes).filter(
@@ -16,6 +16,9 @@ export const useSelectedProjectInfluenceNodes = () => {
 			),
 		[nodes, selectedProject?.id],
 	);
-	if (!selectedProject) return defaultValue;
-	return reactFlowNodes;
+	if (!selectedProject) return { nodes: defaultValue, isFetching: false };
+	return {
+		nodes: reactFlowNodes,
+		isFetching,
+	};
 };

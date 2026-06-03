@@ -13,7 +13,7 @@ export const TopBar = () => {
 	const isLoading = isFetching > 0 || isMutating > 0;
 
 	return (
-		<EdsTopBar sticky={false} className='col-span-2 pl-3.5!'>
+		<EdsTopBar sticky={false} className='col-span-2 border-b-0! pl-3.5!'>
 			<EdsTopBar.Header
 				className='flex! cursor-pointer items-center! justify-center'
 				onClick={() => navigate('/')}
