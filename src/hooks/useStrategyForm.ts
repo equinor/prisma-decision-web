@@ -3,14 +3,16 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Strategy, strategySchema } from '../validators';
 import { useCreateStrategy } from './api/useCreateStrategy';
+import { useUpdateStrategy } from './api/useUpdateStrategy';
 import { useSelectedProject } from './useSelectedProject';
 
 export const useStrategyForm = (strategy?: Strategy) => {
 	const selectedProject = useSelectedProject();
 
-	const { mutate: createStrategy, isPending } = useCreateStrategy(() => {
+	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategy(() => {
 		formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
 	});
+	const { mutate: updateStrategyMutation, isPending: isUpdatePending } = useUpdateStrategy();
 
 	const defaultValues = useMemo(
 		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
@@ -27,6 +29,15 @@ export const useStrategyForm = (strategy?: Strategy) => {
 
 	const handleSubmit = formMethods.handleSubmit(
 		data => {
+			if (strategy) {
+				if (!selectedProject) return;
+				return updateStrategyMutation({
+					...selectedProject,
+					strategies: selectedProject.strategies.map(s =>
+						s.id === strategy.id ? data : s,
+					),
+				});
+			}
 			return createStrategy(data);
 		},
 		errors => {
@@ -34,6 +45,8 @@ export const useStrategyForm = (strategy?: Strategy) => {
 			console.error('Form errors:', errors);
 		},
 	);
+
+	const isPending = isCreatePending || isUpdatePending;
 
 	return {
 		formMethods,

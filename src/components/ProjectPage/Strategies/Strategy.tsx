@@ -5,6 +5,7 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
+import { EditStrategy } from './EditStrategy';
 import { IconData } from '@equinor/eds-icons';
 
 export const Strategy = ({
@@ -26,18 +27,21 @@ export const Strategy = ({
 	);
 	const project = useSelectedProject();
 	const { mutate: updateStrategy } = useUpdateStrategy();
+
 	if (!project) return;
 	return (
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>
 				<div className='flex items-center gap-4'>
+					<Icon data={strategyIcon} />
 					<div>
 						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
-						<h4 className='text-text-tertiary text-sm '>{strategy.rationale}</h4>
+						<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>
 					</div>
-					{strategyIcon && <Icon data={strategyIcon} />}
+					<EditStrategy strategy={strategy} />
 				</div>
-				<div>
+				<div className='flex items-center'>
+					<img src='/compareicon.png' alt='Compare' className='size-5' />
 					<Checkbox
 						checked={selectedStrategyIds?.has(strategy.id)}
 						onChange={() => onClickAddToStrategyTable(strategy.id)}
