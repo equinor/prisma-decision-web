@@ -1,26 +1,29 @@
-import { Issue } from '../validators';
 import { Node } from '@xyflow/react';
 
 export const convertToDecisionTreeNode = (
-	issue: Issue,
+	issueId: string,
 	type: 'treeNode' | 'expandNode',
 	id: string,
-	path: Set<string> = new Set<string>(),
+	statePath: string[] = [],
 	expectedValue?: number | null,
-): Node<{ issue: Issue; path: Set<string>; expectedValue?: number | null }> => {
+	expandPathSegment?: string,
+): Node<{
+	issueId: string;
+	statePath: string[];
+	expectedValue?: number | null;
+	expandPathSegment?: string;
+}> => {
 	return {
 		id,
 		type,
 		height: 80,
 		width: type === 'treeNode' ? 250 : 1,
-		position: {
-			x: issue.node.node_style.x_position,
-			y: issue.node.node_style.y_position,
-		},
+		position: { x: 0, y: 0 },
 		data: {
-			issue: issue,
+			issueId,
 			expectedValue,
-			path,
+			statePath,
+			expandPathSegment,
 		},
 	};
 };

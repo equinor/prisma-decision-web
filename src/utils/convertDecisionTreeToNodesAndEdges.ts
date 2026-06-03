@@ -1,48 +1,72 @@
-import { DecisionTree } from '../hooks/api/useGetDecisionTree';
+import { DecisionPath, DecisionTree } from '../hooks/api/useGetDecisionTree';
+import { isDecisionPathSelected } from '../hooks/useExpandedTreeNodes';
 import { buildDecisionTreeEdge } from './buildDecisionTreeEdge';
 import { convertToDecisionTreeNode } from './convertToDecisionTreeNode';
 import { convertToOutputNode } from './convertToOutputNode';
 import { Node, Edge } from '@xyflow/react';
 
 export const convertDecisionTreeToNodesAndEdges = ({
-	selected,
+	selectedPath,
 	tree,
 	depth = 0,
-	expandable = true,
-	expanded,
 }: ConvertDecisionTreeToNodesAndEdgesArgs) => {
 	const nodes: Node[] = [];
 	const edges: Edge[] = [];
-	const walk = (node: DecisionTree, depth = 0, path: Set<string> = new Set<string>()) => {
-		const issue = node.tree_node.issue;
-		const expectedValue = node.tree_node.expected_value;
-		const nodeId = node.tree_node.id;
-		const isEndPoint = issue.type === 'EndPoint';
-		const isCollapsed =
-			expandable &&
-			expanded &&
-			!expanded.has(node.tree_node.id) &&
-			depth !== 0 &&
-			!isEndPoint;
+	const walk = (node: DecisionTree, depth = 0, statePath: string[] = []) => {
+		const expectedValue = node.expected_value;
+		const nodeId = node.id;
+		const isEndPoint = node.type === 'End';
 
 		if (isEndPoint) {
-			const newNode = convertToOutputNode(issue, node.tree_node.id, path);
+			const newNode = convertToOutputNode(
+				{
+					cumulative_probability: node.cumulative_probability,
+					id: node.id,
+					value: node.endpoint_value,
+				},
+				node.id,
+				statePath,
+			);
 			return nodes.push(newNode);
 		}
-		if (isCollapsed) {
-			const newNode = convertToDecisionTreeNode(issue, 'expandNode', nodeId, path);
-			return nodes.push(newNode);
-		}
-		const newNode = convertToDecisionTreeNode(issue, 'treeNode', nodeId, path, expectedValue);
+
+		const newNode = convertToDecisionTreeNode(
+			node.issue_id,
+			'treeNode',
+			nodeId,
+			statePath,
+			expectedValue,
+		);
 		nodes.push(newNode);
 
-		if (!node.tree_node.children) return;
-		node.tree_node.children.forEach((child, index) => {
-			const isSelected = selected.has(child.tree_node.id);
-			const newEdge = buildDecisionTreeEdge(node, child, index, isSelected);
+		node.utilities.forEach(utility => {
+			const stateId = utility.option_id || utility.outcome_id;
+			if (!stateId) return;
+			const branchPath = [...statePath, stateId];
+			const animated = isDecisionPathSelected(selectedPath, branchPath);
+
+			const matchingChild = node.children.find(c => c.parent_state_id === stateId);
+
+			if (matchingChild) {
+				const newEdge = buildDecisionTreeEdge(node, matchingChild.id, stateId, animated);
+				if (!newEdge) return;
+				edges.push(newEdge);
+				walk(matchingChild, depth + 1, branchPath);
+				return;
+			}
+			const expandNodeId = `expand:${node.id}:${stateId}`;
+			const newEdge = buildDecisionTreeEdge(node, expandNodeId, stateId, animated);
+			const expandNode = convertToDecisionTreeNode(
+				node.issue_id,
+				'expandNode',
+				expandNodeId,
+				statePath,
+				expectedValue,
+				stateId,
+			);
 			if (!newEdge) return;
+			nodes.push(expandNode);
 			edges.push(newEdge);
-			walk(child, depth + 1, new Set([...path, child.tree_node.id]));
 		});
 	};
 	walk(tree, depth);
@@ -51,8 +75,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 
 type ConvertDecisionTreeToNodesAndEdgesArgs = {
 	tree: DecisionTree;
-	expanded?: Set<string>;
-	selected: Set<string>;
+	selectedPath: DecisionPath | null;
 	depth?: number;
 	expandable?: boolean;
 };
