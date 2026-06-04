@@ -61,40 +61,26 @@ export const Strategy = ({
 								onClickOption={option => {
 									if (!existingOption) {
 										updateStrategy({
-											...project,
-											strategies: project.strategies.map(projectStrategy => {
-												if (projectStrategy.id !== strategy.id)
-													return projectStrategy;
-												return {
-													...projectStrategy,
-													options: [...projectStrategy.options, option],
-												};
-											}),
+											...strategy,
+											options: [...strategy.options, option],
 										});
 										return;
 									}
-									updateStrategy({
-										...project,
-										strategies: project.strategies.map(projectStrategy => {
-											if (projectStrategy.id !== strategy.id)
-												return projectStrategy;
-											if (option.id === existingOption.id)
-												return {
-													...projectStrategy,
-													options: projectStrategy.options.filter(
-														o => o.id !== option.id,
-													),
-												};
-											return {
-												...projectStrategy,
-												options: projectStrategy.options.map(o =>
-													o.decision_id === issue.decision.id
-														? option
-														: o,
-												),
-											};
-										}),
-									});
+									if (option.id === existingOption.id) {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.filter(
+												o => o.id !== option.id,
+											),
+										});
+									} else {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.map(o =>
+												o.decision_id === issue.decision.id ? option : o,
+											),
+										});
+									}
 								}}
 								key={issue.id}
 								issue={issue}

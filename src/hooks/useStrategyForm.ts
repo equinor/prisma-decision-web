@@ -12,7 +12,7 @@ export const useStrategyForm = (strategy?: Strategy) => {
 	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategy(() => {
 		formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
 	});
-	const { mutate: updateStrategyMutation, isPending: isUpdatePending } = useUpdateStrategy();
+	const { mutate: updateStrategy, isPending: isUpdatePending } = useUpdateStrategy();
 
 	const defaultValues = useMemo(
 		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
@@ -29,16 +29,10 @@ export const useStrategyForm = (strategy?: Strategy) => {
 
 	const handleSubmit = formMethods.handleSubmit(
 		data => {
-			if (strategy) {
-				if (!selectedProject) return;
-				return updateStrategyMutation({
-					...selectedProject,
-					strategies: selectedProject.strategies.map(s =>
-						s.id === strategy.id ? data : s,
-					),
-				});
-			}
-			return createStrategy(data);
+			const mutationFn = strategy ? updateStrategy : createStrategy;
+			return mutationFn({
+				...data,
+			});
 		},
 		errors => {
 			// eslint-disable-next-line no-console
