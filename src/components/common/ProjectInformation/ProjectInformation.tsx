@@ -20,6 +20,13 @@ export const ProjectInformation = () => {
 		name: 'end_date',
 		control: formMethods.control,
 	});
+
+	const {
+		field: { value: isPublic, onChange: onChangePublic },
+	} = useController({
+		name: 'public',
+		control: formMethods.control,
+	});
 	return (
 		<FormProvider {...formMethods}>
 			<form className='flex flex-col gap-4'>
@@ -57,8 +64,11 @@ export const ProjectInformation = () => {
 						<Switch
 							label='Make Project Public'
 							className='w-max!'
-							{...register('public')}
-							onChange={() => handleSubmit()}
+							checked={isPublic}
+							onChange={() => {
+								onChangePublic(!isPublic);
+								handleSubmit();
+							}}
 						/>
 						<div className='col-span-1 md:col-span-2'>
 							<Textarea
