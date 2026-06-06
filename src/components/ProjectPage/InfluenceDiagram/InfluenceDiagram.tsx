@@ -28,7 +28,7 @@ export const InfluenceDiagram = () => {
 
 	return (
 		<div
-			className='bg-background-light absolute
+			className='influence-diagram bg-background-light absolute
 			inset-0 rounded-sm'
 		>
 			<ReactFlow
