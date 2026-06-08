@@ -4,9 +4,13 @@ import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
 import { strategyIcons } from './icons';
+import { useGetStrategy } from '../../../hooks/api/useGetStrategy';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
+	const { strategies } = useGetStrategy(selectedProject?.id ?? '');
+	const filteredStrategies = strategies?.filter(s => s.project_id === selectedProject?.id);
+
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
 	const handleClickAddToStrategyTable = (id: string) => {
@@ -26,8 +30,8 @@ export const Strategies = () => {
 	};
 
 	const selelectedStrategies =
-		selectedProject?.strategies.filter(s => selectedStrategyIds.has(s.id)) ?? [];
-	if (!selectedProject) return;
+		filteredStrategies?.filter(s => selectedStrategyIds.has(s.id)) ?? [];
+	if (!selectedProject) return null;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex items-center justify-between'>
