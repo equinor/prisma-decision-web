@@ -7,6 +7,7 @@ import { getInfluenceDiagramLayout } from '../utils/getInfluenceDiagramLayout';
 import { useSelectedProjectEdges } from './useSelectedProjectEdges';
 import { useSelectedProjectInfluenceNodes } from './useSelectedProjectInfluenceNodes';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
+import { useInfluenceDiagramSettings } from './useInfluenceDiagramSettings';
 
 const defaultNodes = [] as ReactFlowInfluenceNode[];
 const defaultEdges = [] as Edge[];
@@ -17,6 +18,7 @@ export const useInfluenceDiagramLayout = () => {
 	const { edges, isFetching: isFetchingEdges } = useSelectedProjectEdges();
 	const queryClient = useQueryClient();
 	const latestLayoutNodesRef = useRef<ReactFlowInfluenceNode[]>(defaultNodes);
+	const [layoutOptions] = useInfluenceDiagramSettings();
 
 	const filteredNodes = useMemo(() => {
 		const filteredIssues = issues.filter(issue => {
@@ -35,13 +37,14 @@ export const useInfluenceDiagramLayout = () => {
 			positionedEdges: defaultEdges,
 		},
 	} = useQuery({
-		queryKey: ['influenceDiagramLayout', { nodes: filteredNodes, edges }],
+		queryKey: ['influenceDiagramLayout', { nodes: filteredNodes, edges, layoutOptions }],
 		placeholderData: keepPreviousData,
 		queryFn: async () => {
 			const measuredNodes = mergeMeasuredNodes(filteredNodes, latestLayoutNodesRef.current);
 			const layout = await getInfluenceDiagramLayout(
 				measuredNodes,
 				convertToInfluenceEdges(edges, measuredNodes),
+				layoutOptions,
 			);
 
 			latestLayoutNodesRef.current = layout.positionedNodes;
@@ -60,7 +63,7 @@ export const useInfluenceDiagramLayout = () => {
 		latestLayoutNodesRef.current = nextLayout.positionedNodes;
 
 		queryClient.setQueryData(
-			['influenceDiagramLayout', { nodes: filteredNodes, edges }],
+			['influenceDiagramLayout', { nodes: filteredNodes, edges, layoutOptions }],
 			nextLayout,
 		);
 	};

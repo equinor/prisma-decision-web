@@ -137,6 +137,14 @@ const getInfluenceEdgeRoute = (edge: ElkExtendedEdge) => {
 export const getInfluenceDiagramLayout = async (
 	nodes: ReactFlowInfluenceNode[],
 	edges: FlowEdge<InfluenceEdgeData>[],
+	layoutOptions: {
+		'elk.algorithm.graphviz': string;
+		'elk.spacing.edgeNode': string;
+		'elk.spacing.nodeNode': string;
+		'elk.direction': string;
+		'elk.layered.spacing.edgeNodeBetweenLayers': string;
+		'elk.layered.spacing.nodeNodeBetweenLayers': string;
+	},
 ) => {
 	if (nodes.length < 2) {
 		return {
@@ -147,21 +155,7 @@ export const getInfluenceDiagramLayout = async (
 
 	const graph: ElkNode = {
 		id: 'influence-diagram',
-		layoutOptions: {
-			'elk.algorithm': 'layered',
-			'elk.interactive': 'true',
-			'elk.edgeRouting': 'ORTHOGONAL',
-			'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
-			'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-			'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
-			'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-			'elk.layered.unnecessaryBendpoints': 'true',
-			'elk.spacing.edgeEdge': '30',
-			'elk.spacing.edgeNode': '70',
-			'elk.spacing.nodeNode': '100',
-			'elk.layered.spacing.edgeNodeBetweenLayers': '100',
-			'elk.layered.spacing.nodeNodeBetweenLayers': '250',
-		},
+		layoutOptions,
 		children: nodes.map(node => ({
 			id: node.id,
 			width: node.measured?.width ?? defaultNodeWidth,
