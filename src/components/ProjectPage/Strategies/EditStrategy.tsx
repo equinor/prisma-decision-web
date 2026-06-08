@@ -23,7 +23,7 @@ export const EditStrategy = ({ strategy }: { strategy: Strategy }) => {
 		<FormProvider {...formMethods}>
 			<Tooltip title='Edit strategy'>
 				<Button variant='ghost_icon' onClick={() => setIsOpen(true)}>
-					<Icon data={edit} size={18} />
+					<Icon data={edit} />
 				</Button>
 			</Tooltip>
 			{isOpen && (

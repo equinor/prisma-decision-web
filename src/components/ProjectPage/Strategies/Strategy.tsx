@@ -1,4 +1,5 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
+import { IconData } from '@equinor/eds-icons';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
@@ -6,7 +7,6 @@ import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
-import { IconData } from '@equinor/eds-icons';
 
 export const Strategy = ({
 	strategy,
@@ -38,14 +38,15 @@ export const Strategy = ({
 						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
 						<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>
 					</div>
-					<EditStrategy strategy={strategy} />
 				</div>
 				<div className='flex items-center'>
-					<img src='/compareicon.png' alt='Compare' className='size-5' />
 					<Checkbox
+						label='Add to compare'
+						className='flex-row-reverse'
 						checked={selectedStrategyIds?.has(strategy.id)}
 						onChange={() => onClickAddToStrategyTable(strategy.id)}
 					/>
+					<EditStrategy strategy={strategy} />
 					<DeleteStrategyDialog strategy={strategy} />
 				</div>
 			</div>
