@@ -1,11 +1,12 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
+import { IconData } from '@equinor/eds-icons';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
-import { IconData } from '@equinor/eds-icons';
+import { EditStrategy } from './EditStrategy';
 
 export const Strategy = ({
 	strategy,
@@ -26,22 +27,26 @@ export const Strategy = ({
 	);
 	const project = useSelectedProject();
 	const { mutate: updateStrategy } = useUpdateStrategy();
+
 	if (!project) return;
 	return (
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>
 				<div className='flex items-center gap-4'>
+					<Icon data={strategyIcon} />
 					<div>
 						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
-						<h4 className='text-text-tertiary text-sm '>{strategy.rationale}</h4>
+						<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>
 					</div>
-					{strategyIcon && <Icon data={strategyIcon} />}
 				</div>
-				<div>
+				<div className='flex items-center'>
 					<Checkbox
+						label='Add to compare'
+						className='flex-row-reverse'
 						checked={selectedStrategyIds?.has(strategy.id)}
 						onChange={() => onClickAddToStrategyTable(strategy.id)}
 					/>
+					<EditStrategy strategy={strategy} />
 					<DeleteStrategyDialog strategy={strategy} />
 				</div>
 			</div>
@@ -57,40 +62,26 @@ export const Strategy = ({
 								onClickOption={option => {
 									if (!existingOption) {
 										updateStrategy({
-											...project,
-											strategies: project.strategies.map(projectStrategy => {
-												if (projectStrategy.id !== strategy.id)
-													return projectStrategy;
-												return {
-													...projectStrategy,
-													options: [...projectStrategy.options, option],
-												};
-											}),
+											...strategy,
+											options: [...strategy.options, option],
 										});
 										return;
 									}
-									updateStrategy({
-										...project,
-										strategies: project.strategies.map(projectStrategy => {
-											if (projectStrategy.id !== strategy.id)
-												return projectStrategy;
-											if (option.id === existingOption.id)
-												return {
-													...projectStrategy,
-													options: projectStrategy.options.filter(
-														o => o.id !== option.id,
-													),
-												};
-											return {
-												...projectStrategy,
-												options: projectStrategy.options.map(o =>
-													o.decision_id === issue.decision.id
-														? option
-														: o,
-												),
-											};
-										}),
-									});
+									if (option.id === existingOption.id) {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.filter(
+												o => o.id !== option.id,
+											),
+										});
+									} else {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.map(o =>
+												o.decision_id === issue.decision.id ? option : o,
+											),
+										});
+									}
 								}}
 								key={issue.id}
 								issue={issue}
