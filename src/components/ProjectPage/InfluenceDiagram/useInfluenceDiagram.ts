@@ -96,7 +96,7 @@ export const useInfluenceDiagram = () => {
 		});
 	};
 
-	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
+	const onEdgeMouseLeave: EdgeMouseHandler = () => {
 		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
 			return {
 				positionedNodes: positionedNodes,
@@ -105,7 +105,7 @@ export const useInfluenceDiagram = () => {
 						...e,
 						data: {
 							...e.data,
-							hovered: e.id === edge.id,
+							hovered: false,
 						},
 					};
 				}),
@@ -114,11 +114,21 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onNodesChange = async (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
+		const nextNodes = applyNodeChanges(changes, positionedNodes);
+		const hasLayoutAffectingChange = changes.some(change => change.type !== 'select');
+
+		if (!hasLayoutAffectingChange) {
+			updateInfluenceDiagram(() => {
+				return {
+					positionedNodes: nextNodes,
+					positionedEdges,
+				};
+			});
+			return;
+		}
+
 		const { positionedNodes: newNodes, positionedEdges: newEdges } =
-			await getInfluenceDiagramLayout(
-				applyNodeChanges(changes, positionedNodes),
-				positionedEdges,
-			);
+			await getInfluenceDiagramLayout(nextNodes, positionedEdges);
 		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
