@@ -19,6 +19,7 @@ import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
 import { PublicLoginPage } from './components/PublicLoginPage';
 import { isPublic } from './utils/getEnvironment';
+import { Assessments } from './components/ProjectPage/Assessments/Assessments';
 
 const RequirePublicAuth = ({ children }: { children: React.ReactNode }) => {
 	if (isPublic() && !sessionStorage.getItem('username')) {
@@ -49,6 +50,7 @@ const router = createBrowserRouter(
 					<Route path='compact-tree' element={<CompactTree />} />
 					<Route path='solution-tree' element={<SolutionTree />} />
 					<Route path='strategies' element={<Strategies />} />
+					<Route path='assessments' element={<Assessments />} />
 				</Route>
 			</Route>
 		</>,
