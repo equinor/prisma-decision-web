@@ -10,6 +10,26 @@ export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 			await apiClient.put('/objectives', [objective]);
 			return objective;
 		},
+		onMutate: async (updatedObjective: Objective) => {
+			await queryClient.cancelQueries({
+				queryKey: ['objectives', updatedObjective.project_id],
+			});
+
+			const previousObjectives = queryClient.getQueryData<Objective[]>([
+				'objectives',
+				updatedObjective.project_id,
+			]);
+
+			queryClient.setQueryData(
+				['objectives', updatedObjective.project_id],
+				(old: Objective[] | undefined) => {
+					if (!old) return [updatedObjective];
+					return old.map(o => (o.id === updatedObjective.id ? updatedObjective : o));
+				},
+			);
+
+			return { previousObjectives };
+		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			onSuccess?.();
