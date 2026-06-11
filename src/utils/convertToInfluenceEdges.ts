@@ -1,8 +1,11 @@
 import { Node } from '@xyflow/react';
 import { Edge } from '../validators';
 
+export type InfluenceEdgePoint = [number, number];
+
 export type InfluenceEdgeRoute = {
 	path: string;
+	points: InfluenceEdgePoint[];
 	labelX: number;
 	labelY: number;
 };

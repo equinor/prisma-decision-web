@@ -1,11 +1,12 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, useReactFlow } from '@xyflow/react';
+import { useAnimatedInfluenceRoute } from '../../../hooks/useAnimatedInfluenceRoute';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
 
 export const InfluenceEdge = ({ id, markerEnd, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
-	const edgePath = data?.route?.path ?? '';
+	const path = useAnimatedInfluenceRoute(data?.route);
 	const labelX = data?.route?.labelX ?? 0;
 	const labelY = data?.route?.labelY ?? 0;
 
@@ -17,7 +18,7 @@ export const InfluenceEdge = ({ id, markerEnd, data }: EdgeProps<Edge<InfluenceE
 		<>
 			<BaseEdge
 				id={id}
-				path={edgePath}
+				path={path}
 				markerEnd={markerEnd}
 				interactionWidth={60}
 				className='stroke-primary-resting! stroke-4!'
