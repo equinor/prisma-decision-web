@@ -1,6 +1,8 @@
 import {
+	applyEdgeChanges,
 	applyNodeChanges,
 	Connection,
+	EdgeChange,
 	EdgeMouseHandler,
 	Edge as FlowEdge,
 	IsValidConnection,
@@ -113,6 +115,18 @@ export const useInfluenceDiagram = () => {
 		});
 	};
 
+	const onEdgesChange = async (changes: EdgeChange[]) => {
+		const nextEdges = applyEdgeChanges(changes, positionedEdges);
+		const { positionedNodes: newNodes, positionedEdges: newEdges } =
+			await getInfluenceDiagramLayout(positionedNodes, nextEdges);
+		updateInfluenceDiagram(() => {
+			return {
+				positionedNodes: newNodes,
+				positionedEdges: newEdges,
+			};
+		});
+	};
+
 	const onNodesChange = async (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
 		const nextNodes = applyNodeChanges(changes, positionedNodes);
 		const hasLayoutAffectingChange = changes.some(change => change.type !== 'select');
@@ -154,6 +168,7 @@ export const useInfluenceDiagram = () => {
 		onReconnect,
 		onReconnectStart,
 		onNodesChange,
+		onEdgesChange,
 		isValidConnection,
 		isSelecting,
 		onClickSelectionMode,
