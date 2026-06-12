@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TARGET_ENVIRONMENTS: dev
+    ports:
+      - '5004:3000'
+    environment:
+      - NODE_ENV=development
