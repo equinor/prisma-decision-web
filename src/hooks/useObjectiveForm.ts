@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Objective, objectiveSchema } from '../validators';
-import { useCreateObjective } from './api/useCreateObjective';
 import { useUpdateObjective } from './api/useUpdateObjective';
 import { useSelectedProject } from './useSelectedProject';
+import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 
 export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
 	const selectedProject = useSelectedProject();
@@ -19,7 +19,7 @@ export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs)
 		resolver: zodResolver(objectiveSchema),
 	});
 
-	const { mutate: createObjective, isPending: isCreating } = useCreateObjective({
+	const { mutate: createObjective, isPending: isCreating } = useCreateObjectiveOptimistic({
 		onSuccess: () => {
 			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
 			onSuccess?.();

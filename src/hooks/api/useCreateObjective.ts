@@ -1,24 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { Objective, Project } from '../../validators';
+import { Objective } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
-
-export const useCreateObjective = ({ onSuccess }: { onSuccess?: () => void }) => {
-	const queryClient = useQueryClient();
-	return useMutation({
-		mutationFn: async (data: Objective) => {
-			const res = await apiClient.post('/objectives', [data]);
-			return res.data[0];
-		},
-		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['projects'] });
-			onSuccess?.();
-		},
-		onError: () => {
-			showErrorToast('Failed to create objective');
-		},
-	});
-};
 
 export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
@@ -28,24 +11,22 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 			return res.data[0];
 		},
 		onMutate: (newObjective: Objective) => {
-			queryClient.cancelQueries({ queryKey: ['projects'] });
 			const projectId = newObjective.project_id;
-			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
-			const newProjects = previousProjects.map(project => {
-				if (project.id === projectId) {
-					return {
-						...project,
-						objectives: [...project.objectives, newObjective],
-					};
-				}
-				return project;
-			});
-			queryClient.setQueryData(['projects'], newProjects);
-			return { previousProjects };
+			queryClient.cancelQueries({ queryKey: ['objectives', projectId] });
+			const previousObjectives =
+				queryClient.getQueryData<Objective[]>(['objectives', projectId]) || [];
+			queryClient.setQueryData(
+				['objectives', projectId],
+				[...previousObjectives, newObjective],
+			);
+			return { previousObjectives, projectId };
 		},
-		onError: (_err, _newOpportunity, context) => {
-			if (context?.previousProjects) {
-				queryClient.setQueryData(['projects'], context.previousProjects);
+		onError: (_err, _newObjective, context) => {
+			if (context?.previousObjectives) {
+				queryClient.setQueryData(
+					['objectives', context.projectId],
+					context.previousObjectives,
+				);
 			}
 			showErrorToast('Failed to create objective');
 			return _err;

@@ -59,12 +59,10 @@ export const projectSchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunity_statement: z.string().optional(),
-	objectives: z.array(objectiveSchema, 'Objectives must be an array'),
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime(),
-	strategies: z.array(strategySchema, 'Strategies must be an array'),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
 
@@ -170,8 +168,10 @@ export const projectImportFile = z.array(z.file().mime('application/json'));
 
 export const projectImportSchema = z.object({
 	projects: projectSchema,
+	Objectives: z.array(objectiveSchema).optional(),
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
+	Strategies: z.array(strategySchema).optional(),
 });
 export const DecisionQualityAssessmentSchema = z.object({
 	id: uuid(),

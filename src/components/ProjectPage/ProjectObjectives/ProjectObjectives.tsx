@@ -4,10 +4,11 @@ import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { format } from 'date-fns';
 import { EditObjectiveDialog } from './EditObjectiveDialog';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useGetObjective } from '../../../hooks/api/useGetObjective';
 
 export const ProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
-	const objectives = selectedProject?.objectives || [];
+	const { objectives = [] } = useGetObjective(selectedProject?.id ?? '');
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
@@ -23,7 +24,7 @@ export const ProjectObjectives = () => {
 						<div className='flex gap-2'>
 							<h2 className='text-2xl font-semibold'>Objectives</h2>
 							<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-								{objectives.length}
+								{objectives?.length ?? 0}
 							</span>
 						</div>
 						<p className='text-text-tertiary'>

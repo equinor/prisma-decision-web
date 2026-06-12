@@ -6,7 +6,7 @@ export const useGetObjective = (projectId: string) => {
 	const { data: objectives } = useQuery({
 		queryKey: ['objectives', projectId],
 		queryFn: async () => {
-			const res = await apiClient.get<Objective[]>('/objectives');
+			const res = await apiClient.get<Objective[]>(`/projects/${projectId}/objectives`);
 			return res.data;
 		},
 		meta: {

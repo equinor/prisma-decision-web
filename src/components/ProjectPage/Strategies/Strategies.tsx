@@ -9,8 +9,6 @@ import { useGetStrategy } from '../../../hooks/api/useGetStrategy';
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
 	const { strategies } = useGetStrategy(selectedProject?.id ?? '');
-	const filteredStrategies = strategies?.filter(s => s.project_id === selectedProject?.id);
-
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
 	const handleClickAddToStrategyTable = (id: string) => {
@@ -29,8 +27,7 @@ export const Strategies = () => {
 		}
 	};
 
-	const selelectedStrategies =
-		filteredStrategies?.filter(s => selectedStrategyIds.has(s.id)) ?? [];
+	const selectedStrategies = strategies?.filter(s => selectedStrategyIds.has(s.id)) ?? [];
 	if (!selectedProject) return null;
 	return (
 		<div className='flex flex-col gap-4'>
@@ -38,7 +35,7 @@ export const Strategies = () => {
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateStrategy />
 			</div>
-			{selelectedStrategies.length > 0 && <StrategyTable strategies={selelectedStrategies} />}
+			{selectedStrategies.length > 0 && <StrategyTable strategies={selectedStrategies} />}
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
@@ -47,14 +44,14 @@ export const Strategies = () => {
 					<div className='flex gap-2'>
 						<h2 className='text-2xl font-semibold'>Strategies</h2>
 						<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-							{selectedProject.strategies.length}
+							{strategies?.length ?? 0}
 						</span>
 					</div>
 					<p className='text-text-tertiary'>
 						Define and manage strategies for your decision optimization project
 					</p>
 				</div>
-				{selectedProject.strategies.map(strategy => {
+				{strategies?.map(strategy => {
 					return (
 						<Strategy
 							strategyIcon={strategyIcons[strategy.icon]}
