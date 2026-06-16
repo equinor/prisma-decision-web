@@ -1,10 +1,11 @@
-import { Configuration, IPublicClientApplication } from '@azure/msal-browser';
-import { PublicClientApplication } from '@azure/msal-browser';
+import { Configuration, PublicClientApplication } from '@azure/msal-browser';
+import { InternalAxiosRequestConfig } from 'axios';
 
 const REDIRECT_URI = import.meta.env.VITE_APP_REDIRECT_URI;
 const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID;
 
-export const msalConfig: Configuration = {
+const scopes = [import.meta.env.VITE_APP_PRISMA_API_SCOPE];
+const msalConfig: Configuration = {
 	auth: {
 		clientId: CLIENT_ID,
 		authority: 'https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0', // This is a URL (e.g. https://login.microsoftonline.com/{your tenant ID})
@@ -15,10 +16,9 @@ export const msalConfig: Configuration = {
 	},
 };
 
-export const scopes = [import.meta.env.VITE_APP_PRISMA_API_SCOPE];
+const msalInstance = new PublicClientApplication(msalConfig);
 
-export const msalInstance = new PublicClientApplication(msalConfig);
-export const initializeAuth = async (msalInstance: IPublicClientApplication) => {
+export const initializeMsalAuth = async () => {
 	await msalInstance.initialize?.();
 
 	const response = await msalInstance.handleRedirectPromise();
@@ -41,4 +41,22 @@ export const initializeAuth = async (msalInstance: IPublicClientApplication) => 
 				scopes: scopes,
 			});
 		});
+};
+
+export const msalInterceptor = (config: InternalAxiosRequestConfig) => {
+	return msalInstance
+		.acquireTokenSilent({
+			account: msalInstance.getAllAccounts()[0],
+			scopes,
+		})
+		.then(async token => {
+			config.headers.authorization = `Bearer ${token.accessToken}`;
+			return config;
+		})
+		.catch(
+			async () =>
+				msalInstance.acquireTokenRedirect({
+					scopes: scopes,
+				}) as never,
+		);
 };

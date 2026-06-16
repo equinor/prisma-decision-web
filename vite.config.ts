@@ -23,4 +23,12 @@ export default defineConfig({
 	server: {
 		port: 5004,
 	},
+	build: {
+		rollupOptions: {
+			input: {
+				main: 'index.html',
+				login: 'login.html',
+			},
+		},
+	},
 });
