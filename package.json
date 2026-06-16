@@ -5,10 +5,13 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
+		"public": "vite --mode public",
 		"build": "tsc && vite build",
 		"build:dev": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode development",
 		"build:prod": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode production",
 		"build:test": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode test",
+		"build:public": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode public",
+		"release:public": "npm run fetch-tags && git tag -f PUBLIC && npm run push-tags",
 		"release:prod": "npm run fetch-tags && git tag -f PROD && npm run push-tags",
 		"release:test": "npm run fetch-tags && git tag -f TEST && npm run push-tags",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

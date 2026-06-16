@@ -1,0 +1,27 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+    name: prisma-decision-web-public
+
+spec:
+    environments:
+        - name: public
+          build:
+            from: PUBLIC
+    components:
+        - name: frontend
+          src: .
+          publicPort: http
+          ports:
+              - name: http
+                port: 3000
+    dnsAlias:
+        - alias: prisma-public
+          environment: public
+          component: frontend
+    dnsExternalAlias:
+      - alias: prisma-demo.equinor.com
+        environment: public
+        component: frontend 
+        useCertificateAutomation: true
+        

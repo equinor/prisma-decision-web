@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="icon" type="image/svg+xml" href="/icon.png" />
+	<link rel="stylesheet" href="https://cdn.eds.equinor.com/font/equinor-font.css" />
+	<link rel="stylesheet" href="/src/index.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisma Login</title>
+</head>
+<body class="text-text-default">
+    <main>
+		<div class='flex h-screen items-center justify-center'>
+			<form class='flex w-[min(400px,90%)] flex-col' id="login-form">
+				<div class="mb-4">
+					<h1 class='text-3xl font-bold'>Prisma Login</h1>
+					<p class='text-text-tertiary'>Enter a username to get started.</p>
+				</div>
+				<input
+					class="focus-within:outline-2 focus-within:outline-primary p-1.5 w-full bg-background-light 
+					border-b border-background-sticky"
+					id="username"
+				/>
+				<p class='text-sm text-text-warning py-2'>
+					This is a demo version. Do not use your real email or personal information, as all data may be visible to other users. By continuing, you acknowledge that this username will be stored in the database and that you proceed at your own risk.
+				</p>
+				<button type='submit' class="bg-primary text-text-white py-2 rounded-sm text-sm font-medium hover:bg-primary-hover">Continue</button>
+			</form>
+		</div>
+    </main>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+
+            const trimmedUsername = usernameInput.value.trim();
+            if(!trimmedUsername) return
+
+            localStorage.setItem('username', trimmedUsername);
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

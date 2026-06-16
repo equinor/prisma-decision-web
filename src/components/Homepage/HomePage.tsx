@@ -1,14 +1,14 @@
 import { Search } from '@equinor/eds-core-react';
 import { useState } from 'react';
+import { useGetEdges } from '../../hooks/api/useGetEdges';
+import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
-import { useGetIssues } from '../../hooks/api/useGetIssues';
-import { useGetEdges } from '../../hooks/api/useGetEdges';
 
 import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
+import { isProd } from '../../utils/getEnvironment';
 import { CreateProject } from '../common/ProjectInformation/CreateProject';
 import { ImportProject } from '../common/ProjectInformation/ImportProject';
-import { isDev, isTest } from '../../utils/getEnvironment';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -16,6 +16,7 @@ export const HomePage = () => {
 	const filteredProjects = projects.filter(project =>
 		project.name.toLowerCase().includes(searchTerm.toLowerCase()),
 	);
+
 	useGetIssues();
 	useGetEdges();
 	useGetInfluenceNodes();
@@ -42,7 +43,7 @@ export const HomePage = () => {
 						/>
 						<div className='flex justify-between gap-2'>
 							<CreateProject />
-							{(isDev() || isTest()) && <ImportProject />}
+							{!isProd() && <ImportProject />}
 						</div>
 					</div>
 					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
