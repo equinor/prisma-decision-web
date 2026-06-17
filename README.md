@@ -135,3 +135,35 @@ npm run release:prod   # Tag and push PROD release
 ```
 
 The app is built via Docker (`Dockerfile`), served on port 3000 via a Node.js Express server (`deployment/`).
+
+## Running Locally with Docker Compose
+
+> **Note:** `VITE_APP_PRISMA_API_URL` is baked into the frontend bundle at **build time**, not at runtime. To point the app at a local backend you must update the env file before building.
+
+### 1. Set the API URL
+
+Edit `.env.development` and set your local backend URL:
+
+```env
+VITE_APP_PRISMA_API_URL=http://localhost:7075/
+```
+
+### 2. Build and run
+
+Always use `--build` so Docker re-bundles the frontend with the updated URL:
+
+```bash
+docker compose up --build
+```
+
+The app is available at **http://localhost:5004**.
+
+### 3. Rebuild from scratch (clear cache)
+
+
+```bash
+docker compose build --no-cache
+docker compose up
+```
+
+
