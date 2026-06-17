@@ -23,6 +23,12 @@ export const SideBar = () => {
 	const decisionTreeButtonRef = useRef<HTMLButtonElement>(null);
 	const project = useSelectedProject();
 	const pendingCount = usePendingAssessmentCount();
+	let decisionTreeIcon = share;
+	if (window.location.pathname.includes('compact-tree')) {
+		decisionTreeIcon = compactTreeIcon;
+	} else if (window.location.pathname.includes('solution-tree')) {
+		decisionTreeIcon = functions;
+	}
 	if (!project) return <div />;
 	return (
 		<EdsSideBar
@@ -41,6 +47,7 @@ export const SideBar = () => {
 				</p>
 
 				<EdsSideBar.Link
+					active={window.location.pathname === `/project/${project.id}`}
 					label='Project Information'
 					icon={info_circle}
 					className='[&_svg]:fill-primary-resting border-b-0!'
@@ -49,6 +56,7 @@ export const SideBar = () => {
 				/>
 
 				<EdsSideBar.Link
+					active={window.location.pathname.includes('objectives')}
 					label='Objectives'
 					as={Link}
 					className='[&_svg]:fill-primary-resting border-b-0!'
@@ -56,6 +64,7 @@ export const SideBar = () => {
 					to={`/project/${project.id}/objectives`}
 				/>
 				<EdsSideBar.Link
+					active={window.location.pathname.includes('issues')}
 					label='Issues'
 					as={Link}
 					className='[&_svg]:fill-primary-resting border-b-0!'
@@ -64,6 +73,7 @@ export const SideBar = () => {
 				/>
 				<EdsSideBar.Link
 					label='Strategies'
+					active={window.location.pathname.includes('strategies')}
 					as={Link}
 					className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:ml-0.5! [&_svg]:size-5!'
 					icon={ChessIcon}
@@ -79,6 +89,7 @@ export const SideBar = () => {
 				<EdsSideBar.Link
 					as={Link}
 					label='Influence Diagram'
+					active={window.location.pathname.includes('influence-diagram')}
 					className='[&_svg]:fill-primary-resting border-b-0! [&_svg]:w-full!'
 					icon={timeline}
 					to={`/project/${project.id}/influence-diagram`}
@@ -87,8 +98,13 @@ export const SideBar = () => {
 					ref={decisionTreeButtonRef}
 					onClick={() => setIsDecisionTreeMenuOpen(prev => !prev)}
 					label='Decision Tree'
+					active={
+						window.location.pathname.includes('decision-tree') ||
+						window.location.pathname.includes('compact-tree') ||
+						window.location.pathname.includes('solution-tree')
+					}
 					className='[&_svg]:fill-primary-resting border-b-0!'
-					icon={share}
+					icon={decisionTreeIcon}
 				/>
 				<Popover
 					open={isDecisionTreeMenuOpen}
@@ -139,6 +155,7 @@ export const SideBar = () => {
 				<EdsSideBar.Link
 					as={Link}
 					label='Assessments'
+					active={window.location.pathname.includes('assessments')}
 					className={cn(
 						'[&_svg]:fill-primary-resting relative border-b-0! [&_svg]:w-full!',
 						{
