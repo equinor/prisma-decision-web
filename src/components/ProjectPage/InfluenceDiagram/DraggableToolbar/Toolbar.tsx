@@ -2,6 +2,7 @@ import { useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
+import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
 import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
@@ -9,12 +10,12 @@ import {} from '../../../../utils/convertNodeToInfluenceNode';
 import { CreateIssues } from '../../../common/CreateIssue';
 import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
+import { ZoomControls } from '../../ZoomControls';
 import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
+import { LayoutControls } from './LayoutControls';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
-import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
-import { ZoomControls } from '../../ZoomControls';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -42,6 +43,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 				<Icon data={dragHandle} size={24} />
 			</div>
 			<ZoomControls />
+			<LayoutControls />
 			<div className='bg-background-light h-9 w-0.5' />
 			<TogglePanMode checked={!isSelecting} onChange={onClickPanMode} />
 			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />

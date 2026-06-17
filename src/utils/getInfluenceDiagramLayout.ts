@@ -1,5 +1,5 @@
 import { Edge as FlowEdge } from '@xyflow/react';
-import ELK, { ElkExtendedEdge, ElkNode } from 'elkjs/lib/elk.bundled.js';
+import ELK, { ElkExtendedEdge, ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
 import { ReactFlowInfluenceNode } from '../types';
 import { buildRoundedPolylinePath } from './buildRoundedPolylinePath';
 import { InfluenceEdgeData, InfluenceEdgePoint } from './convertToInfluenceEdges';
@@ -34,6 +34,7 @@ const getInfluenceEdgeRoute = (edge: ElkExtendedEdge) => {
 export const getInfluenceDiagramLayout = async (
 	nodes: ReactFlowInfluenceNode[],
 	edges: FlowEdge<InfluenceEdgeData>[],
+	layoutOptions: LayoutOptions,
 ) => {
 	if (nodes.length < 2) {
 		return {
@@ -45,19 +46,8 @@ export const getInfluenceDiagramLayout = async (
 	const graph: ElkNode = {
 		id: 'influence-diagram',
 		layoutOptions: {
-			'elk.algorithm': 'layered',
-			'elk.interactive': 'true',
-			'elk.edgeRouting': 'ORTHOGONAL',
-			'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
-			'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-			'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
-			'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-			'elk.layered.unnecessaryBendpoints': 'true',
-			'elk.spacing.edgeEdge': '30',
-			'elk.spacing.edgeNode': '70',
-			'elk.spacing.nodeNode': '100',
-			'elk.layered.spacing.edgeNodeBetweenLayers': '100',
-			'elk.layered.spacing.nodeNodeBetweenLayers': '250',
+			...layoutOptions,
+			'elk.algorithm.graphviz': 'dot',
 		},
 		children: nodes.map(node => ({
 			id: node.id,

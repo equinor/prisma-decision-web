@@ -19,6 +19,7 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 import { ReactFlowInfluenceNode } from '../../../types';
 import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
+import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
@@ -26,6 +27,7 @@ export const useInfluenceDiagram = () => {
 	const { mutate: deleteEdge } = useDeleteEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
+	const [layoutOptions] = useInfluenceDiagramSettings();
 	const { positionedNodes, positionedEdges, updateInfluenceDiagram } =
 		useInfluenceDiagramLayout();
 
@@ -118,7 +120,7 @@ export const useInfluenceDiagram = () => {
 	const onEdgesChange = async (changes: EdgeChange[]) => {
 		const nextEdges = applyEdgeChanges(changes, positionedEdges);
 		const { positionedNodes: newNodes, positionedEdges: newEdges } =
-			await getInfluenceDiagramLayout(positionedNodes, nextEdges);
+			await getInfluenceDiagramLayout(positionedNodes, nextEdges, layoutOptions);
 		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
@@ -142,7 +144,7 @@ export const useInfluenceDiagram = () => {
 		}
 
 		const { positionedNodes: newNodes, positionedEdges: newEdges } =
-			await getInfluenceDiagramLayout(nextNodes, positionedEdges);
+			await getInfluenceDiagramLayout(nextNodes, positionedEdges, layoutOptions);
 		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
