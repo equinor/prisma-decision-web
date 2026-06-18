@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
 import checker from 'vite-plugin-checker';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -7,6 +8,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
 	plugins: [
 		react(),
+		babel({
+			presets: [reactCompilerPreset()],
+		}),
 		tailwindcss(),
 		checker({
 			typescript: {
@@ -18,5 +22,13 @@ export default defineConfig({
 	],
 	server: {
 		port: 5004,
+	},
+	build: {
+		rollupOptions: {
+			input: {
+				main: 'index.html',
+				login: 'login.html',
+			},
+		},
 	},
 });

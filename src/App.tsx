@@ -2,15 +2,15 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 import { CreateProjectPage } from './components/CreateProjectPage/CreateProjectPage';
 import { HomePage } from './components/Homepage/HomePage';
 import { Layout } from './components/Layout';
-import { ProjectPage } from './components/ProjectPage/ProjectPage';
-import { ProjectIssues } from './components/ProjectPage/ProjectIssues/ProjectIssues';
-import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectDetails';
-import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
-import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
+import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
 import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree';
+import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
+import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectDetails';
+import { ProjectIssues } from './components/ProjectPage/ProjectIssues/ProjectIssues';
+import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
+import { ProjectPage } from './components/ProjectPage/ProjectPage';
 import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
-import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
 import { Assessments } from './components/ProjectPage/Assessments/Assessments';
 
 const router = createBrowserRouter(

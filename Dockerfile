@@ -1,5 +1,4 @@
-FROM node:20-alpine AS build
-# RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+FROM node:25-alpine AS build
 
 ARG TARGET_ENVIRONMENTS
 
@@ -8,14 +7,14 @@ RUN mkdir -p /home/node/app/node_modules \
 WORKDIR /home/node/app
 COPY package*.json ./
 
-# Exclude the devDependencies of your project. This also includes Cypress, which takes a long time to install
+# Exclude the devDependencies of your project
 RUN npm ci
 
 COPY . .
 # Here you export the build secrets so you can use them in your application. It is important to run "npm run build" in the same run command 
 RUN npm run build:${TARGET_ENVIRONMENTS}
 
-FROM node:20-alpine AS deployment
+FROM node:25-alpine AS deployment
 
 RUN deluser --remove-home node \
     && addgroup -S node -g 1001 \

@@ -7,7 +7,7 @@ import { InfluenceNode } from './InfluenceNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 
 const nodeTypes = { issue: InfluenceNode };
-const edgeTypes = { issue: InfluenceEdge };
+const edgeTypes = { 'issue-edge': InfluenceEdge };
 
 export const InfluenceDiagram = () => {
 	const {
@@ -15,8 +15,8 @@ export const InfluenceDiagram = () => {
 		edges,
 		onConnect,
 		isValidConnection,
-		onEdgesChange,
 		onNodesChange,
+		onEdgesChange,
 		onReconnect,
 		onReconnectStart,
 		onClickPanMode,
@@ -24,11 +24,12 @@ export const InfluenceDiagram = () => {
 		isSelecting,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
+		onDeleteEdges,
 	} = useInfluenceDiagram();
 
 	return (
 		<div
-			className='bg-background-light absolute
+			className='influence-diagram bg-background-light absolute
 			inset-0 rounded-sm'
 		>
 			<ReactFlow
@@ -36,7 +37,7 @@ export const InfluenceDiagram = () => {
 				nodes={nodes}
 				edges={edges}
 				defaultEdgeOptions={{
-					type: 'issue',
+					type: 'issue-edge',
 					markerEnd: {
 						type: MarkerType.ArrowClosed,
 						color: 'rgba(var(--eds_primary_resting), 1)',
@@ -44,27 +45,27 @@ export const InfluenceDiagram = () => {
 				}}
 				selectionMode={SelectionMode.Partial}
 				connectionMode={ConnectionMode.Strict}
+				onEdgesChange={onEdgesChange}
 				zoomOnDoubleClick={false}
 				panOnDrag={!isSelecting}
+				connectOnClick={false}
 				nodesDraggable={false}
 				selectNodesOnDrag={isSelecting}
 				selectionKeyCode={['Control']}
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
 				onNodesChange={onNodesChange}
+				onEdgesDelete={onDeleteEdges}
 				onReconnectStart={onReconnectStart}
 				onEdgeMouseEnter={onEdgeMouseEnter}
 				onEdgeMouseLeave={onEdgeMouseLeave}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}
-				connectOnClick={false}
 				onConnect={onConnect}
 				isValidConnection={isValidConnection}
-				onEdgesChange={onEdgesChange}
 				proOptions={{ hideAttribution: true }}
 				fitView
-				fitViewOptions={{ padding: 0.4 }}
 			>
 				<Background />
 				<DraggableToolbar

@@ -11,6 +11,7 @@ export const DecisionQualityAssessmentForm = ({
 }: DecisionQualityAssessmentFormProps) => {
 	const { handleSubmit, isPending, watch, setValue } = useDecisionQualityAssessmentForm({
 		assessmentId: assessment.id,
+		projectId: assessment.project_id,
 	});
 
 	const metrics = watch();

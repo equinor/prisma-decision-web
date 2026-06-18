@@ -9,7 +9,8 @@ export default function useDarkMode() {
 	};
 
 	useEffect(() => {
-		document.body.classList.toggle('dark', darkMode);
+		document.documentElement.classList.toggle('dark', darkMode);
+		document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
 	}, [darkMode]);
 
 	return { toggleDarkMode, darkMode };

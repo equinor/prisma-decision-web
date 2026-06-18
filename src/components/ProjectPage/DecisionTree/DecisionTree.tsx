@@ -1,12 +1,23 @@
 import { Background, ReactFlow } from '@xyflow/react';
+import { useAtomValue } from 'jotai';
 import { EDGE_TYPES, NODE_TYPES, REACT_FLOW_CONFIG } from '../../../config/decisionTree';
-import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
-import { useDecisionTree } from './useDecisionTree';
+import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
+import { useDecisionTree } from '../../../hooks/useDecisionTree';
+import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
 
 export const DecisionTree = () => {
+	const project = useSelectedProject();
+	const expanded = useAtomValue(
+		expandedDecisionTreeNodes({ projectId: project?.id, treeType: 'decision' }),
+	);
+
+	const { data: decisionTree } = useGetDecisionTree(project?.id, expanded);
+
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
-	const { nodes, edges } = useDecisionTree();
+	const { nodes, edges } = useDecisionTree(decisionTree, 'decision');
 
 	return (
 		<div className='bg-background-light absolute inset-0 rounded-sm'>

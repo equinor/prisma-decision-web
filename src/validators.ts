@@ -1,5 +1,4 @@
 import { uuid, z } from 'zod/v4';
-import { parseISO } from 'date-fns';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
@@ -41,6 +40,7 @@ const optionSchema = z.object({
 	name: z.string().min(1, 'Option name is required'),
 	id: uuid(),
 	decision_id: uuid(),
+	project_id: uuid(),
 	utility: z.number().optional(),
 	created_at: z.iso.datetime().optional(),
 });
@@ -63,9 +63,7 @@ export const projectSchema = z.object({
 	public: z.boolean(),
 	parent_project_id: uuid().nullable(),
 	parent_project_name: z.string().optional(),
-	end_date: z.iso.datetime().refine(date => parseISO(date) >= new Date(), {
-		message: 'End date must be in the future',
-	}),
+	end_date: z.iso.datetime(),
 	strategies: z.array(strategySchema, 'Strategies must be an array'),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
@@ -73,6 +71,7 @@ export const projectSchema = z.object({
 export const decisionSchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	type: z.enum(decisionTypes),
 	options: z.array(optionSchema),
 });
@@ -90,6 +89,7 @@ export const discreteProbabilitySchema = z.object({
 	probability: z.number().min(0).max(1),
 	parent_outcome_ids: z.array(uuid()),
 	uncertainty_id: uuid(),
+	project_id: uuid(),
 });
 
 export const discreteUtilitiesSchema = z.object({
@@ -99,11 +99,13 @@ export const discreteUtilitiesSchema = z.object({
 	parent_option_ids: z.array(uuid()),
 	parent_outcome_ids: z.array(uuid()),
 	utility_id: uuid(),
+	project_id: uuid(),
 });
 
 export const utilitySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 export const outcomeSchema = z.object({
@@ -112,10 +114,12 @@ export const outcomeSchema = z.object({
 	name: z.string().min(1, 'Outcome name is required'),
 	uncertainty_id: z.uuid(),
 	created_at: z.iso.datetime(),
+	project_id: z.uuid(),
 });
 export const uncertaintySchema = z.object({
 	id: uuid(),
 	issue_id: uuid(),
+	project_id: uuid(),
 	is_key: z.boolean(),
 	outcomes: z.array(outcomeSchema),
 	discrete_probabilities: z.array(discreteProbabilitySchema),
@@ -179,6 +183,7 @@ export const DecisionQualityAssessmentSchema = z.object({
 	doable_alternatives: z.number(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
+	project_id: uuid(),
 	created_by_id: z.string().optional(),
 	created_at: z.iso.datetime(),
 	updated_at: z.iso.datetime().optional(),

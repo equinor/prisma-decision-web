@@ -7,6 +7,7 @@ import { DiscreteProbabilityCell } from './DiscreteProbabilityCell';
 import { useProbablityTable } from './useProbablityTable';
 import { calculateRowSum, getParentLabel, isRowSumValid } from './utils';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
+import { cn } from '../../../../utils/cn';
 
 export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityTableProps) => {
 	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
@@ -33,7 +34,11 @@ export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityT
 						<Icon data={close} />
 					</Button>
 				</div>
-				<div className='flex gap-4'>
+				<div
+					className={cn('grid grid-cols-[auto_auto] gap-2', {
+						'grid-cols-[auto]': parents.length === 0,
+					})}
+				>
 					{/* Parent issues table */}
 					{parents.length > 0 && (
 						<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>

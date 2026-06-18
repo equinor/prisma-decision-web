@@ -1,52 +1,24 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
-import {
-	BaseEdge,
-	Edge,
-	EdgeLabelRenderer,
-	EdgeProps,
-	getSmoothStepPath,
-	useReactFlow,
-} from '@xyflow/react';
-import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, useReactFlow } from '@xyflow/react';
+import { useAnimatedInfluenceRoute } from '../../../hooks/useAnimatedInfluenceRoute';
+import { ReactFlowInfluenceNode } from '../../../types';
 import { InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
 
-export const InfluenceEdge = ({
-	id,
-	sourceX,
-	sourceY,
-	targetX,
-	targetY,
-	sourcePosition,
-	targetPosition,
-	markerEnd,
-	data,
-}: EdgeProps<Edge<InfluenceEdgeData>>) => {
-	const [fallbackPath, fallbackLabelX, fallbackLabelY] = getSmoothStepPath({
-		sourceX,
-		sourceY,
-		targetX,
-		targetY,
-		sourcePosition,
-		targetPosition,
-		borderRadius: 25,
-	});
+export const InfluenceEdge = ({ id, markerEnd, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
+	const path = useAnimatedInfluenceRoute(data?.route);
+	const labelX = data?.route?.labelX ?? 0;
+	const labelY = data?.route?.labelY ?? 0;
 
-	const edgePath = data?.route?.path ?? fallbackPath;
-	const labelX = data?.route?.labelX ?? fallbackLabelX;
-	const labelY = data?.route?.labelY ?? fallbackLabelY;
-
-	const { mutate: deleteEdge } = useDeleteEdge();
-	const { setEdges } = useReactFlow();
-	const handleDelete = () => {
-		deleteEdge(id);
-		setEdges([]);
+	const { deleteElements } = useReactFlow<ReactFlowInfluenceNode, Edge<InfluenceEdgeData>>();
+	const handleDelete = async () => {
+		deleteElements({ edges: [{ id }] });
 	};
 	return (
 		<>
 			<BaseEdge
 				id={id}
-				path={edgePath}
+				path={path}
 				markerEnd={markerEnd}
 				interactionWidth={60}
 				className='stroke-primary-resting! stroke-4!'

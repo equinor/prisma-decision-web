@@ -58,4 +58,5 @@ export const FactCard = ({ issue, ...rest }: FactCardProps) => {
 type FactCardProps = {
 	issue: Issue;
 	className?: string;
+	canExpand?: boolean;
 };

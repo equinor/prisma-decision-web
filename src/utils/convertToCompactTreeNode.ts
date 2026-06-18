@@ -11,7 +11,8 @@ export const convertToCompactTreeNode = (issues: Issue[]) => {
 			y: 100,
 		},
 		data: {
-			issue,
+			issueId: issue.id,
+			issue: issue,
 		},
 	}));
 };
