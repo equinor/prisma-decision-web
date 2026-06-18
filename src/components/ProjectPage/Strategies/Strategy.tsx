@@ -42,7 +42,7 @@ export const Strategy = ({
 						{expected_utility !== undefined && (
 							<p className='text-text-secondary text-sm'>
 								Expected utility:{' '}
-								<span className='font-medium'>{expected_utility.toFixed(2)}</span>
+								<span className='font-medium'>{expected_utility.toFixed(3)}</span>
 							</p>
 						)}
 					</div>

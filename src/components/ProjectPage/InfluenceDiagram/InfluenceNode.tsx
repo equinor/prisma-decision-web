@@ -1,18 +1,24 @@
-import { Handle, Node, NodeProps, Position, useConnection, useEdges } from '@xyflow/react';
+import {
+	Handle,
+	Node,
+	NodeProps,
+	Position,
+	useConnection,
+	useEdges,
+	useReactFlow,
+} from '@xyflow/react';
 import { useState } from 'react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../utils/cn';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import { InfluenceNode as InfluenceNodeType } from '../../../validators';
+import { ReactFlowInfluenceNode } from '../../../types';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
-import { FactCard } from '../../common/Cards/FactCard';
-import { UnassignedCard } from '../../common/Cards/UnassignedCard';
 import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
 import { UtilityCard } from '../../common/Cards/UtilityCard';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { UtilityTable } from './UtilityTable/UtilityTable';
-
-export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNodeType>>) => {
+export const InfluenceNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
 	const issue = useSelectedProjectIssues().find(issue => issue.id === data.issue_id);
 	const edges = useEdges();
 	const { inProgress, isTarget } = useConnection<
@@ -24,6 +30,10 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 	}));
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
+	const { updateNodeData } = useReactFlow();
+	const selectedOption = issue?.decision.options.find(o => o.id === data.selectedOptionId);
+	const selectedOutcome = issue?.uncertainty.outcomes.find(o => o.id === data.selectedOutcomeId);
+
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
 	if (!issue) return null;
 	return (
@@ -34,7 +44,7 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 		>
 			<div
 				className={cn(
-					`pointer-events-none relative z-10 flex h-full flex-col gap-2 overflow-hidden
+					`pointer-events-none relative z-10 flex h-full flex-col gap-2 overflow-visible
 					rounded-sm border-2 [&_button]:pointer-events-auto [&_li]:pointer-events-auto`,
 					getDiagramIssueBorderColor(issue.type, selected),
 					{
@@ -67,9 +77,19 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 							inProgress,
 					})}
 				>
-					{issue.type === 'Fact' && <FactCard issue={issue} />}
-					{issue.type === 'Unassigned' && <UnassignedCard issue={issue} />}
-					{issue.type === 'Decision' && <DecisionCard issue={issue} />}
+					{issue.type === 'Decision' && (
+						<DecisionCard
+							issue={issue}
+							onClickOption={option => {
+								if (option.id === data.selectedOptionId) {
+									updateNodeData(id, { selectedOptionId: undefined });
+									return;
+								}
+								updateNodeData(id, { selectedOptionId: option.id });
+							}}
+							selectedOption={selectedOption}
+						/>
+					)}
 					{issue.type === 'Utility' && (
 						<UtilityCard
 							className='min-h-34'
@@ -81,6 +101,14 @@ export const InfluenceNode = ({ id, data, selected }: NodeProps<Node<InfluenceNo
 					{issue.type === 'Uncertainty' && (
 						<UncertaintyCard
 							issue={issue}
+							onClickOutcome={outcome => {
+								if (outcome.id === data.selectedOutcomeId) {
+									updateNodeData(id, { selectedOutcomeId: undefined });
+									return;
+								}
+								updateNodeData(id, { selectedOutcomeId: outcome.id });
+							}}
+							selectedOutcome={selectedOutcome}
 							onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
 						/>
 					)}

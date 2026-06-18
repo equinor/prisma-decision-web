@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { percentageIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../../../validators';
+import { Issue, Outcome } from '../../../validators';
 import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
@@ -16,6 +16,9 @@ import { UncertaintyLabel } from './IssueLabel';
 export const UncertaintyCard = ({
 	issue,
 	canExpand = true,
+	onClickOutcome,
+	onDoubleClickOutcome,
+	selectedOutcome,
 	onClickOpenProbabilities,
 	expanded: expandedProp,
 	...rest
@@ -88,8 +91,21 @@ export const UncertaintyCard = ({
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>
 								{sortedOutcomes.map(outcome => (
 									<li
+										onClick={() => onClickOutcome && onClickOutcome(outcome)}
+										onDoubleClick={event => {
+											event.stopPropagation();
+											onDoubleClickOutcome && onDoubleClickOutcome(outcome);
+										}}
 										key={outcome.id}
-										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
+										className={cn(
+											'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',
+											{
+												'hover:bg-primary-hover-alt cursor-pointer':
+													onClickOutcome,
+												'outline-primary-resting outline-2':
+													outcome.id === selectedOutcome?.id,
+											},
+										)}
 									>
 										<p className='truncate'>{outcome.name}</p>
 										<p className='truncate'>{outcome.utility}</p>
@@ -129,6 +145,9 @@ type UncertaintyCardProps = {
 	issue: Issue;
 	className?: string;
 	canExpand?: boolean;
+	onClickOutcome?: (outcome: Outcome) => void;
+	onDoubleClickOutcome?: (outcome: Outcome) => void;
+	selectedOutcome?: Outcome;
 	onClickOpenProbabilities?: () => void;
 	expanded?: boolean;
 };

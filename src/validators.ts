@@ -139,6 +139,8 @@ export const influenceNodeSchema = z.object({
 	name: z.string().min(1, 'Node name is required'),
 	isHighlighted: z.string().optional(),
 	node_style: nodeStyleSchema,
+	selectedOptionId: z.string().optional(),
+	selectedOutcomeId: z.string().optional(),
 });
 
 export const edgeSchema = z.object({
@@ -225,6 +227,7 @@ export const evaluationMetrics = [
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
+export type Outcome = z.infer<typeof outcomeSchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;

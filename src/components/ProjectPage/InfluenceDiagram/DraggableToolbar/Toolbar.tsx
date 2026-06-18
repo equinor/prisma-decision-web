@@ -3,10 +3,10 @@ import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
 import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
+import { useGetExpectedValue } from '../../../../hooks/api/useGetExpectedValue';
 import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
-import {} from '../../../../utils/convertNodeToInfluenceNode';
 import { CreateIssues } from '../../../common/CreateIssue';
 import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
@@ -16,16 +16,49 @@ import { ChangeIssueType } from './ChangeIssueType';
 import { LayoutControls } from './LayoutControls';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
+import { SolutionEvidenceRequest } from '../../../../validators';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
 	const { ref, handleRef } = useDraggable({
 		id: 'toolbar',
 	});
+	const { hasError: hasInfluenceDiagramError } = useHasInfluenceDiagramError();
 	const isSelecting = useStore(state => state.selectNodesOnDrag);
 	const nodes = useNodes<ReactFlowInfluenceNode>();
-
 	const selectedNodes = nodes.filter(node => node.selected);
+	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
+	const stateIds = nodes.flatMap(
+		n => [n.data.selectedOptionId, n.data.selectedOutcomeId].filter(Boolean) as string[],
+	);
+	const baseEvidence: SolutionEvidenceRequest[] = [
+		{
+			evidence_id: projectId ?? 'base-ev',
+			state_ids: [],
+		},
+	];
+	const selectedEvidence: SolutionEvidenceRequest[] = [
+		{
+			evidence_id: projectId ?? 'selected-ev',
+			state_ids: stateIds,
+		},
+	];
+	const { data: baseEvidenceData, isPending: isBaseEvPending } = useGetExpectedValue(
+		baseEvidence,
+		projectId,
+		true,
+	);
+	const { data: selectedEvidenceData, isPending: isSelectedEvPending } = useGetExpectedValue(
+		selectedEvidence,
+		projectId,
+	);
+	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
+	const selectedExpectedUtility = selectedEvidenceData?.[0]?.expected_utility;
+	const hasSelectedStateIds = stateIds.length > 0;
+	const evDelta =
+		baseExpectedUtility !== undefined && selectedExpectedUtility !== undefined
+			? selectedExpectedUtility - baseExpectedUtility
+			: undefined;
 
 	return (
 		<div
@@ -53,10 +86,49 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ChangeIssueType />
 			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
-			{useHasInfluenceDiagramError().hasError && (
+			{hasInfluenceDiagramError && (
 				<>
 					<div className='bg-background-light h-9 w-0.5' />
 					<InfluenceDiagramValidation />
+				</>
+			)}
+			{baseExpectedUtility !== undefined && (
+				<>
+					<div className='bg-background-light h-9 w-0.5' />
+					<div className='flex items-center gap-3 px-1'>
+						<div className='flex flex-col items-start justify-center'>
+							<p className='text-text-tertiary text-[10px] uppercase'>Base EV</p>
+							<p className='text-sm font-medium'>
+								{isBaseEvPending ? '…' : baseExpectedUtility.toFixed(2)}
+							</p>
+						</div>
+						<div className='bg-background-light h-7 w-px' />
+						<div className='flex flex-col items-start justify-center'>
+							<p className='text-text-tertiary text-[10px] uppercase'>Selected EV</p>
+							<p className='text-sm font-medium'>
+								{!hasSelectedStateIds
+									? 'Select states'
+									: isSelectedEvPending
+										? '…'
+										: (selectedExpectedUtility?.toFixed(2) ?? '—')}
+							</p>
+						</div>
+						{evDelta !== undefined && (
+							<div
+								className={cn(
+									'bg-background-light rounded-sm px-2 py-1 text-xs font-medium',
+									{
+										'text-[#0A7D33]': evDelta > 0,
+										'text-[#B42318]': evDelta < 0,
+										'text-text-tertiary': evDelta === 0,
+									},
+								)}
+							>
+								{evDelta > 0 ? '+' : ''}
+								{evDelta.toFixed(2)}
+							</div>
+						)}
+					</div>
 				</>
 			)}
 		</div>
