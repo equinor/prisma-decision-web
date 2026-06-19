@@ -17,7 +17,6 @@ export const UncertaintyCard = ({
 	issue,
 	canExpand = true,
 	onClickOutcome,
-	onDoubleClickOutcome,
 	selectedOutcome,
 	onClickOpenProbabilities,
 	expanded: expandedProp,
@@ -92,10 +91,6 @@ export const UncertaintyCard = ({
 								{sortedOutcomes.map(outcome => (
 									<li
 										onClick={() => onClickOutcome && onClickOutcome(outcome)}
-										onDoubleClick={event => {
-											event.stopPropagation();
-											onDoubleClickOutcome && onDoubleClickOutcome(outcome);
-										}}
 										key={outcome.id}
 										className={cn(
 											'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',

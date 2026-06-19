@@ -3,10 +3,17 @@ import { Background, ConnectionMode, MarkerType, ReactFlow, SelectionMode } from
 import { ConnectionLine } from './ConnectingLine';
 import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
-import { InfluenceNode } from './InfluenceNode';
+import { DecisionNode } from './DecisionNode';
+import { UncertaintyNode } from './UncertaintyNode';
+import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 
-const nodeTypes = { issue: InfluenceNode };
+const nodeTypes = {
+	decision: DecisionNode,
+	uncertainty: UncertaintyNode,
+	utility: UtilityNode,
+};
+
 const edgeTypes = { 'issue-edge': InfluenceEdge };
 
 export const InfluenceDiagram = () => {
