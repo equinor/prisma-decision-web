@@ -55,19 +55,27 @@ export const Strategy = ({
 						{baseExpectedUtility !== undefined && (
 							<div className='bg-background-light flex flex-wrap items-center gap-2 rounded-sm px-3 py-2 text-sm'>
 								<p className='text-text-tertiary'>
-									Base EV <span className='text-text-primary font-semibold'>{formatEv(baseExpectedUtility)}</span>
+									Base EV{' '}
+									<span className='text-text-primary font-semibold'>
+										{formatEv(baseExpectedUtility)}
+									</span>
 								</p>
 								<div className='bg-background-medium h-4 w-px' />
 								<p className='text-text-tertiary'>
-									Scenario EV <span className='text-text-primary font-semibold'>{expected_utility !== undefined ? formatEv(expected_utility) : '—'}</span>
+									Scenario EV{' '}
+									<span className='text-text-primary font-semibold'>
+										{expected_utility !== undefined
+											? formatEv(expected_utility)
+											: '—'}
+									</span>
 								</p>
 								{evDelta !== undefined && (
 									<div
 										className={`rounded-sm px-2 py-1 text-xs font-semibold ${
 											evDelta > 0
-												? 'text-[#0A7D33] bg-[#E8F5EC]'
+												? 'bg-[#E8F5EC] text-[#0A7D33]'
 												: evDelta < 0
-													? 'text-[#B42318] bg-[#FEECEB]'
+													? 'bg-[#FEECEB] text-[#B42318]'
 													: 'text-text-tertiary bg-background-default'
 										}`}
 									>
