@@ -141,7 +141,6 @@ type UncertaintyCardProps = {
 	className?: string;
 	canExpand?: boolean;
 	onClickOutcome?: (outcome: Outcome) => void;
-	onDoubleClickOutcome?: (outcome: Outcome) => void;
 	selectedOutcome?: Outcome;
 	onClickOpenProbabilities?: () => void;
 	expanded?: boolean;
