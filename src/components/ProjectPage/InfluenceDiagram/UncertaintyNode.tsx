@@ -7,7 +7,10 @@ import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
 export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
-	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
+	const { issue, inProgress, isTarget, hasValidationError } = useInfluenceNodeCommon(
+		id,
+		data.issue_id,
+	);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const { updateNodeData } = useReactFlow();
 	const selectedOutcome = issue?.uncertainty.outcomes.find(o => o.id === data.selectedOutcomeId);
@@ -25,13 +28,17 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 			content={
 				<UncertaintyCard
 					issue={issue}
-					onClickOutcome={outcome => {
-						if (outcome.id === data.selectedOutcomeId) {
-							updateNodeData(id, { selectedOutcomeId: undefined });
-							return;
-						}
-						updateNodeData(id, { selectedOutcomeId: outcome.id });
-					}}
+					onClickOutcome={
+						hasValidationError
+							? undefined
+							: outcome => {
+									if (outcome.id === data.selectedOutcomeId) {
+										updateNodeData(id, { selectedOutcomeId: undefined });
+										return;
+									}
+									updateNodeData(id, { selectedOutcomeId: outcome.id });
+								}
+					}
 					selectedOutcome={selectedOutcome}
 					onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
 				/>

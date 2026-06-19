@@ -1,9 +1,12 @@
 import { Node, useConnection } from '@xyflow/react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { InfluenceNode as InfluenceNodeType } from '../../../validators';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const useInfluenceNodeCommon = (id: string, issueId: string) => {
 	const issue = useSelectedProjectIssues().find(currentIssue => currentIssue.id === issueId);
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
+
 	const { inProgress, isTarget } = useConnection<
 		Node<InfluenceNodeType>,
 		{ inProgress: boolean; isTarget: boolean }
@@ -16,5 +19,6 @@ export const useInfluenceNodeCommon = (id: string, issueId: string) => {
 		issue,
 		inProgress,
 		isTarget,
+		hasValidationError,
 	};
 };

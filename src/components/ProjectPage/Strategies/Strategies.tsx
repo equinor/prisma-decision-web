@@ -5,9 +5,11 @@ import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
 import { strategyIcons } from './icons';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
 	const evidence =
@@ -15,7 +17,14 @@ export const Strategies = () => {
 			evidence_id: s.id,
 			state_ids: s.options.map(o => o.id),
 		})) ?? [];
+	const baseEvidence =
+		selectedProject?.id && selectedProject.strategies.length > 0
+			? [{ evidence_id: selectedProject.id, state_ids: [] }]
+			: [];
+
+	const { data: baseEvidenceData } = useGetExpectedValue(baseEvidence, selectedProject?.id, true);
 	const { data: solutionsData } = useGetExpectedValue(evidence, selectedProject?.id);
+	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
 
 	const handleClickAddToStrategyTable = (id: string) => {
 		if (selectedStrategyIds.has(id)) {
@@ -67,8 +76,10 @@ export const Strategies = () => {
 							strategyIcon={strategyIcons[strategy.icon]}
 							key={strategy.id}
 							strategy={strategy}
+							hasValidationError={hasValidationError}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
+							baseExpectedUtility={baseExpectedUtility}
 							expected_utility={expected_utility}
 						/>
 					);

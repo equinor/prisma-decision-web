@@ -104,7 +104,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 						</div>
 						<div className='bg-background-light h-7 w-px' />
 						<div className='flex flex-col items-start justify-center'>
-							<p className='text-text-tertiary text-[10px] uppercase'>Selected EV</p>
+							<p className='text-text-tertiary text-[10px] uppercase'>Scenario EV</p>
 							<p className='text-sm font-medium'>
 								{!hasSelectedStateIds
 									? 'Select states'
@@ -124,7 +124,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 									},
 								)}
 							>
-								{evDelta > 0 ? '+' : ''}
+								Δ {evDelta > 0 ? '+' : ''}
 								{evDelta.toFixed(2)}
 							</div>
 						)}
