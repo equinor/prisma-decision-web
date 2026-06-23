@@ -17,6 +17,7 @@ import { LayoutControls } from './LayoutControls';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { SolutionEvidenceRequest } from '../../../../validators';
+import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -28,9 +29,8 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const selectedNodes = nodes.filter(node => node.selected);
 	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
-	const stateIds = nodes.flatMap(
-		n => [n.data.selectedOptionId, n.data.selectedOutcomeId].filter(Boolean) as string[],
-	);
+	const { evidence } = useInfluenceDiagramEvidence();
+
 	const baseEvidence: SolutionEvidenceRequest[] = [
 		{
 			evidence_id: projectId ?? 'base-ev',
@@ -40,7 +40,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const selectedEvidence: SolutionEvidenceRequest[] = [
 		{
 			evidence_id: projectId ?? 'selected-ev',
-			state_ids: stateIds,
+			state_ids: evidence,
 		},
 	];
 	const { data: baseEvidenceData, isPending: isBaseEvPending } = useGetExpectedValue(
@@ -54,7 +54,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	);
 	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
 	const selectedExpectedUtility = selectedEvidenceData?.[0]?.expected_utility;
-	const hasSelectedStateIds = stateIds.length > 0;
+	const hasSelectedStateIds = evidence.length > 0;
 	const evDelta =
 		baseExpectedUtility !== undefined && selectedExpectedUtility !== undefined
 			? selectedExpectedUtility - baseExpectedUtility
@@ -84,7 +84,6 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<div className='bg-background-light h-9 w-0.5' />
 			<DeleteIssuesDialog nodes={selectedNodes} />
 			<ChangeIssueType />
-			<div className='bg-background-light h-9 w-0.5' />
 			<CreateIssues />
 			{hasInfluenceDiagramError && (
 				<>

@@ -1,5 +1,6 @@
-import { NodeProps, useReactFlow } from '@xyflow/react';
+import { NodeProps } from '@xyflow/react';
 import { useState } from 'react';
+import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
@@ -12,8 +13,8 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 		data.issue_id,
 	);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
-	const { updateNodeData } = useReactFlow();
-	const selectedOption = issue?.decision.options.find(o => o.id === data.selectedOptionId);
+	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
+	const selectedOption = issue?.decision.options.find(o => evidence.includes(o.id));
 
 	if (!issue) return null;
 
@@ -32,11 +33,7 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 						hasValidationError
 							? undefined
 							: option => {
-									if (option.id === data.selectedOptionId) {
-										updateNodeData(id, { selectedOptionId: undefined });
-										return;
-									}
-									updateNodeData(id, { selectedOptionId: option.id });
+									toggleEvidence(option.id, issue.id);
 								}
 					}
 					selectedOption={selectedOption}

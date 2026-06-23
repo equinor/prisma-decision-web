@@ -1,9 +1,10 @@
-import { NodeProps, useReactFlow } from '@xyflow/react';
+import { NodeProps } from '@xyflow/react';
 import { useState } from 'react';
+import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { ReactFlowInfluenceNode } from '../../../types';
+import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
-import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
 export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
@@ -12,8 +13,8 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 		data.issue_id,
 	);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
-	const { updateNodeData } = useReactFlow();
-	const selectedOutcome = issue?.uncertainty.outcomes.find(o => o.id === data.selectedOutcomeId);
+	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
+	const selectedOutcome = issue?.uncertainty.outcomes.find(o => evidence.includes(o.id));
 
 	if (!issue) return null;
 
@@ -32,11 +33,7 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 						hasValidationError
 							? undefined
 							: outcome => {
-									if (outcome.id === data.selectedOutcomeId) {
-										updateNodeData(id, { selectedOutcomeId: undefined });
-										return;
-									}
-									updateNodeData(id, { selectedOutcomeId: outcome.id });
+									toggleEvidence(outcome.id, issue.id);
 								}
 					}
 					selectedOutcome={selectedOutcome}

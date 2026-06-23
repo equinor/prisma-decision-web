@@ -139,8 +139,6 @@ export const influenceNodeSchema = z.object({
 	name: z.string().min(1, 'Node name is required'),
 	isHighlighted: z.string().optional(),
 	node_style: nodeStyleSchema,
-	selectedOptionId: z.string().optional(),
-	selectedOutcomeId: z.string().optional(),
 });
 
 export const edgeSchema = z.object({
