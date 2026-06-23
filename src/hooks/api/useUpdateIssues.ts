@@ -47,6 +47,7 @@ export const useUpdateIssuesOptimistic = () => {
 			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['solution'] });
+			queryClient.invalidateQueries({ queryKey: ['restrictionTables'] });
 		},
 	});
 };

@@ -19,12 +19,18 @@ export const useUpdateStrategy = () => {
 				strategy.id === updatedStrategy.id ? updatedStrategy : strategy,
 			);
 			queryClient.setQueryData(['strategies'], updatedStrategies);
+			return { previousStrategies };
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 		},
-		onError: () => {
+		onError: (_err, _updatedEntry, context) => {
 			showErrorToast('Failed to update strategy');
+			const previousStrategies = context?.previousStrategies;
+			if (previousStrategies) {
+				queryClient.setQueryData(['strategies'], previousStrategies);
+			}
+			queryClient.invalidateQueries({ queryKey: ['strategies'] });
 		},
 	});
 };

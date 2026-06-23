@@ -1,23 +1,51 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { delete_to_trash } from '@equinor/eds-icons';
-import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, useReactFlow } from '@xyflow/react';
+import { more_vertical } from '@equinor/eds-icons';
+import {
+	BaseEdge,
+	Edge,
+	EdgeLabelRenderer,
+	EdgeProps,
+	useNodes,
+	useReactFlow,
+} from '@xyflow/react';
+import { useState } from 'react';
 import { useAnimatedInfluenceRoute } from '../../../hooks/useAnimatedInfluenceRoute';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
+import { useCreateRestrictionTables } from '../../../hooks/api/useCreateRestrictionTables';
+import { useSelectedProject } from '../ProjectContext';
+import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { RestrictionTable } from './RestrictionTable/RestrictionTable';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { cn } from '../../../utils/cn';
 
-export const InfluenceEdge = ({ id, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
+export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
 	const path = useAnimatedInfluenceRoute(data?.route);
 	const {
 		validationErrors: { edgesInLoop },
 	} = useHasInfluenceDiagramError();
 	const labelX = data?.route?.labelX ?? 0;
 	const labelY = data?.route?.labelY ?? 0;
-
+	const [isPanelOpen, setIsPanelOpen] = useState(false);
+	const { mutate: createRestrictionTable, isPending: isCreatingRestrictionTable } =
+		useCreateRestrictionTables();
 	const { deleteElements } = useReactFlow<ReactFlowInfluenceNode, Edge<InfluenceEdgeData>>();
 	const handleDelete = async () => {
 		deleteElements({ edges: [{ id }] });
+	};
+	const project = useSelectedProject();
+	const nodes = useNodes<ReactFlowInfluenceNode>();
+	const issues = useSelectedProjectIssues();
+	const { restrictionTables } = useSelectedProjectRestrictionTables();
+	const restrictionTable = restrictionTables.find(table => table.edge_id === id);
+	const sourceNode = nodes.find(node => node.id === source);
+	const targetNode = nodes.find(node => node.id === target);
+	const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
+	const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
+
+	const openRestrictionTable = () => {
+		setIsPanelOpen(prev => !prev);
 	};
 	return (
 		<>
@@ -59,25 +87,59 @@ export const InfluenceEdge = ({ id, data }: EdgeProps<Edge<InfluenceEdgeData>>) 
 					'stroke-warning-resting!': edgesInLoop.find(x => x.id === id),
 				})}
 			/>
-			{data?.hovered && (
-				<EdgeLabelRenderer>
-					<div
-						className='nodrag nopan bg-background-light pointer-events-auto absolute origin-center'
-						style={{
-							transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-						}}
-					>
+			<EdgeLabelRenderer>
+				<div
+					className='nodrag nopan pointer-events-auto absolute z-10 origin-center'
+					style={{
+						transform: `translate(-50%, 12px) translate(${labelX}px, ${labelY}px)`,
+					}}
+				>
+					{isPanelOpen && (
+						<div className='shadow-lg'>
+							{restrictionTable && sourceIssue && targetIssue ? (
+								<RestrictionTable
+									restrictionTable={restrictionTable}
+									sourceIssue={sourceIssue}
+									targetIssue={targetIssue}
+									onClose={setIsPanelOpen}
+									onDeleteEdge={handleDelete}
+								/>
+							) : (
+								<div className='border-background-medium bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>
+									{isCreatingRestrictionTable
+										? 'Preparing restriction table...'
+										: 'Restriction table is not available for this edge.'}
+								</div>
+							)}
+						</div>
+					)}
+				</div>
+				<div
+					className='nodrag nopan pointer-events-auto absolute z-10 origin-center'
+					style={{
+						transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+					}}
+				>
+					{(data?.hovered || isPanelOpen) && (
 						<Button
 							variant='ghost_icon'
-							className='p-1!'
-							color='danger'
-							onClick={handleDelete}
+							className='bg-background-light! hover:bg-primary-hover-alt! outline-primary-hover-alt p-1! outline-1!'
+							onClick={openRestrictionTable}
+							onMouseEnter={() => {
+								if (restrictionTable) return;
+								createRestrictionTable({
+									id: crypto.randomUUID(),
+									project_id: project.id,
+									edge_id: id,
+									restriction_entries: [],
+								});
+							}}
 						>
-							<Icon data={delete_to_trash} />
+							<Icon data={more_vertical} />
 						</Button>
-					</div>
-				</EdgeLabelRenderer>
-			)}
+					)}
+				</div>
+			</EdgeLabelRenderer>
 		</>
 	);
 };
