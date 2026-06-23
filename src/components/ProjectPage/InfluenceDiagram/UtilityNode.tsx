@@ -15,10 +15,7 @@ import { UtilityTable } from './UtilityTable/UtilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
 export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
-	const { issue, inProgress, isTarget, hasValidationError } = useInfluenceNodeCommon(
-		id,
-		data.issue_id,
-	);
+	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const edges = useEdges();
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
@@ -38,7 +35,7 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 							<IssueCardDeleteMenuItem />
 							<IssueCardUtilityTableMenuItem
 								onClick={() => setUtilityTableOpen(true)}
-								disabled={!hasTwoOrMoreParents || hasValidationError}
+								disabled={!hasTwoOrMoreParents}
 							/>
 						</IssueCardMenu>
 					</IssueCardHeader>

@@ -29,7 +29,7 @@ export const useUncertaintyOutcomeSelection = ({
 			>();
 
 			rows.forEach(row => {
-				row.probabilities.forEach(prob => {
+				row.values.forEach(prob => {
 					const parentIds = [...prob.parent_option_ids, ...prob.parent_outcome_ids];
 					if (!parentIds.includes(selectedEvidenceId)) return;
 					const existing = outcomeParentProbabilities.get(prob.outcome_id) ?? [];
@@ -51,7 +51,7 @@ export const useUncertaintyOutcomeSelection = ({
 			});
 		} else {
 			rows.forEach(row => {
-				const firstProbability = row.probabilities[0];
+				const firstProbability = row.values[0];
 				if (!firstProbability) return;
 
 				const rowParentIds = [
@@ -63,7 +63,7 @@ export const useUncertaintyOutcomeSelection = ({
 				);
 				if (!rowMatchesEvidence) return;
 
-				row.probabilities.forEach(prob => {
+				row.values.forEach(prob => {
 					if (prob.probability === 0) outcomesWithZeroProbability.add(prob.outcome_id);
 				});
 			});

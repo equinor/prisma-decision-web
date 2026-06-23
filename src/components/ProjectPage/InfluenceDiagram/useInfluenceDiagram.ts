@@ -32,7 +32,24 @@ export const useInfluenceDiagram = () => {
 		useInfluenceDiagramLayout();
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
+	const hoveredEdgeId = useRef<string | null>(null);
 	const [isSelecting, setIsSelecting] = useState(false);
+
+	const updateHoveredEdge = (edgeId: string | null) => {
+		hoveredEdgeId.current = edgeId;
+		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
+			return {
+				positionedNodes,
+				positionedEdges: positionedEdges.map(edge => ({
+					...edge,
+					data: {
+						...edge.data,
+						hovered: edge.id === edgeId,
+					},
+				})),
+			};
+		});
+	};
 
 	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
 		const sourceNode = positionedNodes.find(node => node.id === sourceId);
@@ -82,37 +99,13 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
-		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
-			return {
-				positionedNodes: positionedNodes,
-				positionedEdges: positionedEdges.map(e => {
-					return {
-						...e,
-						data: {
-							...e.data,
-							hovered: e.id === edge.id,
-						},
-					};
-				}),
-			};
-		});
+		if (hoveredEdgeId.current === edge.id) return;
+		updateHoveredEdge(edge.id);
 	};
 
-	const onEdgeMouseLeave: EdgeMouseHandler = () => {
-		updateInfluenceDiagram((positionedNodes, positionedEdges) => {
-			return {
-				positionedNodes: positionedNodes,
-				positionedEdges: positionedEdges.map(e => {
-					return {
-						...e,
-						data: {
-							...e.data,
-							hovered: false,
-						},
-					};
-				}),
-			};
-		});
+	const onEdgeMouseLeave: EdgeMouseHandler = (_, edge) => {
+		if (hoveredEdgeId.current !== edge.id) return;
+		updateHoveredEdge(null);
 	};
 
 	const onEdgesChange = async (changes: EdgeChange[]) => {

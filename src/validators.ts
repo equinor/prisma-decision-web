@@ -133,7 +133,6 @@ export const utilitySchema = z.object({
 	id: z.guid(),
 	issue_id: z.guid(),
 	project_id: z.guid(),
-	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 export const outcomeSchema = z.object({
 	id: z.guid(),
@@ -245,6 +244,28 @@ export const utilityTableSchema = z.object({
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 
+const restrictionEntrySchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	restriction_value: z.number(),
+	parent_state_id: z.guid(),
+	is_parent_uncertainty: z.boolean(),
+	child_state_id: z.guid(),
+	is_child_uncertainty: z.boolean(),
+	restriction_table_id: z.guid(),
+});
+
+export const restrictionTableSchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	name: z.string(),
+	project_id: z.string(),
+	edge_id: z.string(),
+	restriction_entries: z.array(restrictionEntrySchema),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -281,3 +302,5 @@ export type WhiteboardNode = z.infer<typeof whiteboardNode>;
 export type WhiteboardSheet = z.infer<typeof whiteboardSheet>;
 export type Uncertainty = z.infer<typeof uncertaintySchema>;
 export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
+export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
+export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
