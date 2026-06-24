@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
 import { strategyIcons } from './icons';
-import { useGetStrategy } from '../../../hooks/api/useGetStrategy';
+import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
-	const { strategies } = useGetStrategy(selectedProject?.id ?? '');
+	const { selectedStrategies, isFetching } = useSelectedProjectStrategies();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
 	const handleClickAddToStrategyTable = (id: string) => {
@@ -27,8 +28,8 @@ export const Strategies = () => {
 		}
 	};
 
-	const selectedStrategies = strategies?.filter(s => selectedStrategyIds.has(s.id)) ?? [];
 	if (!selectedProject) return null;
+	if (isFetching) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex items-center justify-between'>
@@ -44,14 +45,14 @@ export const Strategies = () => {
 					<div className='flex gap-2'>
 						<h2 className='text-2xl font-semibold'>Strategies</h2>
 						<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-							{strategies?.length ?? 0}
+							{selectedStrategies.length ?? 0}
 						</span>
 					</div>
 					<p className='text-text-tertiary'>
 						Define and manage strategies for your decision optimization project
 					</p>
 				</div>
-				{strategies?.map(strategy => {
+				{selectedStrategies.map(strategy => {
 					return (
 						<Strategy
 							strategyIcon={strategyIcons[strategy.icon]}

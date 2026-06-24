@@ -2,11 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Strategy } from '../../validators';
 
-export const useGetStrategy = (projectId: string) => {
-	const { data: strategies } = useQuery({
-		queryKey: ['strategies', projectId],
+const defaultStrategies: Strategy[] = [];
+
+export const useGetStrategies = () => {
+	const { data: strategies = defaultStrategies, ...rest } = useQuery({
+		queryKey: ['strategies'],
 		queryFn: async () => {
-			const res = await apiClient.get<Strategy[]>(`/projects/${projectId}/strategies`);
+			const res = await apiClient.get<Strategy[]>('/strategies');
 			return res.data;
 		},
 		meta: {
@@ -15,5 +17,6 @@ export const useGetStrategy = (projectId: string) => {
 	});
 	return {
 		strategies,
+		...rest,
 	};
 };

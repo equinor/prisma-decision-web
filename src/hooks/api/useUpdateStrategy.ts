@@ -14,19 +14,11 @@ export const useUpdateStrategy = () => {
 				queryKey: ['strategies', updatedStrategy.project_id],
 			});
 
-			const previousStrategies = queryClient.getQueryData<Strategy[]>([
-				'strategies',
-				updatedStrategy.project_id,
-			]);
-			if (previousStrategies) {
-				queryClient.setQueryData<Strategy[]>(
-					['strategies', updatedStrategy.project_id],
-					prev =>
-						prev
-							? prev.map(s => (s.id === updatedStrategy.id ? updatedStrategy : s))
-							: [updatedStrategy],
-				);
-			}
+			const previousStrategies = queryClient.getQueryData<Strategy[]>(['strategies']) || [];
+			const updatedStrategies = previousStrategies.map(strategy =>
+				strategy.id === updatedStrategy.id ? updatedStrategy : strategy,
+			);
+			queryClient.setQueryData(['strategies'], updatedStrategies);
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['projects'] });

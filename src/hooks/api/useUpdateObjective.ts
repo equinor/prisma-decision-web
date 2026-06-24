@@ -12,22 +12,14 @@ export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 		},
 		onMutate: async (updatedObjective: Objective) => {
 			await queryClient.cancelQueries({
-				queryKey: ['objectives', updatedObjective.project_id],
+				queryKey: ['objectives'],
 			});
 
-			const previousObjectives = queryClient.getQueryData<Objective[]>([
-				'objectives',
-				updatedObjective.project_id,
-			]);
-
-			queryClient.setQueryData(
-				['objectives', updatedObjective.project_id],
-				(old: Objective[] | undefined) => {
-					if (!old) return [updatedObjective];
-					return old.map(o => (o.id === updatedObjective.id ? updatedObjective : o));
-				},
+			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']);
+			const updatedObjectives = previousObjectives?.map(obj =>
+				obj.id === updatedObjective.id ? updatedObjective : obj,
 			);
-
+			queryClient.setQueryData(['objectives'], updatedObjectives);
 			return { previousObjectives };
 		},
 		onSuccess: async () => {

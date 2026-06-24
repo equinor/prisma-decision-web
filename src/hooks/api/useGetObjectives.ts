@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Objective } from '../../validators';
+const defaultObjectives: Objective[] = [];
 
-export const useGetObjective = (projectId: string) => {
-	const { data: objectives } = useQuery({
-		queryKey: ['objectives', projectId],
+export const useGetObjectives = () => {
+	const { data: objectives = defaultObjectives, ...rest } = useQuery({
+		queryKey: ['objectives'],
 		queryFn: async () => {
-			const res = await apiClient.get<Objective[]>(`/projects/${projectId}/objectives`);
+			const res = await apiClient.get<Objective[]>('/objectives');
 			return res.data;
 		},
 		meta: {
@@ -15,5 +16,6 @@ export const useGetObjective = (projectId: string) => {
 	});
 	return {
 		objectives,
+		...rest,
 	};
 };
