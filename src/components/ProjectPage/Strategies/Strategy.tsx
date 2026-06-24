@@ -23,7 +23,7 @@ export const Strategy = ({
 	selectedStrategyIds: Set<string>;
 	strategyIcon: IconData;
 	hasValidationError: boolean;
-	selectedEvidenceData?: SolutionEvidenceRequest[];
+	selectedEvidenceData: SolutionEvidenceRequest[];
 }) => {
 	const project = useSelectedProject();
 	const navigate = useNavigate();

@@ -30,10 +30,10 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const selectedNodes = nodes.filter(node => node.selected);
 	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
 	const { evidence } = useInfluenceDiagramEvidence();
-
+	if (!projectId) return;
 	const selectedEvidence: SolutionEvidenceRequest[] = [
 		{
-			evidence_id: projectId ?? 'selected-ev',
+			evidence_id: projectId,
 			state_ids: evidence,
 		},
 	];

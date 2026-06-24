@@ -30,7 +30,6 @@ export const UncertaintyCard = ({
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-
 	const expanded = expandedProp ?? _expanded;
 
 	return (

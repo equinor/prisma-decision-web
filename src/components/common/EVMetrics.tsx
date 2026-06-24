@@ -6,29 +6,30 @@ import { SolutionEvidenceRequest } from '../../validators';
 export const EVMetrics = ({
 	selectedEvidence,
 }: {
-	selectedEvidence?: SolutionEvidenceRequest[];
+	selectedEvidence: SolutionEvidenceRequest[];
 }) => {
 	const selectedProject = useSelectedProject();
 
 	const formatEv = (value: number) => value.toFixed(2);
-	const baseEvidence =
-		selectedProject?.id && selectedProject.strategies.length > 0
-			? [{ evidence_id: selectedProject.id, state_ids: [] }]
-			: [];
+	const baseEvidence = selectedProject?.id
+		? [{ evidence_id: selectedProject.id, state_ids: [] }]
+		: [];
 	const { data: baseEvidenceData, isLoading: isBaseEvPending } = useGetExpectedValue(
 		baseEvidence,
 		selectedProject?.id,
 		true,
 	);
+	const hasSelectedStateIds = selectedEvidence.some(item => item.state_ids.length > 0);
 	const { data: selectedEvidenceData, isLoading: isSelectedEvPending } = useGetExpectedValue(
-		selectedEvidence ?? [],
+		selectedEvidence,
 		selectedProject?.id,
+		hasSelectedStateIds,
 	);
 	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
-	const expectedUtility = selectedEvidenceData?.[0]?.expected_utility;
+	const selectedExpectedUtility = selectedEvidenceData?.[0]?.expected_utility;
 	const evDelta =
-		baseExpectedUtility !== undefined && expectedUtility !== undefined
-			? expectedUtility - baseExpectedUtility
+		baseExpectedUtility !== undefined && selectedExpectedUtility !== undefined
+			? selectedExpectedUtility - baseExpectedUtility
 			: undefined;
 
 	if (!selectedProject) return null;
@@ -55,9 +56,11 @@ export const EVMetrics = ({
 				<p className='text-sm font-medium'>
 					{isSelectedEvPending
 						? '…'
-						: expectedUtility !== undefined
-							? formatEv(expectedUtility)
-							: '-'}
+						: !hasSelectedStateIds
+							? 'Select states'
+							: selectedExpectedUtility !== undefined
+								? formatEv(selectedExpectedUtility)
+								: '-'}
 				</p>
 			</div>
 			{evDelta !== undefined && (
