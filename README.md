@@ -148,7 +148,7 @@ Edit `.env.development` and set your local backend URL:
 VITE_APP_PRISMA_API_URL=http://localhost:7075/
 ```
 
-### 2. Build and run
+### 2. Build and run 
 
 Always use `--build` so Docker re-bundles the frontend with the updated URL:
 
