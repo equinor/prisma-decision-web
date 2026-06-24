@@ -59,7 +59,7 @@ export const useDecisionQualityAssessmentForm = ({
 	);
 
 	return {
-		...formMethods,
+		formMethods,
 		handleSubmit,
 		isPending,
 	};
