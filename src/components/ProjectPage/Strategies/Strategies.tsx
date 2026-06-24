@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useGetExpectedValue } from '../../../hooks/api/useGetExpectedValue';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
@@ -12,19 +11,11 @@ export const Strategies = () => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
-	const evidence =
+	const selectedEvidence =
 		selectedProject?.strategies.map(s => ({
 			evidence_id: s.id,
 			state_ids: s.options.map(o => o.id),
 		})) ?? [];
-	const baseEvidence =
-		selectedProject?.id && selectedProject.strategies.length > 0
-			? [{ evidence_id: selectedProject.id, state_ids: [] }]
-			: [];
-
-	const { data: baseEvidenceData } = useGetExpectedValue(baseEvidence, selectedProject?.id, true);
-	const { data: solutionsData } = useGetExpectedValue(evidence, selectedProject?.id);
-	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
 
 	const handleClickAddToStrategyTable = (id: string) => {
 		if (selectedStrategyIds.has(id)) {
@@ -68,9 +59,6 @@ export const Strategies = () => {
 					</p>
 				</div>
 				{selectedProject.strategies.map(strategy => {
-					const expected_utility = solutionsData?.find(
-						s => s.evidence_id === strategy.id,
-					)?.expected_utility;
 					return (
 						<Strategy
 							strategyIcon={strategyIcons[strategy.icon]}
@@ -79,8 +67,7 @@ export const Strategies = () => {
 							hasValidationError={hasValidationError}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
-							baseExpectedUtility={baseExpectedUtility}
-							expected_utility={expected_utility}
+							selectedEvidenceData={selectedEvidence}
 						/>
 					);
 				})}
