@@ -12,21 +12,14 @@ export const useCreateStrategyOptimistic = ({ onSuccess }: { onSuccess?: () => v
 		},
 		onMutate: (newStrategy: Strategy) => {
 			const projectId = newStrategy.project_id;
-			queryClient.cancelQueries({ queryKey: ['strategies', projectId] });
-			const previousStrategies =
-				queryClient.getQueryData<Strategy[]>(['strategies', projectId]) || [];
-			queryClient.setQueryData(
-				['strategies', projectId],
-				[...previousStrategies, newStrategy],
-			);
+			queryClient.cancelQueries({ queryKey: ['strategies'] });
+			const previousStrategies = queryClient.getQueryData<Strategy[]>(['strategies']) || [];
+			queryClient.setQueryData(['strategies'], [...previousStrategies, newStrategy]);
 			return { previousStrategies, projectId };
 		},
 		onError: (_err, _newStrategy, context) => {
 			if (context?.previousStrategies) {
-				queryClient.setQueryData(
-					['strategies', context.projectId],
-					context.previousStrategies,
-				);
+				queryClient.setQueryData(['strategies'], context.previousStrategies);
 			}
 			showErrorToast('Failed to create strategy');
 		},
