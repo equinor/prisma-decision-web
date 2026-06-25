@@ -173,14 +173,17 @@ export const projectImportSchema = z.object({
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
 });
+const metricScore = () =>
+	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
+
 export const DecisionQualityAssessmentSchema = z.object({
 	id: uuid(),
-	appropriate_frame: z.number(),
-	trade_off_analysis: z.number(),
-	reasoning_correctness: z.number(),
-	information_reliability: z.number(),
-	commitment_to_action: z.number(),
-	doable_alternatives: z.number(),
+	appropriate_frame: metricScore(),
+	trade_off_analysis: metricScore(),
+	reasoning_correctness: metricScore(),
+	information_reliability: metricScore(),
+	commitment_to_action: metricScore(),
+	doable_alternatives: metricScore(),
 	comment: z.string().optional(),
 	assessment_id: uuid(),
 	project_id: uuid(),
@@ -203,12 +206,12 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export const evaluationMetrics = [
-	{ key: 'appropriate_frame', label: 'Appropriate Frame' },
-	{ key: 'trade_off_analysis', label: 'Trade-off Analysis' },
-	{ key: 'doable_alternatives', label: 'Doable Alternatives' },
-	{ key: 'information_reliability', label: 'Information Reliability' },
-	{ key: 'reasoning_correctness', label: 'Reasoning Correctness' },
-	{ key: 'commitment_to_action', label: 'Commitment to Action' },
+	{ key: 'appropriate_frame', label: 'Appropriate Frame', defaultValue: 50 },
+	{ key: 'trade_off_analysis', label: 'Trade-off Analysis', defaultValue: 50 },
+	{ key: 'doable_alternatives', label: 'Doable Alternatives', defaultValue: 50 },
+	{ key: 'information_reliability', label: 'Information Reliability', defaultValue: 50 },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness', defaultValue: 50 },
+	{ key: 'commitment_to_action', label: 'Commitment to Action', defaultValue: 50 },
 ] as const;
 
 export type Project = z.infer<typeof projectSchema>;
