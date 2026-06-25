@@ -24,7 +24,7 @@
 	"dependencies": {
 		"@azure/msal-browser": "^5.15.0",
 		"@azure/msal-react": "^5.5.0",
-		"@dagrejs/dagre": "^1.1.8",
+		"@dagrejs/dagre": "^3.0.0",
 		"@dnd-kit/abstract": "^0.5.0",
 		"@dnd-kit/collision": "^0.5.0",
 		"@dnd-kit/helpers": "^0.5.0",
