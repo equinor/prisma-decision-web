@@ -2,15 +2,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Strategy, strategySchema } from '../validators';
-import { useCreateStrategy } from './api/useCreateStrategy';
 import { useUpdateStrategy } from './api/useUpdateStrategy';
 import { useSelectedProject } from './useSelectedProject';
+import { useCreateStrategyOptimistic } from './api/useCreateStrategy';
 
 export const useStrategyForm = (strategy?: Strategy) => {
 	const selectedProject = useSelectedProject();
 
-	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategy(() => {
-		formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
+	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategyOptimistic({
+		onSuccess: () => {
+			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
+		},
 	});
 	const { mutate: updateStrategy, isPending: isUpdatePending } = useUpdateStrategy();
 
