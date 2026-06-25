@@ -9,8 +9,8 @@ import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
-	const { selectedObjectives, isFetching } = useSelectedProjectObjectives();
-	if (isFetching) return <LoadingSpinner />;
+	const { selectedObjectives, isLoading } = useSelectedProjectObjectives();
+	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>

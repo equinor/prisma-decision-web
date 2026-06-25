@@ -9,6 +9,8 @@ import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
 import { isProd } from '../../utils/getEnvironment';
 import { CreateProject } from '../common/ProjectInformation/CreateProject';
 import { ImportProject } from '../common/ProjectInformation/ImportProject';
+import { useGetStrategies } from '../../hooks/api/useGetStrategies';
+import { useGetObjectives } from '../../hooks/api/useGetObjectives';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -20,6 +22,8 @@ export const HomePage = () => {
 	useGetIssues();
 	useGetEdges();
 	useGetInfluenceNodes();
+	useGetStrategies();
+	useGetObjectives();
 	return (
 		<div className='mx-auto w-[min(1600px,90%)]'>
 			<div className='flex flex-col gap-12'>

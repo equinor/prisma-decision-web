@@ -4,14 +4,14 @@ import { useGetObjectives } from './api/useGetObjectives';
 
 export const useSelectedProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
-	const { objectives, isFetching } = useGetObjectives();
+	const { objectives, isLoading } = useGetObjectives();
 	const projectObjectives = useMemo(
 		() => objectives.filter(objective => objective.project_id === selectedProject?.id),
 		[objectives, selectedProject?.id],
 	);
-	if (!selectedProject) return { selectedObjectives: [], isFetching: false };
+	if (!selectedProject) return { selectedObjectives: [], isLoading: false };
 	return {
 		selectedObjectives: projectObjectives,
-		isFetching,
+		isLoading,
 	};
 };

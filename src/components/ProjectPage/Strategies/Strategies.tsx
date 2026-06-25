@@ -9,7 +9,7 @@ import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
-	const { selectedStrategies, isFetching } = useSelectedProjectStrategies();
+	const { selectedStrategies, isLoading } = useSelectedProjectStrategies();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
 	const handleClickAddToStrategyTable = (id: string) => {
@@ -29,7 +29,7 @@ export const Strategies = () => {
 	};
 
 	if (!selectedProject) return null;
-	if (isFetching) return <LoadingSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex items-center justify-between'>
