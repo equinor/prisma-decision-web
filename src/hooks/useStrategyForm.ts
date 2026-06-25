@@ -5,18 +5,24 @@ import { Strategy, strategySchema } from '../validators';
 import { useUpdateStrategy } from './api/useUpdateStrategy';
 import { useCreateStrategyOptimistic } from './api/useCreateStrategy';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
+import { useSelectedProjectStrategies } from './useSelectedProjectStrategies';
+import { strategyIconKeys } from '../components/ProjectPage/Strategies/icons';
 
 export const useStrategyForm = (strategy?: Strategy) => {
 	const selectedProject = useSelectedProject();
+	const { selectedStrategies } = useSelectedProjectStrategies();
 
 	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategyOptimistic({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedProject.id));
+			formMethods.reset(getDefaultValues(selectedProject.id, selectedStrategies));
 		},
 	});
 	const { mutate: updateStrategy, isPending: isUpdatePending } = useUpdateStrategy();
 
-	const defaultValues = useMemo(() => getDefaultValues(selectedProject.id), [selectedProject.id]);
+	const defaultValues = useMemo(
+		() => getDefaultValues(selectedProject.id, selectedStrategies),
+		[selectedProject.id, selectedStrategies],
+	);
 
 	const formMethods = useForm({
 		values: {
@@ -48,13 +54,19 @@ export const useStrategyForm = (strategy?: Strategy) => {
 	};
 };
 
-const getDefaultValues = (projectId: string): Strategy => ({
-	project_id: projectId,
-	id: crypto.randomUUID(),
-	name: '',
-	description: '',
-	options: [],
-	rationale: '',
-	icon: 'flash',
-	icon_color: '#007079',
-});
+const getDefaultValues = (projectId: string, existingStrategies: Strategy[]): Strategy => {
+	const icon =
+		strategyIconKeys.filter(
+			iconKey => !existingStrategies.some(strategy => strategy.icon === iconKey),
+		)[0] || 'flash';
+	return {
+		project_id: projectId,
+		id: crypto.randomUUID(),
+		name: '',
+		description: '',
+		options: [],
+		rationale: '',
+		icon,
+		icon_color: '#007079',
+	};
+};

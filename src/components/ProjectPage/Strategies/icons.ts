@@ -1,11 +1,11 @@
 import {
+	flash_on,
 	build_wrench,
 	flower,
 	pizza,
 	snow,
 	gas,
 	dollar,
-	flash_on,
 	puzzle,
 	gavel,
 	turbine,
@@ -14,13 +14,13 @@ import {
 } from '@equinor/eds-icons';
 
 export const strategyIcons = {
+	flash: flash_on,
 	build_wrench: build_wrench,
 	flower: flower,
 	pizza: pizza,
 	snow: snow,
 	gas: gas,
 	dollar: dollar,
-	flash: flash_on,
 	puzzle: puzzle,
 	gavel: gavel,
 	turbine: turbine,
