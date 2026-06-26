@@ -59,4 +59,5 @@ const getDefaultValues = (projectId: string): Strategy => ({
 	options: [],
 	rationale: '',
 	icon: 'flash',
+	icon_color: '#007079',
 });

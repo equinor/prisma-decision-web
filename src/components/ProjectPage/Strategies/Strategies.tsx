@@ -1,11 +1,10 @@
 import { useState } from 'react';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
-import { strategyIcons } from './icons';
-import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
-import { LoadingSpinner } from '../../common/LoadingSpinner';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
@@ -27,7 +26,7 @@ export const Strategies = () => {
 			});
 		}
 	};
-
+	const strategiesToCompare = selectedStrategies.filter(s => selectedStrategyIds.has(s.id)) ?? [];
 	if (!selectedProject) return null;
 	if (isLoading) return <LoadingSpinner />;
 	return (
@@ -36,7 +35,7 @@ export const Strategies = () => {
 				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateStrategy />
 			</div>
-			{selectedStrategies.length > 0 && <StrategyTable strategies={selectedStrategies} />}
+			{selectedStrategies.length > 0 && <StrategyTable strategies={strategiesToCompare} />}
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
@@ -55,7 +54,6 @@ export const Strategies = () => {
 				{selectedStrategies.map(strategy => {
 					return (
 						<Strategy
-							strategyIcon={strategyIcons[strategy.icon]}
 							key={strategy.id}
 							strategy={strategy}
 							selectedStrategyIds={selectedStrategyIds}

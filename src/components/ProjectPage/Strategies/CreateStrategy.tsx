@@ -10,6 +10,7 @@ import { close } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useStrategyForm } from '../../../hooks/useStrategyForm';
+import { StrategyIconColorPicker } from './StrategyIconColorPicker';
 import { StrategyIconPicker } from './StrategyIconPicker';
 
 export const CreateStrategy = () => {
@@ -53,8 +54,9 @@ export const CreateStrategy = () => {
 								Create strategies for your project decisions
 							</p>
 						</div>
-						<div className='grid w-full grid-cols-[auto_1fr] gap-2'>
+						<div className='grid w-full grid-cols-[auto_auto_1fr] gap-2'>
 							<StrategyIconPicker />
+							<StrategyIconColorPicker />
 							<TextField
 								{...formMethods.register('name')}
 								placeholder='Enter strategy name...'

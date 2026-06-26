@@ -1,6 +1,6 @@
 import { Button, Icon, Popover, Tooltip } from '@equinor/eds-core-react';
 import { useRef, useState } from 'react';
-import { useController, useFormContext } from 'react-hook-form';
+import { useController, useFormContext, useWatch } from 'react-hook-form';
 import { Strategy } from '../../../validators';
 import { strategyIconKeys, strategyIcons } from './icons';
 
@@ -8,6 +8,10 @@ export const StrategyIconPicker = () => {
 	const referenceElement = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const { control } = useFormContext<Strategy>();
+	const iconColor = useWatch({
+		control,
+		name: 'icon_color',
+	});
 	const {
 		field: { value: icon, onChange },
 	} = useController({
@@ -23,7 +27,7 @@ export const StrategyIconPicker = () => {
 					variant='outlined'
 					className='mt-4! size-9!'
 				>
-					<Icon data={strategyIcons[icon]} />
+					<Icon data={strategyIcons[icon]} color={iconColor} />
 				</Button>
 			</Tooltip>
 			<Popover
@@ -43,7 +47,7 @@ export const StrategyIconPicker = () => {
 									setIsOpen(false);
 								}}
 							>
-								<Icon data={strategyIcons[iconKey]} />
+								<Icon color={iconColor} data={strategyIcons[iconKey]} />
 							</Button>
 						))}
 					</div>
