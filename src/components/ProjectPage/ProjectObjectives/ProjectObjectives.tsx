@@ -43,8 +43,12 @@ export const ProjectObjectives = () => {
 									<Table.Cell className='w-2/9'>Name</Table.Cell>
 									<Table.Cell className='w-5/9'>Description</Table.Cell>
 									<Table.Cell className='w-2/9'>Type</Table.Cell>
-									<Table.Cell className='w-1/9 truncate'>Date Created</Table.Cell>
-									<Table.Cell className='w-1/9 truncate'>Date Updated</Table.Cell>
+									<Table.Cell className='w-1/9'>
+										<p className='truncate'>Date Created</p>
+									</Table.Cell>
+									<Table.Cell className='w-1/9'>
+										<p className='truncate'>Date Updated</p>
+									</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>

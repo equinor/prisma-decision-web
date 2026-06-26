@@ -12,6 +12,7 @@ import { ProjectPage } from './components/ProjectPage/ProjectPage';
 import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 import { Assessments } from './components/ProjectPage/Assessments/Assessments';
+import { Whiteboard } from './components/ProjectPage/Whiteboard/Whiteboard';
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
 				<Route path='issues' element={<ProjectIssues />} />
 				<Route path='objectives' element={<ProjectObjectives />} />
 				<Route path='influence-diagram' element={<InfluenceDiagram />} />
+				<Route path='whiteboard' element={<Whiteboard />} />
 				<Route path='decision-tree' element={<DecisionTree />} />
 				<Route path='compact-tree' element={<CompactTree />} />
 				<Route path='solution-tree' element={<SolutionTree />} />

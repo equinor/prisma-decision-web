@@ -25,6 +25,7 @@ input[type='color']::-webkit-color-swatch {
 	--color-text-default: rgba(var(--eds_text_default), 1);
 	--color-text-secondary: rgba(var(--eds_text_secondary), 1);
 	--color-text-tertiary: rgba(var(--eds_text_tertiary), 1);
+	--color-whiteboard-stroke: rgba(var(--whiteboard_stroke), 1);
 	--color-text-warning: rgba(var(--eds_warning_text), 1);
 	--color-text-danger: rgba(var(--eds_danger_text), 1);
 	--color-text-success: rgba(var(--eds_success_text), 1);
@@ -156,6 +157,7 @@ html {
 	--eds_text_default: 61, 61, 61;
 	--eds_text_primary_white: 255, 255, 255;
 	--eds_text_tertiary: 111, 111, 111;
+	--whiteboard_stroke: 33, 33, 33;
 	--eds_text_success: 53, 129, 50;
 	--eds_text_secondary: 86, 86, 86;
 	--eds_background_default: 255, 255, 255;
@@ -191,6 +193,7 @@ html {
 	--eds_text_default: 255, 255, 255;
 	--eds_text_tertiary: 156, 166, 172;
 	--eds_text_primary_white: 61, 61, 61;
+	--whiteboard_stroke: 214, 220, 224;
 	--eds_text_success: 161, 218, 160;
 	--eds_text_secondary: 222, 229, 231;
 	--eds_background_default: 19, 38, 52;

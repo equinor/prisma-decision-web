@@ -29,10 +29,12 @@ export const OutputNode = ({
 				<p className='ml-4 whitespace-nowrap'>
 					<span className='font-semibold'>Value: </span> {data.value}
 				</p>
-				<p className='ml-4 whitespace-nowrap'>
-					<span className='font-semibold'>Cumulative probability: </span>{' '}
-					{parseFloat(data.cumulativeProbability.toFixed(2))}
-				</p>
+				{data.cumulativeProbability > 0 && (
+					<p className='ml-4 whitespace-nowrap'>
+						<span className='font-semibold'>Cumulative probability: </span>{' '}
+						{parseFloat(data.cumulativeProbability.toFixed(4))}
+					</p>
+				)}
 			</div>
 		</div>
 	);
