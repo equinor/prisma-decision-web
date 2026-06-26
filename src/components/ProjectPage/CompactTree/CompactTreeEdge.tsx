@@ -30,7 +30,7 @@ export const CompactTreeEdge = ({
 		targetY,
 		sourcePosition,
 		targetPosition,
-		borderRadius: 10,
+		borderRadius: 8,
 		stepPosition: 0.1,
 	});
 	const nodes = useNodes<Node<{ issueId: string; path: Set<string> }>>();

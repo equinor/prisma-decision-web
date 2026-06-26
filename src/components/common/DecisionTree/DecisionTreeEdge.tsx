@@ -34,7 +34,7 @@ export const DecisionTreeEdge = ({
 		targetY,
 		sourcePosition,
 		targetPosition,
-		borderRadius: 25,
+		borderRadius: 8,
 	});
 	const location = useLocation();
 	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';

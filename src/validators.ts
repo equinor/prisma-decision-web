@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { guid, uuid, z } from 'zod/v4';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
@@ -13,6 +13,9 @@ export type ObjectiveType = (typeof objectiveTypes)[number];
 
 export const decisionTypes = ['Policy', 'Focus', 'Tactical'] as const;
 export type DecisionType = (typeof decisionTypes)[number];
+
+export const WhiteboardNodeTypes = ['Issue', 'Rectangle', 'Text', 'Arrow', 'Freehand'] as const;
+export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
 export const objectiveSchema = z.object({
 	id: z.guid(),
@@ -54,6 +57,31 @@ export const strategySchema = z.object({
 	project_id: z.guid(),
 	rationale: z.string().min(1, 'Rational is required'),
 	options: z.array(optionSchema),
+});
+
+export const whiteboardNode = z.object({
+	id: uuid(),
+	board_sheet_id: guid(),
+	project_id: uuid(),
+	height: z.float64(),
+	width: z.float64(),
+	x_position: z.float64(),
+	y_position: z.float64(),
+	rotation: z.float64(),
+	data: z.string(),
+	stroke_width: z.number().optional(),
+	stroke_style: z.enum(['Solid', 'Dashed', 'Dotted']).optional(),
+	text_size: z.number().optional(),
+	opacity: z.number().min(0).max(100).optional(),
+	color: z.string().optional(),
+	type: z.enum(WhiteboardNodeTypes),
+	new: z.boolean().optional(),
+});
+
+export const whiteboardSheet = z.object({
+	id: guid(),
+	project_id: guid(),
+	name: z.string().min(1, 'Sheet name is required'),
 });
 
 export const projectSchema = z.object({
@@ -239,3 +267,5 @@ export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
 export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;
+export type WhiteboardNode = z.infer<typeof whiteboardNode>;
+export type WhiteboardSheet = z.infer<typeof whiteboardSheet>;

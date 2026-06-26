@@ -53,3 +53,75 @@ export const settingsPanelIcon: IconData = {
 	svgPathData:
 		'M23,4a1,1,0,0,1-1,1H19a1,1,0,0,1,0-2h3A1,1,0,0,1,23,4ZM2,3h8.184a3,3,0,1,1,0,2H2A1,1,0,0,1,2,3ZM12,4a1,1,0,1,0,1-1A1,1,0,0,0,12,4ZM1,12a1,1,0,0,1,1-1H6.184a3,3,0,1,1,0,2H2A1,1,0,0,1,1,12Zm7,0a1,1,0,1,0,1-1A1,1,0,0,0,8,12Zm14-1H15a1,1,0,0,0,0,2h7a1,1,0,0,0,0-2Zm0,8H17a1,1,0,0,0,0,2h5a1,1,0,0,0,0-2ZM1,20a1,1,0,0,1,1-1H8.184a3,3,0,1,1,0,2H2A1,1,0,0,1,1,20Zm9,0a1,1,0,1,0,1-1A1,1,0,0,0,10,20Z',
 };
+
+export const rectangleIcon: IconData = {
+	height: '24',
+	width: '24',
+	name: 'rectangle',
+	prefix: 'custom',
+	svgPathData:
+		'M20 3H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2zM4 19V5h16l.001 14H4z',
+};
+
+export const arrowIcon: IconData = {
+	height: '24',
+	width: '24',
+	name: 'arrow',
+	prefix: 'custom',
+	svgPathData:
+		'M3.293,20.707a1,1,0,0,1,0-1.414L17.586,5H12a1,1,0,0,1,0-2h8a1,1,0,0,1,1,1v8a1,1,0,0,1-2,0V6.414L4.707,20.707a1,1,0,0,1-1.414,0Z',
+};
+
+export const solidLineIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'solid_line',
+	prefix: 'custom',
+	svgPathData:
+		'M2.5 8C2.5 7.44772 2.94772 7 3.5 7H12.5C13.0523 7 13.5 7.44772 13.5 8C13.5 8.55228 13.0523 9 12.5 9H3.5C2.94772 9 2.5 8.55228 2.5 8Z',
+};
+
+export const dashedLineIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'dashed_line',
+	prefix: 'custom',
+	svgPathData:
+		'M1.75 8C1.75 7.44772 2.19772 7 2.75 7H4.25C4.80228 7 5.25 7.44772 5.25 8C5.25 8.55228 4.80228 9 4.25 9H2.75C2.19772 9 1.75 8.55228 1.75 8ZM6.25 8C6.25 7.44772 6.69772 7 7.25 7H8.75C9.30228 7 9.75 7.44772 9.75 8C9.75 8.55228 9.30228 9 8.75 9H7.25C6.69772 9 6.25 8.55228 6.25 8ZM10.75 8C10.75 7.44772 11.1977 7 11.75 7H13.25C13.8023 7 14.25 7.44772 14.25 8C14.25 8.55228 13.8023 9 13.25 9H11.75C11.1977 9 10.75 8.55228 10.75 8Z',
+};
+
+export const dottedLineIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'dotted_line',
+	prefix: 'custom',
+	svgPathData:
+		'M2.5 7.2A0.8 0.8 0 1 1 2.5 8.8A0.8 0.8 0 1 1 2.5 7.2ZM5.25 7.2A0.8 0.8 0 1 1 5.25 8.8A0.8 0.8 0 1 1 5.25 7.2ZM8 7.2A0.8 0.8 0 1 1 8 8.8A0.8 0.8 0 1 1 8 7.2ZM10.75 7.2A0.8 0.8 0 1 1 10.75 8.8A0.8 0.8 0 1 1 10.75 7.2ZM13.5 7.2A0.8 0.8 0 1 1 13.5 8.8A0.8 0.8 0 1 1 13.5 7.2Z',
+};
+
+export const thinStrokeIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'thin_stroke',
+	prefix: 'custom',
+	svgPathData:
+		'M2.5 8C2.5 7.72386 2.72386 7.5 3 7.5H13C13.2761 7.5 13.5 7.72386 13.5 8C13.5 8.27614 13.2761 8.5 13 8.5H3C2.72386 8.5 2.5 8.27614 2.5 8Z',
+};
+
+export const mediumStrokeIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'medium_stroke',
+	prefix: 'custom',
+	svgPathData:
+		'M2.5 8C2.5 7.44772 2.94772 7 3.5 7H12.5C13.0523 7 13.5 7.44772 13.5 8C13.5 8.55228 13.0523 9 12.5 9H3.5C2.94772 9 2.5 8.55228 2.5 8Z',
+};
+
+export const thickStrokeIcon: IconData = {
+	height: '16',
+	width: '16',
+	name: 'thick_stroke',
+	prefix: 'custom',
+	svgPathData:
+		'M2.5 8C2.5 7.0335 3.2835 6.25 4.25 6.25H11.75C12.7165 6.25 13.5 7.0335 13.5 8C13.5 8.9665 12.7165 9.75 11.75 9.75H4.25C3.2835 9.75 2.5 8.9665 2.5 8Z',
+};
