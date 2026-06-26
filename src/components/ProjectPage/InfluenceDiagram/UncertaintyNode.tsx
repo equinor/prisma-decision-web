@@ -29,6 +29,7 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 			content={
 				<UncertaintyCard
 					issue={issue}
+					disableZeroProbabilityOutcomes
 					onClickOutcome={
 						hasValidationError
 							? undefined
