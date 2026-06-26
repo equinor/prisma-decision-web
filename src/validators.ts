@@ -218,6 +218,7 @@ export const evaluationMetrics = [
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
+export type Outcome = z.infer<typeof outcomeSchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;

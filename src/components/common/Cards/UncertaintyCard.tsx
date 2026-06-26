@@ -6,12 +6,12 @@ import { useExpandCard } from '../../../hooks/useExpandCard';
 import { percentageIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Issue } from '../../../validators';
-import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
 import { UncertaintyLabel } from './IssueLabel';
+import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 
 export const UncertaintyCard = ({
 	issue,
@@ -20,9 +20,7 @@ export const UncertaintyCard = ({
 	expanded: expandedProp,
 	...rest
 }: UncertaintyCardProps) => {
-	const sortedOutcomes = sortByCreatedAt(issue.uncertainty.outcomes);
-
-	const hasOutcomes = sortedOutcomes.length > 0;
+	const hasOutcomes = issue.uncertainty.outcomes.length > 0;
 	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -86,15 +84,17 @@ export const UncertaintyCard = ({
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOutcomes && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>
-								{sortedOutcomes.map(outcome => (
-									<li
-										key={outcome.id}
-										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
-									>
-										<p className='truncate'>{outcome.name}</p>
-										<p className='truncate'>{outcome.utility}</p>
-									</li>
-								))}
+								{issue.uncertainty.outcomes
+									.toSorted(sortByCreatedAt)
+									.map(outcome => (
+										<li
+											key={outcome.id}
+											className='bg-background-light flex justify-between rounded-sm px-2 py-1'
+										>
+											<p className='truncate'>{outcome.name}</p>
+											<p className='truncate'>{outcome.utility}</p>
+										</li>
+									))}
 							</ul>
 						)}
 					</CollapsibleContent>
@@ -103,7 +103,7 @@ export const UncertaintyCard = ({
 							<CollapsibleTrigger asChild>
 								<button className='nodrag nopan pointer-events-auto absolute right-2 bottom-1 flex cursor-pointer items-center gap-2'>
 									<p className='text-text-tertiary text-sm'>
-										{sortedOutcomes.length} Outcomes
+										{issue.uncertainty.outcomes.length} Outcomes
 									</p>
 									<Icon
 										className='fill-primary-resting'

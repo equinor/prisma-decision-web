@@ -22,11 +22,11 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 			...issue,
 			decision: {
 				...issue.decision,
-				options: sortByCreatedAt(issue.decision.options),
+				options: issue.decision.options.toSorted(sortByCreatedAt),
 			},
 			uncertainty: {
 				...issue.uncertainty,
-				outcomes: sortByCreatedAt(issue.uncertainty.outcomes),
+				outcomes: issue.uncertainty.outcomes.toSorted(sortByCreatedAt),
 			},
 		};
 	}, [issue]);

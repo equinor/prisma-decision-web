@@ -2,6 +2,7 @@ import { Icon } from '@equinor/eds-core-react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { Strategy } from '../../../validators';
 import { strategyIcons } from './icons';
+import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 
 export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 	const issues = useSelectedProjectIssues().filter(
@@ -49,7 +50,7 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 								</div>
 							</div>
 							<div className='flex flex-col gap-1'>
-								{issue.decision.options.map(option => {
+								{issue.decision.options.toSorted(sortByCreatedAt).map(option => {
 									const selectedByStrategies = strategies.filter(strategy =>
 										strategy.options.some(
 											selectedOption => selectedOption.id === option.id,
