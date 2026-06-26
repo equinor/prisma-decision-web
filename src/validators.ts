@@ -49,6 +49,7 @@ export const strategySchema = z.object({
 	id: uuid(),
 	name: z.string().min(1, 'Strategy name is required'),
 	icon: z.enum(strategyIconKeys, { error: 'Strategy icon is required' }),
+	icon_color: z.string().optional(),
 	description: z.string().optional(),
 	project_id: uuid(),
 	rationale: z.string().min(1, 'Rational is required'),

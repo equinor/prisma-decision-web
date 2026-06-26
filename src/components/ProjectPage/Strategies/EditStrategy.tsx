@@ -14,6 +14,7 @@ import { FormProvider } from 'react-hook-form';
 import { Strategy } from '../../../validators';
 import { useStrategyForm } from '../../../hooks/useStrategyForm';
 import { StrategyIconPicker } from './StrategyIconPicker';
+import { StrategyIconColorPicker } from './StrategyIconColorPicker';
 
 export const EditStrategy = ({ strategy }: { strategy: Strategy }) => {
 	const { formMethods, handleSubmit, isPending } = useStrategyForm(strategy);
@@ -57,8 +58,9 @@ export const EditStrategy = ({ strategy }: { strategy: Strategy }) => {
 									Edit strategy name, icon and rationale
 								</p>
 							</div>
-							<div className='grid w-full grid-cols-[auto_1fr] gap-2'>
+							<div className='grid w-full grid-cols-[auto_auto_1fr] gap-2'>
 								<StrategyIconPicker />
+								<StrategyIconColorPicker />
 								<TextField
 									{...formMethods.register('name')}
 									placeholder='Enter strategy name...'

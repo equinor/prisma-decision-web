@@ -1,5 +1,4 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
-import { IconData } from '@equinor/eds-icons';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
@@ -7,17 +6,16 @@ import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
+import { strategyIcons } from './icons';
 
 export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
-	strategyIcon,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	strategyIcon: IconData;
 }) => {
 	const issues = useSelectedProjectIssues().filter(
 		x =>
@@ -33,7 +31,7 @@ export const Strategy = ({
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>
 				<div className='flex items-center gap-4'>
-					<Icon data={strategyIcon} />
+					<Icon data={strategyIcons[strategy.icon]} color={strategy.icon_color} />
 					<div>
 						<h3 className='text-xl font-semibold'>{strategy.name}</h3>
 						<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>

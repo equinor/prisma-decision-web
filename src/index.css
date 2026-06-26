@@ -5,6 +5,15 @@
 [data-dnd-overlay]:not([style*='--dnd-translate']) {
 	display: none;
 }
+
+input[type='color']::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch {
+	border: none;
+}
+
 @theme inline {
 	--breakpoint-2xl: 100rem;
 
