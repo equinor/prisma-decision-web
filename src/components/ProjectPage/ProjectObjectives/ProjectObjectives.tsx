@@ -3,11 +3,14 @@ import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { format } from 'date-fns';
 import { EditObjectiveDialog } from './EditObjectiveDialog';
+import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const ProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
-	const objectives = selectedProject?.objectives || [];
+	const { selectedObjectives, isLoading } = useSelectedProjectObjectives();
+	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
@@ -23,7 +26,7 @@ export const ProjectObjectives = () => {
 						<div className='flex gap-2'>
 							<h2 className='text-2xl font-semibold'>Objectives</h2>
 							<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-								{objectives.length}
+								{selectedObjectives?.length ?? 0}
 							</span>
 						</div>
 						<p className='text-text-tertiary'>
@@ -31,7 +34,7 @@ export const ProjectObjectives = () => {
 						</p>
 					</div>
 				</div>
-				{objectives.length > 0 && (
+				{selectedObjectives.length > 0 && (
 					<div className='outline-background-medium w-full rounded-sm outline-1'>
 						<Table className='w-full table-fixed'>
 							<Table.Head>
@@ -45,27 +48,27 @@ export const ProjectObjectives = () => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{objectives.map(objectives => (
-									<Table.Row key={objectives.id}>
+								{selectedObjectives.map(objective => (
+									<Table.Row key={objective.id}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex items-center'>
-												<EditObjectiveDialog objective={objectives} />
-												<DeleteObjectiveDialog objective={objectives} />
+												<EditObjectiveDialog objective={objective} />
+												<DeleteObjectiveDialog objective={objective} />
 											</div>
 										</Table.Cell>
-										<Table.Cell>{objectives.name}</Table.Cell>
-										<Table.Cell>{objectives.description}</Table.Cell>
+										<Table.Cell>{objective.name}</Table.Cell>
+										<Table.Cell>{objective.description}</Table.Cell>
 										<Table.Cell className='truncate'>
-											{objectives.type}
+											{objective.type}
 										</Table.Cell>
 										<Table.Cell className='truncate'>
-											{objectives.created_at
-												? format(objectives.created_at, 'yyyy-MM-dd')
+											{objective.created_at
+												? format(objective.created_at, 'yyyy-MM-dd')
 												: '-'}
 										</Table.Cell>
 										<Table.Cell className='truncate'>
-											{objectives.updated_at
-												? format(objectives.updated_at, 'yyyy-MM-dd')
+											{objective.updated_at
+												? format(objective.updated_at, 'yyyy-MM-dd')
 												: '-'}
 										</Table.Cell>
 										<Table.Cell></Table.Cell>

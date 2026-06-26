@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { Project, Strategy } from '../../validators';
+import { Strategy } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
 
 export const useDeleteStrategy = () => {
@@ -10,26 +10,24 @@ export const useDeleteStrategy = () => {
 			await apiClient.delete(`/strategies/${strategy.id}`);
 			return strategy;
 		},
-		onMutate: async (strategy: Strategy) => {
-			await queryClient.cancelQueries({ queryKey: ['projects'] });
-			const previousProjects = queryClient.getQueryData<Project[]>(['projects']) || [];
-			const updatedProjects = previousProjects.map(project => {
-				return {
-					...project,
-					strategies: project.strategies.filter((s: Strategy) => s.id !== strategy.id),
-				};
-			});
-			queryClient.setQueryData(['projects'], updatedProjects);
-			return { previousProjects };
+		onMutate: async (deletedStrategy: Strategy) => {
+			await queryClient.cancelQueries({ queryKey: ['strategies'] });
+			const projectId = deletedStrategy.project_id;
+			const previousStrategies = queryClient.getQueryData<Strategy[]>(['strategies']) || [];
+			const updatedStrategies = previousStrategies.filter(
+				(s: Strategy) => s.project_id === projectId && s.id !== deletedStrategy.id,
+			);
+			queryClient.setQueryData(['strategies'], updatedStrategies);
+			return { previousStrategies };
 		},
 		onError: (_err, _strategy, context) => {
 			showErrorToast('Failed to delete strategy');
-			if (context?.previousProjects) {
-				queryClient.setQueryData(['projects'], context.previousProjects);
+			if (context?.previousStrategies) {
+				queryClient.setQueryData(['strategies'], context.previousStrategies);
 			}
 		},
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['projects'] });
+			await queryClient.refetchQueries({ queryKey: ['strategies'] });
 		},
 	});
 };

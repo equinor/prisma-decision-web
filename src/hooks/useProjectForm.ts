@@ -11,11 +11,9 @@ const getDefaultValues = (): Project => ({
 	opportunity_statement: '',
 	public: false,
 	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-	objectives: [],
 	id: crypto.randomUUID(),
 	parent_project_id: null,
 	users: [],
-	strategies: [],
 });
 
 export const useProjectFormContext = () => useFormContext<Project>();

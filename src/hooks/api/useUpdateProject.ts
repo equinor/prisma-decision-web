@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Project } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
+import axios from 'axios';
 
 export const useUpdateProject = () => {
 	const queryClient = useQueryClient();
@@ -28,6 +29,10 @@ export const useUpdateProject = () => {
 		onError: (_err, _project, context) => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
+			}
+			if (axios.isAxiosError(_err) && _err.response?.status === 401) {
+				showErrorToast(_err.response?.data?.detail);
+				return;
 			}
 			showErrorToast('Failed to update project');
 		},
