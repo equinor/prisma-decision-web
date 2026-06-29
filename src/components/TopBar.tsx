@@ -1,9 +1,9 @@
 import { Button, TopBar as EdsTopBar, Icon, StarProgress } from '@equinor/eds-core-react';
 import { sun } from '@equinor/eds-icons';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
+import { useGetProjects } from '../hooks/api/useGetProjects';
 import useDarkMode from '../hooks/useDarkMode';
-import { useSelectedProject } from '../hooks/useSelectedProject';
 import { MoonIcon } from './common/MoonIcon';
 
 export const TopBar = () => {
@@ -12,7 +12,9 @@ export const TopBar = () => {
 	const isFetching = useIsFetching();
 	const isMutating = useIsMutating();
 	const isLoading = isFetching > 0 || isMutating > 0;
-	const selectedProject = useSelectedProject();
+	const { projectId } = useParams<{ projectId: string }>();
+	const { projects } = useGetProjects();
+	const selectedProject = projects.find(project => project.id === projectId);
 
 	return (
 		<EdsTopBar sticky={false} className='col-span-2 border-b-0! pl-3.5!'>
@@ -27,7 +29,7 @@ export const TopBar = () => {
 				{selectedProject && (
 					<>
 						<div className='bg-background-medium m-0! h-8 w-0.5' />
-						{selectedProject?.name}
+						{selectedProject.name}
 					</>
 				)}
 				{isLoading && (

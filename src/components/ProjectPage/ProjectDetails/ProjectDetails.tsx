@@ -1,14 +1,13 @@
 import { Tooltip } from '@equinor/eds-core-react';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { DeleteProjectDialog } from '../../common/DeleteProjectDialog';
 import { DuplicateProjectDialog } from '../../common/DuplicateProjectDialog';
 import { ExportProject } from '../../common/ExportProject';
 import { ProjectInformation } from '../../common/ProjectInformation/ProjectInformation';
 import { Link } from 'react-router';
+import { useSelectedProject } from '../ProjectContext';
 
 export const ProjectDetails = () => {
 	const selectedProject = useSelectedProject();
-	if (!selectedProject) return null;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex justify-between'>

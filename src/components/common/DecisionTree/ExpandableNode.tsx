@@ -5,7 +5,7 @@ import { useLocation } from 'react-router';
 import { usePrefetchDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { usePrefetchSolutionTree } from '../../../hooks/api/useGetSolutionTree';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProject } from '../../ProjectPage/ProjectContext';
 
 export const ExpandNode = ({
 	data: { statePath = [], expandPathSegment },
@@ -28,7 +28,6 @@ export const ExpandNode = ({
 		...expandedPaths,
 		[...statePath, ...(expandPathSegment ? [expandPathSegment] : [])],
 	];
-	if (!project) return null;
 	return (
 		<div className='nopan relative flex h-full items-center overflow-visible'>
 			<Handle

@@ -1,11 +1,14 @@
-import { useSelectedProject } from '../useSelectedProject';
+import { useParams } from 'react-router';
 import { useGetAssessments } from './useGetAssessments';
+import { useGetProjects } from './useGetProjects';
 import { useGetSignUser } from './useGetSignUser';
 
 export const usePendingAssessmentCount = () => {
 	const { assessments } = useGetAssessments();
 	const { signuser } = useGetSignUser();
-	const selectedProject = useSelectedProject();
+	const { projectId } = useParams<{ projectId: string }>();
+	const { projects } = useGetProjects();
+	const selectedProject = projects.find(project => project.id === projectId);
 
 	if (!assessments || !signuser || !selectedProject) return 0;
 	const projectAssessments = assessments.filter(a => a.project_id === selectedProject.id);

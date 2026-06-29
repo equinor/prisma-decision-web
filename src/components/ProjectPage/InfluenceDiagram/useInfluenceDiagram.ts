@@ -14,12 +14,12 @@ import { MouseEvent, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
 import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
+import { useSelectedProject } from '../ProjectContext';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
@@ -48,7 +48,6 @@ export const useInfluenceDiagram = () => {
 
 	const onConnect: OnConnect = async params => {
 		if (sourceAndTargetAreUtility(params.source, params.target)) return;
-		if (!selectedProject) return;
 		const newEdge = {
 			head_id: params.target,
 			tail_id: params.source,
@@ -60,7 +59,6 @@ export const useInfluenceDiagram = () => {
 
 	const onReconnect: OnReconnect = async (oldEdge, newConnection) => {
 		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
-		if (!selectedProject) return;
 		const updatedEdge = {
 			id: oldEdge.id,
 			tail_id: newConnection.source,

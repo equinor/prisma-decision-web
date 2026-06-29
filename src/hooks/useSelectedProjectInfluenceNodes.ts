@@ -1,11 +1,8 @@
 import { useMemo } from 'react';
-import { useGetInfluenceNodes } from './api/useGetInfluenceNodes';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { convertToReactFlowNodes } from '../utils/convertToReactFlowNodes';
-import { useSelectedProject } from './useSelectedProject';
+import { useGetInfluenceNodes } from './api/useGetInfluenceNodes';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
-import { ReactFlowInfluenceNode } from '../types';
-
-const defaultValue: ReactFlowInfluenceNode[] = [];
 
 export const useSelectedProjectInfluenceNodes = () => {
 	const selectedProject = useSelectedProject();
@@ -14,11 +11,10 @@ export const useSelectedProjectInfluenceNodes = () => {
 	const reactFlowNodes = useMemo(
 		() =>
 			convertToReactFlowNodes(nodes, projectIssues).filter(
-				node => node.data.project_id === selectedProject?.id,
+				node => node.data.project_id === selectedProject.id,
 			),
-		[nodes, projectIssues, selectedProject?.id],
+		[nodes, projectIssues, selectedProject.id],
 	);
-	if (!selectedProject) return { nodes: defaultValue, isFetching: false };
 	return {
 		nodes: reactFlowNodes,
 		isFetching,

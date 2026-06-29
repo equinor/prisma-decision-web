@@ -9,19 +9,21 @@ import {
 	timeline,
 } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
-import { Link } from 'react-router';
-import { useSelectedProject } from '../hooks/useSelectedProject';
+import { Link, useParams } from 'react-router';
 import { ChessIcon, compactTreeIcon } from '../icons';
 import { EquinorStar } from './EquinorStar';
 
-import { cn } from '../utils/cn';
+import { useGetProjects } from '../hooks/api/useGetProjects';
 import { usePendingAssessmentCount } from '../hooks/api/usePendingAssessmentCount';
+import { cn } from '../utils/cn';
 
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isDecisionTreeMenuOpen, setIsDecisionTreeMenuOpen] = useState(false);
 	const decisionTreeButtonRef = useRef<HTMLButtonElement>(null);
-	const project = useSelectedProject();
+	const { projectId } = useParams<{ projectId: string }>();
+	const { projects } = useGetProjects();
+	const project = projects.find(project => project.id === projectId);
 	const pendingCount = usePendingAssessmentCount();
 	let decisionTreeIcon = share;
 	if (window.location.pathname.includes('compact-tree')) {

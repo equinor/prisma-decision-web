@@ -2,9 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Assessment, assessmentSchema } from '../validators';
-import { useSelectedProject } from './useSelectedProject';
 import { useCreateAssessment } from './api/useCreateAssessment';
 import { useUpdateAssessment } from './api/useUpdateAssessment';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 const getDefaultValues = (projectId: string): Assessment => ({
 	id: crypto.randomUUID(),
@@ -21,8 +21,8 @@ export const useAssessmentForm = ({ assessment, onSuccess }: UseAssessmentFormAr
 	const selectedProject = useSelectedProject();
 
 	const defaultValues = useMemo(
-		() => assessment || getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-		[selectedProject?.id, assessment],
+		() => assessment || getDefaultValues(selectedProject.id),
+		[selectedProject.id, assessment],
 	);
 
 	const formMethods = useForm({
@@ -41,9 +41,7 @@ export const useAssessmentForm = ({ assessment, onSuccess }: UseAssessmentFormAr
 				{ ...data },
 				{
 					onSuccess: () => {
-						formMethods.reset(
-							getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-						);
+						formMethods.reset(getDefaultValues(selectedProject.id));
 						onSuccess?.(data);
 					},
 				},

@@ -1,7 +1,6 @@
 import { Button, Checkbox, Icon } from '@equinor/eds-core-react';
 import { useNavigate } from 'react-router';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { SolutionEvidenceRequest, Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
@@ -9,6 +8,7 @@ import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
 import { strategyIcons } from './icons';
+import { useSelectedProject } from '../ProjectContext';
 
 export const Strategy = ({
 	strategy,
@@ -34,7 +34,6 @@ export const Strategy = ({
 			(x.boundary === 'in' || x.boundary === 'on'),
 	);
 
-	if (!project) return;
 	return (
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>

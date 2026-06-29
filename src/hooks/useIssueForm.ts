@@ -7,17 +7,14 @@ import { useUpdateIssue } from './api/useUpdateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
 import { sortByCreatedAt } from '../utils/sortByCreatedAt';
-import { useSelectedProject } from './useSelectedProject';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	const selectedProject = useSelectedProject();
-	const defaultValues = useMemo(
-		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-		[],
-	);
+	const defaultValues = useMemo(() => getDefaultValues(selectedProject.id), [selectedProject.id]);
 	const sortedIssue = useMemo(() => {
-		if (!issue) return undefined;
+		if (!issue) return;
 		return {
 			...issue,
 			decision: {
@@ -37,7 +34,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	const { issues } = useGetIssues();
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedProject.id));
 			onSuccess?.();
 		},
 	});
@@ -48,7 +45,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 			const mutationFn = issue ? updateIssue : createIssue;
 			if (issue) return await mutationFn(data);
 
-			const projectId = selectedProject?.id || data.project_id;
+			const projectId = selectedProject.id;
 			const projectIssues = issues.filter(i => i.project_id === projectId);
 			const { x, y } = getNextIssuePosition(projectIssues);
 			await mutationFn({

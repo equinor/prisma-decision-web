@@ -5,7 +5,7 @@ import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 
 export type DecisionPath = string[];
 
-export const getDecisionTreeQueryKey = (projectId?: string, paths: DecisionPath[] = []) =>
+export const getDecisionTreeQueryKey = (projectId: string, paths: DecisionPath[] = []) =>
 	['decisionTree', projectId, paths] as const;
 
 export const fetchDecisionTree = async (projectId: string, paths: DecisionPath[]) => {
@@ -16,14 +16,14 @@ export const fetchDecisionTree = async (projectId: string, paths: DecisionPath[]
 	return res.data;
 };
 
-export const useGetDecisionTree = (projectId?: string, paths: DecisionPath[] = []) => {
+export const useGetDecisionTree = (projectId: string, paths: DecisionPath[] = []) => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: getDecisionTreeQueryKey(projectId, paths),
 		placeholderData: keepPreviousData,
 		queryFn: async () => fetchDecisionTree(projectId!, paths),
 		retry: false,
-		enabled: !!projectId && !hasValidationError,
+		enabled: !hasValidationError,
 		meta: {
 			errorMessage: 'Failed to fetch decision tree',
 		},
@@ -39,10 +39,8 @@ export const usePrefetchDecisionTree = () => {
 	const queryClient = useQueryClient();
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	return useCallback(
-		(projectId: string | undefined, paths: DecisionPath[]) => {
-			if (!projectId || hasValidationError) {
-				return;
-			}
+		(projectId: string, paths: DecisionPath[]) => {
+			if (hasValidationError) return;
 			const queryKey = getDecisionTreeQueryKey(projectId, paths);
 			const queryState = queryClient.getQueryState(queryKey);
 
