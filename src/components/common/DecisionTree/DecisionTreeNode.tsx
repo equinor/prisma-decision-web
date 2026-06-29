@@ -1,12 +1,17 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { Fragment } from 'react';
+import { useLocation } from 'react-router';
 import { isDecisionPathSelected } from '../../../hooks/useExpandedTreeNodes';
 import { useSelectedDecisionTreePath } from '../../../hooks/useSelectedDecisionTreePath';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
-import { DecisionCard } from '../Cards/DecisionCard';
-import { UncertaintyCard } from '../Cards/UncertaintyCard';
-import { useLocation } from 'react-router';
+import {
+	IssueCard,
+	IssueCardContent,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardHeader,
+	IssueCardMenu,
+} from '../Cards/IssueCard';
 
 const handlePositions = [Position.Left, Position.Right];
 
@@ -18,7 +23,6 @@ export const DecisionTreeNode = ({
 	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
 	const issues = useSelectedProjectIssues();
 	const issue = issues.find(issue => issue.id === data.issueId);
-	const IssueCard = issue?.type === 'Decision' ? DecisionCard : UncertaintyCard;
 	const { selectedPath, selectPath } = useSelectedDecisionTreePath(treeType);
 	const statePath = data.statePath || [];
 	const selected = isDecisionPathSelected(selectedPath, statePath);
@@ -48,11 +52,16 @@ export const DecisionTreeNode = ({
 						/>
 					</Fragment>
 				))}
-				<div
-					className={`h-full max-w-87.5
-					overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
-				>
-					<IssueCard canExpand={false} issue={issue} className={'h-20'} />
+				<div className='h-full max-w-87.5 overflow-hidden'>
+					<IssueCard issue={issue} className={'h-20'} includeBorder selected={selected}>
+						<IssueCardHeader>
+							<IssueCardMenu>
+								<IssueCardEditMenuItem />
+								<IssueCardDeleteMenuItem />
+							</IssueCardMenu>
+						</IssueCardHeader>
+						<IssueCardContent />
+					</IssueCard>
 				</div>
 			</div>
 			{!!data.expectedValue && (

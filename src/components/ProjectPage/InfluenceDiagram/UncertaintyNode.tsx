@@ -2,7 +2,17 @@ import { NodeProps } from '@xyflow/react';
 import { useState } from 'react';
 import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { ReactFlowInfluenceNode } from '../../../types';
-import { UncertaintyCard } from '../../common/Cards/UncertaintyCard';
+import {
+	IssueCard,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardExpandableContent,
+	IssueCardExpandTrigger,
+	IssueCardHeader,
+	IssueCardMenu,
+	IssueCardProbabilityTableMenuItem,
+	IssueCardStates,
+} from '../../common/Cards/IssueCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
@@ -16,33 +26,44 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 	if (!issue) return null;
 
 	return (
-		<InfluenceNodeShell
-			issueType={issue.type}
-			selected={selected}
-			isHighlighted={data.isHighlighted}
-			inProgress={inProgress}
-			isTarget={isTarget}
-			expandWidth={probabilityTableOpen}
-			content={
-				<UncertaintyCard
+		<div className='flex flex-col gap-1'>
+			<InfluenceNodeShell
+				inProgress={inProgress}
+				isTarget={isTarget}
+				expandWidth={probabilityTableOpen}
+			>
+				<IssueCard
+					selected={selected}
+					includeBorder
+					isHighlighted={!!data.isHighlighted}
 					issue={issue}
-					disableZeroProbabilityOutcomes
-					onClickOutcome={outcome => {
-						toggleEvidence(outcome.id, issue.id);
+					selectedState={selectedOutcome}
+					onClickState={option => {
+						toggleEvidence(option.id, issue.id);
 					}}
-					selectedOutcome={selectedOutcome}
-					onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
+				>
+					<IssueCardHeader>
+						<IssueCardMenu>
+							<IssueCardEditMenuItem />
+							<IssueCardDeleteMenuItem />
+							<IssueCardProbabilityTableMenuItem
+								onClick={() => setProbabilityTableOpen(true)}
+							/>
+						</IssueCardMenu>
+					</IssueCardHeader>
+					<IssueCardExpandableContent />
+					<IssueCardStates>
+						<IssueCardExpandTrigger />
+					</IssueCardStates>
+				</IssueCard>
+			</InfluenceNodeShell>
+			{probabilityTableOpen && (
+				<ProbabilityTable
+					issue={issue}
+					selected={selected}
+					onClose={setProbabilityTableOpen}
 				/>
-			}
-			modal={
-				probabilityTableOpen && (
-					<ProbabilityTable
-						issue={issue}
-						selected={selected}
-						onClose={setProbabilityTableOpen}
-					/>
-				)
-			}
-		/>
+			)}
+		</div>
 	);
 };

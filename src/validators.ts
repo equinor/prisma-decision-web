@@ -111,9 +111,9 @@ export const outcomeSchema = z.object({
 	id: z.guid(),
 	utility: z.number(),
 	name: z.string().min(1, 'Outcome name is required'),
-	uncertainty_id: z.guid(),
-	created_at: z.iso.datetime(),
-	project_id: z.guid(),
+	uncertainty_id: z.uuid(),
+	created_at: z.iso.datetime().optional(),
+	project_id: z.uuid(),
 });
 export const uncertaintySchema = z.object({
 	id: z.guid(),

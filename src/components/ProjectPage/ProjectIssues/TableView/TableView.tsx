@@ -1,8 +1,17 @@
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import { useIssueDragAndDrop } from '../../../../hooks/useIssueDragAndDrop';
-import { getIssueCardType } from '../../../../utils/getIssueCardType';
-import { IssueType, issueTypes } from '../../../../validators';
+import { issueTypes } from '../../../../validators';
+import {
+	IssueCard,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardExpandableContent,
+	IssueCardExpandTrigger,
+	IssueCardHeader,
+	IssueCardMenu,
+	IssueCardStates,
+} from '../../../common/Cards/IssueCard';
 import { IssueColumn } from './IssueColumn';
 
 export const TableView = () => {
@@ -32,8 +41,20 @@ export const TableView = () => {
 			</div>
 			<DragOverlay>
 				{source => {
-					const Card = getIssueCardType(source.type as IssueType);
-					return <Card issue={source.data.issue} />;
+					return (
+						<IssueCard issue={source.data.issue}>
+							<IssueCardHeader>
+								<IssueCardMenu>
+									<IssueCardEditMenuItem />
+									<IssueCardDeleteMenuItem />
+								</IssueCardMenu>
+							</IssueCardHeader>
+							<IssueCardExpandableContent />
+							<IssueCardStates>
+								<IssueCardExpandTrigger />
+							</IssueCardStates>
+						</IssueCard>
+					);
 				}}
 			</DragOverlay>
 		</DragDropProvider>

@@ -1,7 +1,16 @@
 import { cn } from '../../../../utils/cn';
-import { getIssueCardType } from '../../../../utils/getIssueCardType';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
 import { Issue, IssueType } from '../../../../validators';
+import {
+	IssueCard,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardExpandableContent,
+	IssueCardExpandTrigger,
+	IssueCardHeader,
+	IssueCardMenu,
+	IssueCardStates,
+} from '../../../common/Cards/IssueCard';
 import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
 
@@ -22,7 +31,6 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 				)}
 			>
 				{issues.map((issue, index) => {
-					const Card = getIssueCardType(issue.type);
 					return (
 						<DraggableIssueContainer
 							key={issue.id}
@@ -30,7 +38,18 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 							index={index}
 							type={issueType}
 						>
-							<Card issue={issue} />
+							<IssueCard issue={issue}>
+								<IssueCardHeader>
+									<IssueCardMenu>
+										<IssueCardEditMenuItem />
+										<IssueCardDeleteMenuItem />
+									</IssueCardMenu>
+								</IssueCardHeader>
+								<IssueCardExpandableContent />
+								<IssueCardStates>
+									<IssueCardExpandTrigger />
+								</IssueCardStates>
+							</IssueCard>
 						</DraggableIssueContainer>
 					);
 				})}
