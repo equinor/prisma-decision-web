@@ -1,5 +1,4 @@
 import { Button, Checkbox, Icon } from '@equinor/eds-core-react';
-import { IconData } from '@equinor/eds-icons';
 import { useNavigate } from 'react-router';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProject } from '../../../hooks/useSelectedProject';
@@ -9,19 +8,18 @@ import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
+import { strategyIcons } from './icons';
 
 export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
-	strategyIcon,
 	hasValidationError,
 	selectedEvidenceData,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	strategyIcon: IconData;
 	hasValidationError: boolean;
 	selectedEvidenceData: SolutionEvidenceRequest[];
 }) => {
@@ -41,7 +39,7 @@ export const Strategy = ({
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
 			<div className='flex items-center justify-between gap-2'>
 				<div className='flex items-center gap-4'>
-					<Icon data={strategyIcon} />
+					<Icon data={strategyIcons[strategy.icon]} color={strategy.icon_color} />
 					<div className='flex flex-wrap items-center gap-3'>
 						<div>
 							<h3 className='text-xl font-semibold'>{strategy.name}</h3>

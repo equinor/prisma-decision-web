@@ -27,7 +27,7 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 				{strategies.map(strategy => (
 					<div key={strategy.id} className='flex items-center gap-2 text-sm'>
 						{strategyIcons[strategy.icon] && (
-							<Icon data={strategyIcons[strategy.icon]} />
+							<Icon data={strategyIcons[strategy.icon]} color={strategy.icon_color} />
 						)}
 						<span>{strategy.name}</span>
 					</div>
@@ -66,6 +66,7 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 													<Icon
 														key={strategy.id}
 														data={strategyIcons[strategy.icon]}
+														color={strategy.icon_color}
 													/>
 												))}
 											</div>
