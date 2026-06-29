@@ -59,7 +59,7 @@ export const DecisionTreeNode = ({
 				<div className='absolute top-1/2 -right-3 translate-x-full -translate-y-full '>
 					<p>
 						<span className='font-semibold'>EV: </span>
-						{parseFloat(data.expectedValue?.toFixed(2) || '0')}
+						{parseFloat(data.expectedValue?.toFixed(3) || '0')}
 					</p>
 				</div>
 			)}

@@ -202,6 +202,17 @@ export const assessmentSchema = z.object({
 	created_at: z.iso.datetime(),
 });
 
+export const solutionEvidenceRequestSchema = z.object({
+	evidence_id: uuid(),
+	state_ids: z.array(uuid()),
+});
+
+export const solutionEvidenceResponseSchema = z.object({
+	evidence_id: uuid(), // id for the evidence collection, corresponds to for example the strategy id
+	state_ids: z.array(uuid()),
+	expected_utility: z.number().default(0),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -218,6 +229,7 @@ export const evaluationMetrics = [
 export type Project = z.infer<typeof projectSchema>;
 export type Strategy = z.infer<typeof strategySchema>;
 export type Option = z.infer<typeof optionSchema>;
+export type Outcome = z.infer<typeof outcomeSchema>;
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Issue = z.infer<typeof issueSchema>;
 export type Edge = z.infer<typeof edgeSchema>;
@@ -231,3 +243,5 @@ export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
+export type SolutionEvidenceRequest = z.infer<typeof solutionEvidenceRequestSchema>;
+export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;

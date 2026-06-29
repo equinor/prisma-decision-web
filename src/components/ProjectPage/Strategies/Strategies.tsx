@@ -1,15 +1,23 @@
 import { useState } from 'react';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
-import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
-import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
+import { useSelectedProject } from '../../../hooks/useSelectedProject';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
+	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { selectedStrategies, isLoading } = useSelectedProjectStrategies();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
+
+	const selectedEvidence =
+		selectedStrategies.map(s => ({
+			evidence_id: s.id,
+			state_ids: s.options.map(o => o.id),
+		})) ?? [];
 
 	const handleClickAddToStrategyTable = (id: string) => {
 		if (selectedStrategyIds.has(id)) {
@@ -56,8 +64,10 @@ export const Strategies = () => {
 						<Strategy
 							key={strategy.id}
 							strategy={strategy}
+							hasValidationError={hasValidationError}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
+							selectedEvidenceData={selectedEvidence}
 						/>
 					);
 				})}

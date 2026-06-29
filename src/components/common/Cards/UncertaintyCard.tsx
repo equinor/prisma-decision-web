@@ -5,18 +5,22 @@ import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { percentageIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
-import { Issue } from '../../../validators';
+import { Issue, Outcome } from '../../../validators';
 import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
 import { UncertaintyLabel } from './IssueLabel';
+import { useUncertaintyOutcomeSelection } from '../../../hooks/useUncertaintyOutcomeSelection';
 
 export const UncertaintyCard = ({
 	issue,
 	canExpand = true,
+	onClickOutcome,
+	selectedOutcome,
 	onClickOpenProbabilities,
+	disableZeroProbabilityOutcomes = false,
 	expanded: expandedProp,
 	...rest
 }: UncertaintyCardProps) => {
@@ -28,9 +32,13 @@ export const UncertaintyCard = ({
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-
 	const expanded = expandedProp ?? _expanded;
-
+	const { outcomesWithZeroProbability, activeOutcomeId } = useUncertaintyOutcomeSelection({
+		issue,
+		sortedOutcomes,
+		selectedOutcome,
+		disableZeroProbabilityOutcomes,
+	});
 	return (
 		<CardContainer {...rest} onDoubleClick={() => setEditOpen(true)}>
 			<div className='flex items-center justify-between'>
@@ -86,15 +94,32 @@ export const UncertaintyCard = ({
 					<CollapsibleContent className='mb-2 w-full' asChild>
 						{hasOutcomes && (
 							<ul className='flex flex-col gap-2 rounded-sm text-sm'>
-								{sortedOutcomes.map(outcome => (
-									<li
-										key={outcome.id}
-										className='bg-background-light flex justify-between rounded-sm px-2 py-1'
-									>
-										<p className='truncate'>{outcome.name}</p>
-										<p className='truncate'>{outcome.utility}</p>
-									</li>
-								))}
+								{sortedOutcomes.map(outcome => {
+									const isDisabled = outcomesWithZeroProbability.has(outcome.id);
+
+									return (
+										<li
+											onClick={() => {
+												if (isDisabled) return;
+												if (onClickOutcome) onClickOutcome(outcome);
+											}}
+											key={outcome.id}
+											className={cn(
+												'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',
+												{
+													'hover:bg-primary-hover-alt cursor-pointer':
+														onClickOutcome && !isDisabled,
+													'cursor-not-allowed opacity-50': isDisabled,
+													'outline-primary-resting outline-2':
+														outcome.id === activeOutcomeId,
+												},
+											)}
+										>
+											<p className='truncate'>{outcome.name}</p>
+											<p className='truncate'>{outcome.utility}</p>
+										</li>
+									);
+								})}
 							</ul>
 						)}
 					</CollapsibleContent>
@@ -129,6 +154,9 @@ type UncertaintyCardProps = {
 	issue: Issue;
 	className?: string;
 	canExpand?: boolean;
+	onClickOutcome?: (outcome: Outcome) => void;
+	selectedOutcome?: Outcome;
 	onClickOpenProbabilities?: () => void;
+	disableZeroProbabilityOutcomes?: boolean;
 	expanded?: boolean;
 };
