@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        TARGET_ENVIRONMENTS: dev
+        TARGET_ENVIRONMENTS: research
     ports:
-      - '5004:3000'
+      - "5004:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=research
