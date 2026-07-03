@@ -1,7 +1,7 @@
 {
-	"name": "warp-deployment",
+	"name": "prisma-deployment",
 	"version": "1.0.0",
-	"description": "Warp Deployment",
+	"description": "Prisma Deployment",
 	"author": "Fredrik Wold <fmw@equinor.com>",
 	"license": "MIT",
 	"main": "app.js",
