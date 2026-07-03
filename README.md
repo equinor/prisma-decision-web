@@ -136,34 +136,61 @@ npm run release:prod   # Tag and push PROD release
 
 The app is built via Docker (`Dockerfile`), served on port 3000 via a Node.js Express server (`deployment/`).
 
-## Running Locally with Docker Compose
+## Running Locally with Docker Compose (Research Mode)
 
-> **Note:** `VITE_APP_PRISMA_API_URL` is baked into the frontend bundle at **build time**, not at runtime. To point the app at a local backend you must update the env file before building.
+This repository is currently configured to run Docker Compose in research mode.
 
-### 1. Set the API URL
+Current setup:
 
-Edit `.env.development` and set your local backend URL:
+- [docker-compose.yml](docker-compose.yml) builds with `TARGET_ENVIRONMENTS: research`
+- [docker-compose.yml](docker-compose.yml) sets runtime `NODE_ENV=research`
+- [Dockerfile](Dockerfile) runs `npm run build:${TARGET_ENVIRONMENTS}` during image build
 
-```env
-VITE_APP_PRISMA_API_URL=http://localhost:7075/
-```
+Important:
+
+- `VITE_APP_PRISMA_API_URL` is baked into the frontend at build time.
+- For research mode, update [ .env.research ](.env.research) before building.
+
+### 1. Set research API URL
+
+Edit [ .env.research ](.env.research):
+
+	VITE_APP_PRISMA_API_URL="http://localhost:7075/"
 
 ### 2. Build and run
 
-Always use `--build` so Docker re-bundles the frontend with the updated URL:
+	docker compose build --no-cache
+	docker compose up
 
-```bash
-docker compose up --build
-```
+App URL:
 
-The app is available at **http://localhost:5004**.
+- http://localhost:5004
 
-### 3. Rebuild from scratch (clear cache)
+### 3. Research login requirement
 
+Research auth uses a username stored in browser local storage. If username is missing, the app redirects to [login.html](login.html).
 
-```bash
-docker compose build --no-cache
-docker compose up
-```
+Expected flow:
+
+1. Open http://localhost:5004
+2. If redirected, open http://localhost:5004/login.html
+3. Submit username
+4. Return to influence diagram page
+
+### 4. Troubleshooting
+
+If Docker build fails at `npm ci`:
+
+- Ensure [package.json](package.json) and [package-lock.json](package-lock.json) are in sync.
+- Run `npm install` once locally and commit lockfile updates.
+
+If Docker fails with `no space left on device`:
+
+	docker builder prune -af
+	docker system prune -af --volumes
+
+To check Docker disk usage:
+
+	docker system df -v
 
 
