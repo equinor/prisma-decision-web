@@ -1,4 +1,4 @@
-import { uuid, z } from 'zod/v4';
+import { z } from 'zod/v4';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
@@ -15,11 +15,11 @@ export const decisionTypes = ['Policy', 'Focus', 'Tactical'] as const;
 export type DecisionType = (typeof decisionTypes)[number];
 
 export const objectiveSchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	name: z.string().min(1, 'Objective name is required'),
 	description: z.string().min(1, 'Description is required'),
 	type: z.enum(objectiveTypes, { error: 'Objective type is required' }),
-	project_id: uuid(),
+	project_id: z.guid(),
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
 });
@@ -30,128 +30,128 @@ export const userSchema = z.object({
 });
 
 export const projectRoleSchema = userSchema.extend({
-	id: uuid(),
+	id: z.guid(),
 	user_id: z.string(),
-	project_id: uuid(),
+	project_id: z.guid(),
 	role: z.enum(roleTypes, { error: 'Role is required' }),
 });
 
 const optionSchema = z.object({
 	name: z.string().min(1, 'Option name is required'),
-	id: uuid(),
-	decision_id: uuid(),
-	project_id: uuid(),
+	id: z.guid(),
+	decision_id: z.guid(),
+	project_id: z.guid(),
 	utility: z.number().optional(),
 	created_at: z.iso.datetime().optional(),
 });
 
 export const strategySchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	name: z.string().min(1, 'Strategy name is required'),
 	icon: z.enum(strategyIconKeys, { error: 'Strategy icon is required' }),
 	icon_color: z.string().optional(),
 	description: z.string().optional(),
-	project_id: uuid(),
+	project_id: z.guid(),
 	rationale: z.string().min(1, 'Rational is required'),
 	options: z.array(optionSchema),
 });
 
 export const projectSchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	name: z.string().min(1, 'Name is required'),
 	opportunity_statement: z.string().optional(),
 	public: z.boolean(),
-	parent_project_id: uuid().nullable(),
+	parent_project_id: z.guid().nullable(),
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime(),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
 });
 
 export const decisionSchema = z.object({
-	id: uuid(),
-	issue_id: uuid(),
-	project_id: uuid(),
+	id: z.guid(),
+	issue_id: z.guid(),
+	project_id: z.guid(),
 	type: z.enum(decisionTypes),
 	options: z.array(optionSchema),
 });
 
 export const valueMetricSchema = z.object({
-	id: uuid(),
-	issue_id: uuid(),
+	id: z.guid(),
+	issue_id: z.guid(),
 	name: z.string(),
 });
 
 export const discreteProbabilitySchema = z.object({
-	outcome_id: uuid(),
-	id: uuid(),
-	parent_option_ids: z.array(uuid()),
+	outcome_id: z.guid(),
+	id: z.guid(),
+	parent_option_ids: z.array(z.guid()),
 	probability: z.number().min(0).max(1),
-	parent_outcome_ids: z.array(uuid()),
-	uncertainty_id: uuid(),
-	project_id: uuid(),
+	parent_outcome_ids: z.array(z.guid()),
+	uncertainty_id: z.guid(),
+	project_id: z.guid(),
 });
 
 export const discreteUtilitiesSchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	utility_value: z.number(),
-	value_metric_id: uuid(),
-	parent_option_ids: z.array(uuid()),
-	parent_outcome_ids: z.array(uuid()),
-	utility_id: uuid(),
-	project_id: uuid(),
+	value_metric_id: z.guid(),
+	parent_option_ids: z.array(z.guid()),
+	parent_outcome_ids: z.array(z.guid()),
+	utility_id: z.guid(),
+	project_id: z.guid(),
 });
 
 export const utilitySchema = z.object({
-	id: uuid(),
-	issue_id: uuid(),
-	project_id: uuid(),
+	id: z.guid(),
+	issue_id: z.guid(),
+	project_id: z.guid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 export const outcomeSchema = z.object({
-	id: z.uuid(),
+	id: z.guid(),
 	utility: z.number(),
 	name: z.string().min(1, 'Outcome name is required'),
-	uncertainty_id: z.uuid(),
+	uncertainty_id: z.guid(),
 	created_at: z.iso.datetime(),
-	project_id: z.uuid(),
+	project_id: z.guid(),
 });
 export const uncertaintySchema = z.object({
-	id: uuid(),
-	issue_id: uuid(),
-	project_id: uuid(),
+	id: z.guid(),
+	issue_id: z.guid(),
+	project_id: z.guid(),
 	is_key: z.boolean(),
 	outcomes: z.array(outcomeSchema),
 	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({
-	id: uuid(),
-	node_id: uuid(),
+	id: z.guid(),
+	node_id: z.guid(),
 	x_position: z.number().int(),
 	y_position: z.number().int(),
 });
 
 export const influenceNodeSchema = z.object({
-	id: uuid(),
-	project_id: uuid(),
-	issue_id: uuid(),
+	id: z.guid(),
+	project_id: z.guid(),
+	issue_id: z.guid(),
 	name: z.string().min(1, 'Node name is required'),
 	isHighlighted: z.string().optional(),
 	node_style: nodeStyleSchema,
 });
 
 export const edgeSchema = z.object({
-	id: uuid(),
-	head_id: uuid(),
-	tail_id: uuid(),
-	project_id: uuid(),
-	head_issue_id: uuid().optional(),
-	tail_issue_id: uuid().optional(),
+	id: z.guid(),
+	head_id: z.guid(),
+	tail_id: z.guid(),
+	project_id: z.guid(),
+	head_issue_id: z.guid().optional(),
+	tail_issue_id: z.guid().optional(),
 });
 
 export const issueSchema = z.object({
-	id: uuid(),
-	project_id: uuid(),
+	id: z.guid(),
+	project_id: z.guid(),
 	name: z.string().min(1, 'Issue name is required'),
 	description: z.string().min(1, 'Description is required'),
 	order: z.number().int().nonnegative(),
@@ -178,7 +178,7 @@ const metricScore = () =>
 	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
 
 export const DecisionQualityAssessmentSchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	appropriate_frame: metricScore(),
 	trade_off_analysis: metricScore(),
 	reasoning_correctness: metricScore(),
@@ -186,30 +186,30 @@ export const DecisionQualityAssessmentSchema = z.object({
 	commitment_to_action: metricScore(),
 	doable_alternatives: metricScore(),
 	comment: z.string().optional(),
-	assessment_id: uuid(),
-	project_id: uuid(),
+	assessment_id: z.guid(),
+	project_id: z.guid(),
 	created_by_id: z.string().optional(),
 	created_at: z.iso.datetime(),
 	updated_at: z.iso.datetime().optional(),
 });
 
 export const assessmentSchema = z.object({
-	id: uuid(),
+	id: z.guid(),
 	name: z.string().min(1, 'Assessment name is required'),
-	project_id: uuid(),
+	project_id: z.guid(),
 	is_completed: z.boolean(),
 	decision_quality_assessments: z.array(DecisionQualityAssessmentSchema).optional(),
 	created_at: z.iso.datetime(),
 });
 
 export const solutionEvidenceRequestSchema = z.object({
-	evidence_id: uuid(),
-	state_ids: z.array(uuid()),
+	evidence_id: z.guid(),
+	state_ids: z.array(z.guid()),
 });
 
 export const solutionEvidenceResponseSchema = z.object({
-	evidence_id: uuid(), // id for the evidence collection, corresponds to for example the strategy id
-	state_ids: z.array(uuid()),
+	evidence_id: z.guid(), // id for the evidence collection, corresponds to for example the strategy id
+	state_ids: z.array(z.guid()),
 	expected_utility: z.number().default(0),
 });
 
