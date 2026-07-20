@@ -8,10 +8,7 @@ import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
 export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
-	const { issue, inProgress, isTarget, hasValidationError } = useInfluenceNodeCommon(
-		id,
-		data.issue_id,
-	);
+	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
 	const selectedOutcome = issue?.uncertainty.outcomes.find(o => evidence.includes(o.id));
@@ -30,13 +27,9 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 				<UncertaintyCard
 					issue={issue}
 					disableZeroProbabilityOutcomes
-					onClickOutcome={
-						hasValidationError
-							? undefined
-							: outcome => {
-									toggleEvidence(outcome.id, issue.id);
-								}
-					}
+					onClickOutcome={outcome => {
+						toggleEvidence(outcome.id, issue.id);
+					}}
 					selectedOutcome={selectedOutcome}
 					onClickOpenProbabilities={() => setProbabilityTableOpen(true)}
 				/>
