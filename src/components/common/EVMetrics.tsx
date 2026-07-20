@@ -1,19 +1,19 @@
 import { Tooltip } from '@equinor/eds-core-react';
 import { useGetExpectedValue } from '../../hooks/api/useGetExpectedValue';
-import { cn } from '../../utils/cn';
-import { SolutionEvidenceRequest } from '../../validators';
-import { useSelectedProject } from '../ProjectPage/ProjectContext';
 import { useHasInfluenceDiagramError } from '../../hooks/useHasInfluenceDiagramError';
+import { cn } from '../../utils/cn';
+import { SolutionEvidenceResponse } from '../../validators';
+import { useSelectedProject } from '../ProjectPage/ProjectContext';
 
 export const EVMetrics = ({
 	selectedEvidence,
 }: {
-	selectedEvidence: SolutionEvidenceRequest[];
+	selectedEvidence: SolutionEvidenceResponse[];
 }) => {
 	const selectedProject = useSelectedProject();
 
 	const formatEv = (value: number) => value.toFixed(2);
-	const baseEvidence = [{ evidence_id: selectedProject.id, state_ids: [] }];
+	const baseEvidence = [{ evidence_id: selectedProject.id, state_ids: [], expected_utility: 0 }];
 	const { data: baseEvidenceData, isLoading: isBaseEvPending } = useGetExpectedValue(
 		baseEvidence,
 		selectedProject.id,

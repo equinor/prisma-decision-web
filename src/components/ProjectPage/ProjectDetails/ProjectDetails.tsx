@@ -1,13 +1,20 @@
-import { Tooltip } from '@equinor/eds-core-react';
+import { Link } from 'react-router';
+import { useGetSignUser } from '../../../hooks/api/useGetSignUser';
 import { DeleteProjectDialog } from '../../common/DeleteProjectDialog';
 import { DuplicateProjectDialog } from '../../common/DuplicateProjectDialog';
 import { ExportProject } from '../../common/ExportProject';
-import { ProjectInformation } from '../../common/ProjectInformation/ProjectInformation';
-import { Link } from 'react-router';
 import { useSelectedProject } from '../ProjectContext';
+import { ProjectInformation } from './ProjectInformation';
+import { Tooltip } from '@equinor/eds-core-react';
+import { ProjectForm } from '../../common/ProjectInformation/ProjectForm';
 
 export const ProjectDetails = () => {
 	const selectedProject = useSelectedProject();
+	const { signuser } = useGetSignUser();
+	const isFacilitator = selectedProject?.users.some(
+		user => user.role === 'Facilitator' && user.user_id === signuser?.user_id,
+	);
+	if (!selectedProject) return null;
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex justify-between'>
@@ -33,10 +40,10 @@ export const ProjectDetails = () => {
 				<div className='flex items-end justify-end gap-2'>
 					<ExportProject project={selectedProject} showLabel />
 					<DuplicateProjectDialog project={selectedProject} showLabel />
-					<DeleteProjectDialog project={selectedProject} showLabel />
+					{isFacilitator && <DeleteProjectDialog project={selectedProject} showLabel />}
 				</div>
 			</div>
-			<ProjectInformation />
+			{isFacilitator ? <ProjectForm /> : <ProjectInformation />}
 		</div>
 	);
 };

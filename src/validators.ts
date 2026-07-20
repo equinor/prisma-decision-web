@@ -202,11 +202,6 @@ export const assessmentSchema = z.object({
 	created_at: z.iso.datetime(),
 });
 
-export const solutionEvidenceRequestSchema = z.object({
-	evidence_id: z.guid(),
-	state_ids: z.array(z.guid()),
-});
-
 export const solutionEvidenceResponseSchema = z.object({
 	evidence_id: z.guid(), // id for the evidence collection, corresponds to for example the strategy id
 	state_ids: z.array(z.guid()),
@@ -243,5 +238,4 @@ export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
-export type SolutionEvidenceRequest = z.infer<typeof solutionEvidenceRequestSchema>;
 export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;

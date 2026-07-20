@@ -16,7 +16,7 @@ import { ChangeIssueType } from './ChangeIssueType';
 import { LayoutControls } from './LayoutControls';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
-import { SolutionEvidenceRequest } from '../../../../validators';
+import { SolutionEvidenceResponse } from '../../../../validators';
 import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
@@ -31,10 +31,11 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
 	const { evidence } = useInfluenceDiagramEvidence();
 	if (!projectId) return;
-	const selectedEvidence: SolutionEvidenceRequest[] = [
+	const selectedEvidence: SolutionEvidenceResponse[] = [
 		{
 			evidence_id: projectId,
 			state_ids: evidence,
+			expected_utility: 0,
 		},
 	];
 
