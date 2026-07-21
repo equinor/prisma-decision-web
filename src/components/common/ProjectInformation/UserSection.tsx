@@ -7,8 +7,8 @@ import { useProjectFormContext } from '../../../hooks/useProjectForm';
 import { RoleType, roleTypes, User } from '../../../validators';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../FormErrorMessage';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { useDebounce } from '@uidotdev/usehooks';
+import { useSelectedProject } from '../../ProjectPage/ProjectContext';
 
 type UserSectionProps = {
 	handleSubmit: () => void;
@@ -186,7 +186,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 
 	// Persist selected users with roles
 	const handleAddUser = async (user: UserWithRole) => {
-		if (user.role && selectedProject) {
+		if (user.role) {
 			setUser([...usersValue, { ...user, project_id: selectedProject.id }]);
 			handleSubmit();
 		}

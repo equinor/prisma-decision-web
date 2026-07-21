@@ -9,14 +9,14 @@ import {
 	Line,
 } from 'recharts';
 import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { getAveragedMetrics } from '../../../utils/getAveragedMetrics';
 import { evaluationMetrics } from '../../../validators';
+import { useSelectedProject } from '../ProjectContext';
 export const AssessmentTrend = () => {
 	const { assessments } = useGetAssessments();
 	const selectedProject = useSelectedProject();
 	const projectAssessments = assessments
-		.filter(a => a.project_id === selectedProject?.id)
+		.filter(a => a.project_id === selectedProject.id)
 		.toReversed();
 	const completedAssessmentTrends = projectAssessments
 		.filter(a => a.is_completed)

@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
+import { useForm, useFormContext } from 'react-hook-form';
 import { Project, projectSchema } from '../validators';
-import { useSelectedProject } from './useSelectedProject';
 import { useCreateProject } from './api/useCreateProject';
 import { useUpdateProject } from './api/useUpdateProject';
 
@@ -17,15 +16,14 @@ const getDefaultValues = (): Project => ({
 });
 
 export const useProjectFormContext = () => useFormContext<Project>();
-export const useProjectForm = () => {
-	const selectedProject = useSelectedProject();
+export const useProjectForm = (project?: Project) => {
 	const { mutate: createProject, isPending: isPendingCreate } = useCreateProject();
 	const { mutate: updateProject, isPending: isPendingUpdate } = useUpdateProject();
 
 	const formDefaults = useMemo(() => {
 		// Use selectedProject if available, otherwise use fresh defaults
-		return selectedProject || getDefaultValues();
-	}, [selectedProject]);
+		return project || getDefaultValues();
+	}, [project]);
 
 	const formMethods = useForm({
 		resolver: zodResolver(projectSchema),
@@ -34,7 +32,7 @@ export const useProjectForm = () => {
 
 	const handleSubmit = formMethods.handleSubmit(
 		data => {
-			const mutation = selectedProject ? updateProject : createProject;
+			const mutation = project ? updateProject : createProject;
 			mutation(data);
 		},
 		errors => {

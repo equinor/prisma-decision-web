@@ -3,7 +3,7 @@ import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
 
 const defaultValue: string[] = [];
-export const useGetPartialOrder = (projectId?: string) => {
+export const useGetPartialOrder = (projectId: string) => {
 	return useQuery({
 		queryKey: ['decisionTree', 'partialOrder', projectId],
 		queryFn: async () => {

@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { EditObjectiveDialog } from './EditObjectiveDialog';
 import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProject } from '../ProjectContext';
 
 export const ProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
@@ -14,7 +14,7 @@ export const ProjectObjectives = () => {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex w-full items-center justify-between'>
-				<h1 className='text-3xl font-bold'>{selectedProject?.name}</h1>
+				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateObjective />
 			</div>
 			<div
@@ -35,16 +35,20 @@ export const ProjectObjectives = () => {
 					</div>
 				</div>
 				{selectedObjectives.length > 0 && (
-					<div className='outline-background-medium w-full rounded-sm outline-1'>
-						<Table className='w-full table-fixed'>
+					<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
+						<Table className='w-full'>
 							<Table.Head>
 								<Table.Row>
-									<Table.Cell className='w-20'></Table.Cell>
-									<Table.Cell className='w-2/9'>Name</Table.Cell>
-									<Table.Cell className='w-5/9'>Description</Table.Cell>
-									<Table.Cell className='w-2/9'>Type</Table.Cell>
-									<Table.Cell className='w-1/9 truncate'>Date Created</Table.Cell>
-									<Table.Cell className='w-1/9 truncate'>Date Updated</Table.Cell>
+									<Table.Cell className='w-21 pl-1!'></Table.Cell>
+									<Table.Cell className='min-w-40'>Name</Table.Cell>
+									<Table.Cell className='min-w-96'>Description</Table.Cell>
+									<Table.Cell className='w-30'>Type</Table.Cell>
+									<Table.Cell className='w-34 whitespace-nowrap'>
+										Date Created
+									</Table.Cell>
+									<Table.Cell className='w-34 whitespace-nowrap'>
+										Date Updated
+									</Table.Cell>
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
@@ -57,21 +61,20 @@ export const ProjectObjectives = () => {
 											</div>
 										</Table.Cell>
 										<Table.Cell>{objective.name}</Table.Cell>
-										<Table.Cell>{objective.description}</Table.Cell>
-										<Table.Cell className='truncate'>
-											{objective.type}
+										<Table.Cell className='max-w-xl truncate'>
+											{objective.description}
 										</Table.Cell>
-										<Table.Cell className='truncate'>
+										<Table.Cell className='w-30'>{objective.type}</Table.Cell>
+										<Table.Cell className='whitespace-nowrap'>
 											{objective.created_at
 												? format(objective.created_at, 'yyyy-MM-dd')
 												: '-'}
 										</Table.Cell>
-										<Table.Cell className='truncate'>
+										<Table.Cell className='whitespace-nowrap'>
 											{objective.updated_at
 												? format(objective.updated_at, 'yyyy-MM-dd')
 												: '-'}
 										</Table.Cell>
-										<Table.Cell></Table.Cell>
 									</Table.Row>
 								))}
 							</Table.Body>

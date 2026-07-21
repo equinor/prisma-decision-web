@@ -5,16 +5,16 @@ import { useGetDecisionTree } from '../../../hooks/api/useGetDecisionTree';
 import { useDecisionTree } from '../../../hooks/useDecisionTree';
 import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
+import { useSelectedProject } from '../ProjectContext';
 
 export const DecisionTree = () => {
 	const project = useSelectedProject();
 	const expanded = useAtomValue(
-		expandedDecisionTreeNodes({ projectId: project?.id, treeType: 'decision' }),
+		expandedDecisionTreeNodes({ projectId: project.id, treeType: 'decision' }),
 	);
 
-	const { data: decisionTree } = useGetDecisionTree(project?.id, expanded);
+	const { data: decisionTree } = useGetDecisionTree(project.id, expanded);
 
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { nodes, edges } = useDecisionTree(decisionTree, 'decision');

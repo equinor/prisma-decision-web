@@ -6,7 +6,7 @@ import { CreateIssues } from '../../common/CreateIssue';
 import { ListView } from './ListView/ListView';
 import { TableView } from './TableView/TableView';
 import { ToggleExpandAll } from '../ToggleExpandAll';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProject } from '../ProjectContext';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
@@ -21,7 +21,7 @@ export const ProjectIssues = () => {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex items-center justify-between'>
-				<h1 className='text-3xl font-bold'>{selectedProject?.name}</h1>
+				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
 				<div className='flex items-center gap-4'>
 					<CreateIssues />
 					{activeView !== 0 && <ToggleExpandAll />}

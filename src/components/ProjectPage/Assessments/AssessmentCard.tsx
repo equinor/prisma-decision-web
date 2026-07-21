@@ -3,7 +3,6 @@ import { check_circle_outlined, mood_happy, mood_neutral, mood_very_sad } from '
 import { useGetSignUser } from '../../../hooks/api/useGetSignUser';
 import { useUpdateAssessment } from '../../../hooks/api/useUpdateAssessment';
 import { useIsFacilitator } from '../../../hooks/useIsFacilitator';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { cn } from '../../../utils/cn';
 import {
 	getAssessmentVariance,
@@ -13,6 +12,7 @@ import {
 import { Assessment, evaluationMetrics } from '../../../validators';
 import { DecisionQualityAssessmentForm } from './DecisionQualityAssessmentForm';
 import { formatDate } from 'date-fns';
+import { useSelectedProject } from '../ProjectContext';
 
 export const AssessmentCard = ({
 	assessment,
@@ -152,7 +152,7 @@ const AssessemntComments = ({ assessment }: { assessment: Assessment }) => {
 						<>
 							<h5 className='font-medium'>
 								{
-									selectedProject?.users.find(
+									selectedProject.users.find(
 										user => user.user_id === dqa.created_by_id,
 									)?.name
 								}

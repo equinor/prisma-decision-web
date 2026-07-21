@@ -4,17 +4,17 @@ import { EDGE_TYPES, NODE_TYPES, REACT_FLOW_CONFIG } from '../../../config/decis
 import { useGetSolutionTree } from '../../../hooks/api/useGetSolutionTree';
 import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
 import { useDecisionTree } from '../../../hooks/useDecisionTree';
+import { useSelectedProject } from '../ProjectContext';
 
 export const SolutionTree = () => {
 	const project = useSelectedProject();
 	const expanded = useAtomValue(
-		expandedDecisionTreeNodes({ projectId: project?.id, treeType: 'solution' }),
+		expandedDecisionTreeNodes({ projectId: project.id, treeType: 'solution' }),
 	);
 
-	const { data: decisionTree } = useGetSolutionTree(project?.id, expanded);
+	const { data: decisionTree } = useGetSolutionTree(project.id, expanded);
 
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { nodes, edges } = useDecisionTree(decisionTree, 'solution');

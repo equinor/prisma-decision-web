@@ -3,15 +3,15 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Objective, objectiveSchema } from '../validators';
 import { useUpdateObjective } from './api/useUpdateObjective';
-import { useSelectedProject } from './useSelectedProject';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
 	const selectedProject = useSelectedProject();
 
 	const defaultValues = useMemo(
-		() => objective || getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-		[selectedProject?.id, objective],
+		() => objective || getDefaultValues(selectedProject.id),
+		[selectedProject.id, objective],
 	);
 
 	const formMethods = useForm({
@@ -21,7 +21,7 @@ export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs)
 
 	const { mutate: createObjective, isPending: isCreating } = useCreateObjectiveOptimistic({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedProject.id));
 			onSuccess?.();
 		},
 	});

@@ -5,7 +5,7 @@ import { SolutionEvidenceRequest, SolutionEvidenceResponse } from '../../validat
 
 export const useGetExpectedValue = (
 	evidence: SolutionEvidenceRequest[],
-	projectId?: string,
+	projectId: string,
 	allowEmptyStateIds?: boolean,
 ) => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();

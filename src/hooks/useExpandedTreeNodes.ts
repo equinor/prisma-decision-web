@@ -3,12 +3,12 @@ import { atom, useAtom } from 'jotai';
 import { DecisionPath } from './api/useGetDecisionTree';
 
 import { atomFamily } from 'jotai-family';
-import { useSelectedProject } from './useSelectedProject';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 export const useExpandedTreeNodes = (path: DecisionPath, treeType: 'decision' | 'solution') => {
 	const project = useSelectedProject();
 	const [expanded, setExpanded] = useAtom(
-		expandedDecisionTreeNodes({ projectId: project?.id, treeType }),
+		expandedDecisionTreeNodes({ projectId: project.id, treeType }),
 	);
 	const expandPath = (pathSegment: string) => {
 		setExpanded(prev => {
@@ -31,13 +31,8 @@ export const useExpandedTreeNodes = (path: DecisionPath, treeType: 'decision' | 
 };
 export const expandedDecisionTreeNodes = atomFamily(
 	// @ts-expect-error - atomFamily is not correctly typed
-	({
-		projectId,
-		treeType,
-	}: {
-		projectId: string | undefined;
-		treeType: 'decision' | 'solution';
-	}) => atom<DecisionPath[]>([]),
+	({ projectId, treeType }: { projectId: string; treeType: 'decision' | 'solution' }) =>
+		atom<DecisionPath[]>([]),
 	(a, b) => `${a.projectId}-${a.treeType}` === `${b.projectId}-${b.treeType}`,
 );
 

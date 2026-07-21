@@ -5,7 +5,7 @@ import { StrategyTable } from './StrategyTable';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProject } from '../ProjectContext';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
@@ -35,7 +35,6 @@ export const Strategies = () => {
 		}
 	};
 	const strategiesToCompare = selectedStrategies.filter(s => selectedStrategyIds.has(s.id)) ?? [];
-	if (!selectedProject) return null;
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>

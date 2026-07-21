@@ -3,23 +3,20 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Strategy, strategySchema } from '../validators';
 import { useUpdateStrategy } from './api/useUpdateStrategy';
-import { useSelectedProject } from './useSelectedProject';
 import { useCreateStrategyOptimistic } from './api/useCreateStrategy';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 export const useStrategyForm = (strategy?: Strategy) => {
 	const selectedProject = useSelectedProject();
 
 	const { mutate: createStrategy, isPending: isCreatePending } = useCreateStrategyOptimistic({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedProject?.id || crypto.randomUUID()));
+			formMethods.reset(getDefaultValues(selectedProject.id));
 		},
 	});
 	const { mutate: updateStrategy, isPending: isUpdatePending } = useUpdateStrategy();
 
-	const defaultValues = useMemo(
-		() => getDefaultValues(selectedProject?.id || crypto.randomUUID()),
-		[selectedProject?.id],
-	);
+	const defaultValues = useMemo(() => getDefaultValues(selectedProject.id), [selectedProject.id]);
 
 	const formMethods = useForm({
 		values: {

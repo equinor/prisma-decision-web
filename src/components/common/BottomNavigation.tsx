@@ -1,7 +1,7 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { arrow_back, arrow_forward } from '@equinor/eds-icons';
 import { useLocation, useNavigate } from 'react-router';
-import { useSelectedProject } from '../../hooks/useSelectedProject';
+import { useSelectedProject } from '../ProjectPage/ProjectContext';
 
 const NAV_STEPS = [
 	{ path: '', nextLabel: 'Set Objectives' },
@@ -56,15 +56,11 @@ const getNavigation = (pathname: string, basePath: string) => {
 export const BottomNavigation = () => {
 	const navigate = useNavigate();
 	const selectedProject = useSelectedProject();
-	const basePath = `/project/${selectedProject?.id}/`;
+	const basePath = `/project/${selectedProject.id}/`;
 	const pathname = useLocation().pathname;
 
-	const hideNavigation = !selectedProject?.id || pathname === '/';
-
 	const { back, next } = getNavigation(pathname, basePath);
-	if (hideNavigation) {
-		return null;
-	}
+
 	return (
 		<>
 			{!back.invisible && (

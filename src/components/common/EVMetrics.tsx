@@ -1,7 +1,7 @@
 import { useGetExpectedValue } from '../../hooks/api/useGetExpectedValue';
-import { useSelectedProject } from '../../hooks/useSelectedProject';
 import { cn } from '../../utils/cn';
 import { SolutionEvidenceRequest } from '../../validators';
+import { useSelectedProject } from '../ProjectPage/ProjectContext';
 
 export const EVMetrics = ({
 	selectedEvidence,
@@ -11,18 +11,16 @@ export const EVMetrics = ({
 	const selectedProject = useSelectedProject();
 
 	const formatEv = (value: number) => value.toFixed(2);
-	const baseEvidence = selectedProject?.id
-		? [{ evidence_id: selectedProject.id, state_ids: [] }]
-		: [];
+	const baseEvidence = [{ evidence_id: selectedProject.id, state_ids: [] }];
 	const { data: baseEvidenceData, isLoading: isBaseEvPending } = useGetExpectedValue(
 		baseEvidence,
-		selectedProject?.id,
+		selectedProject.id,
 		true,
 	);
 	const hasSelectedStateIds = selectedEvidence.some(item => item.state_ids.length > 0);
 	const { data: selectedEvidenceData, isLoading: isSelectedEvPending } = useGetExpectedValue(
 		selectedEvidence,
-		selectedProject?.id,
+		selectedProject.id,
 		hasSelectedStateIds,
 	);
 	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
@@ -32,7 +30,6 @@ export const EVMetrics = ({
 			? selectedExpectedUtility - baseExpectedUtility
 			: undefined;
 
-	if (!selectedProject) return null;
 	return (
 		<div
 			className={cn('flex items-center', {

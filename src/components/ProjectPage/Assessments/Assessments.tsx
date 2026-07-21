@@ -1,6 +1,6 @@
 import { useGetAssessments } from '../../../hooks/api/useGetAssessments';
 import { useIsFacilitator } from '../../../hooks/useIsFacilitator';
-import { useSelectedProject } from '../../../hooks/useSelectedProject';
+import { useSelectedProject } from '../ProjectContext';
 import { AssessmentCard } from './AssessmentCard';
 import { AssessmentTrend } from './AssessmentTrend';
 import { CreateAssessment } from './CreateAssessment';
@@ -9,9 +9,7 @@ export const Assessments = () => {
 	const { assessments } = useGetAssessments();
 	const selectedProject = useSelectedProject();
 	const isFacilitator = useIsFacilitator();
-	const projectAssessments = assessments.filter(a => a.project_id === selectedProject?.id);
-
-	if (!selectedProject) return;
+	const projectAssessments = assessments.filter(a => a.project_id === selectedProject.id);
 
 	return (
 		<div className='flex flex-col gap-4'>

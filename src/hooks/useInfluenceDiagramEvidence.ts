@@ -2,11 +2,11 @@
 import { atom, useAtom } from 'jotai';
 
 import { atomFamily } from 'jotai-family';
-import { useSelectedProject } from './useSelectedProject';
+import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
 export const useInfluenceDiagramEvidence = () => {
 	const project = useSelectedProject();
-	const [evidence, setEvidence] = useAtom(influenceDiagramEvidence({ projectId: project?.id }));
+	const [evidence, setEvidence] = useAtom(influenceDiagramEvidence({ projectId: project.id }));
 
 	const toggleEvidence = (evidenceId: string, issueId: string) => {
 		setEvidence(prev => {
@@ -28,6 +28,6 @@ export const useInfluenceDiagramEvidence = () => {
 };
 export const influenceDiagramEvidence = atomFamily(
 	// @ts-expect-error - atomFamily is not correctly typed
-	({ projectId }: { projectId: string | undefined }) => atom<Map<string, string>>(new Map()),
+	({ projectId }: { projectId: string }) => atom<Map<string, string>>(new Map()),
 	(a, b) => a.projectId === b.projectId,
 );

@@ -6,7 +6,7 @@ import { DecisionTree } from './useGetDecisionTree';
 
 export type DecisionPath = string[];
 
-export const getSolutionTreeQueryKey = (projectId?: string, paths: DecisionPath[] = []) =>
+export const getSolutionTreeQueryKey = (projectId: string, paths: DecisionPath[] = []) =>
 	['decisionTree', 'solution', projectId, paths] as const;
 
 export const fetchSolutionTree = async (projectId: string, paths: DecisionPath[]) => {
@@ -16,7 +16,7 @@ export const fetchSolutionTree = async (projectId: string, paths: DecisionPath[]
 	);
 	return res.data;
 };
-export const useGetSolutionTree = (projectId?: string, paths: DecisionPath[] = []) => {
+export const useGetSolutionTree = (projectId: string, paths: DecisionPath[] = []) => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data, ...rest } = useQuery({
 		queryKey: getSolutionTreeQueryKey(projectId, paths),
