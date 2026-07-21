@@ -7,7 +7,7 @@ import { ExportProject } from '../common/ExportProject';
 
 export const ProjectCard = ({ project }: ProjectCardProps) => {
 	return (
-		<Link to={`/project/${project.id}/`}>
+		<Link to={`/project/${project.id}`}>
 			<div
 				className='bg-background-default outline-background-medium
                 hover:bg-background-light shadow-tile grid h-full cursor-pointer

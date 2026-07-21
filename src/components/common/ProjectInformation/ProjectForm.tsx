@@ -8,7 +8,7 @@ import { UserSection } from './UserSection';
 import { parseISO } from 'date-fns';
 import { useSelectedProject } from '../../ProjectPage/ProjectContext';
 
-export const ProjectInformation = () => {
+export const ProjectForm = () => {
 	const selectedProject = useSelectedProject();
 	const { formMethods, handleSubmit } = useProjectForm(selectedProject);
 	const {

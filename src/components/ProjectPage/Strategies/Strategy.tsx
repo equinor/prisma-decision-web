@@ -1,7 +1,7 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { SolutionEvidenceRequest, Strategy as StrategyType } from '../../../validators';
+import { SolutionEvidenceResponse, Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
@@ -17,7 +17,7 @@ export const Strategy = ({
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	selectedEvidenceData: SolutionEvidenceRequest[];
+	selectedEvidenceData: SolutionEvidenceResponse[];
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
 

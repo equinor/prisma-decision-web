@@ -15,6 +15,7 @@ export const Strategies = () => {
 		selectedStrategies.map(s => ({
 			evidence_id: s.id,
 			state_ids: s.options.map(o => o.id),
+			expected_utility: 0,
 		})) ?? [];
 
 	const handleClickAddToStrategyTable = (id: string) => {

@@ -1,11 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
-import { SolutionEvidenceRequest, SolutionEvidenceResponse } from '../../validators';
+import { SolutionEvidenceResponse } from '../../validators';
 
 export const useGetExpectedValue = (
-	evidence: SolutionEvidenceRequest[],
-	projectId: string,
+	evidence: SolutionEvidenceResponse[],
+	projectId?: string,
 	allowEmptyStateIds?: boolean,
 ) => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
