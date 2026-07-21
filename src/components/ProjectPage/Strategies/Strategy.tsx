@@ -1,5 +1,4 @@
-import { Button, Checkbox, Icon } from '@equinor/eds-core-react';
-import { useNavigate } from 'react-router';
+import { Checkbox, Icon } from '@equinor/eds-core-react';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { SolutionEvidenceRequest, Strategy as StrategyType } from '../../../validators';
@@ -8,23 +7,18 @@ import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
 import { strategyIcons } from './icons';
-import { useSelectedProject } from '../ProjectContext';
 
 export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
-	hasValidationError,
 	selectedEvidenceData,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	hasValidationError: boolean;
 	selectedEvidenceData: SolutionEvidenceRequest[];
 }) => {
-	const project = useSelectedProject();
-	const navigate = useNavigate();
 	const { mutate: updateStrategy } = useUpdateStrategy();
 
 	const issues = useSelectedProjectIssues().filter(
@@ -59,23 +53,6 @@ export const Strategy = ({
 				</div>
 			</div>
 			<div className='bg-background-light overflow-auto rounded-sm p-2'>
-				{hasValidationError && (
-					<div className='mb-2 rounded-sm border border-[#EA580C] bg-[#FFF7ED] p-2'>
-						<p className='text-xs font-medium text-[#9A3412]'>
-							Option selection is disabled until influence diagram validation errors
-							are fixed.
-						</p>
-						<div className='mt-2 flex flex-wrap gap-2'>
-							<Button
-								variant='outlined'
-								className='h-7 px-2! text-xs!'
-								onClick={() => navigate(`/project/${project.id}/influence-diagram`)}
-							>
-								Go to validation error
-							</Button>
-						</div>
-					</div>
-				)}
 				<div className='flex min-w-max gap-2'>
 					{issues.map(issue => {
 						const existingOption = strategy.options.find(
@@ -84,43 +61,35 @@ export const Strategy = ({
 						return (
 							<DecisionCard
 								selectedOption={existingOption}
-								onClickOption={
-									hasValidationError
-										? undefined
-										: option => {
-												if (!existingOption) {
-													updateStrategy({
-														...strategy,
-														options: [...strategy.options, option],
-													});
-													return;
-												}
-												if (option.id === existingOption.id) {
-													updateStrategy({
-														...strategy,
-														options: strategy.options.filter(
-															o => o.id !== option.id,
-														),
-													});
-												} else {
-													updateStrategy({
-														...strategy,
-														options: strategy.options.map(o =>
-															o.decision_id === issue.decision.id
-																? option
-																: o,
-														),
-													});
-												}
-											}
-								}
+								onClickOption={option => {
+									if (!existingOption) {
+										updateStrategy({
+											...strategy,
+											options: [...strategy.options, option],
+										});
+										return;
+									}
+									if (option.id === existingOption.id) {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.filter(
+												o => o.id !== option.id,
+											),
+										});
+									} else {
+										updateStrategy({
+											...strategy,
+											options: strategy.options.map(o =>
+												o.decision_id === issue.decision.id ? option : o,
+											),
+										});
+									}
+								}}
 								key={issue.id}
 								issue={issue}
 								expanded={true}
 								canExpand={false}
-								className={`mas max-w-24 cursor-default ${
-									hasValidationError ? 'opacity-70' : ''
-								}`}
+								className='max-w-24 cursor-default'
 							/>
 						);
 					})}

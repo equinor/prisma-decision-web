@@ -8,10 +8,7 @@ import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
 export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
-	const { issue, inProgress, isTarget, hasValidationError } = useInfluenceNodeCommon(
-		id,
-		data.issue_id,
-	);
+	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
 	const selectedOption = issue?.decision.options.find(o => evidence.includes(o.id));
@@ -29,13 +26,9 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 			content={
 				<DecisionCard
 					issue={issue}
-					onClickOption={
-						hasValidationError
-							? undefined
-							: option => {
-									toggleEvidence(option.id, issue.id);
-								}
-					}
+					onClickOption={option => {
+						toggleEvidence(option.id, issue.id);
+					}}
 					selectedOption={selectedOption}
 				/>
 			}

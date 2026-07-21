@@ -1,15 +1,13 @@
 import { useState } from 'react';
+import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { CreateStrategy } from './CreateStrategy';
 import { Strategy } from './Strategy';
 import { StrategyTable } from './StrategyTable';
-import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
-import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
-import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
 
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
-	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { selectedStrategies, isLoading } = useSelectedProjectStrategies();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
@@ -63,7 +61,6 @@ export const Strategies = () => {
 						<Strategy
 							key={strategy.id}
 							strategy={strategy}
-							hasValidationError={hasValidationError}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
 							selectedEvidenceData={selectedEvidence}
