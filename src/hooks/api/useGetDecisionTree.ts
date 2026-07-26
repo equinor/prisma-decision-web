@@ -94,9 +94,8 @@ export type DecisionTreeProbability = {
 
 export type DecisionTreeUtility = {
 	option_id: string | null;
-	option_name: string | null;
+	name: string | null;
 	outcome_id: string | null;
-	outcome_name: string | null;
 	utility_value: number;
 };
 

@@ -1,18 +1,18 @@
-import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react';
 import { collapse_screen } from '@equinor/eds-icons';
 import {
 	BaseEdge,
 	Edge,
 	EdgeLabelRenderer,
 	EdgeProps,
-	getSmoothStepPath,
 	Node,
+	getSmoothStepPath,
 	useNodes,
 } from '@xyflow/react';
 import { useLocation } from 'react-router';
 import { useExpandedTreeNodes } from '../../../hooks/useExpandedTreeNodes';
-import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../utils/cn';
+import { DecisionTreeNodeData, DecisionTreeOutputNodeData } from './types';
 
 export const DecisionTreeEdge = ({
 	id,
@@ -23,10 +23,9 @@ export const DecisionTreeEdge = ({
 	sourcePosition,
 	targetPosition,
 	markerEnd,
-	source,
+	target,
 	animated,
-	data,
-}: EdgeProps<Edge<{ probability: number; utility: number; stateId: string }>>) => {
+}: EdgeProps<Edge>) => {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
 		sourceY,
@@ -38,17 +37,20 @@ export const DecisionTreeEdge = ({
 	});
 	const location = useLocation();
 	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
-	const nodes = useNodes<Node<{ issueId: string; statePath: string[] }>>();
-	const sourceNode = nodes.find(n => n.id === source);
-	const issue = useSelectedProjectIssues().find(issue => issue.id === sourceNode?.data?.issueId);
-	const path = sourceNode ? [...sourceNode.data.statePath, data?.stateId || ''] : [];
-	const { expanded, closePath } = useExpandedTreeNodes(path, treeType);
-
-	if (!issue) return null;
-	const outcomeName =
-		issue.type === 'Uncertainty'
-			? issue.uncertainty.outcomes.find(o => o.id === data?.stateId)?.name
-			: issue.decision.options.find(o => o.id === data?.stateId)?.name;
+	const nodes = useNodes<Node<DecisionTreeNodeData | DecisionTreeOutputNodeData>>();
+	const targetNode = nodes.find(node => node.id === target);
+	const expandPathSegment =
+		targetNode && 'expandPathSegment' in targetNode.data
+			? targetNode.data.expandPathSegment
+			: undefined;
+	const collapsePath =
+		targetNode?.type === 'expandNode'
+			? [
+					...(targetNode.data.statePath || []),
+					...(expandPathSegment ? [expandPathSegment] : []),
+				]
+			: (targetNode?.data.statePath ?? []);
+	const { expanded, closePath } = useExpandedTreeNodes(collapsePath, treeType);
 
 	return (
 		<>
@@ -60,39 +62,8 @@ export const DecisionTreeEdge = ({
 					'stroke-emerald-600!': animated,
 				})}
 			/>
-			<EdgeLabelRenderer>
-				<Tooltip title={outcomeName} placement='top'>
-					<div
-						className='nodrag pointer-events-auto absolute max-w-30 origin-center truncate'
-						style={{
-							transform: `translate(calc(-100% - 20px), -100%) translate(${targetX}px, ${targetY}px)`,
-						}}
-					>
-						{outcomeName}
-					</div>
-				</Tooltip>
-				<div
-					className='nodrag pointer-events-auto absolute origin-center text-end'
-					style={{
-						transform: `translate(calc(-100% - 20px), 5%) translate(${targetX}px, ${targetY}px)`,
-					}}
-				>
-					{issue.type === 'Uncertainty' && (
-						<div>
-							<p>
-								<span className='font-semibold'>Prob: </span>
-								{Math.round((data?.probability || 0) * 100) / 100}
-							</p>
-						</div>
-					)}
-					<div>
-						<p>
-							<span className='font-semibold'>Utility:</span>{' '}
-							{Math.round(data?.utility || 0)}
-						</p>
-					</div>
-				</div>
-				{expanded && (
+			{expanded && collapsePath.length > 0 && (
+				<EdgeLabelRenderer>
 					<div
 						className='nodrag nopan pointer-events-auto absolute z-2 origin-center'
 						style={{
@@ -103,8 +74,8 @@ export const DecisionTreeEdge = ({
 							<Icon data={collapse_screen} />
 						</Button>
 					</div>
-				)}
-			</EdgeLabelRenderer>
+				</EdgeLabelRenderer>
+			)}
 		</>
 	);
 };

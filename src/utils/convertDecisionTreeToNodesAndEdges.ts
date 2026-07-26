@@ -1,3 +1,4 @@
+import { DecisionTreeIncomingState } from '../components/common/DecisionTree/types';
 import { DecisionPath, DecisionTree } from '../hooks/api/useGetDecisionTree';
 import { isDecisionPathSelected } from '../hooks/useExpandedTreeNodes';
 import { buildDecisionTreeEdge } from './buildDecisionTreeEdge';
@@ -12,7 +13,12 @@ export const convertDecisionTreeToNodesAndEdges = ({
 }: ConvertDecisionTreeToNodesAndEdgesArgs) => {
 	const nodes: Node[] = [];
 	const edges: Edge[] = [];
-	const walk = (node: DecisionTree, depth = 0, statePath: string[] = []) => {
+	const walk = (
+		node: DecisionTree,
+		depth = 0,
+		statePath: string[] = [],
+		incomingState?: DecisionTreeIncomingState,
+	) => {
 		const expectedValue = node.expected_value;
 		const nodeId = node.id;
 		const isEndPoint = node.type === 'End';
@@ -26,6 +32,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 				},
 				node.id,
 				statePath,
+				incomingState,
 			);
 			return nodes.push(newNode);
 		}
@@ -36,6 +43,8 @@ export const convertDecisionTreeToNodesAndEdges = ({
 			nodeId,
 			statePath,
 			expectedValue,
+			undefined,
+			incomingState,
 		);
 		nodes.push(newNode);
 
@@ -44,18 +53,31 @@ export const convertDecisionTreeToNodesAndEdges = ({
 			if (!stateId) return;
 			const branchPath = [...statePath, stateId];
 			const animated = isDecisionPathSelected(selectedPath, branchPath);
+			const probability = node.probabilities?.find(
+				probability => probability.outcome_id === stateId,
+			)?.probability_value;
+			const nextIncomingState: DecisionTreeIncomingState = {
+				stateId,
+				label:
+					utility.name ||
+					node.probabilities?.find(probability => probability.outcome_id === stateId)
+						?.outcome_name ||
+					stateId,
+				utility: utility.utility_value,
+				...(probability !== undefined ? { probability } : {}),
+			};
 
 			const matchingChild = node.children.find(c => c.parent_state_id === stateId);
 
 			if (matchingChild) {
-				const newEdge = buildDecisionTreeEdge(node, matchingChild.id, stateId, animated);
+				const newEdge = buildDecisionTreeEdge(node.id, matchingChild.id, animated);
 				if (!newEdge) return;
 				edges.push(newEdge);
-				walk(matchingChild, depth + 1, branchPath);
+				walk(matchingChild, depth + 1, branchPath, nextIncomingState);
 				return;
 			}
 			const expandNodeId = `expand:${node.id}:${stateId}`;
-			const newEdge = buildDecisionTreeEdge(node, expandNodeId, stateId, animated);
+			const newEdge = buildDecisionTreeEdge(node.id, expandNodeId, animated);
 			const expandNode = convertToDecisionTreeNode(
 				node.issue_id,
 				'expandNode',
@@ -63,6 +85,7 @@ export const convertDecisionTreeToNodesAndEdges = ({
 				statePath,
 				expectedValue,
 				stateId,
+				nextIncomingState,
 			);
 			if (!newEdge) return;
 			nodes.push(expandNode);

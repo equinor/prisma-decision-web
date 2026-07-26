@@ -43,7 +43,7 @@ export const useUpdateIssuesOptimistic = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
-			queryClient.refetchQueries({ queryKey: ['issues'] });
+			// queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});
 };

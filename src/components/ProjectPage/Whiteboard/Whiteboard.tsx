@@ -108,7 +108,7 @@ export const Whiteboard = () => {
 						variant={BackgroundVariant.Lines}
 						size={1}
 						gap={30}
-						patternClassName='opacity-20'
+						patternClassName='opacity-20 stroke-primary-resting!'
 					/>
 				)}
 				<DraggableToolbar />

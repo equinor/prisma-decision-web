@@ -7,13 +7,13 @@ import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorder
 import { DecisionCard } from '../Cards/DecisionCard';
 import { UncertaintyCard } from '../Cards/UncertaintyCard';
 import { useLocation } from 'react-router';
+import { DecisionTreeNodeData } from './types';
+import { IncomingStateDetails } from './IncomingStateDetails';
+import { cn } from '../../../utils/cn';
 
 const handlePositions = [Position.Left, Position.Right];
 
-export const DecisionTreeNode = ({
-	data,
-	id,
-}: NodeProps<Node<{ issueId: string; statePath?: string[]; expectedValue?: number | null }>>) => {
+export const DecisionTreeNode = ({ data, id }: NodeProps<Node<DecisionTreeNodeData>>) => {
 	const location = useLocation();
 	const treeType = location.pathname.includes('solution') ? 'solution' : 'decision';
 	const issues = useSelectedProjectIssues();
@@ -26,6 +26,7 @@ export const DecisionTreeNode = ({
 	return (
 		<>
 			<div
+				className='cursor-pointer '
 				onClick={() => {
 					selectPath(statePath.length > 0 ? statePath : null);
 				}}
@@ -49,10 +50,21 @@ export const DecisionTreeNode = ({
 					</Fragment>
 				))}
 				<div
-					className={`h-full max-w-87.5
-					overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
+					className={cn(
+						'h-full overflow-hidden rounded-sm border-2',
+						getDiagramIssueBorderColor(issue.type, selected),
+					)}
 				>
-					<IssueCard canExpand={false} issue={issue} className={'h-20'} />
+					<div className='flex h-full justify-items-start'>
+						<IncomingStateDetails
+							incomingState={data.incomingState}
+							className={cn(
+								'h-full w-28 border-r-2',
+								getDiagramIssueBorderColor(issue.type, selected),
+							)}
+						/>
+						<IssueCard canExpand={false} issue={issue} className='h-25 shadow-none!' />
+					</div>
 				</div>
 			</div>
 			{!!data.expectedValue && (

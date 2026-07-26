@@ -1,8 +1,8 @@
 import dagre from '@dagrejs/dagre';
 import { Edge, Node } from '@xyflow/react';
 
-const nodeWidth = 254;
-const nodeHeight = 80;
+const nodeWidth = 360;
+const nodeHeight = 105;
 
 export const getDecisionTreeLayout = (nodes: Node[], edges: Edge[], direction = 'LR') => {
 	const dagreGraph = new dagre.graphlib.Graph()
