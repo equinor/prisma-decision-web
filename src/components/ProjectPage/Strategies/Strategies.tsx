@@ -11,13 +11,6 @@ export const Strategies = () => {
 	const { selectedStrategies, isLoading } = useSelectedProjectStrategies();
 	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
 
-	const selectedEvidence =
-		selectedStrategies.map(s => ({
-			evidence_id: s.id,
-			state_ids: s.options.map(o => o.id),
-			expected_utility: 0,
-		})) ?? [];
-
 	const handleClickAddToStrategyTable = (id: string) => {
 		if (selectedStrategyIds.has(id)) {
 			setSelectedStrategyIds(prev => {
@@ -64,7 +57,6 @@ export const Strategies = () => {
 							strategy={strategy}
 							selectedStrategyIds={selectedStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
-							selectedEvidenceData={selectedEvidence}
 						/>
 					);
 				})}

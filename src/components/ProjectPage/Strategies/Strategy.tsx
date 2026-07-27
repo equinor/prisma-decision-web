@@ -1,7 +1,7 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { SolutionEvidenceResponse, Strategy as StrategyType } from '../../../validators';
+import { Strategy as StrategyType } from '../../../validators';
 import { DecisionCard } from '../../common/Cards/DecisionCard';
 import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
@@ -12,14 +12,19 @@ export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
-	selectedEvidenceData,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	selectedEvidenceData: SolutionEvidenceResponse[];
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
+	const selectedEvidence = [
+		{
+			evidence_id: strategy.id,
+			state_ids: strategy.options.map(option => option.id),
+			expected_utility: 0,
+		},
+	];
 
 	const issues = useSelectedProjectIssues().filter(
 		x =>
@@ -38,7 +43,7 @@ export const Strategy = ({
 							<h3 className='text-xl font-semibold'>{strategy.name}</h3>
 							<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>
 						</div>
-						<EVMetrics selectedEvidence={selectedEvidenceData} />
+						<EVMetrics selectedEvidence={selectedEvidence} />
 					</div>
 				</div>
 				<div className='flex items-center'>
