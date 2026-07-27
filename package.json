@@ -44,7 +44,7 @@
 		"elkjs": "^0.12.0",
 		"jotai": "^2.20.2",
 		"jotai-family": "^1.0.2",
-		"react": "^19.2.7",
+		"react": "^19.2.8",
 		"react-dom": "^19.2.7",
 		"react-hook-form": "^7.82.0",
 		"react-router": "^8.2.0",
