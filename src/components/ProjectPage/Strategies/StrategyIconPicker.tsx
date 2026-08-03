@@ -3,10 +3,12 @@ import { useRef, useState } from 'react';
 import { useController, useFormContext, useWatch } from 'react-hook-form';
 import { Strategy } from '../../../validators';
 import { strategyIconKeys, strategyIcons } from './icons';
+import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
 
 export const StrategyIconPicker = () => {
 	const referenceElement = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
+	const { selectedStrategies } = useSelectedProjectStrategies();
 	const { control } = useFormContext<Strategy>();
 	const iconColor = useWatch({
 		control,
@@ -37,19 +39,24 @@ export const StrategyIconPicker = () => {
 			>
 				<Popover.Content>
 					<div className='grid grid-cols-4 gap-2'>
-						{strategyIconKeys.map(iconKey => (
-							<Button
-								key={iconKey}
-								variant='ghost'
-								className='size-10!'
-								onClick={() => {
-									onChange(iconKey);
-									setIsOpen(false);
-								}}
-							>
-								<Icon color={iconColor} data={strategyIcons[iconKey]} />
-							</Button>
-						))}
+						{strategyIconKeys
+							.filter(
+								iconKey =>
+									!selectedStrategies.some(strategy => strategy.icon === iconKey),
+							)
+							.map(iconKey => (
+								<Button
+									key={iconKey}
+									variant='ghost'
+									className='size-10!'
+									onClick={() => {
+										onChange(iconKey);
+										setIsOpen(false);
+									}}
+								>
+									<Icon color={iconColor} data={strategyIcons[iconKey]} />
+								</Button>
+							))}
 					</div>
 				</Popover.Content>
 			</Popover>
