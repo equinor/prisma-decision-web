@@ -43,7 +43,7 @@
 		"date-fns": "^4.4.0",
 		"elkjs": "^0.12.0",
 		"jotai": "^2.20.2",
-		"jotai-family": "^1.0.2",
+		"jotai-family": "^1.1.0",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"react-hook-form": "^7.82.0",
