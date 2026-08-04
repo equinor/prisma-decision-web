@@ -4,6 +4,7 @@ import {
 	InfluenceNode as InfluenceNodeType,
 	Issue,
 	issueTypes,
+	ProbabilityTable,
 } from '../validators';
 import { hasInvalidProbabilitySum } from './getDiscreteProbabiltyRows';
 
@@ -22,16 +23,21 @@ export const getNodesInOrOnBoundary = (
 	});
 };
 
-export const getIssuesWithInvalidProbabilityTable = (issues: Issue[]): Issue[] => {
-	return issues.filter(i => {
+export const getIssuesWithInvalidProbabilityTable = (
+	issues: Issue[],
+	probabilityTables: ProbabilityTable[],
+): ProbabilityTable[] => {
+	return probabilityTables.filter(pt => {
+		const issue = issues.find(i => i.id === pt.issue_id);
+		if (!issue) return false;
 		const isUncertainty =
-			i.type === 'Uncertainty' &&
-			i.uncertainty.is_key &&
-			(i.boundary === 'in' || i.boundary === 'on');
-		const hasDiscreteProbability = i.uncertainty?.discrete_probabilities?.length > 0;
+			issue.type === 'Uncertainty' &&
+			issue.uncertainty.is_key &&
+			(issue.boundary === 'in' || issue.boundary === 'on');
+		const hasDiscreteProbability = pt?.discrete_probabilities?.length > 0;
 		if (!isUncertainty || !hasDiscreteProbability) return false;
 
-		return hasInvalidProbabilitySum(i.uncertainty.discrete_probabilities, issues);
+		return hasInvalidProbabilitySum(pt.discrete_probabilities, issues);
 	});
 };
 
@@ -65,10 +71,11 @@ export const getEdgesInCycle = (nodes: Node[], edges: ReactFlowEdge[]): Set<stri
 export const ValidateProbabilityTable = (
 	nodes: Node<InfluenceNodeType>[],
 	issues: Issue[],
+	probabilityTables: ProbabilityTable[],
 ): boolean => {
 	const nodeIssueIds = new Set(nodes.map(n => n.data.issue_id));
 	const nodeIssues = issues.filter(i => nodeIssueIds.has(i.id));
-	return getIssuesWithInvalidProbabilityTable(nodeIssues).length > 0;
+	return getIssuesWithInvalidProbabilityTable(nodeIssues, probabilityTables).length > 0;
 };
 
 export const hasLoops = (

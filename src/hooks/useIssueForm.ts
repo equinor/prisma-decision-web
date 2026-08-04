@@ -96,13 +96,12 @@ const getDefaultValues = (projectId: string): Issue => {
 			project_id: projectId,
 			is_key: false,
 			outcomes: [],
-			discrete_probabilities: [],
 		},
 		utility: {
+			discrete_utilities: [],
 			id: crypto.randomUUID(),
 			issue_id: id,
 			project_id: projectId,
-			discrete_utilities: [],
 		},
 		value_metric: {
 			id: '288e0811-7ab6-5d24-b80c-9fa925b848a6',

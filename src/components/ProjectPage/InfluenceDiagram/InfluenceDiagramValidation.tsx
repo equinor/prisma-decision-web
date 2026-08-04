@@ -3,11 +3,12 @@ import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
 import { MarkerType, Node, Edge as ReactFlowEdge, useReactFlow } from '@xyflow/react';
 import { useState } from 'react';
 
-import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
-import { InfluenceNode as InfluenceNodeType, Issue } from '../../../validators';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { InfluenceNode as InfluenceNodeType, Issue, ProbabilityTable } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
 
+import { useGetProbabilityTables } from '../../../hooks/api/useGetProbabilityTables';
 import {
 	getEdgesInCycle,
 	getIssuesWithInvalidProbabilityTable,
@@ -120,8 +121,11 @@ const highlightUncertaintiesWithUnvalidatedPT = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
+	probabilityTables: ProbabilityTable[],
 ): Node<InfluenceNodeType>[] => {
-	const invalidIssueIds = new Set(getIssuesWithInvalidProbabilityTable(issues).map(i => i.id));
+	const invalidIssueIds = new Set(
+		getIssuesWithInvalidProbabilityTable(issues, probabilityTables).map(i => i.issue_id),
+	);
 	return highlightMatchingNodes(
 		nodes,
 		node => invalidIssueIds.has(node.data.issue_id) && getNodeConnectivity(node.id, edges),
@@ -196,8 +200,11 @@ const clearUnvalidatedPTHighlight = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
+	probabilityTables: ProbabilityTable[],
 ): Node<InfluenceNodeType>[] => {
-	const invalidIssueIds = new Set(getIssuesWithInvalidProbabilityTable(issues).map(i => i.id));
+	const invalidIssueIds = new Set(
+		getIssuesWithInvalidProbabilityTable(issues, probabilityTables).map(i => i.issue_id),
+	);
 	return clearNodeHighlights(
 		nodes,
 		node => invalidIssueIds.has(node.data.issue_id) && getNodeConnectivity(node.id, edges),
@@ -212,6 +219,8 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 	const { getEdges, setEdges, setNodes, getNodes } = useReactFlow<Node<InfluenceNodeType>>();
 	const issues = useSelectedProjectIssues();
 	const [highlighted, setHighlighted] = useState(false);
+	const { data } = useGetProbabilityTables();
+	const probabilityTables = data.filter(pt => issues.some(issue => issue.id === pt.issue_id));
 
 	const actions: Record<string, { label: string; apply: () => void; clear: () => void }> = {
 		Edges: {
@@ -242,8 +251,18 @@ const ValidationRuleItem = ({ title, message, isError, isExpanded }: ValidationR
 		ProbabilityTable: {
 			label: 'Probability Table',
 			apply: () =>
-				setNodes(highlightUncertaintiesWithUnvalidatedPT(getNodes(), getEdges(), issues)),
-			clear: () => setNodes(clearUnvalidatedPTHighlight(getNodes(), getEdges(), issues)),
+				setNodes(
+					highlightUncertaintiesWithUnvalidatedPT(
+						getNodes(),
+						getEdges(),
+						issues,
+						probabilityTables,
+					),
+				),
+			clear: () =>
+				setNodes(
+					clearUnvalidatedPTHighlight(getNodes(), getEdges(), issues, probabilityTables),
+				),
 		},
 	};
 
@@ -311,8 +330,10 @@ export const InfluenceDiagramValidation = () => {
 	const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 	const { hasError, validationErrors } = useHasInfluenceDiagramError();
 
+	if (!hasError) return null;
 	return (
 		<>
+			<div className='bg-background-light h-9 w-0.5' />
 			<Button
 				className='border-warning-resting! hover:bg-warning-resting/20! px-1.5!'
 				color='danger'

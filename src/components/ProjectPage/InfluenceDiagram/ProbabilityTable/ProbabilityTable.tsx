@@ -1,13 +1,13 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
+import { cn } from '../../../../utils/cn';
 import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
+import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
 import { DiscreteProbabilityCell } from './DiscreteProbabilityCell';
 import { useProbablityTable } from './useProbablityTable';
 import { calculateRowSum, getParentLabel, isRowSumValid } from './utils';
-import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
-import { cn } from '../../../../utils/cn';
 
 export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityTableProps) => {
 	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
