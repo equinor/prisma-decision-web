@@ -14,6 +14,7 @@ export const useUpdateIssues = () => {
 			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 		},
 		onError: () => {
 			showErrorToast('Failed to update issues');

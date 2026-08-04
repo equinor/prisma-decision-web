@@ -21,6 +21,7 @@ export const useCreateEdge = () => {
 			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['solution'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},

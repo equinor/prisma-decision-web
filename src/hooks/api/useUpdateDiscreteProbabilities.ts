@@ -32,8 +32,8 @@ export const useUpdateDiscreteProbabilities = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.refetchQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 		},
 	});
 };
