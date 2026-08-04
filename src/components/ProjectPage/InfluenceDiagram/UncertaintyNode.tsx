@@ -16,12 +16,23 @@ import {
 import { InfluenceNodeShell } from './InfluenceNodeShell';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { Icon } from '@equinor/eds-core-react';
+import { warning_outlined } from '@equinor/eds-icons';
 
 export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
 	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
 	const selectedOutcome = issue?.uncertainty.outcomes.find(o => evidence.includes(o.id));
+	const { validationErrors } = useHasInfluenceDiagramError();
+	if (!issue) return null;
+	const hasMissingOutcomes = !!validationErrors.UncertaintyOutcomes.find(
+		x => x === data.issue_id,
+	);
+	const hasInvalidProbabilityTable = !!validationErrors.ProbabilityTable.find(
+		x => x === data.issue_id,
+	);
 
 	if (!issue) return null;
 
@@ -35,7 +46,6 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 				<IssueCard
 					selected={selected}
 					includeBorder
-					isHighlighted={!!data.isHighlighted}
 					issue={issue}
 					selectedState={selectedOutcome}
 					onClickState={option => {
@@ -57,6 +67,18 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 					</IssueCardStates>
 				</IssueCard>
 			</InfluenceNodeShell>
+			{hasMissingOutcomes && (
+				<div className='absolute -top-7 flex gap-1.5'>
+					<Icon className='fill-warning-resting' data={warning_outlined} />
+					<p className='text-warning-resting'>Has missing outcomes</p>
+				</div>
+			)}
+			{hasInvalidProbabilityTable && (
+				<div className='absolute -top-7 flex gap-1.5'>
+					<Icon className='fill-warning-resting' data={warning_outlined} />
+					<p className='text-warning-resting'>Has invalid probability table</p>
+				</div>
+			)}
 			{probabilityTableOpen && (
 				<ProbabilityTable
 					issue={issue}

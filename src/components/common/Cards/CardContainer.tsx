@@ -7,7 +7,6 @@ export const CardContainer = ({
 	className,
 	issueType,
 	selected,
-	isHighlighted,
 	expandWidth,
 	includeBorder,
 	...props
@@ -20,7 +19,6 @@ export const CardContainer = ({
 				className,
 				getDiagramIssueBorderColor(issueType, !!selected),
 				{
-					'border-[#FF9200]': isHighlighted,
 					'w-auto': expandWidth,
 					'border-2': includeBorder,
 				},
@@ -34,7 +32,6 @@ type CardContainerProps = {
 	children: React.ReactNode;
 	issueType: IssueType;
 	selected?: boolean;
-	isHighlighted?: boolean;
 	expandWidth?: boolean;
 	includeBorder?: boolean;
 } & React.ComponentProps<'div'>;

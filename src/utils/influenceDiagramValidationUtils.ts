@@ -1,11 +1,5 @@
 import { getOutgoers, Node, Edge as ReactFlowEdge } from '@xyflow/react';
-import {
-	decisionTypes,
-	InfluenceNode as InfluenceNodeType,
-	Issue,
-	issueTypes,
-	ProbabilityTable,
-} from '../validators';
+import { InfluenceNode as InfluenceNodeType, Issue, ProbabilityTable } from '../validators';
 import { hasInvalidProbabilitySum } from './getDiscreteProbabiltyRows';
 
 export const getNodesInOrOnBoundary = (
@@ -72,23 +66,26 @@ export const ValidateProbabilityTable = (
 	nodes: Node<InfluenceNodeType>[],
 	issues: Issue[],
 	probabilityTables: ProbabilityTable[],
-): boolean => {
+) => {
 	const nodeIssueIds = new Set(nodes.map(n => n.data.issue_id));
 	const nodeIssues = issues.filter(i => nodeIssueIds.has(i.id));
-	return getIssuesWithInvalidProbabilityTable(nodeIssues, probabilityTables).length > 0;
+	return getIssuesWithInvalidProbabilityTable(nodeIssues, probabilityTables).map(
+		pt => pt.issue_id,
+	);
 };
 
 export const hasLoops = (
 	nodes: Node<InfluenceNodeType>[],
 	edges: ReactFlowEdge[],
 	issues: Issue[],
-): boolean => {
+) => {
 	const filteredNodes = getNodesInOrOnBoundary(nodes, issues);
 	const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
 	const filteredEdges = edges.filter(
 		e => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target),
 	);
-	return getEdgesInCycle(filteredNodes, filteredEdges).size > 0;
+	const cycleEdgeIds = getEdgesInCycle(filteredNodes, filteredEdges);
+	return filteredEdges.filter(edge => cycleEdgeIds.has(edge.id));
 };
 
 export const hasIssues = (nodes: Node<InfluenceNodeType>[], issues: Issue[]): boolean => {
@@ -99,27 +96,22 @@ export const hasMissingEdges = (edges: { length: number }): boolean => {
 	return edges.length === 0;
 };
 
-export const hasOptionsMissing = (nodes: Node<InfluenceNodeType>[], issues: Issue[]): boolean => {
+export const hasOptionsMissing = (nodes: Node<InfluenceNodeType>[], issues: Issue[]) => {
 	const filteredNodes = getNodesInOrOnBoundary(nodes, issues);
-	return filteredNodes.some(node => {
-		const issue = issues.find(i => i.id === node.data.issue_id);
-
-		return (
-			issue?.type === issueTypes[1] &&
-			issue.decision.type === decisionTypes[1] &&
-			issue.decision?.options?.length === 0
-		);
-	});
+	return filteredNodes
+		.filter(node => {
+			const issue = issues.find(i => i.id === node.data.issue_id);
+			return issue?.type === 'Decision' && issue.decision?.options?.length === 0;
+		})
+		.map(node => node.data.issue_id);
 };
 
-export const hasOutcomesMissing = (nodes: Node<InfluenceNodeType>[], issues: Issue[]): boolean => {
+export const hasOutcomesMissing = (nodes: Node<InfluenceNodeType>[], issues: Issue[]) => {
 	const filteredNodes = getNodesInOrOnBoundary(nodes, issues);
-	return filteredNodes.some(node => {
-		const issue = issues.find(i => i.id === node.data.issue_id);
-		return (
-			issue?.type === issueTypes[2] &&
-			issue.uncertainty.is_key &&
-			issue.uncertainty?.outcomes?.length === 0
-		);
-	});
+	return filteredNodes
+		.filter(node => {
+			const issue = issues.find(i => i.id === node.data.issue_id);
+			return issue?.type === 'Uncertainty' && issue.uncertainty?.outcomes?.length === 0;
+		})
+		.map(node => node.data.issue_id);
 };
