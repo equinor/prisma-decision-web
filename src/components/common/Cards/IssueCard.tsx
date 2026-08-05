@@ -143,7 +143,7 @@ export const IssueCardUtilityTableMenuItem = ({
 	);
 };
 
-export const IssueCardHeader = ({ children }: { children: React.ReactNode }) => {
+export const IssueCardHeader = ({ children }: { children?: React.ReactNode }) => {
 	const { issue } = useIssueCardContext();
 	return (
 		<div className='flex items-center justify-between'>
