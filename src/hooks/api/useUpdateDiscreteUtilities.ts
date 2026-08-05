@@ -16,7 +16,7 @@ export const useUpdateDiscreteUtilities = () => {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
+
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 	});

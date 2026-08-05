@@ -149,7 +149,6 @@ export const uncertaintySchema = z.object({
 	project_id: z.guid(),
 	is_key: z.boolean(),
 	outcomes: z.array(outcomeSchema),
-	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({
@@ -236,6 +235,11 @@ export const solutionEvidenceResponseSchema = z.object({
 	expected_utility: z.number().default(0),
 });
 
+export const probabilityTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_probabilities: z.array(discreteProbabilitySchema),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -269,3 +273,5 @@ export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessment
 export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;
 export type WhiteboardNode = z.infer<typeof whiteboardNode>;
 export type WhiteboardSheet = z.infer<typeof whiteboardSheet>;
+export type Uncertainty = z.infer<typeof uncertaintySchema>;
+export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
