@@ -12,6 +12,8 @@ export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 
 			onSuccess?.();

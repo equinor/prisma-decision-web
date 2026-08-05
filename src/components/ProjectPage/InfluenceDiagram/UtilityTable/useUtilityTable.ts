@@ -7,10 +7,13 @@ import {
 	buildSortKey,
 	getParentRowSpans,
 } from '../ProbabilityTable/utils';
+import { useGetUtilityTables } from '../../../../hooks/api/useGetUtilityTables';
 
 export const useUtilityTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();
-	const discreteUtilities = issue.utility.discrete_utilities;
+	const { data } = useGetUtilityTables();
+
+	const discreteUtilities = data?.find(ut => ut.issue_id === issue.id)?.discrete_utilities || [];
 	// Build lookup maps for option/outcome names from all issues
 	const lookups = useMemo(() => {
 		const optionMap = new Map<string, { name: string; issueName: string; issueId: string }>();
