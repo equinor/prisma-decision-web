@@ -98,7 +98,6 @@ const getDefaultValues = (projectId: string): Issue => {
 			outcomes: [],
 		},
 		utility: {
-			discrete_utilities: [],
 			id: crypto.randomUUID(),
 			issue_id: id,
 			project_id: projectId,

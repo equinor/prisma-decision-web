@@ -4,9 +4,14 @@ import {
 	DiscreteUtility,
 } from '../../../../validators';
 
+export type ParentStateValue = {
+	parent_option_ids: string[];
+	parent_outcome_ids: string[];
+};
+
 /** Get display label for a specific parent from a discrete probability */
 export const getParentLabel = (
-	dp: DiscreteProbability | DiscreteUtility,
+	dp: ParentStateValue,
 	parent: ParentDescriptor,
 	lookups: {
 		optionMap: Map<string, { name: string; issueName: string; issueId: string }>;
@@ -33,7 +38,7 @@ export const getParentLabel = (
 
 /** Build a sort key that orders rows by parent states in tree order */
 export const buildSortKey = (
-	dp: DiscreteProbability | DiscreteUtility,
+	dp: ParentStateValue,
 	parents: ParentDescriptor[],
 	lookups: {
 		optionMap: Map<string, { name: string; issueName: string; issueId: string }>;

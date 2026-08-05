@@ -1,13 +1,12 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
-import { cn } from '../../../../utils/cn';
 import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
-import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
+import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
 import { DiscreteProbabilityCell } from './DiscreteProbabilityCell';
 import { useProbablityTable } from './useProbablityTable';
-import { calculateRowSum, getParentLabel, isRowSumValid } from './utils';
+import { calculateRowSum, isRowSumValid } from './utils';
 
 export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityTableProps) => {
 	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
@@ -36,117 +35,43 @@ export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityT
 						<Icon data={close} />
 					</Button>
 				</div>
-				<div
-					className={cn('grid grid-cols-[auto_auto] gap-2', {
-						'grid-cols-[auto]': parents.length === 0,
-					})}
-				>
-					{/* Parent issues table */}
-					{parents.length > 0 && (
-						<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
-							<thead>
-								<tr className='text-left text-[0.7rem]'>
-									{parents.map(parent => (
-										<th
-											key={parent.issueId}
-											className='bg-background-default rounded-sm px-2 py-1 font-normal whitespace-nowrap'
-										>
-											<div className='flex items-center gap-1.5'>
-												<ParentTypeIndicator kind={parent.kind} />
-												<div>
-													<span className='text-text-tertiary text-[10px]'>
-														{parent.kind === 'decision'
-															? 'Decision'
-															: 'Uncertainty'}
-													</span>
-													<div className='text-sm font-bold'>
-														{parent.issueName}
-													</div>
-												</div>
-											</div>
-										</th>
-									))}
-								</tr>
-							</thead>
-							<tbody>
-								{rows.map(({ rowKey, probabilities }, rowIndex) => (
-									<tr key={rowKey}>
-										{parents.map((parent, parentIndex) => {
-											const rowSpan = parentRowSpans[parentIndex];
-											const shouldRenderCell = rowIndex % rowSpan === 0;
-											if (!shouldRenderCell) return null;
+				<DiscreteValueTable
+					parents={parents}
+					parentRowSpans={parentRowSpans}
+					rows={rows}
+					lookups={lookups}
+					valueColumns={[
+						...childOutcomes.map(outcome => ({
+							id: outcome.id,
+							label: outcome.name,
+							eyebrow: issue.name,
+						})),
+						{ id: 'sum', label: 'Sum' },
+					]}
+					renderValueCells={probabilities => {
+						const sum = calculateRowSum(probabilities);
+						const isValid = isRowSumValid(sum);
 
-											const label = getParentLabel(
-												probabilities[0],
-												parent,
-												lookups,
-											);
-											return (
-												<td
-													key={`${rowKey}-${parent.issueId}`}
-													rowSpan={rowSpan}
-													className='bg-background-default rounded-sm px-2 py-1 text-sm whitespace-nowrap'
-												>
-													{label}
-												</td>
-											);
-										})}
-									</tr>
-								))}
-							</tbody>
-						</table>
-					)}
-
-					{/* Child outcomes table */}
-					<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
-						<thead>
-							<tr className='text-left text-[0.7rem]'>
+						return (
+							<>
 								{childOutcomes.map(outcome => (
-									<th
+									<DiscreteProbabilityCell
 										key={outcome.id}
-										className='bg-background-default rounded-sm px-2 py-1 font-normal'
-									>
-										<div className='text-text-tertiary text-[10px]'>
-											{issue.name}
-										</div>
-										<div className='max-w-20 truncate text-sm font-bold'>
-											{outcome.name}
-										</div>
-									</th>
+										outcomeId={outcome.id}
+										probabilities={probabilities}
+									/>
 								))}
-								<th className='bg-background-default rounded-sm px-2 py-1 text-center'>
-									<div className='text-text-primary  text-sm font-medium'>
-										Sum
-									</div>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{rows.map(({ rowKey, probabilities }) => {
-								const sum = calculateRowSum(probabilities);
-								const isValid = isRowSumValid(sum);
-								return (
-									<tr key={rowKey}>
-										{childOutcomes.map(outcome => (
-											<DiscreteProbabilityCell
-												key={outcome.id}
-												outcomeId={outcome.id}
-												probabilities={probabilities}
-											/>
-										))}
-										<td
-											className={`bg-background-default rounded-sm px-2 py-1 text-center text-sm ${
-												isValid ? 'text-text-tertiary' : 'text-red-600'
-											}`}
-										>
-											{isValid ? '∑=1' : '∑≠1'}
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</div>
+								<td
+									className={`bg-background-default rounded-sm px-2 py-1 text-center text-sm ${
+										isValid ? 'text-text-tertiary' : 'text-red-600'
+									}`}
+								>
+									{isValid ? '∑=1' : '∑≠1'}
+								</td>
+							</>
+						);
+					}}
+				/>
 			</div>
 		</CardContainer>
 	);

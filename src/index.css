@@ -142,6 +142,10 @@ input[type='color']::-webkit-color-swatch {
 	will-change: transform;
 }
 
+.influence-diagram .react-flow__edgelabel-renderer {
+	z-index: 1002;
+}
+
 [role='tooltip'] {
 	color: rgb(255, 255, 255) !important;
 }
