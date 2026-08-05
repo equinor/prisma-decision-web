@@ -11,6 +11,8 @@ export const useUpdateIssues = () => {
 		},
 		onSuccess: () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 		},
 		onError: () => {
@@ -41,6 +43,9 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 		},
 	});
 };

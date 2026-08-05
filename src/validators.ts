@@ -240,6 +240,11 @@ export const probabilityTableSchema = z.object({
 	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
+export const utilityTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_utilities: z.array(discreteUtilitiesSchema),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -266,6 +271,7 @@ export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
 export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
+export type UtilityTable = z.infer<typeof utilityTableSchema>;
 export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
