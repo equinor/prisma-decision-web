@@ -47,6 +47,7 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 					selected={selected}
 					includeBorder
 					issue={issue}
+					className='min-h-35!'
 					selectedState={selectedOutcome}
 					onClickState={option => {
 						toggleEvidence(option.id, issue.id);

@@ -1,26 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
 import { DiscreteUtility, Issue, UtilityTable } from '../../validators';
-import { useSelectedProjectIssues } from '../useSelectedProjectIssues';
-import { useSelectedProject } from '../../components/ProjectPage/ProjectContext';
+import { useGetIssues } from './useGetIssues';
 
-const defaultValue: UtilityTable[] = [];
+const defaultDiscreteUtilities: DiscreteUtility[] = [];
 export const useGetUtilityTables = () => {
-	const issues = useSelectedProjectIssues();
-	const selectedProject = useSelectedProject();
-	const { data = defaultValue, ...rest } = useQuery({
-		queryKey: ['utilityTables', selectedProject.id],
+	const { issues } = useGetIssues();
+	const { data: discreteUtilities = defaultDiscreteUtilities, ...rest } = useQuery({
+		queryKey: ['utilityTables'],
 		queryFn: async () => {
 			try {
 				const response = await apiClient.get<DiscreteUtility[]>('/discrete_utilities');
 
-				return transformToUtilityTables(response.data, issues) || defaultValue;
+				return response.data;
 			} catch {
 				showErrorToast('Failed to fetch utility tables');
 			}
 		},
 	});
+	const data = useMemo(
+		() => transformToUtilityTables(discreteUtilities, issues),
+		[discreteUtilities, issues],
+	);
 	return { data, ...rest };
 };
 
