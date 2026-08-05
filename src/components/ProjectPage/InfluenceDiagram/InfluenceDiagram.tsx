@@ -1,9 +1,9 @@
-import { Background, ConnectionMode, MarkerType, ReactFlow, SelectionMode } from '@xyflow/react';
+import { Background, ConnectionMode, ReactFlow, SelectionMode } from '@xyflow/react';
 
 import { ConnectionLine } from './ConnectingLine';
+import { DecisionNode } from './DecisionNode';
 import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
-import { DecisionNode } from './DecisionNode';
 import { UncertaintyNode } from './UncertaintyNode';
 import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
@@ -45,10 +45,6 @@ export const InfluenceDiagram = () => {
 				edges={edges}
 				defaultEdgeOptions={{
 					type: 'issue-edge',
-					markerEnd: {
-						type: MarkerType.ArrowClosed,
-						color: 'rgba(var(--eds_primary_resting), 1)',
-					},
 				}}
 				selectionMode={SelectionMode.Partial}
 				connectionMode={ConnectionMode.Strict}

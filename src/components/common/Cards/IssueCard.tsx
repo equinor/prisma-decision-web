@@ -20,7 +20,6 @@ type IssueCardProps = {
 	children: React.ReactNode;
 	className?: string;
 	selected?: boolean;
-	isHighlighted?: boolean;
 	expandWidth?: boolean;
 	includeBorder?: boolean;
 };
