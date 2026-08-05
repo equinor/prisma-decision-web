@@ -70,14 +70,11 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 					<InfluenceDiagramValidation />
 				</>
 			)}
-			{selectedEvidence.length > 0 && (
-				<>
-					<div className='bg-background-light h-9 w-0.5' />
-					<div className='flex items-center gap-3 px-1'>
-						<EVMetrics selectedEvidence={selectedEvidence} />
-					</div>
-				</>
-			)}
+
+			<div className='bg-background-light h-9 w-0.5' />
+			<div className='flex items-center gap-3 px-1'>
+				<EVMetrics selectedEvidence={selectedEvidence} />
+			</div>
 		</div>
 	);
 };

@@ -1,7 +1,5 @@
 import { getOutgoers, Node, Edge as ReactFlowEdge } from '@xyflow/react';
-
 import {
-	boundaryTypes,
 	decisionTypes,
 	InfluenceNode as InfluenceNodeType,
 	Issue,
@@ -15,7 +13,12 @@ export const getNodesInOrOnBoundary = (
 ): Node<InfluenceNodeType>[] => {
 	return nodes.filter(node => {
 		const issue = issues.find(i => i.id === node.data.issue_id);
-		return issue?.boundary === boundaryTypes[0] || issue?.boundary === boundaryTypes[2];
+		if (!issue) return false;
+		const inOrOnBoundary = issue.boundary === 'in' || issue.boundary === 'on';
+		if (issue.type === 'Decision') return inOrOnBoundary && issue.decision.type === 'Focus';
+		if (issue.type === 'Uncertainty') return inOrOnBoundary && issue.uncertainty.is_key;
+		if (issue.type === 'Utility') return inOrOnBoundary;
+		return false;
 	});
 };
 

@@ -1,8 +1,16 @@
 import { NodeProps, useEdges } from '@xyflow/react';
 import { useState } from 'react';
 import { ReactFlowInfluenceNode } from '../../../types';
+import {
+	IssueCard,
+	IssueCardContent,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardHeader,
+	IssueCardMenu,
+	IssueCardUtilityTableMenuItem,
+} from '../../common/Cards/IssueCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
-import { UtilityCard } from '../../common/Cards/UtilityCard';
 import { UtilityTable } from './UtilityTable/UtilityTable';
 import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 
@@ -17,28 +25,45 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 	if (!issue) return null;
 
 	return (
-		<InfluenceNodeShell
-			issueType={issue.type}
-			selected={selected}
-			isHighlighted={data.isHighlighted}
-			inProgress={inProgress}
-			isTarget={isTarget}
-			expandWidth={utilityTableOpen}
-			content={
-				<UtilityCard
-					className='min-h-34'
+		<div className='flex flex-col gap-1'>
+			<InfluenceNodeShell
+				inProgress={inProgress}
+				isTarget={isTarget}
+				expandWidth={utilityTableOpen}
+			>
+				<IssueCard
 					issue={issue}
-					hasTwoOrMoreParents={hasTwoOrMoreParents}
-					onClickOpenUtilityTable={
-						hasValidationError ? undefined : () => setUtilityTableOpen(true)
-					}
-				/>
-			}
-			modal={
-				utilityTableOpen && (
-					<UtilityTable issue={issue} selected={selected} onClose={setUtilityTableOpen} />
-				)
-			}
-		/>
+					selected={selected}
+					includeBorder
+					isHighlighted={!!data.isHighlighted}
+				>
+					<IssueCardHeader>
+						<IssueCardMenu>
+							<IssueCardEditMenuItem />
+							<IssueCardDeleteMenuItem />
+							<IssueCardUtilityTableMenuItem
+								onClick={() => setUtilityTableOpen(true)}
+								disabled={!hasTwoOrMoreParents || hasValidationError}
+							/>
+						</IssueCardMenu>
+					</IssueCardHeader>
+					{!hasTwoOrMoreParents ? (
+						<div>
+							<h3 className='font-semibold '>{issue.name}</h3>
+							{!hasTwoOrMoreParents && (
+								<p className='max-w-55 text-xs font-medium text-[#EA580C]'>
+									Connect 2+ parent nodes to enable utility table and solver
+								</p>
+							)}
+						</div>
+					) : (
+						<IssueCardContent descriptionClassName='line-clamp-2' />
+					)}
+				</IssueCard>
+			</InfluenceNodeShell>
+			{utilityTableOpen && (
+				<UtilityTable issue={issue} selected={selected} onClose={setUtilityTableOpen} />
+			)}
+		</div>
 	);
 };

@@ -12,6 +12,8 @@ export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) =>
 	const { parents, parentRowSpans, rows, lookups } = useUtilityTable(issue);
 	return (
 		<CardContainer
+			issueType={issue.type}
+			selected={selected}
 			className={`w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
 		>
 			<div className='flex flex-col'>
