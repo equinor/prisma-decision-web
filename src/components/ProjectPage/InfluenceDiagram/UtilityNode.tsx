@@ -28,7 +28,7 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 				isTarget={isTarget}
 				expandWidth={utilityTableOpen}
 			>
-				<IssueCard issue={issue} selected={selected} includeBorder>
+				<IssueCard issue={issue} className='min-h-35!' selected={selected} includeBorder>
 					<IssueCardHeader>
 						<IssueCardMenu>
 							<IssueCardEditMenuItem />

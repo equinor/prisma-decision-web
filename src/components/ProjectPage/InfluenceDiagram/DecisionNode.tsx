@@ -33,6 +33,7 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 				issue={issue}
 				selected={selected}
 				includeBorder
+				className='min-h-35!'
 				selectedState={selectedOption}
 				onClickState={option => {
 					toggleEvidence(option.id, issue.id);

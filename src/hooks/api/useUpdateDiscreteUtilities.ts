@@ -16,8 +16,8 @@ export const useUpdateDiscreteUtilities = () => {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-
-			queryClient.refetchQueries({ queryKey: ['issues'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 		},
 	});
 };

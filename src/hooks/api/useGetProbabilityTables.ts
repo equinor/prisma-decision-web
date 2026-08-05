@@ -1,27 +1,30 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
 import { DiscreteProbability, Issue, ProbabilityTable } from '../../validators';
-import { useSelectedProjectIssues } from '../useSelectedProjectIssues';
-import { useSelectedProject } from '../../components/ProjectPage/ProjectContext';
+import { useGetIssues } from './useGetIssues';
 
-const defaultValue: ProbabilityTable[] = [];
+const defaultDiscreteProbabilities: DiscreteProbability[] = [];
 export const useGetProbabilityTables = () => {
-	const issues = useSelectedProjectIssues();
-	const selectedProject = useSelectedProject();
-	const { data = defaultValue, ...rest } = useQuery({
-		queryKey: ['probabilityTables', selectedProject.id],
+	const { issues } = useGetIssues();
+	const { data: discreteProbabilities = defaultDiscreteProbabilities, ...rest } = useQuery({
+		queryKey: ['probabilityTables'],
 		queryFn: async () => {
 			try {
 				const response =
 					await apiClient.get<DiscreteProbability[]>('/discrete_probabilities');
 
-				return transformToProbabilityTables(response.data, issues) || defaultValue;
+				return response.data;
 			} catch {
 				showErrorToast('Failed to fetch probability tables');
 			}
 		},
 	});
+	const data = useMemo(
+		() => transformToProbabilityTables(discreteProbabilities, issues),
+		[discreteProbabilities, issues],
+	);
 	return { data, ...rest };
 };
 
