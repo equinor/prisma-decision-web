@@ -1,25 +1,26 @@
-import { DragEndEvent, DragDropProvider, DragOverlay, useDraggable } from '@dnd-kit/react';
+import { DragDropProvider, DragEndEvent, DragOverlay, useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useReactFlow } from '@xyflow/react';
 import { useCreateWhiteboardNode } from '../../../../hooks/api/useCreateWhiteboardNode ';
+import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
 import { dragHandle } from '../../../../icons';
 import { cn } from '../../../../utils/cn';
+import {
+	IssueCard as IssueCardComponent,
+	IssueCardContent,
+	IssueCardHeader,
+} from '../../../common/Cards/IssueCard';
+import { useSelectedProject } from '../../ProjectContext';
 import { ZoomControls } from '../../ZoomControls';
 import { AddIssue } from './AddIssue';
+import { SheetPicker } from './SheetPicker';
 import { ToggleArrowMode } from './ToggleArrowMode';
 import { ToggleFreehandMode } from './ToggleFreehandMode';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleRectangleMode } from './ToggleRectangleMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { ToggleTextMode } from './ToggleTextMode';
-import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
-import { useSelectedProject } from '../../ProjectContext';
-import {
-	IssueCard as IssueCardComponent,
-	IssueCardContent,
-	IssueCardHeader,
-} from '../../../common/Cards/IssueCard';
 
 export const Toolbar = () => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position-whiteboard', 'top');
@@ -88,6 +89,9 @@ export const Toolbar = () => {
 				<ToggleTextMode />
 				<ToggleFreehandMode />
 				<AddIssue />
+				<div className='bg-background-light h-9 w-0.5' />
+
+				<SheetPicker />
 				<DragOverlay dropAnimation={null}>
 					{source => {
 						return (

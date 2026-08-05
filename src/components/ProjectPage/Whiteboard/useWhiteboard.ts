@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useUpdateWhiteboardNodes } from '../../../hooks/api/useUpdateWhiteboardNodes';
 import { useSelectedProjectWhiteboardNodes } from '../../../hooks/useSelectedProjectWhiteboardNodes';
 import { ReactFlowWhiteboardNode } from '../../../types';
+import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
 
 type UseWhiteboardOptions = {
 	snapToGrid?: boolean;
@@ -34,13 +35,14 @@ const snapRectangleDimensions = (
 
 export const useWhiteboard = ({ snapToGrid = false }: UseWhiteboardOptions = {}) => {
 	const nodes = useSelectedProjectWhiteboardNodes();
+	const sheet = useSelectedWhiteboardSheet();
+	const sheetNodes = nodes.filter(node => node.data.board_sheet_id === sheet.id);
 	const { mutate: updateWhiteboardNodes } = useUpdateWhiteboardNodes();
-
 	const [localNodes, setLocalNodes] = useNodesState([] as ReactFlowWhiteboardNode[]);
 
 	useEffect(() => {
 		setLocalNodes(
-			nodes.map(n => {
+			sheetNodes.map(n => {
 				const localNode = localNodes.find(ln => ln.id === n.id);
 				if (!localNode) return n;
 				return {
@@ -49,10 +51,10 @@ export const useWhiteboard = ({ snapToGrid = false }: UseWhiteboardOptions = {})
 				};
 			}),
 		);
-	}, [nodes]);
+	}, [sheetNodes, setLocalNodes]);
 
 	const onNodesChange = (changes: NodeChange<ReactFlowWhiteboardNode>[]) => {
-		const nextChanges = snapToGrid ? snapRectangleDimensions(changes, localNodes) : changes;
+		const nextChanges = snapToGrid ? snapRectangleDimensions(changes, sheetNodes) : changes;
 		const s = applyNodeChanges(nextChanges, localNodes);
 		setLocalNodes(s);
 	};
