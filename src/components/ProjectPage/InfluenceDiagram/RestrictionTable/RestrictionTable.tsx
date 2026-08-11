@@ -16,14 +16,22 @@ export const RestrictionTable = ({
 	const { parents, parentRowSpans, rows, lookups, sourceStates, targetStates } =
 		useRestrictionTable(restrictionTable, sourceIssue, targetIssue);
 
-	if (!rows.length || !targetStates.length) {
+	if (!targetStates.length) {
 		return (
 			<div className='border-background-light bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>
-				Restriction tables are available for edges between decisions and uncertainties.
+				Target issue &quot;{targetIssue.name}&quot; has no states defined. Please define
+				states for the target issue to view the restriction table.
 			</div>
 		);
 	}
-
+	if (!sourceStates.length) {
+		return (
+			<div className='border-background-light bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>
+				Source issue &quot;{sourceIssue.name}&quot; has no states defined. Please define
+				states for the source issue to view the restriction table.
+			</div>
+		);
+	}
 	return (
 		<CardContainer
 			issueType={targetIssue.type}

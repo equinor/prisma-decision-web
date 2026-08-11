@@ -37,6 +37,9 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 	const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
 
 	const targetIsUtility = targetIssue?.type === 'Utility';
+	const hasRestriction =
+		restrictionTable &&
+		restrictionTable.restriction_entries.some(entry => !entry.restriction_value);
 	const openRestrictionTable = () => {
 		setIsPanelOpen(prev => !prev);
 	};
@@ -97,6 +100,7 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 				path={path}
 				interactionWidth={60}
 				markerEnd={`url(#${id})`}
+				style={{ strokeDasharray: hasRestriction ? '12 8' : undefined }}
 				className={cn('stroke-primary-resting! stroke-4!', {
 					'stroke-warning-resting!': edgesInLoop.find(x => x.id === id),
 				})}
