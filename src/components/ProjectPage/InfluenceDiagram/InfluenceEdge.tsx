@@ -1,13 +1,6 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash, more_vertical } from '@equinor/eds-icons';
-import {
-	BaseEdge,
-	Edge,
-	EdgeLabelRenderer,
-	EdgeProps,
-	useNodes,
-	useReactFlow,
-} from '@xyflow/react';
+import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, useNodes } from '@xyflow/react';
 import { useState } from 'react';
 import { useAnimatedInfluenceRoute } from '../../../hooks/useAnimatedInfluenceRoute';
 import { ReactFlowInfluenceNode } from '../../../types';
@@ -19,6 +12,7 @@ import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssue
 import { RestrictionTable } from './RestrictionTable/RestrictionTable';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { cn } from '../../../utils/cn';
+import { DeleteEdgeDialog } from '../../common/DeleteEdgeDialog';
 
 export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
 	const path = useAnimatedInfluenceRoute(data?.route);
@@ -28,9 +22,9 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 	const labelX = data?.route?.labelX ?? 0;
 	const labelY = data?.route?.labelY ?? 0;
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	const { mutate: createRestrictionTable, isPending: isCreatingRestrictionTable } =
 		useCreateRestrictionTables();
-	const { deleteElements } = useReactFlow<ReactFlowInfluenceNode, Edge<InfluenceEdgeData>>();
 
 	const project = useSelectedProject();
 	const nodes = useNodes<ReactFlowInfluenceNode>();
@@ -47,16 +41,12 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 		setIsPanelOpen(prev => !prev);
 	};
 
-	const handleDelete = async () => {
-		deleteElements({ edges: [{ id }] });
-	};
-
 	const onClickLabel = () => {
 		if (!targetIsUtility) {
 			openRestrictionTable();
 			return;
 		}
-		handleDelete();
+		setIsDeleteDialogOpen(true);
 	};
 
 	const onLabelMouseEnter = () => {
@@ -113,6 +103,15 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 			/>
 			<EdgeLabelRenderer>
 				<>
+					{sourceIssue && targetIssue && (
+						<DeleteEdgeDialog
+							edgeId={id}
+							sourceIssue={sourceIssue}
+							targetIssue={targetIssue}
+							open={isDeleteDialogOpen}
+							onClose={setIsDeleteDialogOpen}
+						/>
+					)}
 					<div
 						className='nodrag nopan pointer-events-auto absolute z-10 origin-center'
 						style={{
@@ -127,7 +126,7 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 										sourceIssue={sourceIssue}
 										targetIssue={targetIssue}
 										onClose={setIsPanelOpen}
-										onDeleteEdge={handleDelete}
+										onDeleteEdge={() => setIsDeleteDialogOpen(true)}
 									/>
 								) : (
 									<div className='border-background-medium bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'>

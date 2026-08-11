@@ -12,19 +12,17 @@ import {
 } from '@xyflow/react';
 import { MouseEvent, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
-import { useDeleteEdge } from '../../../hooks/api/useDeleteEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
+import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
+import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
-import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
-import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
 import { useSelectedProject } from '../ProjectContext';
 
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
 	const { mutate: createEdge } = useCreateEdge();
-	const { mutate: deleteEdge } = useDeleteEdge();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
 	const [layoutOptions] = useInfluenceDiagramSettings();
@@ -51,20 +49,14 @@ export const useInfluenceDiagram = () => {
 		});
 	};
 
-	const sourceAndTargetAreUtility = (sourceId: string, targetId: string) => {
+	const sourceIsUtility = (sourceId: string) => {
 		const sourceNode = positionedNodes.find(node => node.id === sourceId);
-		const targetNode = positionedNodes.find(node => node.id === targetId);
 		const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
-		const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
-		return sourceIssue?.type === 'Utility' && targetIssue?.type === 'Utility';
-	};
-
-	const onDeleteEdges = async (edgesToDelete: FlowEdge[]) => {
-		deleteEdge(edgesToDelete[0].id);
+		return sourceIssue?.type === 'Utility';
 	};
 
 	const onConnect: OnConnect = async params => {
-		if (sourceAndTargetAreUtility(params.source, params.target)) return;
+		if (sourceIsUtility(params.source)) return;
 		const newEdge = {
 			head_id: params.target,
 			tail_id: params.source,
@@ -75,7 +67,7 @@ export const useInfluenceDiagram = () => {
 	};
 
 	const onReconnect: OnReconnect = async (oldEdge, newConnection) => {
-		if (sourceAndTargetAreUtility(newConnection.source, newConnection.target)) return;
+		if (sourceIsUtility(newConnection.source)) return;
 		const updatedEdge = {
 			id: oldEdge.id,
 			tail_id: newConnection.source,
@@ -168,6 +160,5 @@ export const useInfluenceDiagram = () => {
 		onClickPanMode,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
-		onDeleteEdges,
 	};
 };

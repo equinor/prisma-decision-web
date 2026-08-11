@@ -31,7 +31,6 @@ export const InfluenceDiagram = () => {
 		isSelecting,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
-		onDeleteEdges,
 	} = useInfluenceDiagram();
 
 	return (
@@ -58,7 +57,6 @@ export const InfluenceDiagram = () => {
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
 				onNodesChange={onNodesChange}
-				onEdgesDelete={onDeleteEdges}
 				onReconnectStart={onReconnectStart}
 				onEdgeMouseEnter={onEdgeMouseEnter}
 				onEdgeMouseLeave={onEdgeMouseLeave}
