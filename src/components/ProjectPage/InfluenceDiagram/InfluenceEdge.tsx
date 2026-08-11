@@ -1,5 +1,5 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { more_vertical } from '@equinor/eds-icons';
+import { delete_to_trash, more_vertical } from '@equinor/eds-icons';
 import {
 	BaseEdge,
 	Edge,
@@ -31,9 +31,7 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 	const { mutate: createRestrictionTable, isPending: isCreatingRestrictionTable } =
 		useCreateRestrictionTables();
 	const { deleteElements } = useReactFlow<ReactFlowInfluenceNode, Edge<InfluenceEdgeData>>();
-	const handleDelete = async () => {
-		deleteElements({ edges: [{ id }] });
-	};
+
 	const project = useSelectedProject();
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const issues = useSelectedProjectIssues();
@@ -44,9 +42,35 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 	const sourceIssue = issues.find(issue => issue.id === sourceNode?.data.issue_id);
 	const targetIssue = issues.find(issue => issue.id === targetNode?.data.issue_id);
 
+	const targetIsUtility = targetIssue?.type === 'Utility';
 	const openRestrictionTable = () => {
 		setIsPanelOpen(prev => !prev);
 	};
+
+	const handleDelete = async () => {
+		deleteElements({ edges: [{ id }] });
+	};
+
+	const onClickLabel = () => {
+		if (!targetIsUtility) {
+			openRestrictionTable();
+			return;
+		}
+		handleDelete();
+	};
+
+	const onLabelMouseEnter = () => {
+		if (restrictionTable) return;
+		createRestrictionTable({
+			id: crypto.randomUUID(),
+			project_id: project.id,
+			edge_id: id,
+			restriction_entries: [],
+		});
+	};
+
+	const labelIcon = targetIsUtility ? delete_to_trash : more_vertical;
+
 	return (
 		<>
 			<svg>
@@ -87,8 +111,8 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 					'stroke-warning-resting!': edgesInLoop.find(x => x.id === id),
 				})}
 			/>
-			{targetIssue?.type !== 'Utility' && (
-				<EdgeLabelRenderer>
+			<EdgeLabelRenderer>
+				<>
 					<div
 						className='nodrag nopan pointer-events-auto absolute z-10 origin-center'
 						style={{
@@ -124,24 +148,20 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 						{(data?.hovered || isPanelOpen) && (
 							<Button
 								variant='ghost_icon'
-								className='bg-background-light! hover:bg-primary-hover-alt! outline-primary-hover-alt p-1! outline-1!'
-								onClick={openRestrictionTable}
-								onMouseEnter={() => {
-									if (restrictionTable) return;
-									createRestrictionTable({
-										id: crypto.randomUUID(),
-										project_id: project.id,
-										edge_id: id,
-										restriction_entries: [],
-									});
-								}}
+								className={cn({
+									'bg-background-light! hover:bg-primary-hover-alt! outline-primary-hover-alt p-1! outline-1!':
+										!targetIsUtility,
+								})}
+								color={targetIsUtility ? 'danger' : 'primary'}
+								onClick={onClickLabel}
+								onMouseEnter={onLabelMouseEnter}
 							>
-								<Icon data={more_vertical} />
+								<Icon data={labelIcon} />
 							</Button>
 						)}
 					</div>
-				</EdgeLabelRenderer>
-			)}
+				</>
+			</EdgeLabelRenderer>
 		</>
 	);
 };
