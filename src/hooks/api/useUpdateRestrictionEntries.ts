@@ -44,6 +44,7 @@ export const useUpdateRestrictionEntries = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 			queryClient.invalidateQueries({ queryKey: ['restrictionTables'] });
 			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
 		},
