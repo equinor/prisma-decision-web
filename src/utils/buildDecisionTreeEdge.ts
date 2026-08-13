@@ -12,10 +12,10 @@ export const buildDecisionTreeEdge = (
 		? node.probabilities.find(p => p.outcome_id === stateId)?.probability_value || 0
 		: 0;
 
-	const utility = node.utilities
-		? node.utilities.find(u => u.outcome_id === stateId || u.option_id === stateId)
-				?.utility_value || 0
-		: 0;
+	const matchingUtility = node.utilities?.find(
+		u => u.outcome_id === stateId || u.option_id === stateId,
+	);
+	const utility = matchingUtility?.utility_value || 0;
 
 	const newEdge: Edge = {
 		id: `e${node.id}-${targetId}`,
@@ -28,6 +28,7 @@ export const buildDecisionTreeEdge = (
 			probability,
 			utility,
 			stateId,
+			pruned: matchingUtility?.pruned || false,
 		},
 	};
 	return newEdge;

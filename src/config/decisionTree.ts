@@ -3,12 +3,14 @@ import { DecisionTreeEdge } from '../components/common/DecisionTree/DecisionTree
 import { DecisionTreeNode } from '../components/common/DecisionTree/DecisionTreeNode';
 import { ExpandNode } from '../components/common/DecisionTree/ExpandableNode';
 import { OutputNode } from '../components/common/DecisionTree/OutputNode';
+import { PrunedNode } from '../components/common/DecisionTree/PrunedNode';
 
 // Constants
 export const NODE_TYPES = {
 	treeNode: DecisionTreeNode,
 	expandNode: ExpandNode,
 	outputNode: OutputNode,
+	prunedNode: PrunedNode,
 };
 
 export const EDGE_TYPES = {
