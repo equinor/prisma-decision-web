@@ -1,6 +1,13 @@
 import { getOutgoers, Node, Edge as ReactFlowEdge } from '@xyflow/react';
-import { InfluenceNode as InfluenceNodeType, Issue, ProbabilityTable } from '../validators';
+import {
+	Edge as InfluenceEdge,
+	InfluenceNode as InfluenceNodeType,
+	Issue,
+	ProbabilityTable,
+	RestrictionTable,
+} from '../validators';
 import { hasInvalidProbabilitySum } from './getDiscreteProbabiltyRows';
+import { getRestrictedEntriesForTargetNode } from './getProbabilityRestrictions';
 
 export const getNodesInOrOnBoundary = (
 	nodes: Node<InfluenceNodeType>[],
@@ -20,6 +27,8 @@ export const getNodesInOrOnBoundary = (
 export const getIssuesWithInvalidProbabilityTable = (
 	issues: Issue[],
 	probabilityTables: ProbabilityTable[],
+	edges: InfluenceEdge[],
+	restrictionTables: RestrictionTable[],
 ): ProbabilityTable[] => {
 	return probabilityTables.filter(pt => {
 		const issue = issues.find(i => i.id === pt.issue_id);
@@ -31,7 +40,13 @@ export const getIssuesWithInvalidProbabilityTable = (
 		const hasDiscreteProbability = pt?.discrete_probabilities?.length > 0;
 		if (!isUncertainty || !hasDiscreteProbability) return false;
 
-		return hasInvalidProbabilitySum(pt.discrete_probabilities, issues);
+		const restrictedEntries = getRestrictedEntriesForTargetNode(
+			issue.node.id,
+			edges,
+			restrictionTables,
+		);
+
+		return hasInvalidProbabilitySum(pt.discrete_probabilities, issues, restrictedEntries);
 	});
 };
 
@@ -66,12 +81,17 @@ export const ValidateProbabilityTable = (
 	nodes: Node<InfluenceNodeType>[],
 	issues: Issue[],
 	probabilityTables: ProbabilityTable[],
+	edges: InfluenceEdge[],
+	restrictionTables: RestrictionTable[],
 ) => {
 	const nodeIssueIds = new Set(nodes.map(n => n.data.issue_id));
 	const nodeIssues = issues.filter(i => nodeIssueIds.has(i.id));
-	return getIssuesWithInvalidProbabilityTable(nodeIssues, probabilityTables).map(
-		pt => pt.issue_id,
-	);
+	return getIssuesWithInvalidProbabilityTable(
+		nodeIssues,
+		probabilityTables,
+		edges,
+		restrictionTables,
+	).map(pt => pt.issue_id);
 };
 
 export const hasLoops = (

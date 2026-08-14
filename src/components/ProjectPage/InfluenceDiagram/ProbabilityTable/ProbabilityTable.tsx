@@ -1,6 +1,7 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
 import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
+import { getRestrictedOutcomeIds } from '../../../../utils/getProbabilityRestrictions';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
 import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
@@ -9,7 +10,8 @@ import { useProbablityTable } from './useProbablityTable';
 import { calculateRowSum, isRowSumValid } from './utils';
 
 export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityTableProps) => {
-	const { childOutcomes, parents, parentRowSpans, rows, lookups } = useProbablityTable(issue);
+	const { childOutcomes, parents, parentRowSpans, rows, lookups, restrictedEntries } =
+		useProbablityTable(issue);
 
 	if (!childOutcomes.length) {
 		return (
@@ -50,7 +52,13 @@ export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityT
 					]}
 					renderValueCells={probabilities => {
 						const sum = calculateRowSum(probabilities);
-						const isValid = isRowSumValid(sum);
+						const disabledOutcomeIds = getRestrictedOutcomeIds(
+							probabilities[0],
+							childOutcomes.map(outcome => outcome.id),
+							restrictedEntries,
+						);
+						const isValid =
+							disabledOutcomeIds.size === childOutcomes.length || isRowSumValid(sum);
 
 						return (
 							<>
@@ -59,6 +67,11 @@ export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityT
 										key={outcome.id}
 										outcomeId={outcome.id}
 										probabilities={probabilities}
+										disabledReason={
+											disabledOutcomeIds.has(outcome.id)
+												? 'Disabled by a restriction on a parent edge.'
+												: undefined
+										}
 									/>
 								))}
 								<td
