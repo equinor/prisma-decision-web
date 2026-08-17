@@ -208,6 +208,16 @@ export const solutionEvidenceResponseSchema = z.object({
 	expected_utility: z.number().default(0),
 });
 
+export const policyTableRowOutgoingDtoSchema = z.object({
+	states: z.record(z.string(), z.guid()),
+	value: z.number(),
+});
+
+export const policyTableDecisionOutgoingDtoSchema = z.object({
+	decision_id: z.guid(),
+	rows: z.array(policyTableRowOutgoingDtoSchema),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -239,3 +249,5 @@ export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
 export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;
+export type PolicyTableRowOutgoingDto = z.infer<typeof policyTableRowOutgoingDtoSchema>;
+export type PolicyTableDecisionOutgoingDto = z.infer<typeof policyTableDecisionOutgoingDtoSchema>;

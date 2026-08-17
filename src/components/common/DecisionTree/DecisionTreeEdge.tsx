@@ -45,7 +45,7 @@ export const DecisionTreeEdge = ({
 	const { expanded, closePath } = useExpandedTreeNodes(path, treeType);
 
 	if (!issue) return null;
-	const outcomeName =
+	const stateName =
 		issue.type === 'Uncertainty'
 			? issue.uncertainty.outcomes.find(o => o.id === data?.stateId)?.name
 			: issue.decision.options.find(o => o.id === data?.stateId)?.name;
@@ -61,14 +61,14 @@ export const DecisionTreeEdge = ({
 				})}
 			/>
 			<EdgeLabelRenderer>
-				<Tooltip title={outcomeName} placement='top'>
+				<Tooltip title={stateName} placement='top'>
 					<div
 						className='nodrag pointer-events-auto absolute max-w-30 origin-center truncate'
 						style={{
 							transform: `translate(calc(-100% - 20px), -100%) translate(${targetX}px, ${targetY}px)`,
 						}}
 					>
-						{outcomeName}
+						{stateName}
 					</div>
 				</Tooltip>
 				<div

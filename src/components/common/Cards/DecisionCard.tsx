@@ -17,6 +17,7 @@ export const DecisionCard = ({
 	canExpand = true,
 	onClickOption,
 	selectedOption,
+	onClickOpenPolicyTable,
 	expanded: expandedProp,
 	...rest
 }: DecisionCardProps) => {
@@ -55,6 +56,11 @@ export const DecisionCard = ({
 							<Icon data={delete_to_trash} />
 							<p>Delete</p>
 						</Menu.Item>
+						{onClickOpenPolicyTable && (
+							<Menu.Item onClick={onClickOpenPolicyTable}>
+								<p>Policy Table</p>
+							</Menu.Item>
+						)}
 					</Menu>
 				</div>
 			</div>
@@ -131,6 +137,7 @@ type DecisionCardProps = {
 	issue: Issue;
 	onClickOption?: (option: Option) => void;
 	selectedOption?: Option;
+	onClickOpenPolicyTable?: () => void;
 	className?: string;
 	canExpand?: boolean;
 	expanded?: boolean;
