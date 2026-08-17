@@ -18,8 +18,10 @@ export const useDeleteEdge = () => {
 			return { previousEdges };
 		},
 		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
-			queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 		},
 		onError: (_err, _updatedEdge, context) => {

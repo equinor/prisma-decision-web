@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { initializeMsalAuth, msalInterceptor } from './auth/msalAuth';
 import { initializePublicAuth, publicInterceptor } from './auth/publicAuth';
-import { initializeResearchAuth, researchInterceptor } from './auth/researchAuth';
 
 export const authConfig = {
 	public: {
@@ -9,8 +8,8 @@ export const authConfig = {
 		interceptor: publicInterceptor,
 	},
 	research: {
-		initialize: initializeResearchAuth,
-		interceptor: researchInterceptor,
+		initialize: initializePublicAuth,
+		interceptor: publicInterceptor,
 	},
 	development: {
 		initialize: initializeMsalAuth,

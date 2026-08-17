@@ -2,17 +2,16 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getIssueLabel } from '../../../../utils/getIssueLabel';
 import { Issue } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
 import { EditIssueModal } from '../../../common/EditIssueModal';
 import { format } from 'date-fns/format';
+import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
 
 export const IssueRow = ({ issue }: IssueRowProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-	const IssueLabel = getIssueLabel(issue.type);
 	return (
 		<>
 			<Table.Row key={issue.id}>
@@ -37,7 +36,7 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 				</Table.Cell>
 				<Table.Cell>
 					<div className='flex items-center justify-center'>
-						<IssueLabel />
+						<IssueTypeLabel type={issue.type} />
 					</div>
 				</Table.Cell>
 				<Table.Cell className='capitalize'>

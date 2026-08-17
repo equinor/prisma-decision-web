@@ -6,7 +6,8 @@ import {
 	getParentRowSpans,
 	isRowSumValid,
 } from '../components/ProjectPage/InfluenceDiagram/ProbabilityTable/utils';
-import { DiscreteProbability, Issue } from '../validators';
+import { DiscreteProbability, Issue, RestrictionEntry } from '../validators';
+import { getRestrictedOutcomeIds } from './getProbabilityRestrictions';
 
 export const getDiscreteProbabiltyRows = (
 	discreteProbabilities: DiscreteProbability[],
@@ -131,9 +132,17 @@ export const getDiscreteProbabiltyRows = (
 export const hasInvalidProbabilitySum = (
 	discreteProbabilities: DiscreteProbability[],
 	issues: Issue[],
+	restrictedEntries: RestrictionEntry[] = [],
 ): boolean => {
 	const { rows } = getDiscreteProbabiltyRows(discreteProbabilities, issues);
 	return rows.some(({ probabilities }) => {
+		const restrictedOutcomeIds = getRestrictedOutcomeIds(
+			probabilities[0],
+			probabilities.map(probability => probability.outcome_id),
+			restrictedEntries,
+		);
+		if (restrictedOutcomeIds.size === probabilities.length) return false;
+
 		const sum = calculateRowSum(probabilities);
 		return !isRowSumValid(sum);
 	});

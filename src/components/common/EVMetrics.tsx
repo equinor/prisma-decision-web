@@ -26,7 +26,9 @@ export const EVMetrics = ({
 		hasSelectedStateIds,
 	);
 	const baseExpectedUtility = baseEvidenceData?.[0]?.expected_utility;
-	const selectedExpectedUtility = selectedEvidenceData?.[0]?.expected_utility;
+	const selectedExpectedUtility = hasSelectedStateIds
+		? selectedEvidenceData?.[0]?.expected_utility
+		: undefined;
 	const evDelta =
 		baseExpectedUtility !== undefined && selectedExpectedUtility !== undefined
 			? selectedExpectedUtility - baseExpectedUtility

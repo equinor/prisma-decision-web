@@ -3,7 +3,7 @@ import { info_circle } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
-import { FactLabel, UnassignedLabel } from '../../../common/Cards/IssueLabel';
+import { FactLabel, UnassignedLabel } from '../../../common/Cards/IssueTypeLabel';
 import { IssueRow } from './IssueRow';
 
 export const IssuesNotInDiagramTable = () => {

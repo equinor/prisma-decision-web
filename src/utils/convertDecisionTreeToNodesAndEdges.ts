@@ -44,6 +44,20 @@ export const convertDecisionTreeToNodesAndEdges = ({
 			if (!stateId) return;
 			const branchPath = [...statePath, stateId];
 			const animated = isDecisionPathSelected(selectedPath, branchPath);
+			if (utility.pruned) {
+				const prunedNodeId = `pruned:${node.id}:${stateId}`;
+				const newEdge = buildDecisionTreeEdge(node, prunedNodeId, stateId, animated);
+				const prunedNode = convertToDecisionTreeNode(
+					node.issue_id,
+					'prunedNode',
+					prunedNodeId,
+					branchPath,
+				);
+				if (!newEdge) return;
+				nodes.push(prunedNode);
+				edges.push(newEdge);
+				return;
+			}
 
 			const matchingChild = node.children.find(c => c.parent_state_id === stateId);
 

@@ -2,7 +2,7 @@ import { Node } from '@xyflow/react';
 
 export const convertToDecisionTreeNode = (
 	issueId: string,
-	type: 'treeNode' | 'expandNode',
+	type: 'treeNode' | 'expandNode' | 'prunedNode',
 	id: string,
 	statePath: string[] = [],
 	expectedValue?: number | null,

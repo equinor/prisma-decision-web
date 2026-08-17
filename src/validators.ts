@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { guid, uuid, z } from 'zod/v4';
 import { strategyIconKeys } from './components/ProjectPage/Strategies/icons';
 
 export const issueTypes = ['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const;
@@ -13,6 +13,9 @@ export type ObjectiveType = (typeof objectiveTypes)[number];
 
 export const decisionTypes = ['Policy', 'Focus', 'Tactical'] as const;
 export type DecisionType = (typeof decisionTypes)[number];
+
+export const WhiteboardNodeTypes = ['Issue', 'Rectangle', 'Text', 'Arrow', 'Freehand'] as const;
+export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
 export const objectiveSchema = z.object({
 	id: z.guid(),
@@ -54,6 +57,31 @@ export const strategySchema = z.object({
 	project_id: z.guid(),
 	rationale: z.string().min(1, 'Rational is required'),
 	options: z.array(optionSchema),
+});
+
+export const whiteboardNode = z.object({
+	id: uuid(),
+	board_sheet_id: guid(),
+	project_id: uuid(),
+	height: z.float64(),
+	width: z.float64(),
+	x_position: z.float64(),
+	y_position: z.float64(),
+	rotation: z.float64(),
+	data: z.string(),
+	stroke_width: z.number().optional(),
+	stroke_style: z.enum(['Solid', 'Dashed', 'Dotted']).optional(),
+	text_size: z.number().optional(),
+	opacity: z.number().min(0).max(100).optional(),
+	color: z.string().optional(),
+	type: z.enum(WhiteboardNodeTypes),
+	new: z.boolean().optional(),
+});
+
+export const whiteboardSheet = z.object({
+	id: guid(),
+	project_id: guid(),
+	name: z.string().min(1, 'Sheet name is required'),
 });
 
 export const projectSchema = z.object({
@@ -105,15 +133,14 @@ export const utilitySchema = z.object({
 	id: z.guid(),
 	issue_id: z.guid(),
 	project_id: z.guid(),
-	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 export const outcomeSchema = z.object({
 	id: z.guid(),
 	utility: z.number(),
 	name: z.string().min(1, 'Outcome name is required'),
-	uncertainty_id: z.guid(),
-	created_at: z.iso.datetime(),
-	project_id: z.guid(),
+	uncertainty_id: z.uuid(),
+	created_at: z.iso.datetime().optional(),
+	project_id: z.uuid(),
 });
 export const uncertaintySchema = z.object({
 	id: z.guid(),
@@ -121,7 +148,6 @@ export const uncertaintySchema = z.object({
 	project_id: z.guid(),
 	is_key: z.boolean(),
 	outcomes: z.array(outcomeSchema),
-	discrete_probabilities: z.array(discreteProbabilitySchema),
 });
 
 const nodeStyleSchema = z.object({
@@ -208,6 +234,38 @@ export const solutionEvidenceResponseSchema = z.object({
 	expected_utility: z.number().default(0),
 });
 
+export const probabilityTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_probabilities: z.array(discreteProbabilitySchema),
+});
+
+export const utilityTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_utilities: z.array(discreteUtilitiesSchema),
+});
+
+const restrictionEntrySchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	restriction_value: z.number(),
+	parent_state_id: z.guid(),
+	is_parent_uncertainty: z.boolean(),
+	child_state_id: z.guid(),
+	is_child_uncertainty: z.boolean(),
+	restriction_table_id: z.guid(),
+});
+
+export const restrictionTableSchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	name: z.string(),
+	project_id: z.string(),
+	edge_id: z.string(),
+	restriction_entries: z.array(restrictionEntrySchema),
+});
+
 export const policyTableRowOutgoingDtoSchema = z.object({
 	states: z.record(z.string(), z.guid()),
 	value: z.number(),
@@ -244,10 +302,17 @@ export type ProjectRole = z.infer<typeof projectRoleSchema>;
 export type InfluenceNode = z.infer<typeof influenceNodeSchema>;
 export type DiscreteProbability = z.infer<typeof discreteProbabilitySchema>;
 export type DiscreteUtility = z.infer<typeof discreteUtilitiesSchema>;
+export type UtilityTable = z.infer<typeof utilityTableSchema>;
 export type ProjectImportFile = z.infer<typeof projectImportFile>;
 export type ProjectImportData = z.infer<typeof projectImportSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
 export type DecisionQualityAssessment = z.infer<typeof DecisionQualityAssessmentSchema>;
 export type SolutionEvidenceResponse = z.infer<typeof solutionEvidenceResponseSchema>;
+export type WhiteboardNode = z.infer<typeof whiteboardNode>;
+export type WhiteboardSheet = z.infer<typeof whiteboardSheet>;
+export type Uncertainty = z.infer<typeof uncertaintySchema>;
+export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
+export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
+export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
 export type PolicyTableRowOutgoingDto = z.infer<typeof policyTableRowOutgoingDtoSchema>;
 export type PolicyTableDecisionOutgoingDto = z.infer<typeof policyTableDecisionOutgoingDtoSchema>;

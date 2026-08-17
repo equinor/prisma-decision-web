@@ -96,6 +96,7 @@ export type DecisionTreeUtility = {
 	outcome_id: string | null;
 	outcome_name: string | null;
 	utility_value: number;
+	pruned: boolean;
 };
 
 export type EndNodeIssue = {

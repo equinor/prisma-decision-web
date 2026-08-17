@@ -1,6 +1,22 @@
 import { Icon } from '@equinor/eds-core-react';
 import { bookmarks, check_circle_outlined, inbox, info_circle } from '@equinor/eds-icons';
 import { utilityIcon } from '../../../icons';
+import { IssueType } from '../../../validators';
+
+export const IssueTypeLabel = ({ type }: { type: IssueType }) => {
+	switch (type) {
+		case 'Decision':
+			return <DecisionLabel />;
+		case 'Unassigned':
+			return <UnassignedLabel />;
+		case 'Uncertainty':
+			return <UncertaintyLabel />;
+		case 'Fact':
+			return <FactLabel />;
+		case 'Utility':
+			return <UtilityLabel />;
+	}
+};
 
 export const DecisionLabel = () => {
 	return (

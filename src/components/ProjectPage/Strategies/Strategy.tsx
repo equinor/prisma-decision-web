@@ -1,8 +1,16 @@
 import { Checkbox, Icon } from '@equinor/eds-core-react';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { SolutionEvidenceResponse, Strategy as StrategyType } from '../../../validators';
-import { DecisionCard } from '../../common/Cards/DecisionCard';
+import {
+	IssueCard,
+	IssueCardContent,
+	IssueCardDeleteMenuItem,
+	IssueCardEditMenuItem,
+	IssueCardHeader,
+	IssueCardMenu,
+	IssueCardStates,
+} from '../../common/Cards/IssueCard';
+import type { Strategy as StrategyType, Issue, Option } from '../../../validators';
 import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
@@ -12,14 +20,19 @@ export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
 	selectedStrategyIds,
-	selectedEvidenceData,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
 	selectedStrategyIds: Set<string>;
-	selectedEvidenceData: SolutionEvidenceResponse[];
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
+	const selectedEvidence = [
+		{
+			evidence_id: strategy.id,
+			state_ids: strategy.options.map(option => option.id),
+			expected_utility: 0,
+		},
+	];
 
 	const issues = useSelectedProjectIssues().filter(
 		x =>
@@ -27,6 +40,30 @@ export const Strategy = ({
 			x.decision.type === 'Focus' &&
 			(x.boundary === 'in' || x.boundary === 'on'),
 	);
+
+	const onStateClick = (issue: Issue, state: Option) => {
+		const existingOption = strategy.options.find(o => o.decision_id === issue.decision.id);
+		if (!existingOption) {
+			updateStrategy({
+				...strategy,
+				options: [...strategy.options, state],
+			});
+			return;
+		}
+		if (state.id === existingOption.id) {
+			updateStrategy({
+				...strategy,
+				options: strategy.options.filter(o => o.id !== state.id),
+			});
+		} else {
+			updateStrategy({
+				...strategy,
+				options: strategy.options.map(o =>
+					o.decision_id === issue.decision.id ? state : o,
+				),
+			});
+		}
+	};
 
 	return (
 		<div key={strategy.id} className='flex w-full flex-col gap-1'>
@@ -38,7 +75,7 @@ export const Strategy = ({
 							<h3 className='text-xl font-semibold'>{strategy.name}</h3>
 							<h4 className='text-text-tertiary text-sm'>{strategy.rationale}</h4>
 						</div>
-						<EVMetrics selectedEvidence={selectedEvidenceData} />
+						<EVMetrics selectedEvidence={selectedEvidence} />
 					</div>
 				</div>
 				<div className='flex items-center'>
@@ -59,38 +96,22 @@ export const Strategy = ({
 							o => o.decision_id === issue.decision.id,
 						);
 						return (
-							<DecisionCard
-								selectedOption={existingOption}
-								onClickOption={option => {
-									if (!existingOption) {
-										updateStrategy({
-											...strategy,
-											options: [...strategy.options, option],
-										});
-										return;
-									}
-									if (option.id === existingOption.id) {
-										updateStrategy({
-											...strategy,
-											options: strategy.options.filter(
-												o => o.id !== option.id,
-											),
-										});
-									} else {
-										updateStrategy({
-											...strategy,
-											options: strategy.options.map(o =>
-												o.decision_id === issue.decision.id ? option : o,
-											),
-										});
-									}
-								}}
+							<IssueCard
 								key={issue.id}
+								selectedState={existingOption}
+								className='mas max-w-24 cursor-default'
 								issue={issue}
-								expanded={true}
-								canExpand={false}
-								className='max-w-24 cursor-default'
-							/>
+								onClickState={state => onStateClick(issue, state as Option)}
+							>
+								<IssueCardHeader>
+									<IssueCardMenu>
+										<IssueCardEditMenuItem />
+										<IssueCardDeleteMenuItem />
+									</IssueCardMenu>
+								</IssueCardHeader>
+								<IssueCardContent />
+								<IssueCardStates expandedProp />
+							</IssueCard>
 						);
 					})}
 				</div>

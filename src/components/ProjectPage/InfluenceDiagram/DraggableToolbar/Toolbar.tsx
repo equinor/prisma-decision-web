@@ -2,7 +2,6 @@ import { useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
-import { useHasInfluenceDiagramError } from '../../../../hooks/useHasInfluenceDiagramError';
 import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
@@ -24,7 +23,6 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const { ref, handleRef } = useDraggable({
 		id: 'toolbar',
 	});
-	const { hasError: hasInfluenceDiagramError } = useHasInfluenceDiagramError();
 	const isSelecting = useStore(state => state.selectNodesOnDrag);
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const selectedNodes = nodes.filter(node => node.selected);
@@ -64,12 +62,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<DeleteIssuesDialog nodes={selectedNodes} />
 			<ChangeIssueType />
 			<CreateIssues />
-			{hasInfluenceDiagramError && (
-				<>
-					<div className='bg-background-light h-9 w-0.5' />
-					<InfluenceDiagramValidation />
-				</>
-			)}
+			<InfluenceDiagramValidation />
 			{selectedEvidence.length > 0 && (
 				<>
 					<div className='bg-background-light h-9 w-0.5' />
