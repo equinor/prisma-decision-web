@@ -1,6 +1,5 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
-import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
@@ -9,7 +8,6 @@ import { cn } from '../../../../utils/cn';
 
 export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps) => {
 	const { isFetching, optionIds, parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
-
 	if (isFetching) {
 		return (
 			<div
@@ -35,7 +33,10 @@ export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps)
 	return (
 		<CardContainer
 			ref={ref}
-			className={`w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
+			issueType={issue.type}
+			selected={selected}
+			includeBorder
+			className='w-auto rounded-sm px-2 pt-1 pb-2'
 		>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>

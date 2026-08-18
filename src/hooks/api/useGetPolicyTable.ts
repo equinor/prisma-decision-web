@@ -6,7 +6,7 @@ import { useHasInfluenceDiagramError } from '../useHasInfluenceDiagramError';
 export const useGetPolicyTable = (projectId: string) => {
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data = [], ...rest } = useQuery({
-		queryKey: ['policyTable', projectId],
+		queryKey: ['policyTable'],
 		queryFn: async () => {
 			const res = await apiClient.post<PolicyTableDecisionOutgoingDto[]>(
 				`solvers/project/${projectId}/policy_table`,
