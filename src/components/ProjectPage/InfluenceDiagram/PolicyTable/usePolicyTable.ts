@@ -16,10 +16,9 @@ type PolicyRow = {
 	optionValues: Record<string, number>;
 };
 
-const getIssueIdFromStateKey = (stateKey: string): string => {
-	const separatorIndex = stateKey.indexOf(':');
-	if (separatorIndex < 0) return stateKey;
-	return stateKey.slice(0, separatorIndex);
+type StateLookups = {
+	optionMap: Map<string, StateInfo>;
+	outcomeMap: Map<string, StateInfo>;
 };
 
 const buildStateLookups = (issues: Issue[]) => {
@@ -54,36 +53,38 @@ const buildStateLookups = (issues: Issue[]) => {
 const findDecisionPolicy = (
 	policyTable: PolicyTableDecisionOutgoingDto[],
 	decisionKeyCandidates: Set<string>,
+	optionIdSet: Set<string>,
 ) => {
 	const directMatch = policyTable.find(table => decisionKeyCandidates.has(table.decision_id));
 	if (directMatch) return directMatch;
 
 	return policyTable.find(table =>
-		table.rows.some(row =>
-			Object.keys(row.states).some(stateKey =>
-				decisionKeyCandidates.has(getIssueIdFromStateKey(stateKey)),
-			),
-		),
+		table.rows.some(row => {
+			return row.states.some(stateId => optionIdSet.has(stateId));
+		}),
 	);
 };
 
 const addParentState = (
 	parentIssueMap: Map<string, ParentDescriptor>,
+	parentStateSeenByIssue: Map<string, Set<string>>,
 	issueId: string,
 	stateId: string,
 	kind: 'decision' | 'uncertainty',
 	info: StateInfo,
 ) => {
+	const seenStates = parentStateSeenByIssue.get(issueId) ?? new Set<string>();
+	if (seenStates.has(stateId)) return;
+	seenStates.add(stateId);
+	parentStateSeenByIssue.set(issueId, seenStates);
+
 	const existing = parentIssueMap.get(issueId) ?? {
 		issueId,
 		issueName: info.issueName,
 		kind,
 		states: [],
 	};
-
-	if (!existing.states.find(state => state.id === stateId)) {
-		existing.states.push({ id: stateId, name: info.name });
-	}
+	existing.states.push({ id: stateId, name: info.name });
 
 	parentIssueMap.set(issueId, existing);
 };
@@ -118,85 +119,102 @@ const sortPolicyRows = (rows: PolicyRow[], parents: ParentDescriptor[]) => {
 	return rows;
 };
 
+const buildPolicyTableModel = ({
+	decisionRows,
+	optionIdSet,
+	lookups,
+}: {
+	decisionRows: PolicyTableDecisionOutgoingDto['rows'];
+	optionIdSet: Set<string>;
+	lookups: StateLookups;
+}) => {
+	if (!decisionRows.length) {
+		return {
+			parents: [] as ParentDescriptor[],
+			rows: [] as PolicyRow[],
+		};
+	}
+	const parentIssueMap = new Map<string, ParentDescriptor>();
+	const parentStateSeenByIssue = new Map<string, Set<string>>();
+	const groupedRows = new Map<string, PolicyRow>();
+
+	for (const row of decisionRows) {
+		let decisionOptionId = '';
+		const parentStateByIssueId: Record<string, string> = {};
+
+		for (const stateId of row.states) {
+			if (optionIdSet.has(stateId)) {
+				decisionOptionId = stateId;
+				continue;
+			}
+
+			const optionInfo = lookups.optionMap.get(stateId);
+			if (optionInfo) {
+				parentStateByIssueId[optionInfo.issueId] = stateId;
+				addParentState(
+					parentIssueMap,
+					parentStateSeenByIssue,
+					optionInfo.issueId,
+					stateId,
+					'decision',
+					optionInfo,
+				);
+				continue;
+			}
+
+			const outcomeInfo = lookups.outcomeMap.get(stateId);
+			if (outcomeInfo) {
+				parentStateByIssueId[outcomeInfo.issueId] = stateId;
+				addParentState(
+					parentIssueMap,
+					parentStateSeenByIssue,
+					outcomeInfo.issueId,
+					stateId,
+					'uncertainty',
+					outcomeInfo,
+				);
+			}
+		}
+
+		const groupKey = buildGroupKey(parentStateByIssueId);
+		const grouped = groupedRows.get(groupKey) ?? {
+			rowKey: groupKey || 'base',
+			parentStateByIssueId,
+			optionValues: {},
+		};
+
+		if (decisionOptionId) {
+			grouped.optionValues[decisionOptionId] = row.value;
+		}
+
+		groupedRows.set(groupKey, grouped);
+	}
+
+	const parentDescriptors = sortParents([...parentIssueMap.values()]);
+	const policyRows = sortPolicyRows([...groupedRows.values()], parentDescriptors);
+
+	return {
+		parents: parentDescriptors,
+		rows: policyRows,
+	};
+};
+
 export const usePolicyTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();
 	const { policyTable, isFetching } = useGetPolicyTable(issue.project_id);
-	const decisionKeyCandidates = useMemo(
-		() => new Set([issue.id, issue.decision.id]),
-		[issue.id, issue.decision.id],
-	);
-
-	const { optionMap, outcomeMap } = useMemo(() => buildStateLookups(issues), [issues]);
-
-	const decisionPolicy = useMemo(
-		() => findDecisionPolicy(policyTable, decisionKeyCandidates),
-		[policyTable, decisionKeyCandidates],
-	);
-
-	const optionIds = useMemo(
-		() => issue.decision.options.map(option => option.id),
-		[issue.decision.options],
-	);
+	const optionIds = issue.decision.options.map(option => option.id);
+	const optionIdSet = new Set(optionIds);
+	const decisionKeyCandidates = new Set([issue.id, issue.decision.id]);
+	const { optionMap, outcomeMap } = buildStateLookups(issues);
+	const decisionPolicy = findDecisionPolicy(policyTable, decisionKeyCandidates, optionIdSet);
 
 	const { parents, rows } = useMemo(() => {
-		if (!decisionPolicy?.rows.length) {
-			return {
-				parents: [] as ParentDescriptor[],
-				rows: [] as PolicyRow[],
-			};
-		}
-
-		const parentIssueMap = new Map<string, ParentDescriptor>();
-		const groupedRows = new Map<string, PolicyRow>();
-
-		for (const row of decisionPolicy.rows) {
-			let decisionOptionId = '';
-			const parentStateByIssueId: Record<string, string> = {};
-
-			for (const [stateKey, stateId] of Object.entries(row.states)) {
-				const issueId = getIssueIdFromStateKey(stateKey);
-				if (decisionKeyCandidates.has(issueId)) {
-					decisionOptionId = stateId;
-					continue;
-				}
-
-				parentStateByIssueId[issueId] = stateId;
-
-				const optionInfo = optionMap.get(stateId);
-				if (optionInfo) {
-					addParentState(parentIssueMap, issueId, stateId, 'decision', optionInfo);
-					continue;
-				}
-
-				const outcomeInfo = outcomeMap.get(stateId);
-				if (outcomeInfo) {
-					addParentState(parentIssueMap, issueId, stateId, 'uncertainty', outcomeInfo);
-				}
-			}
-
-			const groupKey = buildGroupKey(parentStateByIssueId);
-
-			const grouped = groupedRows.get(groupKey) ?? {
-				rowKey: groupKey || 'base',
-				parentStateByIssueId,
-				optionValues: {},
-			};
-
-			if (decisionOptionId) {
-				grouped.optionValues[decisionOptionId] = row.value;
-			}
-
-			groupedRows.set(groupKey, grouped);
-		}
-
-		const parentDescriptors = sortParents([...parentIssueMap.values()]);
-		const policyRows = sortPolicyRows([...groupedRows.values()], parentDescriptors);
-
-		return {
-			parents: parentDescriptors,
-			rows: policyRows,
-		};
-	}, [decisionPolicy?.rows, decisionKeyCandidates, optionMap, outcomeMap]);
+		return buildPolicyTableModel({
+			decisionRows: decisionPolicy?.rows ?? [],
+			optionIdSet,
+			lookups: { optionMap, outcomeMap },
+		});
+	}, [decisionPolicy?.rows, optionIds, issue.id, issue.decision.id, optionMap, outcomeMap]);
 
 	const parentRowSpans = useMemo(() => getParentRowSpans(parents), [parents]);
 

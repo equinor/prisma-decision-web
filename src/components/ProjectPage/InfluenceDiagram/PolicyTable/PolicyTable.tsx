@@ -1,4 +1,5 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { useMemo } from 'react';
+import { Button, Icon, StarProgress } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
@@ -8,13 +9,20 @@ import { cn } from '../../../../utils/cn';
 
 export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps) => {
 	const { isFetching, optionIds, parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
+	const optionsById = useMemo(
+		() => new Map(issue.decision.options.map(option => [option.id, option] as const)),
+		[issue.decision.options],
+	);
+
 	if (isFetching) {
 		return (
 			<div
 				ref={ref}
-				className='border-background-medium bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'
+				className='border-background-medium bg-background-default w-87.5 rounded-sm border border-dashed px-3 py-2'
 			>
-				Loading policy table...
+				<div className='flex min-h-16 items-center justify-center'>
+					<StarProgress size={24} />
+				</div>
 			</div>
 		);
 	}
@@ -112,9 +120,7 @@ export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps)
 						<thead>
 							<tr className='text-left text-[0.7rem]'>
 								{optionIds.map(optionId => {
-									const option = issue.decision.options.find(
-										item => item.id === optionId,
-									);
+									const option = optionsById.get(optionId);
 									if (!option) return null;
 									return (
 										<th
