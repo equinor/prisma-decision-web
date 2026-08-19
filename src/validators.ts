@@ -267,7 +267,7 @@ export const restrictionTableSchema = z.object({
 });
 
 export const policyTableRowOutgoingDtoSchema = z.object({
-	states: z.record(z.string(), z.guid()),
+	states: z.array(z.guid()),
 	value: z.number(),
 });
 
