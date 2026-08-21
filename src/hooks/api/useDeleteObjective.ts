@@ -12,10 +12,9 @@ export const useDeleteObjective = () => {
 		},
 		onMutate: (deletedObjective: Objective) => {
 			const projectId = deletedObjective.project_id;
-			queryClient.cancelQueries({ queryKey: ['objectives', projectId] });
+			queryClient.cancelQueries({ queryKey: ['objectives'] });
 
-			const previousObjectives =
-				queryClient.getQueryData<Objective[]>(['objectives', projectId]) || [];
+			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']) || [];
 			const newObjectives = previousObjectives.filter(obj => obj.id !== deletedObjective.id);
 			queryClient.setQueryData(['objectives', projectId], newObjectives);
 			return { previousObjectives, projectId };
@@ -23,11 +22,11 @@ export const useDeleteObjective = () => {
 		onError: (_err, _deletedObjective, context) => {
 			showErrorToast('Failed to delete objective');
 			if (context?.previousObjectives) {
-				queryClient.setQueryData(
-					['objectives', context.projectId],
-					context.previousObjectives,
-				);
+				queryClient.setQueryData(['objectives'], context.previousObjectives);
 			}
+		},
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 		},
 	});
 };
