@@ -1,4 +1,4 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { CreateObjective } from './CreateObjective';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
 import { format } from 'date-fns';
@@ -6,10 +6,29 @@ import { EditObjectiveDialog } from './EditObjectiveDialog';
 import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
+import { arrow_down, arrow_up } from '@equinor/eds-icons';
+import { useUpdateObjectives } from '../../../hooks/api/useUpdateObjective';
+import { Objective } from '../../../validators';
 
 export const ProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
 	const { selectedObjectives, isLoading } = useSelectedProjectObjectives();
+	const { mutate: updateObjectives } = useUpdateObjectives();
+	const handleMoveObjective = (objective: Objective, direction: 'up' | 'down') => {
+		const currentIndex = selectedObjectives.findIndex(item => item.id === objective.id);
+		const adjacentIndex = currentIndex + (direction === 'up' ? -1 : 1);
+
+		if (currentIndex === -1 || !selectedObjectives[adjacentIndex]) return;
+
+		const reorderedObjectives = [...selectedObjectives];
+		[reorderedObjectives[currentIndex], reorderedObjectives[adjacentIndex]] = [
+			reorderedObjectives[adjacentIndex],
+			reorderedObjectives[currentIndex],
+		];
+
+		updateObjectives(reorderedObjectives.map((item, index) => ({ ...item, ordering: index })));
+	};
+
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
@@ -52,12 +71,34 @@ export const ProjectObjectives = () => {
 								</Table.Row>
 							</Table.Head>
 							<Table.Body>
-								{selectedObjectives.map(objective => (
-									<Table.Row key={objective.id}>
+								{selectedObjectives.map((objective, index) => (
+									<Table.Row key={objective.id + index}>
 										<Table.Cell className='px-0! pl-1!'>
 											<div className='flex items-center'>
 												<EditObjectiveDialog objective={objective} />
 												<DeleteObjectiveDialog objective={objective} />
+												<Button
+													variant='ghost_icon'
+													aria-label={`Move ${objective.name} up`}
+													disabled={index === 0}
+													onClick={() =>
+														handleMoveObjective(objective, 'up')
+													}
+												>
+													<Icon data={arrow_up} />
+												</Button>
+												<Button
+													variant='ghost_icon'
+													aria-label={`Move ${objective.name} down`}
+													disabled={
+														index === selectedObjectives.length - 1
+													}
+													onClick={() =>
+														handleMoveObjective(objective, 'down')
+													}
+												>
+													<Icon data={arrow_down} />
+												</Button>
 											</div>
 										</Table.Cell>
 										<Table.Cell>{objective.name}</Table.Cell>

@@ -56,6 +56,7 @@ const getDefaultValues = (projectId: string): Objective => ({
 	description: '',
 	type: 'Fundamental',
 	id: crypto.randomUUID(),
+	ordering: 0,
 });
 
 type UseObjectiveFormArgs = {

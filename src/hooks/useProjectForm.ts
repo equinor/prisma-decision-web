@@ -11,6 +11,7 @@ const getDefaultValues = (): Project => ({
 	public: false,
 	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
 	id: crypto.randomUUID(),
+	favorite: false,
 	parent_project_id: null,
 	users: [],
 });
