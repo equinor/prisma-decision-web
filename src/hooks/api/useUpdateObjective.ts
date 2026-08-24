@@ -17,13 +17,13 @@ export const useUpdateObjective = ({ onSuccess }: { onSuccess?: () => void }) =>
 
 			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']);
 			const updatedObjectives = previousObjectives?.map(obj =>
-				obj.id === updatedObjective.id ? updatedObjective : obj,
+				obj.id === updatedObjective.id ? { ...obj, ...updatedObjective } : obj,
 			);
 			queryClient.setQueryData(['objectives'], updatedObjectives);
 			return { previousObjectives };
 		},
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['projects'] });
+			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 			onSuccess?.();
 		},
 		onError: () => {

@@ -22,10 +22,10 @@ export const useCreateObjectiveOptimistic = ({ onSuccess }: { onSuccess?: () => 
 				queryClient.setQueryData(['objectives'], context.previousObjectives);
 			}
 			showErrorToast('Failed to create objective');
-			return _err;
 		},
 		onSuccess: async () => {
 			onSuccess?.();
+			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 		},
 	});
 };

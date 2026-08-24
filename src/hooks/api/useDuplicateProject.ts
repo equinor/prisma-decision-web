@@ -16,6 +16,7 @@ export const useDuplicateProject = () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.refetchQueries({ queryKey: ['nodes'] });
 			queryClient.refetchQueries({ queryKey: ['edges'] });
+			queryClient.refetchQueries({ queryKey: ['objectives'] });
 		},
 		onError: () => {
 			showErrorToast('Failed to duplicate project');
