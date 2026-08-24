@@ -13,6 +13,11 @@ A decision quality assessment tool for Equinor that helps teams structure and ev
 - **Issue view** — Reorder issues with dnd-kit.
 - **Authentication** — Azure AD (MSAL) integration for Equinor SSO
 
+## Related repos
+
+- [API](https://github.com/equinor/prisma-decision-api)
+- [Docs](https://github.com/equinor/prisma-decision-docs)
+
 ## Tech Stack
 
 - **Framework:** React 19 + TypeScript
