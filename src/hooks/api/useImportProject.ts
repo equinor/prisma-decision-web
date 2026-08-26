@@ -19,6 +19,8 @@ export const useImportProject = () => {
 				queryClient.refetchQueries({ queryKey: ['edges'] }),
 				queryClient.refetchQueries({ queryKey: ['objectives'] }),
 				queryClient.refetchQueries({ queryKey: ['strategies'] }),
+				queryClient.refetchQueries({ queryKey: ['probabilityTables'] }),
+				queryClient.refetchQueries({ queryKey: ['utilityTables'] }),
 				queryClient.refetchQueries({ queryKey: ['assessments'] }),
 				queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] }),
 			]);
