@@ -266,14 +266,15 @@ export const restrictionTableSchema = z.object({
 	restriction_entries: z.array(restrictionEntrySchema),
 });
 
-export const policyTableRowOutgoingDtoSchema = z.object({
+export const policyTableDecisionStatesSchema = z.object({
 	states: z.array(z.guid()),
+	option_id: z.guid(),
 	value: z.number(),
 });
 
-export const policyTableDecisionOutgoingDtoSchema = z.object({
+export const policyTableDecisionSchema = z.object({
 	decision_id: z.guid(),
-	rows: z.array(policyTableRowOutgoingDtoSchema),
+	rows: z.array(policyTableDecisionStatesSchema),
 });
 
 export type ErrorHandlingState = {
@@ -314,5 +315,5 @@ export type Uncertainty = z.infer<typeof uncertaintySchema>;
 export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
 export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
 export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
-export type PolicyTableRowOutgoingDto = z.infer<typeof policyTableRowOutgoingDtoSchema>;
-export type PolicyTableDecisionOutgoingDto = z.infer<typeof policyTableDecisionOutgoingDtoSchema>;
+export type PolicyTableDecisionState = z.infer<typeof policyTableDecisionStatesSchema>;
+export type PolicyTableDecision = z.infer<typeof policyTableDecisionSchema>;

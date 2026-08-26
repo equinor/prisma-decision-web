@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useGetPolicyTable } from '../../../../hooks/api/useGetPolicyTable';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import { Issue, PolicyTableDecisionOutgoingDto } from '../../../../validators';
+import { Issue, PolicyTableDecision } from '../../../../validators';
 import { ParentDescriptor, getParentRowSpans } from '../ProbabilityTable/utils';
 
 type StateInfo = {
@@ -19,6 +19,24 @@ type PolicyRow = {
 type StateLookups = {
 	optionMap: Map<string, StateInfo>;
 	outcomeMap: Map<string, StateInfo>;
+};
+
+type OptionContext = {
+	optionIds: string[];
+	decisionKeyCandidates: Set<string>;
+};
+
+const buildOptionContext = (issue: Issue): OptionContext => {
+	const optionIds = issue.decision.options.map(option => option.id);
+	return {
+		optionIds,
+		decisionKeyCandidates: new Set([issue.id, issue.decision.id]),
+	};
+};
+
+const resolveDecisionOptionId = (row: PolicyTableDecision['rows'][number], optionIds: string[]) => {
+	if (optionIds.includes(row.option_id)) return row.option_id;
+	return row.states.find(stateId => optionIds.includes(stateId)) ?? '';
 };
 
 const buildStateLookups = (issues: Issue[]) => {
@@ -51,16 +69,17 @@ const buildStateLookups = (issues: Issue[]) => {
 };
 
 const findDecisionPolicy = (
-	policyTable: PolicyTableDecisionOutgoingDto[],
+	policyTable: PolicyTableDecision[],
 	decisionKeyCandidates: Set<string>,
-	optionIdSet: Set<string>,
+	optionIds: string[],
 ) => {
 	const directMatch = policyTable.find(table => decisionKeyCandidates.has(table.decision_id));
 	if (directMatch) return directMatch;
 
 	return policyTable.find(table =>
 		table.rows.some(row => {
-			return row.states.some(stateId => optionIdSet.has(stateId));
+			if (optionIds.includes(row.option_id)) return true;
+			return row.states.some(stateId => optionIds.includes(stateId));
 		}),
 	);
 };
@@ -121,11 +140,11 @@ const sortPolicyRows = (rows: PolicyRow[], parents: ParentDescriptor[]) => {
 
 const buildPolicyTableModel = ({
 	decisionRows,
-	optionIdSet,
+	optionIds,
 	lookups,
 }: {
-	decisionRows: PolicyTableDecisionOutgoingDto['rows'];
-	optionIdSet: Set<string>;
+	decisionRows: PolicyTableDecision['rows'];
+	optionIds: string[];
 	lookups: StateLookups;
 }) => {
 	if (!decisionRows.length) {
@@ -139,14 +158,11 @@ const buildPolicyTableModel = ({
 	const groupedRows = new Map<string, PolicyRow>();
 
 	for (const row of decisionRows) {
-		let decisionOptionId = '';
+		const decisionOptionId = resolveDecisionOptionId(row, optionIds);
 		const parentStateByIssueId: Record<string, string> = {};
 
 		for (const stateId of row.states) {
-			if (optionIdSet.has(stateId)) {
-				decisionOptionId = stateId;
-				continue;
-			}
+			if (optionIds.includes(stateId)) continue;
 
 			const optionInfo = lookups.optionMap.get(stateId);
 			if (optionInfo) {
@@ -201,17 +217,18 @@ const buildPolicyTableModel = ({
 
 export const usePolicyTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();
-	const { policyTable, isFetching } = useGetPolicyTable(issue.project_id);
-	const optionIds = issue.decision.options.map(option => option.id);
-	const optionIdSet = new Set(optionIds);
-	const decisionKeyCandidates = new Set([issue.id, issue.decision.id]);
+	const { policyTable, isFetching } = useGetPolicyTable();
+	const { optionIds, decisionKeyCandidates } = useMemo(
+		() => buildOptionContext(issue),
+		[issue.id, issue.decision.id, issue.decision.options],
+	);
 	const { optionMap, outcomeMap } = buildStateLookups(issues);
-	const decisionPolicy = findDecisionPolicy(policyTable, decisionKeyCandidates, optionIdSet);
+	const decisionPolicy = findDecisionPolicy(policyTable, decisionKeyCandidates, optionIds);
 
 	const { parents, rows } = useMemo(() => {
 		return buildPolicyTableModel({
 			decisionRows: decisionPolicy?.rows ?? [],
-			optionIdSet,
+			optionIds,
 			lookups: { optionMap, outcomeMap },
 		});
 	}, [decisionPolicy?.rows, optionIds, issue.id, issue.decision.id, optionMap, outcomeMap]);
