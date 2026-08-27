@@ -9,7 +9,7 @@ export const useSelectedProjectWhiteboardNodes = () => {
 		return nodes
 			.filter(node => node.project_id === selectedProject.id)
 			.map(node => ({
-				zIndex: node.type === 'Rectangle' ? 0 : 1,
+				zIndex: node.zIndex,
 				position: {
 					x: node.x_position,
 					y: node.y_position,

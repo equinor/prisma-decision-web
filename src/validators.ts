@@ -17,6 +17,8 @@ export type DecisionType = (typeof decisionTypes)[number];
 export const WhiteboardNodeTypes = ['Issue', 'Rectangle', 'Text', 'Arrow', 'Freehand'] as const;
 export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
+export const BOTTOM_LAYER_Z_INDEX = 0;
+
 export const objectiveSchema = z.object({
 	id: z.guid(),
 	name: z.string().min(1, 'Objective name is required'),
@@ -69,6 +71,7 @@ export const whiteboardNode = z.object({
 	x_position: z.float64(),
 	y_position: z.float64(),
 	rotation: z.float64(),
+	zIndex: z.number().int(),
 	data: z.string(),
 	stroke_width: z.number().optional(),
 	stroke_style: z.enum(['Solid', 'Dashed', 'Dotted']).optional(),

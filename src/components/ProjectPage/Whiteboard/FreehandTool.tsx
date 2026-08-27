@@ -77,6 +77,7 @@ export const FreehandTool = () => {
 			stroke_width: 8,
 			color: 'default',
 			board_sheet_id: sheet?.id,
+			zIndex: 0,
 		});
 
 		reset();
