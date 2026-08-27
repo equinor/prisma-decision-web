@@ -3,10 +3,14 @@ import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useDeleteProject } from '../../hooks/api/useDeleteProject';
 import { Project } from '../../validators';
+import { useNavigate } from 'react-router';
 
 export const DeleteProjectDialog = ({ project, showLabel }: DeleteProjectDialogProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { mutate: deleteProject } = useDeleteProject();
+	const navigate = useNavigate();
+	const { mutate: deleteProject } = useDeleteProject({
+		onSuccess: () => navigate('/'),
+	});
 	return (
 		<>
 			<Button

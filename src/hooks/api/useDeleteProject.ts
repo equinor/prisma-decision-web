@@ -3,7 +3,7 @@ import { apiClient } from '../../api';
 import { Project } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
 
-export const useDeleteProject = () => {
+export const useDeleteProject = (args: { onSuccess?: () => void } | void) => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (id: string) => {
@@ -21,6 +21,9 @@ export const useDeleteProject = () => {
 			if (context?.previousProjects) {
 				queryClient.setQueryData(['projects'], context.previousProjects);
 			}
+		},
+		onSuccess: () => {
+			args?.onSuccess?.();
 		},
 	});
 };
