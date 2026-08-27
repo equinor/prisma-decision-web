@@ -1,18 +1,12 @@
-import { useMemo } from 'react';
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
-import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
+import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
 import { usePolicyTable } from './usePolicyTable';
-import { cn } from '../../../../utils/cn';
 
 export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps) => {
-	const { optionIds, parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
-	const optionsById = useMemo(
-		() => new Map(issue.decision.options.map(option => [option.id, option] as const)),
-		[issue.decision.options],
-	);
+	const { parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
 	if (!rows.length) {
 		return (
 			<div
@@ -39,110 +33,31 @@ export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps)
 						<Icon data={close} />
 					</Button>
 				</div>
-				<div
-					className={cn('grid grid-cols-[auto_auto] gap-2', {
-						'grid-cols-[auto]': parents.length === 0,
-					})}
-				>
-					{parents.length > 0 && (
-						<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
-							<thead>
-								<tr className='text-left text-[0.7rem]'>
-									{parents.map(parent => (
-										<th
-											key={parent.issueId}
-											className='bg-background-default rounded-sm px-2 py-1 font-normal whitespace-nowrap'
-										>
-											<div className='flex items-center gap-1.5'>
-												<ParentTypeIndicator kind={parent.kind} />
-												<div>
-													<span className='text-text-tertiary text-[10px]'>
-														{parent.kind === 'decision'
-															? 'Decision'
-															: 'Uncertainty'}
-													</span>
-													<div className='text-sm font-bold'>
-														{parent.issueName}
-													</div>
-												</div>
-											</div>
-										</th>
-									))}
-								</tr>
-							</thead>
-							<tbody>
-								{rows.map((row, rowIndex) => (
-									<tr key={row.rowKey}>
-										{parents.map((parent, parentIndex) => {
-											const rowSpan = parentRowSpans[parentIndex];
-											const shouldRenderCell = rowIndex % rowSpan === 0;
-											if (!shouldRenderCell) return null;
-
-											const stateId =
-												row.parentStateByIssueId[parent.issueId];
-											const optionLabel =
-												lookups.optionMap.get(stateId)?.name;
-											const outcomeLabel =
-												lookups.outcomeMap.get(stateId)?.name;
-											const label = optionLabel || outcomeLabel || '—';
-
-											return (
-												<td
-													key={`${row.rowKey}-${parent.issueId}`}
-													rowSpan={rowSpan}
-													className='bg-background-default rounded-sm px-2 py-1 text-sm whitespace-nowrap'
-												>
-													{label}
-												</td>
-											);
-										})}
-									</tr>
-								))}
-							</tbody>
-						</table>
-					)}
-
-					<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
-						<thead>
-							<tr className='text-left text-[0.7rem]'>
-								{optionIds.map(optionId => {
-									const option = optionsById.get(optionId);
-									if (!option) return null;
-									return (
-										<th
-											key={option.id}
-											className='bg-background-default rounded-sm px-2 py-1 font-normal'
-										>
-											<div className='text-text-tertiary text-[10px]'>
-												{issue.name}
-											</div>
-											<div className='max-w-26 truncate text-sm font-bold'>
-												{option.name}
-											</div>
-										</th>
-									);
-								})}
-							</tr>
-						</thead>
-						<tbody>
-							{rows.map(row => (
-								<tr key={`values-${row.rowKey}`}>
-									{optionIds.map(optionId => {
-										const value = row.optionValues[optionId] ?? 0;
-										return (
-											<td
-												key={`${row.rowKey}-${optionId}`}
-												className='bg-background-default rounded-sm px-2 py-1 text-center text-sm'
-											>
-												{value === 1 ? '1' : '0'}
-											</td>
-										);
-									})}
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
+				<DiscreteValueTable
+					parents={parents}
+					parentRowSpans={parentRowSpans}
+					rows={rows}
+					lookups={lookups}
+					valueColumns={issue.decision.options.map(option => ({
+						id: option.id,
+						label: option.name,
+						eyebrow: issue.name,
+					}))}
+					renderValueCells={values =>
+						issue.decision.options.map(option => {
+							const value =
+								values.find(row => row.option_id === option.id)?.value ?? 0;
+							return (
+								<td
+									key={option.id}
+									className='bg-background-default rounded-sm px-2 py-1 text-center text-sm'
+								>
+									{value === 1 ? '1' : '0'}
+								</td>
+							);
+						})
+					}
+				/>
 			</div>
 		</CardContainer>
 	);
