@@ -19,6 +19,10 @@ export const HomePage = () => {
 		project.name.toLowerCase().includes(searchTerm.toLowerCase()),
 	);
 
+	const favoriteProjects = filteredProjects.filter(project => project.favorite);
+	const otherProjects = filteredProjects.filter(project => !project.favorite);
+	const hasFavoriteProjects = favoriteProjects.length > 0;
+
 	useGetIssues();
 	useGetEdges();
 	useGetInfluenceNodes();
@@ -37,7 +41,7 @@ export const HomePage = () => {
 					</p>
 				</div>
 
-				<div className='flex flex-col gap-4'>
+				<div className='flex flex-col gap-6'>
 					<div className='flex justify-between'>
 						<Search
 							className='xl:w-87.5'
@@ -50,10 +54,33 @@ export const HomePage = () => {
 							{!isProd() && <ImportProject />}
 						</div>
 					</div>
-					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5'>
-						{filteredProjects.map(project => (
-							<ProjectCard key={project.id} project={project} />
-						))}
+					{hasFavoriteProjects && (
+						<div className='flex flex-col gap-2'>
+							<div className='flex items-center gap-2'>
+								<h3 className='text-xl font-semibold'>Favorite Projects</h3>
+								<span className='bg-background-medium flex h-7 w-8 items-center justify-center rounded-full text-sm'>
+									{favoriteProjects.length}
+								</span>
+							</div>
+							<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
+								{favoriteProjects.map(project => (
+									<ProjectCard key={project.id} project={project} />
+								))}
+							</div>
+						</div>
+					)}
+					<div className='flex flex-col gap-2'>
+						<div className='flex items-center gap-2'>
+							<h3 className='text-xl font-semibold'>All Public Projects</h3>
+							<span className='bg-background-medium flex h-7 w-8 items-center justify-center rounded-full text-sm'>
+								{otherProjects.length}
+							</span>
+						</div>
+						<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
+							{otherProjects.map(project => (
+								<ProjectCard key={project.id} project={project} />
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
