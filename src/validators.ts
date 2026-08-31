@@ -22,6 +22,7 @@ export const objectiveSchema = z.object({
 	name: z.string().min(1, 'Objective name is required'),
 	description: z.string().min(1, 'Description is required'),
 	type: z.enum(objectiveTypes, { error: 'Objective type is required' }),
+	ordering: z.number().int(),
 	project_id: z.guid(),
 	created_at: z.iso.datetime().optional(),
 	updated_at: z.iso.datetime().optional(),
@@ -89,6 +90,7 @@ export const projectSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	opportunity_statement: z.string().optional(),
 	public: z.boolean(),
+	favorite: z.boolean(),
 	parent_project_id: z.guid().nullable(),
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime(),
@@ -113,8 +115,8 @@ export const discreteProbabilitySchema = z.object({
 	outcome_id: z.guid(),
 	id: z.guid(),
 	parent_option_ids: z.array(z.guid()),
-	probability: z.number().min(0).max(1),
 	parent_outcome_ids: z.array(z.guid()),
+	probability: z.number().min(0).max(1),
 	uncertainty_id: z.guid(),
 	project_id: z.guid(),
 });
@@ -199,6 +201,8 @@ export const projectImportSchema = z.object({
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
 	Strategies: z.array(strategySchema).optional(),
+	discrete_probabilities: z.array(discreteProbabilitySchema).optional(),
+	discrete_utilities: z.array(discreteUtilitiesSchema).optional(),
 });
 const metricScore = () =>
 	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');

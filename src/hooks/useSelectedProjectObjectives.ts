@@ -6,7 +6,10 @@ export const useSelectedProjectObjectives = () => {
 	const selectedProject = useSelectedProject();
 	const { objectives, isLoading } = useGetObjectives();
 	const projectObjectives = useMemo(
-		() => objectives.filter(objective => objective.project_id === selectedProject.id),
+		() =>
+			objectives
+				.filter(objective => objective.project_id === selectedProject.id)
+				.toSorted((a, b) => a.ordering - b.ordering),
 		[objectives, selectedProject.id],
 	);
 	return {

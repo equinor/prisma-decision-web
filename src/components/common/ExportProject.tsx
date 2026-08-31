@@ -3,23 +3,43 @@ import { download } from '@equinor/eds-icons';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
 import { useGetObjectives } from '../../hooks/api/useGetObjectives';
-import { Edge, Issue, Objective, Project } from '../../validators';
+import { useGetProbabilityTables } from '../../hooks/api/useGetProbabilityTables';
+import { useGetUtilityTables } from '../../hooks/api/useGetUtilityTables';
+import {
+	DiscreteProbability,
+	DiscreteUtility,
+	Edge,
+	Issue,
+	Objective,
+	Project,
+} from '../../validators';
 
 export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonProps) => {
 	const { issues } = useGetIssues();
 	const { edges } = useGetEdges();
 	const { objectives } = useGetObjectives();
+	const { data: probabilityTables } = useGetProbabilityTables();
+	const { data: utilityTables } = useGetUtilityTables();
 	const projectIssues: Issue[] = issues.filter(issue => issue.project_id === project.id);
 	const projectEdges = edges.filter(edge => edge.project_id === project.id);
 	const projectObjectives: Objective[] = objectives.filter(
 		objective => objective.project_id === project.id,
 	);
+	const projectIssueIds = new Set(projectIssues.map(issue => issue.id));
+	const projectDiscreteProbabilities: DiscreteProbability[] = probabilityTables
+		.filter(table => projectIssueIds.has(table.issue_id))
+		.flatMap(table => table.discrete_probabilities);
+	const projectDiscreteUtilities: DiscreteUtility[] = utilityTables
+		.filter(table => projectIssueIds.has(table.issue_id))
+		.flatMap(table => table.discrete_utilities);
 
 	const convertToJson = (data: {
 		projects: Project;
 		Objectives: Objective[];
 		issues: Issue[];
 		edges: Edge[];
+		discrete_probabilities: DiscreteProbability[];
+		discrete_utilities: DiscreteUtility[];
 	}) => {
 		const json = JSON.stringify(data, null, 2);
 		const blob = new Blob([json], { type: 'application/json' });
@@ -44,6 +64,8 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 						Objectives: projectObjectives,
 						issues: projectIssues,
 						edges: projectEdges,
+						discrete_probabilities: projectDiscreteProbabilities,
+						discrete_utilities: projectDiscreteUtilities,
 					});
 				}}
 			>
