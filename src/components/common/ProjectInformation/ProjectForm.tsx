@@ -74,6 +74,7 @@ export const ProjectForm = () => {
 						/>
 						<div className='col-span-1 md:col-span-2'>
 							<Textarea
+								className='[&_textarea]:resize-y!'
 								rows={5}
 								label='Opportunity Statement'
 								placeholder='Enter opportunity statement...'
