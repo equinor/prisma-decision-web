@@ -14,6 +14,7 @@ import {
 import { useSelectedProject } from '../../ProjectContext';
 import { ZoomControls } from '../../ZoomControls';
 import { AddIssue } from './AddIssue';
+import { ClearSheet } from './ClearSheet';
 import { SheetPicker } from './SheetPicker';
 import { ToggleArrowMode } from './ToggleArrowMode';
 import { ToggleFreehandMode } from './ToggleFreehandMode';
@@ -93,6 +94,7 @@ export const Toolbar = () => {
 				<div className='bg-background-light h-9 w-0.5' />
 
 				<SheetPicker />
+				<ClearSheet />
 				<DragOverlay dropAnimation={null}>
 					{source => {
 						return (
