@@ -1,7 +1,7 @@
 import { NodeProps, NodeResizer, useReactFlow } from '@xyflow/react';
 import { useUpdateWhiteboardNodes } from '../../../hooks/api/useUpdateWhiteboardNodes';
 import { ReactFlowWhiteboardNode } from '../../../types';
-import { scaleFreehandPath } from './freehandPath';
+import { FREEHAND_BASE_STROKE_WIDTH, scaleFreehandPath } from './freehandPath';
 import {
 	whiteboardNodeStrokeColor,
 	whiteboardNodeResizerHandleStyle,
@@ -73,7 +73,7 @@ export const FreehandNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNo
 							: data.color
 					}
 					opacity={strokeOpacity}
-					strokeWidth={3}
+					strokeWidth={Math.max((data.stroke_width ?? 4) - FREEHAND_BASE_STROKE_WIDTH, 0)}
 					strokeLinejoin='round'
 					paintOrder='stroke fill'
 					vectorEffect='non-scaling-stroke'

@@ -15,33 +15,33 @@ export const StrokeWidthPicker = ({
 			<div className='flex gap-1.5'>
 				<Button.Toggle
 					className='h-8! w-8!'
-					selectedIndexes={selectedNode.stroke_width === 4 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === 2 ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 4 })}
+						onClick={() => updateNode({ stroke_width: 2 })}
 					>
 						<Icon data={thinStrokeIcon} />
 					</Button>
 				</Button.Toggle>
 				<Button.Toggle
 					className='size-8!'
-					selectedIndexes={selectedNode.stroke_width === 8 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === 4 ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 8 })}
+						onClick={() => updateNode({ stroke_width: 4 })}
 					>
 						<Icon data={mediumStrokeIcon} />
 					</Button>
 				</Button.Toggle>
 				<Button.Toggle
 					className='size-8!'
-					selectedIndexes={selectedNode.stroke_width === 12 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === 6 ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 12 })}
+						onClick={() => updateNode({ stroke_width: 6 })}
 					>
 						<Icon data={thickStrokeIcon} />
 					</Button>
