@@ -1,6 +1,7 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { thinStrokeIcon, mediumStrokeIcon, thickStrokeIcon } from '../../../../icons';
 import { WhiteboardNode } from '../../../../validators';
+import { LARGE_STROKE_WIDTH, MEDIUM_STROKE_WIDTH, SMALL_STROKE_WIDTH } from '../config';
 
 export const StrokeWidthPicker = ({
 	updateNode,
@@ -15,33 +16,33 @@ export const StrokeWidthPicker = ({
 			<div className='flex gap-1.5'>
 				<Button.Toggle
 					className='h-8! w-8!'
-					selectedIndexes={selectedNode.stroke_width === 4 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === SMALL_STROKE_WIDTH ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 4 })}
+						onClick={() => updateNode({ stroke_width: SMALL_STROKE_WIDTH })}
 					>
 						<Icon data={thinStrokeIcon} />
 					</Button>
 				</Button.Toggle>
 				<Button.Toggle
 					className='size-8!'
-					selectedIndexes={selectedNode.stroke_width === 8 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === MEDIUM_STROKE_WIDTH ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 8 })}
+						onClick={() => updateNode({ stroke_width: MEDIUM_STROKE_WIDTH })}
 					>
 						<Icon data={mediumStrokeIcon} />
 					</Button>
 				</Button.Toggle>
 				<Button.Toggle
 					className='size-8!'
-					selectedIndexes={selectedNode.stroke_width === 12 ? [0] : []}
+					selectedIndexes={selectedNode.stroke_width === LARGE_STROKE_WIDTH ? [0] : []}
 				>
 					<Button
 						className='relative size-8'
-						onClick={() => updateNode({ stroke_width: 12 })}
+						onClick={() => updateNode({ stroke_width: LARGE_STROKE_WIDTH })}
 					>
 						<Icon data={thickStrokeIcon} />
 					</Button>
