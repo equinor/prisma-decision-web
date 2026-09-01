@@ -195,6 +195,28 @@ export const issueSchema = z.object({
 });
 export const projectImportFile = z.array(z.file().mime('application/json'));
 
+const restrictionEntrySchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	restriction_value: z.number(),
+	parent_state_id: z.guid(),
+	is_parent_uncertainty: z.boolean(),
+	child_state_id: z.guid(),
+	is_child_uncertainty: z.boolean(),
+	restriction_table_id: z.guid(),
+});
+
+export const restrictionTableSchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	name: z.string(),
+	project_id: z.string(),
+	edge_id: z.string(),
+	restriction_entries: z.array(restrictionEntrySchema),
+});
+
 export const projectImportSchema = z.object({
 	projects: projectSchema,
 	Objectives: z.array(objectiveSchema).optional(),
@@ -203,6 +225,7 @@ export const projectImportSchema = z.object({
 	Strategies: z.array(strategySchema).optional(),
 	discrete_probabilities: z.array(discreteProbabilitySchema).optional(),
 	discrete_utilities: z.array(discreteUtilitiesSchema).optional(),
+	restriction_tables: z.array(restrictionTableSchema).optional(),
 });
 const metricScore = () =>
 	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
@@ -246,28 +269,6 @@ export const probabilityTableSchema = z.object({
 export const utilityTableSchema = z.object({
 	issue_id: z.guid(),
 	discrete_utilities: z.array(discreteUtilitiesSchema),
-});
-
-const restrictionEntrySchema = z.object({
-	created_at: z.string(),
-	updated_at: z.string(),
-	id: z.string(),
-	restriction_value: z.number(),
-	parent_state_id: z.guid(),
-	is_parent_uncertainty: z.boolean(),
-	child_state_id: z.guid(),
-	is_child_uncertainty: z.boolean(),
-	restriction_table_id: z.guid(),
-});
-
-export const restrictionTableSchema = z.object({
-	created_at: z.string(),
-	updated_at: z.string(),
-	id: z.string(),
-	name: z.string(),
-	project_id: z.string(),
-	edge_id: z.string(),
-	restriction_entries: z.array(restrictionEntrySchema),
 });
 
 export const policyTableSchema = z.object({
