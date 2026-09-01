@@ -102,7 +102,7 @@ export const Whiteboard = () => {
 				snapGrid={[30, 30]}
 				panOnDrag={!isSelecting}
 				selectNodesOnDrag={isSelecting}
-				selectionMode={SelectionMode.Partial}
+				selectionMode={SelectionMode.Full}
 				elevateNodesOnSelect
 				connectionMode={ConnectionMode.Strict}
 				selectionOnDrag={true}
