@@ -7,6 +7,8 @@ import { useGetPolicyTable } from '../../hooks/api/useGetPolicyTable';
 import { useGetProbabilityTables } from '../../hooks/api/useGetProbabilityTables';
 import { useGetRestrictionTables } from '../../hooks/api/useGetRestrictionTables';
 import { useGetUtilityTables } from '../../hooks/api/useGetUtilityTables';
+import { useGetWhiteboardNodes } from '../../hooks/api/useGetWhiteboardNodes';
+import { useGetWhiteboardSheets } from '../../hooks/api/useGetWhiteboardSheets';
 import {
     DiscretePolicy,
 	DiscreteProbability,
@@ -16,6 +18,8 @@ import {
 	Objective,
 	Project,
 	RestrictionTable,
+	WhiteboardNode,
+	WhiteboardSheet,
 } from '../../validators';
 
 export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonProps) => {
@@ -26,10 +30,16 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 	const { data: utilityTables } = useGetUtilityTables();
 	const { restrictionTables } = useGetRestrictionTables();
 	const { data: policyTable } = useGetPolicyTable();
+	const { nodes: whiteboardNodes } = useGetWhiteboardNodes();
+	const { data: whiteboardSheets } = useGetWhiteboardSheets();
 	const projectIssues: Issue[] = issues.filter(issue => issue.project_id === project.id);
 	const projectEdges = edges.filter(edge => edge.project_id === project.id);
 	const projectObjectives: Objective[] = objectives.filter(
 		objective => objective.project_id === project.id,
+	);
+	const projectWhiteboardNodes = whiteboardNodes.filter(node => node.project_id === project.id);
+	const projectWhiteboardSheets = whiteboardSheets.filter(
+		sheet => sheet.project_id === project.id,
 	);
 	const projectIssueIds = new Set(projectIssues.map(issue => issue.id));
 	const projectDiscreteProbabilities: DiscreteProbability[] = probabilityTables
@@ -51,6 +61,8 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 		discrete_utilities: DiscreteUtility[];
 		restriction_tables: RestrictionTable[];
 		policy_table: DiscretePolicy[];
+		board_nodes: WhiteboardNode[];
+		board_sheets: WhiteboardSheet[];
 	}) => {
 		const json = JSON.stringify(data, null, 2);
 		const blob = new Blob([json], { type: 'application/json' });
@@ -79,6 +91,8 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 						discrete_utilities: projectDiscreteUtilities,
 						restriction_tables: projectRestrictionTables,
 						policy_table: policyTable,
+						board_nodes: projectWhiteboardNodes,
+						board_sheets: projectWhiteboardSheets,
 					});
 				}}
 			>
