@@ -92,7 +92,12 @@ export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
 			>
 				<Icon data={more_vertical} />
 			</Button>
-			<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
+			<Menu
+				open={menuOpen}
+				onClose={() => setMenuOpen(false)}
+				anchorEl={anchorEl}
+				className='nodrag nopan nowheel'
+			>
 				{children}
 			</Menu>
 		</div>
