@@ -1,3 +1,5 @@
+import { Icon } from '@equinor/eds-core-react';
+import { warning_outlined } from '@equinor/eds-icons';
 import { NodeProps, useEdges } from '@xyflow/react';
 import { useState } from 'react';
 import { ReactFlowInfluenceNode } from '../../../types';
@@ -40,20 +42,17 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 							/>
 						</IssueCardMenu>
 					</IssueCardHeader>
-					{!hasTwoOrMoreParents ? (
-						<div>
-							<h3 className='font-semibold '>{issue.name}</h3>
-							{!hasTwoOrMoreParents && (
-								<p className='max-w-55 text-xs font-medium text-[#EA580C]'>
-									Connect 2+ parent nodes to enable utility table and solver
-								</p>
-							)}
-						</div>
-					) : (
-						<IssueCardContent descriptionClassName='line-clamp-2' />
-					)}
+					<IssueCardContent descriptionClassName='line-clamp-2' />
 				</IssueCard>
 			</InfluenceNodeShell>
+			{!hasTwoOrMoreParents && (
+				<div className='absolute -top-7 flex gap-1.5'>
+					<Icon className='fill-warning-resting' data={warning_outlined} />
+					<p className='text-warning-resting'>
+						Connect 2+ parent nodes to enable utility table and solver
+					</p>
+				</div>
+			)}
 			{utilityTableOpen && (
 				<UtilityTable issue={issue} selected={selected} onClose={setUtilityTableOpen} />
 			)}
