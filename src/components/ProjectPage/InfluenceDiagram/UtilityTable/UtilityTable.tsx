@@ -6,9 +6,13 @@ import { CardContainer } from '../../../common/Cards/CardContainer';
 import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
 import { DiscreteUtilityCell } from './DiscreteUtilityCell';
 import { useUtilityTable } from './useUtilityTable';
+import { useBulkUpdateDiscreteUtilities } from '../../../../hooks/api/useUpdateDiscreteUtilities';
 
 export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) => {
 	const { parents, parentRowSpans, rows, lookups } = useUtilityTable(issue);
+	const { mutate: updateUtilities, isPending } = useBulkUpdateDiscreteUtilities();
+	const utilities = rows.flatMap(row => row.values);
+	const hasNonZeroValue = utilities.some(utility => utility.utility_value !== 0);
 	return (
 		<CardContainer
 			issueType={issue.type}
@@ -18,9 +22,22 @@ export const UtilityTable = ({ issue, selected, onClose }: UtilityTableProps) =>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>
 					<h6 className='leading-6 font-medium'>{`${issue.name} Utility Table`}</h6>
-					<Button variant='ghost_icon' onClick={() => onClose?.(false)}>
-						<Icon data={close} />
-					</Button>
+					<div className='flex items-center gap-1'>
+						<Button
+							variant='outlined'
+							disabled={!hasNonZeroValue || isPending}
+							onClick={() =>
+								updateUtilities(
+									utilities.map(utility => ({ ...utility, utility_value: 0 })),
+								)
+							}
+						>
+							Reset all
+						</Button>
+						<Button variant='ghost_icon' onClick={() => onClose?.(false)}>
+							<Icon data={close} />
+						</Button>
+					</div>
 				</div>
 				<DiscreteValueTable
 					parents={parents}

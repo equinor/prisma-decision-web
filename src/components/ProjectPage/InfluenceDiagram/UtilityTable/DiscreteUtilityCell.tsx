@@ -7,7 +7,7 @@ export const DiscreteUtilityCell = ({ utilityId, discreteUtilities }: DiscretePr
 	const { mutate } = useUpdateDiscreteUtilities();
 	if (!du) return;
 	return (
-		<td className='text-right' key={du.id}>
+		<td className='text-right' key={du.utility_value}>
 			<TextField
 				type='number'
 				onBlur={e => {

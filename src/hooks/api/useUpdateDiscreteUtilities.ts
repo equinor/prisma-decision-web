@@ -21,3 +21,22 @@ export const useUpdateDiscreteUtilities = () => {
 		},
 	});
 };
+
+export const useBulkUpdateDiscreteUtilities = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (utilities: DiscreteUtility[]) => {
+			const res = await apiClient.put('/discrete_utilities', utilities);
+			return res.data;
+		},
+		onError: () => {
+			showErrorToast('Failed to update utilities');
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
+		},
+	});
+};
