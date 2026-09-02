@@ -10,7 +10,7 @@ import {
 	OnConnect,
 	OnReconnect,
 } from '@xyflow/react';
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useRef } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
@@ -31,7 +31,6 @@ export const useInfluenceDiagram = () => {
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const hoveredEdgeId = useRef<string | null>(null);
-	const [isSelecting, setIsSelecting] = useState(false);
 
 	const updateHoveredEdge = (edgeId: string | null) => {
 		hoveredEdgeId.current = edgeId;
@@ -80,14 +79,6 @@ export const useInfluenceDiagram = () => {
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
 		draggingEdge.current = edge;
-	};
-
-	const onClickSelectionMode = () => {
-		setIsSelecting(true);
-	};
-
-	const onClickPanMode = () => {
-		setIsSelecting(false);
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
@@ -155,9 +146,6 @@ export const useInfluenceDiagram = () => {
 		onNodesChange,
 		onEdgesChange,
 		isValidConnection,
-		isSelecting,
-		onClickSelectionMode,
-		onClickPanMode,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	};
