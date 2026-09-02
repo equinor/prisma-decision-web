@@ -31,7 +31,7 @@ export const useInfluenceDiagram = () => {
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const hoveredEdgeId = useRef<string | null>(null);
-	const [isSelecting, setIsSelecting] = useState(false);
+	const [isSelecting] = useState(false);
 
 	const updateHoveredEdge = (edgeId: string | null) => {
 		hoveredEdgeId.current = edgeId;
@@ -80,14 +80,6 @@ export const useInfluenceDiagram = () => {
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
 		draggingEdge.current = edge;
-	};
-
-	const onClickSelectionMode = () => {
-		setIsSelecting(true);
-	};
-
-	const onClickPanMode = () => {
-		setIsSelecting(false);
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
@@ -156,8 +148,6 @@ export const useInfluenceDiagram = () => {
 		onEdgesChange,
 		isValidConnection,
 		isSelecting,
-		onClickSelectionMode,
-		onClickPanMode,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	};
