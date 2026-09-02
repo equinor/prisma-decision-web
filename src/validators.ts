@@ -95,6 +95,8 @@ export const projectSchema = z.object({
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime(),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
+	created_at: z.iso.datetime().optional(),
+	updated_at: z.iso.datetime().optional(),
 });
 
 export const decisionSchema = z.object({
