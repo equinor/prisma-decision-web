@@ -228,6 +228,8 @@ export const projectImportSchema = z.object({
 	discrete_probabilities: z.array(discreteProbabilitySchema).optional(),
 	discrete_utilities: z.array(discreteUtilitiesSchema).optional(),
 	restriction_tables: z.array(restrictionTableSchema).optional(),
+	board_nodes: z.array(whiteboardNode).optional(),
+	board_sheets: z.array(whiteboardSheet).optional(),
 });
 const metricScore = () =>
 	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
