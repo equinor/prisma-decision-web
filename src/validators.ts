@@ -270,6 +270,18 @@ export const restrictionTableSchema = z.object({
 	restriction_entries: z.array(restrictionEntrySchema),
 });
 
+export const discretePolicySchema = z.object({
+	decision_id: z.guid(),
+	parent_option_ids: z.array(z.guid()),
+	parent_outcome_ids: z.array(z.guid()),
+	option_id: z.guid(),
+	value: z.number(),
+});
+export const policyTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_policies: z.array(discretePolicySchema),
+});
+
 export type ErrorHandlingState = {
 	message: string;
 	showDecisionTree: boolean;
@@ -308,3 +320,5 @@ export type Uncertainty = z.infer<typeof uncertaintySchema>;
 export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
 export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
 export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
+export type DiscretePolicy = z.infer<typeof discretePolicySchema>;
+export type PolicyTable = z.infer<typeof policyTableSchema>;
