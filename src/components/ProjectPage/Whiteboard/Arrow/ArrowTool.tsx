@@ -60,6 +60,7 @@ export function ArrowTool() {
 			stroke_style: 'Solid',
 			stroke_width: 4,
 			board_sheet_id: sheet.id,
+			zIndex: 0,
 		});
 
 		setStart(null);

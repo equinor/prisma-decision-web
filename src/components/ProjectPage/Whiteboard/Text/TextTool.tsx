@@ -34,6 +34,7 @@ export function TextTool() {
 			rotation: 0,
 			new: true,
 			board_sheet_id: sheet?.id ?? '',
+			zIndex: 0,
 		});
 	}
 

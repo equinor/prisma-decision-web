@@ -10,7 +10,7 @@ import { useGetUtilityTables } from '../../hooks/api/useGetUtilityTables';
 import { useGetWhiteboardNodes } from '../../hooks/api/useGetWhiteboardNodes';
 import { useGetWhiteboardSheets } from '../../hooks/api/useGetWhiteboardSheets';
 import {
-    DiscretePolicy,
+	DiscretePolicy,
 	DiscreteProbability,
 	DiscreteUtility,
 	Edge,
