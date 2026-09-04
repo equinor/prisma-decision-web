@@ -26,9 +26,6 @@ export const InfluenceDiagram = () => {
 		onEdgesChange,
 		onReconnect,
 		onReconnectStart,
-		onClickPanMode,
-		onClickSelectionMode,
-		isSelecting,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	} = useInfluenceDiagram();
@@ -49,10 +46,8 @@ export const InfluenceDiagram = () => {
 				connectionMode={ConnectionMode.Strict}
 				onEdgesChange={onEdgesChange}
 				zoomOnDoubleClick={false}
-				panOnDrag={!isSelecting}
 				connectOnClick={false}
 				nodesDraggable={false}
-				selectNodesOnDrag={isSelecting}
 				selectionKeyCode={['Control']}
 				onReconnect={onReconnect}
 				selectionOnDrag={true}
@@ -69,10 +64,7 @@ export const InfluenceDiagram = () => {
 				fitView
 			>
 				<Background />
-				<DraggableToolbar
-					onClickPanMode={onClickPanMode}
-					onClickSelectionMode={onClickSelectionMode}
-				/>
+				<DraggableToolbar />
 			</ReactFlow>
 		</div>
 	);
