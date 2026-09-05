@@ -5,8 +5,9 @@ export type FreehandInputPoint = [x: number, y: number];
 type OutlinePoint = [x: number, y: number];
 
 const average = (first: number, second: number) => (first + second) / 2;
+export const FREEHAND_BASE_STROKE_WIDTH = 2;
 export const FREEHAND_STROKE_OPTIONS: StrokeOptions = {
-	size: 12,
+	size: FREEHAND_BASE_STROKE_WIDTH,
 	thinning: 0.55,
 	smoothing: 0.65,
 	streamline: 0.45,
