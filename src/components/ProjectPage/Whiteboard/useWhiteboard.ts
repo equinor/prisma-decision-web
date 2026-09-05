@@ -43,9 +43,7 @@ const snapRectangleDimensions = (
 export const useWhiteboard = ({ snapToGrid = false }: UseWhiteboardOptions = {}) => {
 	const nodes = useSelectedProjectWhiteboardNodes();
 	const sheet = useSelectedWhiteboardSheet();
-	const sheetNodes = sheet
-		? nodes.filter(node => node.data.board_sheet_id === sheet.id)
-		: [];
+	const sheetNodes = sheet ? nodes.filter(node => node.data.board_sheet_id === sheet.id) : [];
 	const { mutate: updateWhiteboardNodes } = useUpdateWhiteboardNodes();
 	const [localNodes, setLocalNodes] = useNodesState([] as ReactFlowWhiteboardNode[]);
 
