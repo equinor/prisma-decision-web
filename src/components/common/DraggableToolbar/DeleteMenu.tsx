@@ -1,9 +1,9 @@
 import { Button, Icon, Menu } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useSelectedProjectEdges } from '../../../../hooks/useSelectedProjectEdges';
-import { ReactFlowInfluenceNode } from '../../../../types';
-import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
+import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
+import { ReactFlowInfluenceNode } from '../../../types';
+import { DeleteIssuesDialog } from '../DeleteIssuesDialog';
 import { DeleteAllEdgesDialog } from './DeleteAllEdgesDialog';
 
 export const DeleteMenu = ({ selectedNodes }: DeleteMenuProps) => {
@@ -35,7 +35,7 @@ export const DeleteMenu = ({ selectedNodes }: DeleteMenuProps) => {
 					disabled={selectedNodes.length === 0}
 					onClick={() => openDialog('issues')}
 				>
-					Delete selected issue
+					Delete selected issues
 				</Menu.Item>
 				<Menu.Item
 					disabled={isFetching || edges.length === 0}

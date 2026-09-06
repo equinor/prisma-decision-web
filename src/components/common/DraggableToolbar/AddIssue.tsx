@@ -1,20 +1,20 @@
-import { Composite, CompositeItem, CompositeProvider } from '@ariakit/react';
 import { PointerSensor, useDraggable } from '@dnd-kit/react';
 import { Button, Icon, Popover } from '@equinor/eds-core-react';
+import { Composite, CompositeItem, CompositeProvider } from '@ariakit/react';
 import { add, assignment_important } from '@equinor/eds-icons';
 import { useHotkey } from '@tanstack/react-hotkeys';
 import { useReactFlow } from '@xyflow/react';
 import { useRef, useState } from 'react';
-import { useCreateWhiteboardNodes } from '../../../../hooks/api/useCreateWhiteboardNodes';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
-import { Issue } from '../../../../validators';
+import { useCreateWhiteboardNodes } from '../../../hooks/api/useCreateWhiteboardNodes';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
+import { Issue } from '../../../validators';
+import { useSelectedProject } from '../../ProjectPage/ProjectContext';
 import {
 	IssueCard as IssueCardComponent,
 	IssueCardContent,
 	IssueCardHeader,
-} from '../../../common/Cards/IssueCard';
-import { useSelectedProject } from '../../ProjectContext';
+} from '../Cards/IssueCard';
 
 const issuesPerRow = 4;
 const horizontalSpacing = 300;
