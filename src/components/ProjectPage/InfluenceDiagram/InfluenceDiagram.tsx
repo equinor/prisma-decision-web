@@ -2,11 +2,11 @@ import { Background, ConnectionMode, ReactFlow, SelectionMode } from '@xyflow/re
 
 import { ConnectionLine } from './ConnectingLine';
 import { DecisionNode } from './DecisionNode';
-import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
 import { UncertaintyNode } from './UncertaintyNode';
 import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
+import { InfluenceDiagramToolbar } from './InfluenceDiagramToolbar';
 
 const nodeTypes = {
 	decision: DecisionNode,
@@ -64,7 +64,7 @@ export const InfluenceDiagram = () => {
 				fitView
 			>
 				<Background />
-				<DraggableToolbar />
+				<InfluenceDiagramToolbar />
 			</ReactFlow>
 		</div>
 	);
