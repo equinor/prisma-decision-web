@@ -1,8 +1,8 @@
 import { Button } from '@equinor/eds-core-react';
-import { DragIcon } from '../../../common/DragIcon';
 import { useAtom } from 'jotai';
-import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
+import { DragIcon } from '../DragIcon';
 
 export const TogglePanMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
