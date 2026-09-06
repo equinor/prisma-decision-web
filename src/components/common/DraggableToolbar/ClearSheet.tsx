@@ -1,9 +1,9 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_forever } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useDeleteWhiteboardNode } from '../../../../hooks/api/useDeleteWhiteboardNode';
-import { useSelectedProjectWhiteboardNodes } from '../../../../hooks/useSelectedProjectWhiteboardNodes';
-import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
+import { useDeleteWhiteboardNode } from '../../../hooks/api/useDeleteWhiteboardNode';
+import { useSelectedProjectWhiteboardNodes } from '../../../hooks/useSelectedProjectWhiteboardNodes';
+import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
 
 export const ClearSheet = () => {
 	const [isOpen, setIsOpen] = useState(false);

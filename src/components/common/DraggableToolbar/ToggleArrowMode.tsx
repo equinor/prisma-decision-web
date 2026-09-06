@@ -1,8 +1,8 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { useAtom } from 'jotai';
-import { arrowIcon } from '../../../../icons';
-import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
+import { arrowIcon } from '../../../icons';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
 
 export const ToggleArrowMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
