@@ -1,8 +1,8 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { title } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
-import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
 
 export const ToggleTextMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);

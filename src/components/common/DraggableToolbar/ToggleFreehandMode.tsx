@@ -2,7 +2,7 @@ import { Button, Icon } from '@equinor/eds-core-react';
 import { edit_text } from '@equinor/eds-icons';
 import { useHotkey } from '@tanstack/react-hotkeys';
 import { useAtom } from 'jotai';
-import { activeToolAtom } from '../activeToolAtom';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
 
 export const ToggleFreehandMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
