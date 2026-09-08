@@ -33,7 +33,7 @@ export function ArrowTool() {
 	}
 
 	function handlePointerUp() {
-		if (!start || !end) return;
+		if (!start || !end || !sheet) return;
 
 		const startPosition = screenToFlowPosition(start);
 		const endPosition = screenToFlowPosition(end);
