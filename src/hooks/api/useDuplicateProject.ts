@@ -20,6 +20,8 @@ export const useDuplicateProject = () => {
 			queryClient.refetchQueries({ queryKey: ['objectives'] });
 			queryClient.refetchQueries({ queryKey: ['probabilityTables'] });
 			queryClient.refetchQueries({ queryKey: ['utilityTables'] });
+			queryClient.refetchQueries({ queryKey: ['whiteboardNodes'] });
+			queryClient.refetchQueries({ queryKey: ['whiteboardSheets'] });
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			navigate(`/project/${data.id}`);
 		},
