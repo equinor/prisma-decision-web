@@ -50,6 +50,7 @@ export const FreehandTool = () => {
 
 	const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
 		event.preventDefault();
+		if (!sheet) return;
 		if (event.currentTarget.hasPointerCapture(event.pointerId)) {
 			event.currentTarget.releasePointerCapture(event.pointerId);
 		}
@@ -77,7 +78,7 @@ export const FreehandTool = () => {
 			stroke_style: 'Solid',
 			stroke_width: MEDIUM_STROKE_WIDTH,
 			color: 'default',
-			board_sheet_id: sheet?.id,
+			board_sheet_id: sheet.id,
 			zIndex: 0,
 		});
 
