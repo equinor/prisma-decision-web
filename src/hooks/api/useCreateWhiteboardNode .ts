@@ -12,7 +12,7 @@ export const useCreateWhiteboardNode = (args: { onSuccess?: () => void } | void)
 	const highestZIndex =
 		Math.max(
 			...nodes
-				.filter(node => node.data.board_sheet_id === sheet.id)
+				.filter(node => node.data.board_sheet_id === sheet?.id)
 				.map(node => node.zIndex ?? BOTTOM_LAYER_Z_INDEX),
 			0,
 		) + 1;
