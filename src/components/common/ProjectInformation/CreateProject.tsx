@@ -7,10 +7,6 @@ import { ProjectNameField } from './ProjectNameField';
 export const CreateProject = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { formMethods, isPending, handleSubmit } = useProjectForm();
-	const {
-		register,
-		formState: { errors },
-	} = formMethods;
 
 	const referenceElement = useRef<HTMLButtonElement>(null);
 
@@ -39,7 +35,7 @@ export const CreateProject = () => {
 									Create a new project to start oprimizing
 								</p>
 							</div>
-							<ProjectNameField register={register} errors={errors} />
+							<ProjectNameField />
 							<Button
 								variant='ghost_icon'
 								className='absolute! top-2 right-2'
