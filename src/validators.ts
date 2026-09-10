@@ -224,10 +224,10 @@ export const restrictionTableSchema = z.object({
 
 export const projectImportSchema = z.object({
 	projects: projectSchema,
-	Objectives: z.array(objectiveSchema).optional(),
+	objectives: z.array(objectiveSchema).optional(),
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
-	Strategies: z.array(strategySchema).optional(),
+	strategies: z.array(strategySchema).optional(),
 	discrete_probabilities: z.array(discreteProbabilitySchema).optional(),
 	discrete_utilities: z.array(discreteUtilitiesSchema).optional(),
 	restriction_tables: z.array(restrictionTableSchema).optional(),
