@@ -1,8 +1,9 @@
-import { DatePicker, Switch, Textarea } from '@equinor/eds-core-react';
+import { DatePicker, Switch } from '@equinor/eds-core-react';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';
 import { FormErrorMessage } from '../FormErrorMessage';
+import { OpportunityStatementEditor } from './OpportunityStatementEditor';
 import { ProjectNameField } from './ProjectNameField';
 import { UserSection } from './UserSection';
 import { parseISO } from 'date-fns';
@@ -12,7 +13,6 @@ export const ProjectForm = () => {
 	const selectedProject = useSelectedProject();
 	const { formMethods, handleSubmit } = useProjectForm(selectedProject);
 	const {
-		register,
 		formState: { errors },
 	} = formMethods;
 
@@ -29,6 +29,18 @@ export const ProjectForm = () => {
 		name: 'public',
 		control: formMethods.control,
 	});
+
+	const {
+		field: {
+			value: opportunityStatement,
+			onChange: onChangeOpportunityStatement,
+			onBlur: onBlurOpportunityStatement,
+		},
+	} = useController({
+		name: 'opportunity_statement',
+		control: formMethods.control,
+	});
+
 	return (
 		<FormProvider {...formMethods}>
 			<form className='flex flex-col gap-4'>
@@ -44,8 +56,6 @@ export const ProjectForm = () => {
 					</div>
 					<div className='grid w-full grid-cols-1 gap-4 md:grid-cols-2'>
 						<ProjectNameField
-							register={register}
-							errors={errors}
 							onBlur={() => {
 								handleSubmit();
 							}}
@@ -73,13 +83,12 @@ export const ProjectForm = () => {
 							}}
 						/>
 						<div className='col-span-1 md:col-span-2'>
-							<Textarea
-								className='[&_textarea]:resize-y!'
-								rows={5}
-								label='Opportunity Statement'
-								placeholder='Enter opportunity statement...'
-								{...register('opportunity_statement')}
+							<OpportunityStatementEditor
+								key={selectedProject.id}
+								initialValue={opportunityStatement}
+								onChange={onChangeOpportunityStatement}
 								onBlur={() => {
+									onBlurOpportunityStatement();
 									handleSubmit();
 								}}
 							/>

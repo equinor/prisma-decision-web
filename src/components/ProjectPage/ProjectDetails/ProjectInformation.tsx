@@ -9,7 +9,12 @@ export const ProjectInformation = () => {
 		<div className='flex w-full flex-col gap-6 pt-4'>
 			<div className='border-primary-resting grid grid-cols-[250px_auto] gap-8 border-b pb-6'>
 				<h2 className='font-medium'>OPPORTUNITY STATEMENT</h2>
-				<p className='text-text-secondary'>{project.opportunity_statement}</p>
+				<div
+					className='text-text-secondary [&_a]:text-primary-resting [&_a]:cursor-pointer [&_a]:underline
+						[&_ol]:mt-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p+p]:mt-2
+						[&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-6'
+					dangerouslySetInnerHTML={{ __html: project.opportunity_statement ?? '' }}
+				/>
 			</div>
 			<div className='border-primary-resting grid grid-cols-[250px_max-content_max-content] gap-8 border-b pb-6'>
 				<h2 className='font-medium'>DETAILS</h2>
