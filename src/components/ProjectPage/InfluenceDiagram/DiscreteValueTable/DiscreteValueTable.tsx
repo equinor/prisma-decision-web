@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
 import { getParentLabel, ParentDescriptor, ParentStateValue } from '../ProbabilityTable/utils';
 import { ParentStateLookups } from './getDiscreteValueRows';
+import { cn } from '../../../../utils/cn';
 
 export const DiscreteValueTable = <T extends ParentStateValue>({
 	parents,
@@ -11,7 +12,7 @@ export const DiscreteValueTable = <T extends ParentStateValue>({
 	valueColumns,
 	renderValueCells,
 }: DiscreteValueTableProps<T>) => (
-	<div className='grid grid-cols-[auto_1fr] gap-2'>
+	<div className={cn('grid grid-cols-[auto_1fr] gap-2', parents.length === 0 && 'grid-cols-1')}>
 		{parents.length > 0 && (
 			<table className='bg-background-light border-separate border-spacing-2 rounded-sm'>
 				<thead>
