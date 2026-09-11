@@ -67,7 +67,7 @@ export function RectangleTool() {
 			data: '',
 			rotation: 0,
 			stroke_style: 'Solid',
-			stroke_width: 8,
+			stroke_width: 4,
 			new: true,
 			board_sheet_id: sheet.id,
 			zIndex: 0,
@@ -99,7 +99,7 @@ export function RectangleTool() {
 					style={{
 						...rect.dimension,
 						transform: `translate(${rect.position.x - 75}px, ${rect.position.y - 65}px)`,
-						border: `2px dashed ${whiteboardPreviewStrokeColor}`,
+						border: `4px dashed ${whiteboardPreviewStrokeColor}`,
 						pointerEvents: 'none',
 					}}
 				></div>
