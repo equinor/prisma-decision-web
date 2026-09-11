@@ -15,6 +15,7 @@ import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
 import { strategyIcons } from './icons';
+import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
 
 export const Strategy = ({
 	strategy,
@@ -26,6 +27,7 @@ export const Strategy = ({
 	selectedStrategyIds: Set<string>;
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
+	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
 	const selectedEvidence = [
 		{
 			evidence_id: strategy.id,
@@ -110,7 +112,10 @@ export const Strategy = ({
 									</IssueCardMenu>
 								</IssueCardHeader>
 								<IssueCardContent />
-								<IssueCardStates expandedProp />
+								<IssueCardStates
+									expandedProp
+									disabledStateIds={fullyRestrictedStateIds}
+								/>
 							</IssueCard>
 						);
 					})}

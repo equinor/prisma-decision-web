@@ -18,12 +18,14 @@ import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { Icon } from '@equinor/eds-core-react';
 import { warning_outlined } from '@equinor/eds-icons';
+import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
 import { useState } from 'react';
 
 export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
 	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const [policyTableOpen, setPolicyTableOpen] = useState(false);
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
+	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
 	const selectedOption = issue?.decision.options.find(o => evidence.includes(o.id));
 	const {
 		validationErrors: { DecisionOptions },
@@ -55,7 +57,7 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 					</IssueCardMenu>
 				</IssueCardHeader>
 				<IssueCardExpandableContent />
-				<IssueCardStates>
+				<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
 					<IssueCardExpandTrigger />
 				</IssueCardStates>
 			</IssueCard>
