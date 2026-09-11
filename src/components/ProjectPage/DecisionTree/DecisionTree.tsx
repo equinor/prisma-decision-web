@@ -7,6 +7,14 @@ import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
 import { useSelectedProject } from '../ProjectContext';
+import {
+	ToolBar,
+	ToolbarDragDropProvider,
+	ToolbarSeparator,
+} from '../../common/DraggableToolbar/Toolbar';
+import { ZoomControls } from '../../common/DraggableToolbar/ZoomControls';
+import { BarMetrics } from '../InfluenceDiagram/InfluenceDiagramToolbar';
+import { ExpandAllDecisionTreeNodes } from './ExpandAllDecisionTreeNodes';
 
 export const DecisionTree = () => {
 	const project = useSelectedProject();
@@ -30,6 +38,14 @@ export const DecisionTree = () => {
 			>
 				{hasValidationError && <InvalidDiagramDialog />}
 				<Background />
+				<ToolbarDragDropProvider>
+					<ToolBar>
+						<ZoomControls />
+						<ExpandAllDecisionTreeNodes nodes={nodes} />
+						<ToolbarSeparator />
+						<BarMetrics />
+					</ToolBar>
+				</ToolbarDragDropProvider>
 			</ReactFlow>
 		</div>
 	);

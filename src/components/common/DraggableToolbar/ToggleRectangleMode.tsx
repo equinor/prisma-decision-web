@@ -1,8 +1,8 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { rectangleIcon } from '../../../../icons';
 import { useAtom } from 'jotai';
-import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
+import { rectangleIcon } from '../../../icons';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
 
 export const ToggleRectangleMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
