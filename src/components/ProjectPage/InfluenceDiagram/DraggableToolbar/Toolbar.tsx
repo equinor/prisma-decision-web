@@ -1,29 +1,26 @@
 import { useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useNodes, useStore } from '@xyflow/react';
+import { useNodes } from '@xyflow/react';
+import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
 import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
+import { SolutionEvidenceResponse } from '../../../../validators';
 import { CreateIssues } from '../../../common/CreateIssue';
 import { EVMetrics } from '../../../common/EVMetrics';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
 import { ZoomControls } from '../../ZoomControls';
 import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
-import { LayoutControls } from './LayoutControls';
-import { TogglePanMode } from './TogglePanMode';
-import { ToggleSelectionMode } from './ToggleSelectionMode';
-import { SolutionEvidenceResponse } from '../../../../validators';
-import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
 import { DeleteMenu } from './DeleteMenu';
+import { LayoutControls } from './LayoutControls';
 
-export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
+export const Toolbar = () => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
 	const { ref, handleRef } = useDraggable({
 		id: 'toolbar',
 	});
-	const isSelecting = useStore(state => state.selectNodesOnDrag);
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const selectedNodes = nodes.filter(node => node.selected);
 	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
@@ -55,8 +52,6 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ZoomControls />
 			<LayoutControls />
 			<div className='bg-background-light h-9 w-0.5' />
-			<TogglePanMode checked={!isSelecting} onChange={onClickPanMode} />
-			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
 			<ToggleExpandAll />
 			<div className='bg-background-light h-9 w-0.5' />
 			<DeleteMenu selectedNodes={selectedNodes} />
@@ -73,9 +68,4 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			)}
 		</div>
 	);
-};
-
-type ToolBarProps = {
-	onClickPanMode: () => void;
-	onClickSelectionMode: () => void;
 };
