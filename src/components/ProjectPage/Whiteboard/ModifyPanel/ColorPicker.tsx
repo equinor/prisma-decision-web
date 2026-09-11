@@ -1,7 +1,7 @@
 import { cn } from '../../../../utils/cn';
 import { WhiteboardNode } from '../../../../validators';
 
-const predefinedColors = ['default', '#ff6467', '#ffff00', '#00ffff'] as const;
+const predefinedColors = ['default', '#fca5a5', '#ff9200', '#40d38f', '#52c0ff'] as const;
 
 export const ColorPicker = ({
 	updateNode,
