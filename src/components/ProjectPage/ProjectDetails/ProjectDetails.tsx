@@ -43,7 +43,7 @@ export const ProjectDetails = () => {
 					{isFacilitator && <DeleteProjectDialog project={selectedProject} showLabel />}
 				</div>
 			</div>
-			{isFacilitator ? <ProjectForm /> : <ProjectInformation />}
+			{isFacilitator ? <ProjectForm key={selectedProject.id} /> : <ProjectInformation />}
 		</div>
 	);
 };
