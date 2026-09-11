@@ -37,3 +37,42 @@ export const useUpdateDiscreteProbabilities = () => {
 		},
 	});
 };
+
+export const useBulkUpdateDiscreteProbabilities = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (probabilities: DiscreteProbability[]) => {
+			const res = await apiClient.put('/discrete_probabilities', probabilities);
+			return res.data;
+		},
+
+		onMutate: async newProbs => {
+			await queryClient.cancelQueries({ queryKey: ['discreteProbabilities'] });
+			const previousProbs = queryClient.getQueryData<DiscreteProbability[]>([
+				'discreteProbabilities',
+			]);
+			if (previousProbs) {
+				queryClient.setQueryData(
+					['discreteProbabilities'],
+					previousProbs.map(p => {
+						const updatedProb = newProbs.find(np => np.id === p.id);
+						return updatedProb ? updatedProb : p;
+					}),
+				);
+			}
+			return { previousProbs };
+		},
+		onError: (_err, _newProb, context) => {
+			showErrorToast('Failed to update probabilities');
+			if (context?.previousProbs) {
+				queryClient.setQueryData(['discreteProbabilities'], context.previousProbs);
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
+			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
+			queryClient.invalidateQueries({ queryKey: ['solution'] });
+		},
+	});
+};
