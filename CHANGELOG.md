@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/prisma-decision-web/compare/v1.1.0...v1.2.0) (2026-09-11)
+
+
+### Features
+
+* adds clear all button to prob and utility tables ([#767](https://github.com/equinor/prisma-decision-web/issues/767)) ([5afd9d0](https://github.com/equinor/prisma-decision-web/commit/5afd9d0a60dafa2c4bc27bfa31cb2cad2dff4a19))
+* disabel state options when restricition table makes it impossible ([#752](https://github.com/equinor/prisma-decision-web/issues/752)) ([4877593](https://github.com/equinor/prisma-decision-web/commit/487759370198f942f633697f4141b7ae163208c9))
+
+
+### Bug Fixes
+
+* refetch board nodes and sheets after duplicating a project ([8a5a88d](https://github.com/equinor/prisma-decision-web/commit/8a5a88d69a0a91954c06d6a5c699e46d84d4b880))
+
 ## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-09-03)
 
 
