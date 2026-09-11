@@ -6,11 +6,11 @@ import { useGetProjects } from '../../hooks/api/useGetProjects';
 import { ProjectCard } from './ProjectCard';
 
 import { useGetInfluenceNodes } from '../../hooks/api/useGetInfluenceNodes';
+import { useGetObjectives } from '../../hooks/api/useGetObjectives';
+import { useGetStrategies } from '../../hooks/api/useGetStrategies';
 import { isProd } from '../../utils/getEnvironment';
 import { CreateProject } from '../common/ProjectInformation/CreateProject';
 import { ImportProject } from '../common/ProjectInformation/ImportProject';
-import { useGetStrategies } from '../../hooks/api/useGetStrategies';
-import { useGetObjectives } from '../../hooks/api/useGetObjectives';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -77,9 +77,13 @@ export const HomePage = () => {
 							</span>
 						</div>
 						<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4'>
-							{otherProjects.map(project => (
-								<ProjectCard key={project.id} project={project} />
-							))}
+							{otherProjects
+								.toSorted(
+									(a, b) => a.created_at?.localeCompare(b.created_at ?? '') ?? 0,
+								)
+								.map(project => (
+									<ProjectCard key={project.id} project={project} />
+								))}
 						</div>
 					</div>
 				</div>

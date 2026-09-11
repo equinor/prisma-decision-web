@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-09-03)
+
+
+### Features
+
+* add abilty to remove options from strategies ([d31c1ab](https://github.com/equinor/prisma-decision-web/commit/d31c1abb18c748a8c84cd532dc76f516b79f8b95))
+* add cumulative probability to output nodes ([#419](https://github.com/equinor/prisma-decision-web/issues/419)) ([fa7cd05](https://github.com/equinor/prisma-decision-web/commit/fa7cd05c7812964d936103ed3f7febdc16a4cb8a))
+* add whiteboard ([#686](https://github.com/equinor/prisma-decision-web/issues/686)) ([8a96ac2](https://github.com/equinor/prisma-decision-web/commit/8a96ac2c4475804d280242e9e4053c4536cd32cf))
+* adds a readonly version of the project information page to be shown to user who are not facilitators ([#664](https://github.com/equinor/prisma-decision-web/issues/664)) ([8f14c64](https://github.com/equinor/prisma-decision-web/commit/8f14c64ad639eb8d0fa3cfe282f6bb14e46e9f1e))
+* adds compact decision tree view ([#471](https://github.com/equinor/prisma-decision-web/issues/471)) ([32b6e74](https://github.com/equinor/prisma-decision-web/commit/32b6e747804e84d679e8ff23416bf5549d3f882c))
+* adds confirmation dialog to deleting edges and disable utility node from being an edge source ([cbba8e2](https://github.com/equinor/prisma-decision-web/commit/cbba8e2d70071de9d576c5a92e67901d7e24e184))
+* adds favorite project feature an objective ordering ([#722](https://github.com/equinor/prisma-decision-web/issues/722)) ([8b0afe3](https://github.com/equinor/prisma-decision-web/commit/8b0afe34840cc409a4912c47d24787ae96dc933e))
+* adds pruned nodes to the decision tree ([ebea0b1](https://github.com/equinor/prisma-decision-web/commit/ebea0b10185b920ed1c0a5c8c7ae04d5b76536f7))
+* adds restriciton table ([#694](https://github.com/equinor/prisma-decision-web/issues/694)) ([0475697](https://github.com/equinor/prisma-decision-web/commit/047569770d00304d69b8ffc5d03ceab40e294727))
+* adds simple user customization to the influence diagram ([#595](https://github.com/equinor/prisma-decision-web/issues/595)) ([b7c4394](https://github.com/equinor/prisma-decision-web/commit/b7c43946445b820aee36817fe8f7c2552356b5ca))
+* adds strategy table ([#452](https://github.com/equinor/prisma-decision-web/issues/452)) ([7e17860](https://github.com/equinor/prisma-decision-web/commit/7e1786048cef6fe25945b9da516195f58f7a9048))
+* adds whiteboard sheets ([d5a58ed](https://github.com/equinor/prisma-decision-web/commit/d5a58eda0b6f905bce14f3499fe066fe6cce2d5f))
+* Allow the user to click a node to bring it to the foreground ([#726](https://github.com/equinor/prisma-decision-web/issues/726)) ([671d1d5](https://github.com/equinor/prisma-decision-web/commit/671d1d59167e6db592787e9097d2e12a827b5db4))
+* allow user to select strategy icon color ([#611](https://github.com/equinor/prisma-decision-web/issues/611)) ([a8ac6f8](https://github.com/equinor/prisma-decision-web/commit/a8ac6f8f02996202b9d287257095dc9113c29990))
+* change ui for id validation ([#690](https://github.com/equinor/prisma-decision-web/issues/690)) ([9cd009d](https://github.com/equinor/prisma-decision-web/commit/9cd009d69ff5531161bb3ae5714ec21e56f78905))
+* collection of small UI and bug fixes ([#418](https://github.com/equinor/prisma-decision-web/issues/418)) ([85b9435](https://github.com/equinor/prisma-decision-web/commit/85b9435b89051a329c65d704a600a7e964fabb0c))
+* disable input in probabilty table bases on parent restriction table ([cc5ad87](https://github.com/equinor/prisma-decision-web/commit/cc5ad87cca7d255257527d2450b945ff3c233a4c))
+* implements partial decsion tree fetching ([#547](https://github.com/equinor/prisma-decision-web/issues/547)) ([55d5d58](https://github.com/equinor/prisma-decision-web/commit/55d5d58e894b30edd49bf03e56ea732de58f9850))
+* Move influence diagram errors to toolbar ([#465](https://github.com/equinor/prisma-decision-web/issues/465)) ([3de52a1](https://github.com/equinor/prisma-decision-web/commit/3de52a13e31c39f4e2d4f7eac53a33b971b853ca))
+
+
+### Bug Fixes
+
+* add back delete button on edges when the target is a utility node ([c1984ca](https://github.com/equinor/prisma-decision-web/commit/c1984cad9782e8960b00cb0130f6a4863f018f36))
+* allow decimal numbers for utilities ([80f1add](https://github.com/equinor/prisma-decision-web/commit/80f1add6296a4a7d5ee077b11c99d185ed2f470a))
+* allow the user to select state when id is invalid. also simplifies the error ui for when it is invalid ([#663](https://github.com/equinor/prisma-decision-web/issues/663)) ([8a4e4a0](https://github.com/equinor/prisma-decision-web/commit/8a4e4a0d6a0ef4d7f6a6ecc2348f901c290b1fbf))
+* default to an unused strategy icon ([#610](https://github.com/equinor/prisma-decision-web/issues/610)) ([b00b0c9](https://github.com/equinor/prisma-decision-web/commit/b00b0c9eaa792984ae77e4657544a058b5a449af))
+* Fixes problem where issue shows in the wrong table in list view ([#472](https://github.com/equinor/prisma-decision-web/issues/472)) ([9017a2a](https://github.com/equinor/prisma-decision-web/commit/9017a2a6c8135bb8e73eb613601980c674dfd5ec))
+* fixes prod check ([5785dd8](https://github.com/equinor/prisma-decision-web/commit/5785dd80f90a3fe66363df2a7556958c2b9b2fd2))
+* include board nodes and sheet when exporting a project ([#757](https://github.com/equinor/prisma-decision-web/issues/757)) ([f71c4a2](https://github.com/equinor/prisma-decision-web/commit/f71c4a2cb9859986e487285f374a5799cb1fa689))
+* invalidate solution when restriction entry is updated ([#701](https://github.com/equinor/prisma-decision-web/issues/701)) ([9645caf](https://github.com/equinor/prisma-decision-web/commit/9645cafcc2020d83d6f1bb124ec646db23bf3e16))
+* isDev helper function now works as expected ([03e8d6d](https://github.com/equinor/prisma-decision-web/commit/03e8d6d9cff0603584d72cec1b7cd0dd35b09d4c))
+* Layout issue for decisions in strategy table ([#473](https://github.com/equinor/prisma-decision-web/issues/473)) ([d7b07f6](https://github.com/equinor/prisma-decision-web/commit/d7b07f60dd1b902af88a1a92f2a6c70fdb1028bd))
+* make sure all derived queries are refetched when invalid ([#691](https://github.com/equinor/prisma-decision-web/issues/691)) ([1733b85](https://github.com/equinor/prisma-decision-web/commit/1733b8593d420a6d41cb964072829b03a5147498))
+* Move parent project information into ProjectDetails component ([#485](https://github.com/equinor/prisma-decision-web/issues/485)) ([a2bbd1f](https://github.com/equinor/prisma-decision-web/commit/a2bbd1f394a9667bebd743118784b6df6fe0e0ae))
+* move utility node error state above the node ([#766](https://github.com/equinor/prisma-decision-web/issues/766)) ([b614a88](https://github.com/equinor/prisma-decision-web/commit/b614a88d5015e0e7433c7ee47aacf21644e9f64b))
+* navigate user to new project on duplicate ([#753](https://github.com/equinor/prisma-decision-web/issues/753)) ([dafb86c](https://github.com/equinor/prisma-decision-web/commit/dafb86ce358805e3dff148a5c7139557d7dacef4))
+* navigate user to the homepage after deleting a project ([#754](https://github.com/equinor/prisma-decision-web/issues/754)) ([bbd4325](https://github.com/equinor/prisma-decision-web/commit/bbd43251ab5d1201b72fc82933281c86d5ec666e))
+* only include the correct issues in the influence diagram ([0c6e854](https://github.com/equinor/prisma-decision-web/commit/0c6e854fb8a672da5a05f3689ab90809af4894cb))
+* per strategy ev metrics ([cbd3157](https://github.com/equinor/prisma-decision-web/commit/cbd3157499fa02594bbf4fca996ae329e3dd062c))
+* refetch all data when a new project is imported ([0a2ab0c](https://github.com/equinor/prisma-decision-web/commit/0a2ab0c19cf24d2ed2b3ceea1d439d5556e12315))
+* remove uneeded call to calculate decision tree ([acc4a26](https://github.com/equinor/prisma-decision-web/commit/acc4a2670df732b41caa640b47d266c59ab23d09))
+* remove validation that end date must be in the future ([d31c1ab](https://github.com/equinor/prisma-decision-web/commit/d31c1abb18c748a8c84cd532dc76f516b79f8b95))
+* show proper error message when non-facilitator tries to udpdate project info ([0dc5dcc](https://github.com/equinor/prisma-decision-web/commit/0dc5dcc02fb8451c2d04cdaa69763571fd343074))
+* small table fixes ([#695](https://github.com/equinor/prisma-decision-web/issues/695)) ([848045c](https://github.com/equinor/prisma-decision-web/commit/848045c1958629da2d6635fa6823c7b342fb586d))
+* sort project by create date ([#758](https://github.com/equinor/prisma-decision-web/issues/758)) ([53e3c0d](https://github.com/equinor/prisma-decision-web/commit/53e3c0d52a722e209f8d142fcc0370c9aa6e15d0))
+* stabilize influence diagram more ([db80720](https://github.com/equinor/prisma-decision-web/commit/db807206ffedd039c9d24dc451df93592021d478))
+* stabilize the influence diagram ([#546](https://github.com/equinor/prisma-decision-web/issues/546)) ([df595ef](https://github.com/equinor/prisma-decision-web/commit/df595ef2b0171481b6f8413c77620970c22875ff))
+* stops influence diagram edges from being created when the user just click on two nodes ([22ccf12](https://github.com/equinor/prisma-decision-web/commit/22ccf1264ac96281ae95cd42b701c92df74236f6))
+* truncate ev values in decision tree ([07ca5f5](https://github.com/equinor/prisma-decision-web/commit/07ca5f5563746677a83d55e2bf2cbba58fd3496a))
+
 ## 1.0.0 (2026-02-13)
 
 

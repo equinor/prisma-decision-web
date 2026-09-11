@@ -57,6 +57,8 @@ The app uses environment-specific `.env` files:
 
 Environment files: `.env.development`, `.env.test`, `.env.production`
 
+For authenticated environments, register the absolute `/redirect.html` URL as a Single-page application redirect URI in the corresponding Entra ID app registration. The protocol, host, port, and path must match exactly.
+
 ## Usage
 
 Start the development server:

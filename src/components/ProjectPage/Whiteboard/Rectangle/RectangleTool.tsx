@@ -70,6 +70,7 @@ export function RectangleTool() {
 			stroke_width: 8,
 			new: true,
 			board_sheet_id: sheet.id,
+			zIndex: 0,
 		});
 
 		setStart(null);

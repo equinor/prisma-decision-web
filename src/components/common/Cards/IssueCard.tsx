@@ -1,5 +1,12 @@
 import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
-import { chevron_down, chevron_up, delete_to_trash, edit, more_vertical } from '@equinor/eds-icons';
+import {
+	chevron_down,
+	chevron_up,
+	delete_to_trash,
+	edit,
+	functions,
+	more_vertical,
+} from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { createContext, use, useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
@@ -85,7 +92,12 @@ export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
 			>
 				<Icon data={more_vertical} />
 			</Button>
-			<Menu open={menuOpen} onClose={() => setMenuOpen(false)} anchorEl={anchorEl}>
+			<Menu
+				open={menuOpen}
+				onClose={() => setMenuOpen(false)}
+				anchorEl={anchorEl}
+				className='nodrag nopan nowheel'
+			>
 				{children}
 			</Menu>
 		</div>
@@ -138,6 +150,21 @@ export const IssueCardUtilityTableMenuItem = ({
 		<Menu.Item onClick={onClick} disabled={disabled}>
 			<Icon data={utilityIcon} className='ml-1' />
 			<p>Utility Table</p>
+		</Menu.Item>
+	);
+};
+
+export const IssueCardPolicyTableMenuItem = ({
+	onClick,
+	disabled,
+}: {
+	onClick: () => void;
+	disabled?: boolean;
+}) => {
+	return (
+		<Menu.Item onClick={onClick} disabled={disabled}>
+			<Icon data={functions} />
+			<p>Policy Table</p>
 		</Menu.Item>
 	);
 };

@@ -17,6 +17,8 @@ export type DecisionType = (typeof decisionTypes)[number];
 export const WhiteboardNodeTypes = ['Issue', 'Rectangle', 'Text', 'Arrow', 'Freehand'] as const;
 export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
+export const BOTTOM_LAYER_Z_INDEX = 0;
+
 export const objectiveSchema = z.object({
 	id: z.guid(),
 	name: z.string().min(1, 'Objective name is required'),
@@ -69,6 +71,7 @@ export const whiteboardNode = z.object({
 	x_position: z.float64(),
 	y_position: z.float64(),
 	rotation: z.float64(),
+	zIndex: z.number().int(),
 	data: z.string(),
 	stroke_width: z.number().optional(),
 	stroke_style: z.enum(['Solid', 'Dashed', 'Dotted']).optional(),
@@ -95,6 +98,8 @@ export const projectSchema = z.object({
 	parent_project_name: z.string().optional(),
 	end_date: z.iso.datetime(),
 	users: z.array(projectRoleSchema, 'Users must be an array'),
+	created_at: z.iso.datetime().optional(),
+	updated_at: z.iso.datetime().optional(),
 });
 
 export const decisionSchema = z.object({
@@ -195,14 +200,39 @@ export const issueSchema = z.object({
 });
 export const projectImportFile = z.array(z.file().mime('application/json'));
 
+const restrictionEntrySchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	restriction_value: z.number(),
+	parent_state_id: z.guid(),
+	is_parent_uncertainty: z.boolean(),
+	child_state_id: z.guid(),
+	is_child_uncertainty: z.boolean(),
+	restriction_table_id: z.guid(),
+});
+
+export const restrictionTableSchema = z.object({
+	created_at: z.string(),
+	updated_at: z.string(),
+	id: z.string(),
+	name: z.string(),
+	project_id: z.string(),
+	edge_id: z.string(),
+	restriction_entries: z.array(restrictionEntrySchema),
+});
+
 export const projectImportSchema = z.object({
 	projects: projectSchema,
-	Objectives: z.array(objectiveSchema).optional(),
+	objectives: z.array(objectiveSchema).optional(),
 	issues: z.array(issueSchema).optional(),
 	edges: z.array(edgeSchema).optional(),
-	Strategies: z.array(strategySchema).optional(),
+	strategies: z.array(strategySchema).optional(),
 	discrete_probabilities: z.array(discreteProbabilitySchema).optional(),
 	discrete_utilities: z.array(discreteUtilitiesSchema).optional(),
+	restriction_tables: z.array(restrictionTableSchema).optional(),
+	board_nodes: z.array(whiteboardNode).optional(),
+	board_sheets: z.array(whiteboardSheet).optional(),
 });
 const metricScore = () =>
 	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
@@ -248,26 +278,16 @@ export const utilityTableSchema = z.object({
 	discrete_utilities: z.array(discreteUtilitiesSchema),
 });
 
-const restrictionEntrySchema = z.object({
-	created_at: z.string(),
-	updated_at: z.string(),
-	id: z.string(),
-	restriction_value: z.number(),
-	parent_state_id: z.guid(),
-	is_parent_uncertainty: z.boolean(),
-	child_state_id: z.guid(),
-	is_child_uncertainty: z.boolean(),
-	restriction_table_id: z.guid(),
+export const discretePolicySchema = z.object({
+	decision_id: z.guid(),
+	parent_option_ids: z.array(z.guid()),
+	parent_outcome_ids: z.array(z.guid()),
+	option_id: z.guid(),
+	value: z.number(),
 });
-
-export const restrictionTableSchema = z.object({
-	created_at: z.string(),
-	updated_at: z.string(),
-	id: z.string(),
-	name: z.string(),
-	project_id: z.string(),
-	edge_id: z.string(),
-	restriction_entries: z.array(restrictionEntrySchema),
+export const policyTableSchema = z.object({
+	issue_id: z.guid(),
+	discrete_policies: z.array(discretePolicySchema),
 });
 
 export type ErrorHandlingState = {
@@ -308,3 +328,5 @@ export type Uncertainty = z.infer<typeof uncertaintySchema>;
 export type ProbabilityTable = z.infer<typeof probabilityTableSchema>;
 export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
 export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
+export type DiscretePolicy = z.infer<typeof discretePolicySchema>;
+export type PolicyTable = z.infer<typeof policyTableSchema>;

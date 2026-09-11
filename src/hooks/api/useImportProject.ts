@@ -22,6 +22,9 @@ export const useImportProject = () => {
 				queryClient.refetchQueries({ queryKey: ['probabilityTables'] }),
 				queryClient.refetchQueries({ queryKey: ['utilityTables'] }),
 				queryClient.refetchQueries({ queryKey: ['assessments'] }),
+				queryClient.refetchQueries({ queryKey: ['restrictionTables'] }),
+				queryClient.refetchQueries({ queryKey: ['whiteboardNodes'] }),
+				queryClient.refetchQueries({ queryKey: ['whiteboardSheets'] }),
 				queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] }),
 			]);
 		},

@@ -22,6 +22,12 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+app.get('/redirect.html', (req, res) => {
+	res.setHeader('Cache-Control', 'no-store');
+	res.removeHeader('Cross-Origin-Opener-Policy');
+	res.sendFile(path + 'dist/redirect.html');
+});
+
 // Define routes with strict CSP
 router.get('*', (req, res) => {
 	const nonce = randomBytes(16).toString('base64');

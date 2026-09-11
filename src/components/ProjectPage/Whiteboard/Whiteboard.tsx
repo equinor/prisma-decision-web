@@ -64,9 +64,10 @@ export const Whiteboard = () => {
 	const holdingShift = useKeyHold('Shift');
 	const holdingControl = useKeyHold('Alt');
 	const enableSnapToGrid = holdingShift && holdingControl;
-	const { nodes, onNodesChange, onNodeDragStop, setNodes } = useWhiteboard({
-		snapToGrid: enableSnapToGrid,
-	});
+	const { nodes, onNodesChange, onNodeDragStart, onNodeDragStop, setNodes, onNodeClick } =
+		useWhiteboard({
+			snapToGrid: enableSnapToGrid,
+		});
 	const nodeTypes = useMemo(
 		() => ({
 			Arrow: (props: NodeProps<ReactFlowWhiteboardNode>) => (
@@ -99,10 +100,10 @@ export const Whiteboard = () => {
 				nodes={nodes}
 				snapToGrid={enableSnapToGrid}
 				snapGrid={[30, 30]}
-				zIndexMode='manual'
 				panOnDrag={!isSelecting}
 				selectNodesOnDrag={isSelecting}
 				selectionMode={SelectionMode.Partial}
+				elevateNodesOnSelect
 				connectionMode={ConnectionMode.Strict}
 				selectionOnDrag={true}
 				zoomOnDoubleClick={false}
@@ -110,8 +111,10 @@ export const Whiteboard = () => {
 				deleteKeyCode={['Backspace', 'Delete']}
 				nodeTypes={nodeTypes}
 				onDelete={data => deleteWhiteboardNode(data.nodes.map(n => n.id))}
+				onNodeDragStart={onNodeDragStart}
 				onNodeDragStop={onNodeDragStop}
 				onNodesChange={onNodesChange}
+				onNodeClick={onNodeClick}
 				proOptions={{ hideAttribution: true }}
 				fitView
 				fitViewOptions={{ padding: 0.4 }}

@@ -58,6 +58,7 @@ export const Toolbar = () => {
 			data: sourceId,
 			rotation: 0,
 			board_sheet_id: sheet.id,
+			zIndex: 0,
 		});
 	};
 

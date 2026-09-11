@@ -7,12 +7,14 @@ import {
 	getParentRowSpans,
 } from '../ProbabilityTable/utils';
 
+export type ParentStateInfo = { name: string; issueName: string; issueId: string };
+
 export type ParentStateLookups = {
-	optionMap: Map<string, { name: string; issueName: string; issueId: string }>;
-	outcomeMap: Map<string, { name: string; issueName: string; issueId: string }>;
+	optionMap: Map<string, ParentStateInfo>;
+	outcomeMap: Map<string, ParentStateInfo>;
 };
 
-export const getDiscreteValueRows = <T extends ParentStateValue>(values: T[], issues: Issue[]) => {
+export const getParentStateLookups = (issues: Issue[]): ParentStateLookups => {
 	const lookups: ParentStateLookups = {
 		optionMap: new Map(),
 		outcomeMap: new Map(),
@@ -40,6 +42,12 @@ export const getDiscreteValueRows = <T extends ParentStateValue>(values: T[], is
 		}
 	}
 
+	return lookups;
+};
+
+export const getDiscreteValueRows = <T extends ParentStateValue>(values: T[], issues: Issue[]) => {
+	const lookups = getParentStateLookups(issues);
+
 	if (!values.length) {
 		return { lookups, parents: [], parentRowSpans: [], rows: [] };
 	}
@@ -61,11 +69,13 @@ export const getDiscreteValueRows = <T extends ParentStateValue>(values: T[], is
 		}
 	};
 
-	for (const optionId of values[0].parent_option_ids) {
-		addParent(optionId, 'decision', lookups.optionMap);
-	}
-	for (const outcomeId of values[0].parent_outcome_ids) {
-		addParent(outcomeId, 'uncertainty', lookups.outcomeMap);
+	for (const value of values) {
+		for (const optionId of value.parent_option_ids) {
+			addParent(optionId, 'decision', lookups.optionMap);
+		}
+		for (const outcomeId of value.parent_outcome_ids) {
+			addParent(outcomeId, 'uncertainty', lookups.outcomeMap);
+		}
 	}
 
 	const addState = (stateId: string, lookup: ParentStateLookups['optionMap']) => {
