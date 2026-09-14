@@ -57,7 +57,7 @@
 	},
 	"devDependencies": {
 		"@hookform/devtools": "^4.4.0",
-		"@rolldown/plugin-babel": "^0.2.3",
+		"@rolldown/plugin-babel": "^0.2.4",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.5",
