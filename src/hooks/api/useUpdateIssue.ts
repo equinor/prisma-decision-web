@@ -3,9 +3,16 @@ import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
 
-export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useUpdateIssue = ({
+	onSuccess,
+	scope,
+}: {
+	onSuccess?: () => void;
+	scope?: string;
+}) => {
 	const queryClient = useQueryClient();
 	return useMutation({
+		scope: scope ? { id: scope } : undefined,
 		mutationFn: async (issue: Issue) => {
 			const res = await apiClient.put('/issues', [issue]);
 			return res.data;
