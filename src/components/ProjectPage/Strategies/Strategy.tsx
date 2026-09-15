@@ -20,11 +20,11 @@ import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedP
 export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
-	selectedStrategyIds,
+	hiddenStrategyIds,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
-	selectedStrategyIds: Set<string>;
+	hiddenStrategyIds: Set<string>;
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
 	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
@@ -84,7 +84,7 @@ export const Strategy = ({
 					<Checkbox
 						label='Add to compare'
 						className='flex-row-reverse'
-						checked={selectedStrategyIds?.has(strategy.id)}
+						checked={!hiddenStrategyIds?.has(strategy.id)}
 						onChange={() => onClickAddToStrategyTable(strategy.id)}
 					/>
 					<EditStrategy strategy={strategy} />
