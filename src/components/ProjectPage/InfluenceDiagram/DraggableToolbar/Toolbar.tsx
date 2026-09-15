@@ -6,7 +6,6 @@ import { dragHandle } from '../../../../icons';
 import { ReactFlowInfluenceNode } from '../../../../types';
 import { cn } from '../../../../utils/cn';
 import { CreateIssues } from '../../../common/CreateIssue';
-import { DeleteIssuesDialog } from '../../../common/DeleteIssuesDialog';
 import { EVMetrics } from '../../../common/EVMetrics';
 import { ToggleExpandAll } from '../../ToggleExpandAll';
 import { ZoomControls } from '../../ZoomControls';
@@ -17,6 +16,7 @@ import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { SolutionEvidenceResponse } from '../../../../validators';
 import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
+import { DeleteMenu } from './DeleteMenu';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -59,7 +59,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
 			<ToggleExpandAll />
 			<div className='bg-background-light h-9 w-0.5' />
-			<DeleteIssuesDialog nodes={selectedNodes} />
+			<DeleteMenu selectedNodes={selectedNodes} />
 			<ChangeIssueType />
 			<CreateIssues />
 			<InfluenceDiagramValidation />
