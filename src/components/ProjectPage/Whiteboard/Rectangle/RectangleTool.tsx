@@ -43,7 +43,7 @@ export function RectangleTool() {
 	}
 
 	function handlePointerUp() {
-		if (!start || !end) return;
+		if (!start || !end || !sheet) return;
 		const position = screenToFlowPosition(getPosition(start, end));
 		const dimension = getDimensions(start, end, getViewport().zoom);
 		const newNode = {
