@@ -1,7 +1,7 @@
 import { Button } from '@equinor/eds-core-react';
 import { useAtom } from 'jotai';
-import { DragToSelectIcon } from '../../../common/DragToSelectIcon';
-import { activeToolAtom } from '../activeToolAtom';
+import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
+import { DragToSelectIcon } from '../DragToSelectIcon';
 
 export const ToggleSelectionMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
