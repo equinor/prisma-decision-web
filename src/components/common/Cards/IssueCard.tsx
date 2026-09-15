@@ -237,7 +237,7 @@ export const IssueCardStates = ({
 								disabledStateIds?.includes(option.id) &&
 								option.id !== selectedState?.id;
 							return (
-								<li
+								<IssueCardState
 									onClick={() => !disabled && onClickState?.(option)}
 									key={option.id}
 									className={cn(
@@ -253,7 +253,7 @@ export const IssueCardStates = ({
 								>
 									<p className='truncate'>{option.name}</p>
 									<p className='truncate'>{option.utility}</p>
-								</li>
+								</IssueCardState>
 							);
 						})}
 					</ul>
@@ -261,6 +261,27 @@ export const IssueCardStates = ({
 			</CollapsibleContent>
 			{children}
 		</Collapsible>
+	);
+};
+
+export const IssueCardState = ({
+	className,
+	children,
+	...rest
+}: {
+	className?: string;
+	children: React.ReactNode;
+} & React.HTMLAttributes<HTMLLIElement>) => {
+	return (
+		<li
+			className={cn(
+				className,
+				'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',
+			)}
+			{...rest}
+		>
+			{children}
+		</li>
 	);
 };
 
