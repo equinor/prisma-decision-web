@@ -2,9 +2,13 @@ import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Issue } from '../../../../validators';
+import { useController } from 'react-hook-form';
+import { useIssueForm } from '../../../../hooks/useIssueForm';
+import { boundaryTypes, Issue, issueTypes } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
+import { DropdownTableCell } from '../../../common/DropdownTableCell';
+import { EditableTableCell } from '../../../common/EditableTableCell';
 import { EditIssueModal } from '../../../common/EditIssueModal';
 import { format } from 'date-fns/format';
 import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
@@ -12,6 +16,20 @@ import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
 export const IssueRow = ({ issue }: IssueRowProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const { control, onSubmit } = useIssueForm({ issue });
+	const {
+		field: { onChange: onChangeName },
+	} = useController({ control, name: 'name' });
+	const {
+		field: { onChange: onChangeDescription },
+	} = useController({ control, name: 'description' });
+	const {
+		field: { onChange: onChangeType },
+	} = useController({ control, name: 'type' });
+	const {
+		field: { onChange: onChangeBoundary },
+	} = useController({ control, name: 'boundary' });
+
 	return (
 		<>
 			<Table.Row key={issue.id}>
@@ -25,8 +43,17 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 						</Button>
 					</div>
 				</Table.Cell>
-				<Table.Cell>{issue.name}</Table.Cell>
-				<Table.Cell className='max-w-xl truncate'>{issue.description}</Table.Cell>
+				<EditableTableCell
+					value={issue.name}
+					onChange={onChangeName}
+					onBlur={() => onSubmit()}
+				/>
+				<EditableTableCell
+					className='max-w-xl truncate'
+					value={issue.description}
+					onChange={onChangeDescription}
+					onBlur={() => onSubmit()}
+				/>
 				<Table.Cell className='text-right!'>
 					{issue.type === 'Decision'
 						? issue.decision.options.length
@@ -34,16 +61,28 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 							? issue.uncertainty.outcomes.length
 							: null}
 				</Table.Cell>
-				<Table.Cell>
-					<div className='flex items-center justify-center'>
-						<IssueTypeLabel type={issue.type} />
-					</div>
-				</Table.Cell>
-				<Table.Cell className='capitalize'>
-					<div className='flex items-center justify-center'>
-						<BoundaryLabel boundary={issue.boundary} />
-					</div>
-				</Table.Cell>
+				<DropdownTableCell
+					value={issue.type}
+					options={issueTypes}
+					onChange={onChangeType}
+					onBlur={() => onSubmit()}
+					renderValue={type => (
+						<div className='flex h-full items-center justify-center'>
+							<IssueTypeLabel type={type} />
+						</div>
+					)}
+				/>
+				<DropdownTableCell
+					value={issue.boundary}
+					options={boundaryTypes}
+					onChange={onChangeBoundary}
+					onBlur={() => onSubmit()}
+					renderValue={boundary => (
+						<div className='flex h-full items-center justify-center'>
+							<BoundaryLabel boundary={boundary} />
+						</div>
+					)}
+				/>
 				<Table.Cell className='whitespace-nowrap'>
 					{' '}
 					{issue.created_at ? format(issue.created_at, 'yyyy-MM-dd') : '-'}
