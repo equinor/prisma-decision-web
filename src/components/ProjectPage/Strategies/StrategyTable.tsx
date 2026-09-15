@@ -1,6 +1,7 @@
 import { Icon } from '@equinor/eds-core-react';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { Strategy } from '../../../validators';
+import { IssueCard, IssueCardContent, IssueCardState } from '../../common/Cards/IssueCard';
 import { strategyIcons } from './icons';
 
 export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
@@ -36,19 +37,9 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 			<div className='bg-background-light w-full overflow-auto rounded-sm p-2'>
 				<div className='flex min-w-max gap-2'>
 					{issues.map(issue => (
-						<div
-							key={issue.id}
-							className='bg-background-default shadow-tile flex min-w-60.25 flex-col gap-2 rounded-sm p-2'
-						>
-							<div>
-								<div className='max-w-52 text-sm font-bold whitespace-nowrap'>
-									{issue.name}
-								</div>
-								<div className='text-text-tertiary line-clamp-1 max-w-56 text-sm'>
-									{issue.description}
-								</div>
-							</div>
-							<div className='flex flex-col gap-1'>
+						<IssueCard key={issue.id} issue={issue} className='w-max pb-3'>
+							<IssueCardContent />
+							<ul className='flex flex-col gap-2 rounded-sm text-sm'>
 								{issue.decision.options.map(option => {
 									const selectedByStrategies = strategies.filter(strategy =>
 										strategy.options.some(
@@ -56,10 +47,7 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 										),
 									);
 									return (
-										<div
-											key={option.id}
-											className='bg-background-light flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1 text-sm'
-										>
+										<IssueCardState key={option.id}>
 											<span>{option.name}</span>
 											<div className='flex flex-wrap items-center justify-end gap-1'>
 												{selectedByStrategies.map(strategy => (
@@ -67,14 +55,16 @@ export const StrategyTable = ({ strategies }: { strategies: Strategy[] }) => {
 														key={strategy.id}
 														data={strategyIcons[strategy.icon]}
 														color={strategy.icon_color}
+														size={20 as 24}
+														className='h-max!'
 													/>
 												))}
 											</div>
-										</div>
+										</IssueCardState>
 									);
 								})}
-							</div>
-						</div>
+							</ul>
+						</IssueCard>
 					))}
 				</div>
 			</div>
