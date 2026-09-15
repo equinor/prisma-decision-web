@@ -6,8 +6,9 @@ import { useUpdateObjective } from './api/useUpdateObjective';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
-export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
+export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
 	const selectedProject = useSelectedProject();
+	const { objective, onSuccess } = props || {};
 
 	const defaultValues = useMemo(
 		() => objective || getDefaultValues(selectedProject.id),
@@ -62,4 +63,4 @@ const getDefaultValues = (projectId: string): Objective => ({
 type UseObjectiveFormArgs = {
 	objective?: Objective;
 	onSuccess?: () => void;
-};
+} | void;
