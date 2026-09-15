@@ -16,7 +16,7 @@ export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
 	);
 
 	const formMethods = useForm({
-		defaultValues,
+		values: defaultValues,
 		resolver: zodResolver(objectiveSchema),
 	});
 
@@ -29,6 +29,7 @@ export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
 
 	const { mutate: updateObjective, isPending: isUpdating } = useUpdateObjective({
 		onSuccess: onSuccess,
+		scope: objective?.id,
 	});
 
 	const handleSubmit = formMethods.handleSubmit(
