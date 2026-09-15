@@ -1,5 +1,6 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
+import { sortByCreatedAt } from '../../../../utils/sortByCreatedAt';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
 import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
@@ -7,6 +8,7 @@ import { usePolicyTable } from './usePolicyTable';
 
 export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps) => {
 	const { parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
+	const childOptions = sortByCreatedAt(issue.decision.options);
 	if (!rows.length) {
 		return (
 			<div
@@ -38,13 +40,13 @@ export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps)
 					parentRowSpans={parentRowSpans}
 					rows={rows}
 					lookups={lookups}
-					valueColumns={issue.decision.options.map(option => ({
+					valueColumns={childOptions.map(option => ({
 						id: option.id,
 						label: option.name,
 						eyebrow: issue.name,
 					}))}
 					renderValueCells={values =>
-						issue.decision.options.map(option => {
+						childOptions.map(option => {
 							const value =
 								values.find(row => row.option_id === option.id)?.value ?? 0;
 							return (
