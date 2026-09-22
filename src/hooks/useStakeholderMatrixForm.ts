@@ -3,24 +3,33 @@ import { useForm } from 'react-hook-form';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { StakeholderMatrix, stakeholderMatrixSchema } from '../validators';
 import { useCreateStakeholderMatrix } from './api/useCreateStakeholderMatrix';
+import { useUpdateStakeholderMatrix } from './api/useUpdateStakeholderMatrix';
 
-export const useStakeholderMatrixForm = (args?: { onSuccess?: () => void }) => {
+export const useStakeholderMatrixForm = (args?: {
+	stakeholder?: StakeholderMatrix;
+	onSuccess?: () => void;
+}) => {
 	const selectedProject = useSelectedProject();
 	const formMethods = useForm<StakeholderMatrix>({
-		defaultValues: getDefaultValues(selectedProject.id),
+		values: args?.stakeholder ?? getDefaultValues(selectedProject.id),
 		resolver: zodResolver(stakeholderMatrixSchema),
 	});
-	const { mutate: createStakeholder, isPending } = useCreateStakeholderMatrix({
+	const { mutate: createStakeholder, isPending: isCreating } = useCreateStakeholderMatrix({
 		onSuccess: () => {
 			formMethods.reset(getDefaultValues(selectedProject.id));
 			args?.onSuccess?.();
 		},
 	});
+	const { mutate: updateStakeholder, isPending: isUpdating } = useUpdateStakeholderMatrix({
+		onSuccess: args?.onSuccess,
+	});
 
 	return {
 		...formMethods,
-		handleSubmit: formMethods.handleSubmit(data => createStakeholder(data)),
-		isPending,
+		handleSubmit: formMethods.handleSubmit(data =>
+			args?.stakeholder ? updateStakeholder(data) : createStakeholder(data),
+		),
+		isPending: isCreating || isUpdating,
 	};
 };
 

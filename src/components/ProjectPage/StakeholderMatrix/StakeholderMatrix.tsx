@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import { CircularProgress, TextField } from '@equinor/eds-core-react';
+import { useCallback, useState } from 'react';
 import {
 	Chart,
 	LinearScale,
@@ -12,6 +13,8 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderMatrixes';
 import { useSelectedProject } from '../ProjectContext';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
+import { DeleteStakeholderMatrixDialog } from './DeleteStakeholderMatrixDialog';
+import { EditStakeholderMatrix } from './EditStakeholderMatrix';
 
 Chart.register(LinearScale, PointElement, ScatterController, Tooltip, annotationPlugin);
 
@@ -19,7 +22,65 @@ type StakeholderMatrixProps = {
 	className?: string;
 };
 
-const stakeholderColors = ['#007079', '#eb0037', '#4f6b2f', '#8c4a12', '#365f91', '#7d3c74'];
+const regionColors = {
+	consult: '#d1495b',
+	partnerClosely: '#007f8b',
+	observe: '#5b5bd6',
+	keepInformed: '#2e8540',
+};
+
+const stakeholderRegions = [
+	{ key: 'partnerClosely', label: 'Partner closely', affecting: 1, affected: 1 },
+	{ key: 'consult', label: 'Consult', affecting: 0, affected: 1 },
+	{ key: 'keepInformed', label: 'Keep informed', affecting: 1, affected: 0 },
+	{ key: 'observe', label: 'Observe', affecting: 0, affected: 0 },
+] as const;
+
+const getRegionColor = (affectingDecision: number, affectedByDecision: number) => {
+	if (affectedByDecision) {
+		return affectingDecision ? regionColors.partnerClosely : regionColors.consult;
+	}
+	return affectingDecision ? regionColors.keepInformed : regionColors.observe;
+};
+
+const truncateCanvasText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number) => {
+	if (ctx.measureText(text).width <= maxWidth) return text;
+	let truncatedText = text;
+	while (truncatedText.length > 1 && ctx.measureText(`${truncatedText}...`).width > maxWidth) {
+		truncatedText = truncatedText.slice(0, -1);
+	}
+	return `${truncatedText}...`;
+};
+
+const matrixRegionsPlugin: Plugin<'scatter'> = {
+	id: 'stakeholderMatrixRegions',
+	beforeDraw: chart => {
+		const { ctx, chartArea } = chart;
+		const { left, right, top, bottom } = chartArea;
+		const middleX = (left + right) / 2;
+		const middleY = (top + bottom) / 2;
+		const regions = [
+			{ x: left, y: top, color: 'rgba(209, 73, 91, 0.12)', label: 'CONSULT' },
+			{ x: middleX, y: top, color: 'rgba(0, 127, 139, 0.12)', label: 'PARTNER CLOSELY' },
+			{ x: left, y: middleY, color: 'rgba(91, 91, 214, 0.11)', label: 'OBSERVE' },
+			{ x: middleX, y: middleY, color: 'rgba(46, 133, 64, 0.11)', label: 'KEEP INFORMED' },
+		];
+
+		ctx.save();
+		regions.forEach(region => {
+			ctx.fillStyle = region.color;
+			ctx.fillRect(region.x, region.y, middleX - left, middleY - top);
+			ctx.fillStyle = getComputedStyle(chart.canvas).color;
+			ctx.globalAlpha = 0.55;
+			ctx.font = '600 11px equinor, sans-serif';
+			ctx.textAlign = 'left';
+			ctx.textBaseline = 'top';
+			ctx.fillText(region.label, region.x + 14, region.y + 12);
+			ctx.globalAlpha = 1;
+		});
+		ctx.restore();
+	},
+};
 
 const matrixLabelsPlugin: Plugin<'scatter'> = {
 	id: 'stakeholderMatrixLabels',
@@ -75,6 +136,9 @@ const stakeholderLabelsPlugin: Plugin<'scatter'> = {
 	afterDatasetsDraw: chart => {
 		const { ctx, chartArea } = chart;
 		const textColor = getComputedStyle(chart.canvas).color;
+		const labelBackgroundColor = getComputedStyle(
+			chart.canvas.parentElement ?? chart.canvas,
+		).backgroundColor;
 		const regionWidth = (chartArea.right - chartArea.left) / 2;
 		const regionHeight = (chartArea.bottom - chartArea.top) / 2;
 		const rowHeight = 34;
@@ -103,14 +167,26 @@ const stakeholderLabelsPlugin: Plugin<'scatter'> = {
 				const rowsInColumn = Math.min(maxRows, datasetIndexes.length - column * maxRows);
 				const labelX = point.x - regionWidth / 2 + columnWidth * (column + 0.5);
 				const labelY = point.y - ((rowsInColumn - 1) * rowHeight) / 2 + row * rowHeight;
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
+				const maxLabelWidth = Math.max(72, columnWidth - 28);
+				ctx.font = '600 13px equinor, sans-serif';
+				const label = truncateCanvasText(ctx, dataset.label, maxLabelWidth);
+				const labelWidth = Math.min(maxLabelWidth, ctx.measureText(label).width) + 28;
+
+				ctx.fillStyle = labelBackgroundColor;
+				ctx.beginPath();
+				ctx.roundRect(labelX - labelWidth / 2, labelY - 14, labelWidth, 28, 4);
+				ctx.fill();
 				ctx.fillStyle =
 					typeof dataset.pointBackgroundColor === 'string'
 						? dataset.pointBackgroundColor
 						: textColor;
-				ctx.font = '600 13px equinor, sans-serif';
-				ctx.fillText(dataset.label, labelX, labelY, columnWidth - 12);
+				ctx.beginPath();
+				ctx.arc(labelX - labelWidth / 2 + 10, labelY, 3, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillStyle = textColor;
+				ctx.fillText(label, labelX + 5, labelY);
 			});
 		});
 		ctx.restore();
@@ -118,8 +194,15 @@ const stakeholderLabelsPlugin: Plugin<'scatter'> = {
 };
 
 export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) => {
+	const [searchQuery, setSearchQuery] = useState('');
 	const selectedProject = useSelectedProject();
-	const { stakeholderMatrices } = useGetStakeholderMatrixes(selectedProject.id);
+	const { stakeholderMatrices, isLoading } = useGetStakeholderMatrixes(selectedProject.id);
+	const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
+	const filteredStakeholders = stakeholderMatrices.filter(stakeholder =>
+		`${stakeholder.stakeholder_name} ${stakeholder.stakeholder_role}`
+			.toLocaleLowerCase()
+			.includes(normalizedSearchQuery),
+	);
 
 	const setCanvasRef = useCallback(
 		(canvas: HTMLCanvasElement | null) => {
@@ -186,7 +269,7 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 			const chart = new Chart(canvas, {
 				type: 'scatter',
 				data: {
-					datasets: stakeholderMatrices.map((stakeholder, index) => ({
+					datasets: stakeholderMatrices.map(stakeholder => ({
 						label: `${stakeholder.stakeholder_name} - ${stakeholder.stakeholder_role}`,
 						data: [
 							{
@@ -196,13 +279,16 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 						],
 						pointRadius: 0,
 						pointHoverRadius: 0,
-						pointBackgroundColor: stakeholderColors[index % stakeholderColors.length],
+						pointBackgroundColor: getRegionColor(
+							stakeholder.affecting_the_decision,
+							stakeholder.affected_by_the_decision,
+						),
 						pointBorderColor: '#ffffff',
 						pointBorderWidth: 2,
 					})),
 				},
 				options,
-				plugins: [matrixLabelsPlugin, stakeholderLabelsPlugin],
+				plugins: [matrixRegionsPlugin, matrixLabelsPlugin, stakeholderLabelsPlugin],
 			});
 
 			return () => chart.destroy();
@@ -211,10 +297,16 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 	);
 
 	return (
-		<div className={`flex flex-col gap-5 py-2 ${className}`}>
-			<header className='flex items-start justify-between gap-4'>
+		<div className={`flex w-full flex-col gap-5 py-2 ${className}`}>
+			<header className='flex flex-wrap items-start justify-between gap-4'>
 				<div>
-					<h1 className='text-3xl font-bold'>Stakeholder Matrix</h1>
+					<div className='flex items-center gap-3'>
+						<h1 className='text-3xl font-bold'>Stakeholder Matrix</h1>
+						<span className='bg-background-medium rounded-sm px-2 py-1 text-xs font-semibold'>
+							{stakeholderMatrices.length}{' '}
+							{stakeholderMatrices.length === 1 ? 'stakeholder' : 'stakeholders'}
+						</span>
+					</div>
 					<p className='text-text-tertiary mt-1 text-sm'>
 						Assess how much a stakeholder affects the decision and how strongly the
 						decision affects them.
@@ -223,9 +315,19 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 				<CreateStakeholderMatrix />
 			</header>
 
-			<div className='grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]'>
+			<div className='grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_320px]'>
 				<section className='bg-background-default shadow-tile min-w-0 rounded-md p-4 sm:p-6'>
-					<div className='h-80 w-full'>
+					<div className='text-text-tertiary mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs'>
+						<span>
+							<strong className='text-text-default'>Horizontal:</strong> influence on
+							the decision
+						</span>
+						<span>
+							<strong className='text-text-default'>Vertical:</strong> impact from the
+							decision
+						</span>
+					</div>
+					<div className='min-h-125 w-full' style={{ height: 'calc(100vh - 240px)' }}>
 						<canvas
 							ref={setCanvasRef}
 							className='text-text-default'
@@ -233,12 +335,114 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 							role='img'
 						/>
 					</div>
-					{stakeholderMatrices.length === 0 && (
+					{isLoading && (
+						<div className='flex justify-center py-3'>
+							<CircularProgress size={24} />
+						</div>
+					)}
+					{!isLoading && stakeholderMatrices.length === 0 && (
 						<p className='text-text-tertiary text-center text-sm'>
 							No stakeholders yet. Create one to add it to the matrix.
 						</p>
 					)}
 				</section>
+
+				<aside className='bg-background-default shadow-tile flex h-[calc(100vh-240px)] min-h-125 flex-col overflow-hidden rounded-md xl:w-80'>
+					<div className='border-border-medium border-b px-4 py-3'>
+						<h2 className='text-base font-semibold'>Stakeholders</h2>
+						<p className='text-text-tertiary text-xs'>Grouped by matrix region</p>
+					</div>
+					<div className='border-border-medium border-b p-3'>
+						<TextField
+							label='Search stakeholders'
+							placeholder='Name or role'
+							value={searchQuery}
+							onChange={event => setSearchQuery(event.target.value)}
+						/>
+					</div>
+					<div className='min-h-0 flex-1 overflow-y-auto p-2'>
+						{stakeholderRegions.map(region => {
+							const regionStakeholders = filteredStakeholders
+								.filter(
+									stakeholder =>
+										stakeholder.affecting_the_decision === region.affecting &&
+										stakeholder.affected_by_the_decision === region.affected,
+								)
+								.sort((first, second) =>
+									first.stakeholder_name.localeCompare(second.stakeholder_name),
+								);
+							if (regionStakeholders.length === 0) return null;
+
+							return (
+								<section key={region.key} className='mb-3 last:mb-0'>
+									<div className='bg-background-light sticky top-0 z-10 flex items-center gap-2 px-3 py-2'>
+										<span
+											className='h-2.5 w-2.5 rounded-full'
+											style={{
+												backgroundColor: regionColors[region.key],
+											}}
+										/>
+										<h3 className='flex-1 text-xs font-semibold uppercase'>
+											{region.label}
+										</h3>
+										<span className='text-text-tertiary text-xs'>
+											{regionStakeholders.length}
+										</span>
+									</div>
+									{regionStakeholders.map(stakeholder => (
+										<div
+											key={stakeholder.stakeholder_matrix_id}
+											className='hover:bg-background-light flex items-center rounded-sm pr-1'
+										>
+											<div className='flex min-w-0 flex-1 items-center gap-3 px-3 py-3 text-left'>
+												<span className='min-w-0 flex-1'>
+													<span className='block truncate text-sm font-semibold'>
+														{stakeholder.stakeholder_name}
+													</span>
+													<span className='text-text-tertiary block truncate text-xs'>
+														{stakeholder.stakeholder_role}
+													</span>
+													<span className='mt-1.5 flex flex-wrap gap-1 text-[11px]'>
+														<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
+															Affecting:{' '}
+															{stakeholder.affecting_the_decision
+																? 'High'
+																: 'Low'}
+														</span>
+														<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
+															Affected:{' '}
+															{stakeholder.affected_by_the_decision
+																? 'High'
+																: 'Low'}
+														</span>
+													</span>
+												</span>
+											</div>
+											<div className='flex shrink-0'>
+												<EditStakeholderMatrix stakeholder={stakeholder} />
+												<DeleteStakeholderMatrixDialog
+													stakeholder={stakeholder}
+												/>
+											</div>
+										</div>
+									))}
+								</section>
+							);
+						})}
+						{!isLoading && stakeholderMatrices.length === 0 && (
+							<p className='text-text-tertiary px-3 py-8 text-center text-sm'>
+								Your stakeholder list will appear here.
+							</p>
+						)}
+						{!isLoading &&
+							stakeholderMatrices.length > 0 &&
+							filteredStakeholders.length === 0 && (
+								<p className='text-text-tertiary px-3 py-8 text-center text-sm'>
+									No stakeholders match your search.
+								</p>
+							)}
+					</div>
+				</aside>
 			</div>
 		</div>
 	);
