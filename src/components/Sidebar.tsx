@@ -2,6 +2,7 @@ import { Button, Divider, SideBar as EdsSideBar, Icon, Popover } from '@equinor/
 import {
 	assignment_important,
 	functions,
+	group,
 	info_circle,
 	measure,
 	share,
@@ -164,6 +165,14 @@ export const SideBar = () => {
 					>
 						EVALUATE
 					</p>
+					<EdsSideBar.Link
+						label='Stakeholder Matrix'
+						active={window.location.pathname.includes('stakeholder-matrix')}
+						as={Link}
+						className='[&_svg]:fill-primary-resting border-b-0!'
+						icon={group}
+						to={`/project/${project.id}/stakeholder-matrix`}
+					/>
 					<EdsSideBar.Link
 						as={Link}
 						label='Assessments'
