@@ -21,6 +21,7 @@ export const InfluenceDiagram = () => {
 		nodes,
 		edges,
 		onConnect,
+		onEdgesDelete,
 		isValidConnection,
 		onNodesChange,
 		onEdgesChange,
@@ -48,6 +49,7 @@ export const InfluenceDiagram = () => {
 				selectionMode={SelectionMode.Partial}
 				connectionMode={ConnectionMode.Strict}
 				onEdgesChange={onEdgesChange}
+				onEdgesDelete={onEdgesDelete}
 				zoomOnDoubleClick={false}
 				panOnDrag={!isSelecting}
 				connectOnClick={false}
