@@ -11,13 +11,12 @@ export const useDeleteObjective = () => {
 			return objective;
 		},
 		onMutate: (deletedObjective: Objective) => {
-			const projectId = deletedObjective.project_id;
 			queryClient.cancelQueries({ queryKey: ['objectives'] });
 
 			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']) || [];
 			const newObjectives = previousObjectives.filter(obj => obj.id !== deletedObjective.id);
-			queryClient.setQueryData(['objectives', projectId], newObjectives);
-			return { previousObjectives, projectId };
+			queryClient.setQueryData(['objectives'], newObjectives);
+			return { previousObjectives };
 		},
 		onError: (_err, _deletedObjective, context) => {
 			showErrorToast('Failed to delete objective');
