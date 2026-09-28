@@ -29,7 +29,7 @@ app.get('/redirect.html', (req, res) => {
 });
 
 // Define routes with strict CSP
-router.get('*', (req, res) => {
+router.get('/{*splat}', (req, res) => {
 	const nonce = randomBytes(16).toString('base64');
 
 	const csp = [
