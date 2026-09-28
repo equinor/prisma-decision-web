@@ -1,22 +1,14 @@
-import { CircularProgress, TextField } from '@equinor/eds-core-react';
-import { useCallback, useState } from 'react';
-import {
-	Chart,
-	LinearScale,
-	PointElement,
-	ScatterController,
-	Tooltip,
-	type ChartOptions,
-	type Plugin,
-} from 'chart.js';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import { TextField } from '@equinor/eds-core-react';
+import { ReactFlow, useNodesState, type Node, type NodeProps } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import { useMemo, useState } from 'react';
 import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderMatrixes';
+import type { StakeholderMatrix as StakeholderMatrixRecord } from '../../../validators';
+import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { DeleteStakeholderMatrixDialog } from './DeleteStakeholderMatrixDialog';
 import { EditStakeholderMatrix } from './EditStakeholderMatrix';
-
-Chart.register(LinearScale, PointElement, ScatterController, Tooltip, annotationPlugin);
 
 type StakeholderMatrixProps = {
 	className?: string;
@@ -36,162 +28,214 @@ const stakeholderRegions = [
 	{ key: 'observe', label: 'Observe', affecting: 0, affected: 0 },
 ] as const;
 
-const getRegionColor = (affectingDecision: number, affectedByDecision: number) => {
+const getRegionKey = (affectingDecision: number, affectedByDecision: number) => {
 	if (affectedByDecision) {
-		return affectingDecision ? regionColors.partnerClosely : regionColors.consult;
+		return affectingDecision ? 'partnerClosely' : 'consult';
 	}
-	return affectingDecision ? regionColors.keepInformed : regionColors.observe;
+	return affectingDecision ? 'keepInformed' : 'observe';
 };
 
-const truncateCanvasText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number) => {
-	if (ctx.measureText(text).width <= maxWidth) return text;
-	let truncatedText = text;
-	while (truncatedText.length > 1 && ctx.measureText(`${truncatedText}...`).width > maxWidth) {
-		truncatedText = truncatedText.slice(0, -1);
-	}
-	return `${truncatedText}...`;
+type MatrixBackgroundData = {
+	[key: string]: unknown;
+	width: number;
+	height: number;
 };
 
-const matrixRegionsPlugin: Plugin<'scatter'> = {
-	id: 'stakeholderMatrixRegions',
-	beforeDraw: chart => {
-		const { ctx, chartArea } = chart;
-		const { left, right, top, bottom } = chartArea;
-		const middleX = (left + right) / 2;
-		const middleY = (top + bottom) / 2;
-		const regions = [
-			{ x: left, y: top, color: 'rgba(209, 73, 91, 0.12)', label: 'CONSULT' },
-			{ x: middleX, y: top, color: 'rgba(0, 127, 139, 0.12)', label: 'PARTNER CLOSELY' },
-			{ x: left, y: middleY, color: 'rgba(91, 91, 214, 0.11)', label: 'OBSERVE' },
-			{ x: middleX, y: middleY, color: 'rgba(46, 133, 64, 0.11)', label: 'KEEP INFORMED' },
-		];
+type StakeholderNodeData = {
+	[key: string]: unknown;
+	name: string;
+	role: string;
+	color: string;
+};
 
-		ctx.save();
-		regions.forEach(region => {
-			ctx.fillStyle = region.color;
-			ctx.fillRect(region.x, region.y, middleX - left, middleY - top);
-			ctx.fillStyle = getComputedStyle(chart.canvas).color;
-			ctx.globalAlpha = 0.55;
-			ctx.font = '600 11px equinor, sans-serif';
-			ctx.textAlign = 'left';
-			ctx.textBaseline = 'top';
-			ctx.fillText(region.label, region.x + 14, region.y + 12);
-			ctx.globalAlpha = 1;
+type MatrixBackgroundNode = Node<MatrixBackgroundData, 'matrixBackground'>;
+type StakeholderNode = Node<StakeholderNodeData, 'stakeholder'>;
+type StakeholderMatrixNode = MatrixBackgroundNode | StakeholderNode;
+
+const MATRIX_WIDTH = 1000;
+const MIN_REGION_HEIGHT = 300;
+const NODE_WIDTH = 104;
+const NODE_HEIGHT = 34;
+const NODE_COLUMNS = 2;
+const NODE_GAP_X = 12;
+const NODE_GAP_Y = 8;
+const REGION_PADDING_X = 28;
+const REGION_HEADER_HEIGHT = 58;
+const AXIS_GUTTER_WIDTH = 112;
+const AXIS_GUTTER_BOTTOM = 40;
+
+const MatrixBackground = ({ data }: NodeProps<MatrixBackgroundNode>) => (
+	<div
+		className='text-text-default relative'
+		style={{
+			width: data.width + AXIS_GUTTER_WIDTH,
+			height: data.height + AXIS_GUTTER_BOTTOM,
+		}}
+	>
+		<div
+			className='border-text-tertiary absolute top-0 grid grid-cols-2 border'
+			style={{ left: AXIS_GUTTER_WIDTH, width: data.width, height: data.height }}
+		>
+			{[
+				{ label: 'CONSULT', color: 'rgba(209, 73, 91, 0.12)' },
+				{ label: 'PARTNER CLOSELY', color: 'rgba(0, 127, 139, 0.12)' },
+				{ label: 'OBSERVE', color: 'rgba(91, 91, 214, 0.11)' },
+				{ label: 'KEEP INFORMED', color: 'rgba(46, 133, 64, 0.11)' },
+			].map(region => (
+				<div
+					key={region.label}
+					className='border-text-tertiary border-r border-b p-4 text-xs font-semibold last:border-r-0'
+					style={{ backgroundColor: region.color }}
+				>
+					{region.label}
+				</div>
+			))}
+			<div className='absolute inset-x-0 -bottom-8 text-center text-sm'>
+				<span className='absolute left-0'>Low</span>
+				Affecting the decision
+				<span className='absolute right-0'>High →</span>
+			</div>
+		</div>
+		<div
+			className='absolute top-0 bottom-10 flex flex-col justify-between text-sm'
+			style={{ left: AXIS_GUTTER_WIDTH - 44 }}
+		>
+			<span>High ↑</span>
+			<span>Low</span>
+		</div>
+		<div className='absolute top-1/2 left-5 -translate-y-1/2 -rotate-90 text-sm whitespace-nowrap'>
+			Affected by the decision
+		</div>
+	</div>
+);
+
+const StakeholderCardNode = ({ data }: NodeProps<StakeholderNode>) => (
+	<div
+		className='bg-background-default shadow-raised flex cursor-grab rounded-sm border-l-2 px-1.5 py-0.5 active:cursor-grabbing'
+		style={{ width: NODE_WIDTH, minHeight: NODE_HEIGHT, borderLeftColor: data.color }}
+	>
+		<span className='min-w-0'>
+			<span className='block truncate text-[11px] font-semibold' title={data.name}>
+				{data.name}
+			</span>
+			<span className='text-text-tertiary block truncate text-[9px]' title={data.role}>
+				{data.role}
+			</span>
+		</span>
+	</div>
+);
+
+const nodeTypes = {
+	matrixBackground: MatrixBackground,
+	stakeholder: StakeholderCardNode,
+};
+
+type MatrixCanvasProps = {
+	initialNodes: StakeholderMatrixNode[];
+	stakeholderCount: number;
+};
+
+const MatrixCanvas = ({ initialNodes, stakeholderCount }: MatrixCanvasProps) => {
+	const [nodes, , onNodesChange] = useNodesState<StakeholderMatrixNode>(initialNodes);
+
+	return (
+		<ReactFlow
+			nodes={nodes}
+			onNodesChange={onNodesChange}
+			nodeTypes={nodeTypes}
+			nodesConnectable={false}
+			elementsSelectable={false}
+			panOnDrag={false}
+			autoPanOnNodeDrag={false}
+			zoomOnScroll={false}
+			zoomOnPinch={false}
+			zoomOnDoubleClick={false}
+			fitView
+			fitViewOptions={{ padding: 0.15 }}
+			proOptions={{ hideAttribution: true }}
+			aria-label={`Stakeholder matrix with ${stakeholderCount} stakeholders`}
+		/>
+	);
+};
+
+const buildMatrixNodes = (stakeholders: StakeholderMatrixRecord[]): StakeholderMatrixNode[] => {
+	const regionCounts = stakeholders.reduce<Record<string, number>>((counts, stakeholder) => {
+		const regionKey = getRegionKey(
+			stakeholder.affecting_the_decision,
+			stakeholder.affected_by_the_decision,
+		);
+		counts[regionKey] = (counts[regionKey] ?? 0) + 1;
+		return counts;
+	}, {});
+	const largestRegion = Math.max(0, ...Object.values(regionCounts));
+	const regionRows = Math.max(1, Math.ceil(largestRegion / NODE_COLUMNS));
+	const regionHeight = Math.max(
+		MIN_REGION_HEIGHT,
+		REGION_HEADER_HEIGHT + regionRows * (NODE_HEIGHT + NODE_GAP_Y) + NODE_GAP_Y,
+	);
+	const matrixHeight = regionHeight * 2;
+	const positionsByRegion = new Map<string, number>();
+	const nodes: StakeholderMatrixNode[] = [
+		{
+			id: 'matrix-background',
+			type: 'matrixBackground',
+			position: { x: -AXIS_GUTTER_WIDTH, y: 0 },
+			data: { width: MATRIX_WIDTH, height: matrixHeight },
+			draggable: false,
+			selectable: false,
+			focusable: false,
+			zIndex: 0,
+		},
+	];
+
+	stakeholders.forEach(stakeholder => {
+		const regionKey = getRegionKey(
+			stakeholder.affecting_the_decision,
+			stakeholder.affected_by_the_decision,
+		);
+		const positionInRegion = positionsByRegion.get(regionKey) ?? 0;
+		positionsByRegion.set(regionKey, positionInRegion + 1);
+		const column = positionInRegion % NODE_COLUMNS;
+		const row = Math.floor(positionInRegion / NODE_COLUMNS);
+		const regionLeft = stakeholder.affecting_the_decision ? MATRIX_WIDTH / 2 : 0;
+		const regionTop = stakeholder.affected_by_the_decision ? 0 : regionHeight;
+
+		nodes.push({
+			id: stakeholder.stakeholder_matrix_id,
+			type: 'stakeholder',
+			position: {
+				x: regionLeft + REGION_PADDING_X + column * (NODE_WIDTH + NODE_GAP_X),
+				y: regionTop + REGION_HEADER_HEIGHT + row * (NODE_HEIGHT + NODE_GAP_Y),
+			},
+			data: {
+				name: stakeholder.stakeholder_name,
+				role: stakeholder.stakeholder_role,
+				color: regionColors[regionKey],
+			},
+			draggable: true,
+			selectable: false,
+			focusable: false,
+			extent: [
+				[regionLeft, regionTop],
+				[regionLeft + MATRIX_WIDTH / 2, regionTop + regionHeight],
+			],
+			zIndex: 1,
 		});
-		ctx.restore();
-	},
+	});
+
+	return nodes;
 };
 
-const matrixLabelsPlugin: Plugin<'scatter'> = {
-	id: 'stakeholderMatrixLabels',
-	afterDraw: chart => {
-		const { ctx, chartArea } = chart;
-		const { left, right, top, bottom } = chartArea;
-		const textColor = getComputedStyle(chart.canvas).color;
-
-		ctx.save();
-		ctx.fillStyle = textColor;
-		ctx.font = '14px equinor, sans-serif';
-
-		ctx.textAlign = 'right';
-		ctx.textBaseline = 'middle';
-		ctx.fillText('High', left - 14, top);
-		ctx.fillText('Low', left - 14, bottom);
-
-		ctx.textAlign = 'left';
-		ctx.textBaseline = 'top';
-		ctx.fillText('Low', left, bottom + 12);
-		ctx.textAlign = 'right';
-		ctx.fillText('High', right, bottom + 12);
-
-		ctx.textAlign = 'center';
-		ctx.fillText('Affecting the decision', (left + right) / 2, bottom + 12);
-
-		ctx.save();
-		ctx.translate(left - 72, (top + bottom) / 2);
-		ctx.rotate(-Math.PI / 2);
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillText('Affected by the decision', 0, 0);
-		ctx.restore();
-
-		ctx.strokeStyle = textColor;
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-		ctx.moveTo(right + 6, bottom - 3);
-		ctx.lineTo(right + 11, bottom);
-		ctx.lineTo(right + 6, bottom + 3);
-		ctx.stroke();
-		ctx.beginPath();
-		ctx.moveTo(left - 3, top - 6);
-		ctx.lineTo(left, top - 11);
-		ctx.lineTo(left + 3, top - 6);
-		ctx.stroke();
-		ctx.restore();
-	},
-};
-
-const stakeholderLabelsPlugin: Plugin<'scatter'> = {
-	id: 'stakeholderLabels',
-	afterDatasetsDraw: chart => {
-		const { ctx, chartArea } = chart;
-		const textColor = getComputedStyle(chart.canvas).color;
-		const labelBackgroundColor = getComputedStyle(
-			chart.canvas.parentElement ?? chart.canvas,
-		).backgroundColor;
-		const regionWidth = (chartArea.right - chartArea.left) / 2;
-		const regionHeight = (chartArea.bottom - chartArea.top) / 2;
-		const rowHeight = 34;
-		const maxRows = Math.max(1, Math.floor((regionHeight - 20) / rowHeight));
-		const regions = new Map<string, number[]>();
-
-		chart.data.datasets.forEach((dataset, index) => {
-			const point = dataset.data[0] as { x: number; y: number } | undefined;
-			if (!point) return;
-			const regionKey = `${point.x}-${point.y}`;
-			regions.set(regionKey, [...(regions.get(regionKey) ?? []), index]);
-		});
-
-		ctx.save();
-		regions.forEach(datasetIndexes => {
-			const columns = Math.ceil(datasetIndexes.length / maxRows);
-			const columnWidth = regionWidth / columns;
-
-			datasetIndexes.forEach((datasetIndex, position) => {
-				const dataset = chart.data.datasets[datasetIndex];
-				const point = chart.getDatasetMeta(datasetIndex).data[0];
-				if (!point || !dataset.label) return;
-
-				const row = position % maxRows;
-				const column = Math.floor(position / maxRows);
-				const rowsInColumn = Math.min(maxRows, datasetIndexes.length - column * maxRows);
-				const labelX = point.x - regionWidth / 2 + columnWidth * (column + 0.5);
-				const labelY = point.y - ((rowsInColumn - 1) * rowHeight) / 2 + row * rowHeight;
-				const maxLabelWidth = Math.max(72, columnWidth - 28);
-				ctx.font = '600 13px equinor, sans-serif';
-				const label = truncateCanvasText(ctx, dataset.label, maxLabelWidth);
-				const labelWidth = Math.min(maxLabelWidth, ctx.measureText(label).width) + 28;
-
-				ctx.fillStyle = labelBackgroundColor;
-				ctx.beginPath();
-				ctx.roundRect(labelX - labelWidth / 2, labelY - 14, labelWidth, 28, 4);
-				ctx.fill();
-				ctx.fillStyle =
-					typeof dataset.pointBackgroundColor === 'string'
-						? dataset.pointBackgroundColor
-						: textColor;
-				ctx.beginPath();
-				ctx.arc(labelX - labelWidth / 2 + 10, labelY, 3, 0, Math.PI * 2);
-				ctx.fill();
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
-				ctx.fillStyle = textColor;
-				ctx.fillText(label, labelX + 5, labelY);
-			});
-		});
-		ctx.restore();
-	},
-};
+const getMatrixRevision = (stakeholders: StakeholderMatrixRecord[]) =>
+	JSON.stringify(
+		stakeholders.map(stakeholder => [
+			stakeholder.stakeholder_matrix_id,
+			stakeholder.stakeholder_name,
+			stakeholder.stakeholder_role,
+			stakeholder.affecting_the_decision,
+			stakeholder.affected_by_the_decision,
+		]),
+	);
 
 export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) => {
 	const [searchQuery, setSearchQuery] = useState('');
@@ -204,97 +248,11 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 			.includes(normalizedSearchQuery),
 	);
 
-	const setCanvasRef = useCallback(
-		(canvas: HTMLCanvasElement | null) => {
-			if (!canvas) return;
-			const rootStyles = getComputedStyle(document.documentElement);
-			const color = (property: string, fallback: string) => {
-				const value = rootStyles.getPropertyValue(property).trim();
-				return value ? `rgb(${value})` : fallback;
-			};
-			const secondaryColor = color('--eds_text_secondary', '#6f6f6f');
-			const options: ChartOptions<'scatter'> = {
-				responsive: true,
-				maintainAspectRatio: false,
-				animation: false,
-				layout: { padding: { left: 112, right: 28, top: 24, bottom: 40 } },
-				scales: {
-					x: {
-						min: 0,
-						max: 1,
-						display: true,
-						grid: { display: false },
-						ticks: { display: false },
-						border: { color: secondaryColor },
-					},
-					y: {
-						min: 0,
-						max: 1,
-						display: true,
-						grid: { display: false },
-						ticks: { display: false },
-						border: { display: true, color: secondaryColor },
-					},
-				},
-				plugins: {
-					legend: { display: false },
-					tooltip: { enabled: false },
-					annotation: {
-						annotations: {
-							horizontalMidpoint: {
-								type: 'line',
-								yMin: 0.5,
-								yMax: 0.5,
-								xMin: 0,
-								xMax: 1,
-								borderColor: secondaryColor,
-								borderWidth: 1,
-								borderDash: [4, 5],
-							},
-							verticalMidpoint: {
-								type: 'line',
-								xMin: 0.5,
-								xMax: 0.5,
-								yMin: 0,
-								yMax: 1,
-								borderColor: secondaryColor,
-								borderWidth: 1,
-								borderDash: [4, 5],
-							},
-						},
-					},
-				},
-			};
-
-			const chart = new Chart(canvas, {
-				type: 'scatter',
-				data: {
-					datasets: stakeholderMatrices.map(stakeholder => ({
-						label: `${stakeholder.stakeholder_name} - ${stakeholder.stakeholder_role}`,
-						data: [
-							{
-								x: stakeholder.affecting_the_decision >= 0.5 ? 0.75 : 0.25,
-								y: stakeholder.affected_by_the_decision >= 0.5 ? 0.75 : 0.25,
-							},
-						],
-						pointRadius: 0,
-						pointHoverRadius: 0,
-						pointBackgroundColor: getRegionColor(
-							stakeholder.affecting_the_decision,
-							stakeholder.affected_by_the_decision,
-						),
-						pointBorderColor: '#ffffff',
-						pointBorderWidth: 2,
-					})),
-				},
-				options,
-				plugins: [matrixRegionsPlugin, matrixLabelsPlugin, stakeholderLabelsPlugin],
-			});
-
-			return () => chart.destroy();
-		},
+	const generatedMatrixNodes = useMemo(
+		() => buildMatrixNodes(stakeholderMatrices),
 		[stakeholderMatrices],
 	);
+	const matrixRevision = getMatrixRevision(stakeholderMatrices);
 
 	return (
 		<div className={`flex w-full flex-col gap-5 py-2 ${className}`}>
@@ -327,19 +285,17 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 							decision
 						</span>
 					</div>
-					<div className='min-h-125 w-full' style={{ height: 'calc(100vh - 240px)' }}>
-						<canvas
-							ref={setCanvasRef}
-							className='text-text-default'
-							aria-label={`Stakeholder matrix with ${stakeholderMatrices.length} stakeholders`}
-							role='img'
+					<div
+						className='bg-background-light relative min-h-125 w-full overflow-hidden rounded-sm'
+						style={{ height: 'calc(100vh - 240px)' }}
+					>
+						<MatrixCanvas
+							key={matrixRevision}
+							initialNodes={generatedMatrixNodes}
+							stakeholderCount={stakeholderMatrices.length}
 						/>
+						{isLoading && <LoadingSpinner />}
 					</div>
-					{isLoading && (
-						<div className='flex justify-center py-3'>
-							<CircularProgress size={24} />
-						</div>
-					)}
 					{!isLoading && stakeholderMatrices.length === 0 && (
 						<p className='text-text-tertiary text-center text-sm'>
 							No stakeholders yet. Create one to add it to the matrix.
