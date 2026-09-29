@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/prisma-decision-web/compare/v1.1.0...v1.2.0) (2026-09-29)
+
+
+### Features
+
+* add randomize button for probabilities in development mode ([#843](https://github.com/equinor/prisma-decision-web/issues/843)) ([3639cba](https://github.com/equinor/prisma-decision-web/commit/3639cbaa8b07e00248a8b69af44887cbf40e49bf))
+* adds clear all button to prob and utility tables ([#767](https://github.com/equinor/prisma-decision-web/issues/767)) ([5afd9d0](https://github.com/equinor/prisma-decision-web/commit/5afd9d0a60dafa2c4bc27bfa31cb2cad2dff4a19))
+* disabel state options when restricition table makes it impossible ([#752](https://github.com/equinor/prisma-decision-web/issues/752)) ([4877593](https://github.com/equinor/prisma-decision-web/commit/487759370198f942f633697f4141b7ae163208c9))
+
+
+### Bug Fixes
+
+* **objective:** keep delete error handling on shared objectives cache ([#854](https://github.com/equinor/prisma-decision-web/issues/854)) ([5f41dfd](https://github.com/equinor/prisma-decision-web/commit/5f41dfd40291958eb3201da1acfe76827b9e5067))
+* prevents board sheet race condition from happening ([#771](https://github.com/equinor/prisma-decision-web/issues/771)) ([087c1b9](https://github.com/equinor/prisma-decision-web/commit/087c1b9f99442cf7f25dffaf02be0784ac3b219e))
+* refetch board nodes and sheets after duplicating a project ([8a5a88d](https://github.com/equinor/prisma-decision-web/commit/8a5a88d69a0a91954c06d6a5c699e46d84d4b880))
+* **restriction-table:** allow deleting edge when no rows exist ([#856](https://github.com/equinor/prisma-decision-web/issues/856)) ([f342681](https://github.com/equinor/prisma-decision-web/commit/f342681cb965ae0b8c9e5c1cb202730f3b677013))
+
 ## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-09-03)
 
 
