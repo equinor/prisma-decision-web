@@ -8,6 +8,9 @@ spec:
         - name: public
           build:
             from: PUBLIC
+        - name: design
+          build:
+            from: DESIGN
     components:
         - name: frontend
           src: .
