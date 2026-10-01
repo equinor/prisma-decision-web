@@ -21,7 +21,7 @@ export const SheetPicker = () => {
 	const [editing, setEditing] = useState<string | null>(null);
 	return (
 		<>
-			<Button ref={setAnchorEl} variant='outlined' onClick={() => setIsOpen(true)}>
+			<Button ref={setAnchorEl} variant='ghost' onClick={() => setIsOpen(true)}>
 				{sheet?.name}
 			</Button>
 			<EdsProvider density='compact'>

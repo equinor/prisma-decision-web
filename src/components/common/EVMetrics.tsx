@@ -53,7 +53,7 @@ export const EVMetrics = ({
 				className={cn('flex items-center ', {
 					'gap-2': true,
 					'flex-col items-start justify-center gap-1': false,
-					'**:text-text-danger  outline-text-danger rounded-sm px-2  py-0.5 outline-2 dark:outline-red-400 dark:**:text-red-400':
+					'**:text-text-danger  outline-text-danger rounded-sm px-2  py-0.5 ':
 						hasValidationError,
 				})}
 			>

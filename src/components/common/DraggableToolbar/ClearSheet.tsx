@@ -26,7 +26,7 @@ export const ClearSheet = () => {
 				disabled={nodes.length === 0}
 				data-no-dnd
 				className='px-1.5!'
-				variant='outlined'
+				variant='ghost'
 				title='Clear sheet'
 				onClick={() => setIsOpen(true)}
 			>

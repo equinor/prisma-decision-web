@@ -81,6 +81,7 @@ export const AddIssue = () => {
 				onChange={() => setIsOpen(!isOpen)}
 				selectedIndexes={isOpen ? [0] : []}
 				title='Add issue'
+				className='**:border-none!'
 			>
 				<Button
 					ref={referenceElement}

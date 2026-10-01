@@ -14,6 +14,7 @@ export const ToggleSelectionMode = () => {
 			onChange={onChange}
 			selectedIndexes={checked ? [0] : []}
 			title='Toggle selection mode'
+			className='**:border-none!'
 		>
 			<Button className='px-1.5!'>
 				<DragToSelectIcon />

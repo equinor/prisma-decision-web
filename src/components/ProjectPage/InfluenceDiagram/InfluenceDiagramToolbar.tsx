@@ -32,8 +32,9 @@ export const InfluenceDiagramToolbar = () => {
 				<DeleteMenu selectedNodes={selectedNodes} />
 				<ChangeIssueType />
 				<CreateIssues />
-				<InfluenceDiagramValidation />
 				<ToolbarSeparator />
+
+				<InfluenceDiagramValidation />
 				<BarMetrics />
 			</ToolBar>
 		</ToolbarDragDropProvider>
