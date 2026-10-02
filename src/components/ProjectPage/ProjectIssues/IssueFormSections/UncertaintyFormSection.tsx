@@ -4,8 +4,10 @@ import { delete_to_trash } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
 import { FormErrorMessage } from '../../../common/FormErrorMessage';
+import { cn } from '../../../../utils/cn';
+import { ForceState, ForceStateButton } from './ForceStateButton';
 
-export const UncertaintyFormSection = () => {
+export const UncertaintyFormSection = ({ forceState }: { forceState?: ForceState }) => {
 	const { control, register } = useIssueFormContext();
 	const {
 		fields: outcomesArray,
@@ -23,6 +25,10 @@ export const UncertaintyFormSection = () => {
 		control,
 		name: 'project_id',
 	});
+	const watchedOutcomes = useWatch({
+		control,
+		name: 'uncertainty.outcomes',
+	});
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
@@ -34,7 +40,19 @@ export const UncertaintyFormSection = () => {
 
 			<div className='grid grid-cols-1 gap-4'>
 				{outcomesArray.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
+					<div
+						key={field.id}
+						className={cn('relative grid grid-cols-[1fr_8rem_auto] gap-2', {
+							'grid-cols-[auto_1fr_8rem_auto]': forceState,
+						})}
+					>
+						{forceState && (
+							<ForceStateButton
+								forceState={forceState}
+								stateId={watchedOutcomes[index]?.id}
+								label='outcome'
+							/>
+						)}
 						<div>
 							<TextField
 								placeholder={`Outcome ${index + 1}...`}

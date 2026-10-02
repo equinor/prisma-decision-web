@@ -8,16 +8,22 @@ import {
 	IsValidConnection,
 	NodeChange,
 	OnConnect,
+	OnNodeDrag,
 	OnReconnect,
 } from '@xyflow/react';
 import { MouseEvent, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
+import { useInfluenceDiagramCustomPositions } from '../../../hooks/useInfluenceDiagramCustomPositions';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
 import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
+import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramNodeView';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowInfluenceNode } from '../../../types';
-import { getInfluenceDiagramLayout } from '../../../utils/getInfluenceDiagramLayout';
+import {
+	getInfluenceDiagramLayout,
+	rerouteCustomEdges,
+} from '../../../utils/getInfluenceDiagramLayout';
 import { useSelectedProject } from '../ProjectContext';
 
 export const useInfluenceDiagram = () => {
@@ -26,8 +32,10 @@ export const useInfluenceDiagram = () => {
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
 	const [layoutOptions] = useInfluenceDiagramSettings();
-	const { positionedNodes, positionedEdges, updateInfluenceDiagram } =
+	const [nodeView] = useInfluenceDiagramNodeView();
+	const { positionedNodes, positionedEdges, updateInfluenceDiagram, customPositions } =
 		useInfluenceDiagramLayout();
+	const [, setCustomPositions] = useInfluenceDiagramCustomPositions();
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const hoveredEdgeId = useRef<string | null>(null);
@@ -103,7 +111,13 @@ export const useInfluenceDiagram = () => {
 	const onEdgesChange = async (changes: EdgeChange[]) => {
 		const nextEdges = applyEdgeChanges(changes, positionedEdges);
 		const { positionedNodes: newNodes, positionedEdges: newEdges } =
-			await getInfluenceDiagramLayout(positionedNodes, nextEdges, layoutOptions);
+			await getInfluenceDiagramLayout(
+				positionedNodes,
+				nextEdges,
+				layoutOptions,
+				nodeView,
+				customPositions,
+			);
 		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
@@ -114,6 +128,29 @@ export const useInfluenceDiagram = () => {
 
 	const onNodesChange = async (changes: NodeChange<ReactFlowInfluenceNode>[]) => {
 		const nextNodes = applyNodeChanges(changes, positionedNodes);
+		const positionChangeIds = changes.flatMap(change =>
+			change.type === 'position' ? [change.id] : [],
+		);
+		const isDrag =
+			positionChangeIds.length > 0 &&
+			changes.every(change => change.type === 'position' || change.type === 'select');
+
+		if (isDrag) {
+			const customNodeIds = new Set([...Object.keys(customPositions), ...positionChangeIds]);
+			updateInfluenceDiagram(() => {
+				return {
+					positionedNodes: nextNodes,
+					positionedEdges: rerouteCustomEdges(
+						nextNodes,
+						positionedEdges,
+						customNodeIds,
+						true,
+					),
+				};
+			});
+			return;
+		}
+
 		const hasLayoutAffectingChange = changes.some(change => change.type !== 'select');
 
 		if (!hasLayoutAffectingChange) {
@@ -127,13 +164,31 @@ export const useInfluenceDiagram = () => {
 		}
 
 		const { positionedNodes: newNodes, positionedEdges: newEdges } =
-			await getInfluenceDiagramLayout(nextNodes, positionedEdges, layoutOptions);
+			await getInfluenceDiagramLayout(
+				nextNodes,
+				positionedEdges,
+				layoutOptions,
+				nodeView,
+				customPositions,
+			);
 		updateInfluenceDiagram(() => {
 			return {
 				positionedNodes: newNodes,
 				positionedEdges: newEdges,
 			};
 		});
+	};
+
+	const onNodeDragStop: OnNodeDrag<ReactFlowInfluenceNode> = (_, __, draggedNodes) => {
+		setCustomPositions(prev => ({
+			...prev,
+			...Object.fromEntries(
+				draggedNodes.map(node => [
+					node.id,
+					{ x: Math.round(node.position.x), y: Math.round(node.position.y) },
+				]),
+			),
+		}));
 	};
 	const isValidConnection: IsValidConnection = (connection: Connection | FlowEdge) => {
 		if (connection.source === connection.target) return false;
@@ -153,6 +208,7 @@ export const useInfluenceDiagram = () => {
 		onReconnect,
 		onReconnectStart,
 		onNodesChange,
+		onNodeDragStop,
 		onEdgesChange,
 		isValidConnection,
 		isSelecting,

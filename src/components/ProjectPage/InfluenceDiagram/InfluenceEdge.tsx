@@ -3,6 +3,7 @@ import { delete_to_trash, more_vertical } from '@equinor/eds-icons';
 import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, useNodes } from '@xyflow/react';
 import { useState } from 'react';
 import { useAnimatedInfluenceRoute } from '../../../hooks/useAnimatedInfluenceRoute';
+import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramNodeView';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { InfluenceEdgeData } from '../../../utils/convertToInfluenceEdges';
 import { useCreateRestrictionTables } from '../../../hooks/api/useCreateRestrictionTables';
@@ -16,9 +17,12 @@ import { DeleteEdgeDialog } from '../../common/DeleteEdgeDialog';
 
 export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
 	const path = useAnimatedInfluenceRoute(data?.route);
+	const [nodeView] = useInfluenceDiagramNodeView();
+	const isShapeView = nodeView === 'shape';
 	const {
 		validationErrors: { edgesInLoop },
 	} = useHasInfluenceDiagramError();
+	const isInLoop = edgesInLoop.some(x => x.id === id);
 	const labelX = data?.route?.labelX ?? 0;
 	const labelY = data?.route?.labelY ?? 0;
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -63,47 +67,77 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 	};
 
 	const labelIcon = targetIsUtility ? delete_to_trash : more_vertical;
+	const isHighlighted = !!data?.hovered || isPanelOpen;
 
 	return (
 		<>
 			<svg>
 				<defs>
-					<marker
-						className='react-flow__arrowhead'
-						id={id}
-						markerWidth='12.5'
-						markerHeight='12.5'
-						viewBox='-10 -10 20 20'
-						markerUnits='strokeWidth'
-						orient='auto-start-reverse'
-						refX='0'
-						refY='0'
-					>
-						<polyline
-							className={cn('arrowclosed', {
-								'fill-warning-resting! stroke-warning-resting!': edgesInLoop.find(
-									x => x.id === id,
-								),
-								'fill-primary-resting! stroke-primary-resting!': !edgesInLoop.find(
-									x => x.id === id,
-								),
-							})}
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							points='-5,-4 0,0 -5,4 -5,-4'
-						></polyline>
-					</marker>
+					{isShapeView ? (
+						<marker
+							id={id}
+							markerWidth='8'
+							markerHeight='14'
+							viewBox='0 0 8 14'
+							markerUnits='userSpaceOnUse'
+							orient='auto'
+							refX='8'
+							refY='7'
+						>
+							<path
+								d='M0 0L8 7L0 14Z'
+								className={cn('fill-diagram-edge', {
+									'fill-warning-resting': isInLoop,
+									'fill-primary-resting': isHighlighted,
+								})}
+							/>
+						</marker>
+					) : (
+						<marker
+							className='react-flow__arrowhead'
+							id={id}
+							markerWidth='12.5'
+							markerHeight='12.5'
+							viewBox='-10 -10 20 20'
+							markerUnits='strokeWidth'
+							orient='auto-start-reverse'
+							refX='0'
+							refY='0'
+						>
+							<polyline
+								className={cn('arrowclosed', {
+									'fill-warning-resting! stroke-warning-resting!':
+										isInLoop && !isHighlighted,
+									'fill-primary-resting! stroke-primary-resting!':
+										!isInLoop && !isHighlighted,
+									'fill-primary-hover! stroke-primary-hover!': isHighlighted,
+								})}
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								points='-5,-4 0,0 -5,4 -5,-4'
+							></polyline>
+						</marker>
+					)}
 				</defs>
 			</svg>
 			<BaseEdge
 				id={id}
 				path={path}
-				interactionWidth={60}
+				// Narrower than the gap between parallel edges so hit areas don't hide neighbours
+				interactionWidth={12}
 				markerEnd={`url(#${id})`}
 				style={{ strokeDasharray: hasRestriction ? '12 8' : undefined }}
-				className={cn('stroke-primary-resting! stroke-4!', {
-					'stroke-warning-resting!': edgesInLoop.find(x => x.id === id),
-				})}
+				className={cn(
+					'transition-[stroke]',
+					isShapeView
+						? 'stroke-diagram-edge! stroke-2!'
+						: 'stroke-primary-resting! stroke-4!',
+					{
+						'stroke-warning-resting!': isInLoop && !isHighlighted,
+						'stroke-primary-resting!': isShapeView && isHighlighted,
+						'stroke-primary-hover!': !isShapeView && isHighlighted,
+					},
+				)}
 			/>
 			<EdgeLabelRenderer>
 				<>

@@ -13,10 +13,13 @@ import { ZoomControls } from '../../ZoomControls';
 import { InfluenceDiagramValidation } from '../InfluenceDiagramValidation';
 import { ChangeIssueType } from './ChangeIssueType';
 import { LayoutControls } from './LayoutControls';
+import { ResetLayout } from './ResetLayout';
+import { ToggleNodeView } from './ToggleNodeView';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { SolutionEvidenceResponse } from '../../../../validators';
 import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
+import { useInfluenceDiagramNodeView } from '../../../../hooks/useInfluenceDiagramNodeView';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -28,6 +31,8 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const selectedNodes = nodes.filter(node => node.selected);
 	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
 	const { evidence } = useInfluenceDiagramEvidence();
+	const [nodeView] = useInfluenceDiagramNodeView();
+	const isShapeView = nodeView === 'shape';
 	if (!projectId) return;
 	const selectedEvidence: SolutionEvidenceResponse[] = [
 		{
@@ -52,12 +57,15 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<div className='-mx-1.5 flex cursor-grab items-center justify-center' ref={handleRef}>
 				<Icon data={dragHandle} size={24} />
 			</div>
+			<ToggleNodeView />
+			<div className='bg-background-light h-9 w-0.5' />
 			<ZoomControls />
 			<LayoutControls />
+			{isShapeView && <ResetLayout />}
 			<div className='bg-background-light h-9 w-0.5' />
 			<TogglePanMode checked={!isSelecting} onChange={onClickPanMode} />
 			<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
-			<ToggleExpandAll />
+			{!isShapeView && <ToggleExpandAll />}
 			<div className='bg-background-light h-9 w-0.5' />
 			<DeleteIssuesDialog nodes={selectedNodes} />
 			<ChangeIssueType />

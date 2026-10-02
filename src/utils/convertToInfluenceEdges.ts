@@ -8,6 +8,7 @@ export type InfluenceEdgeRoute = {
 	points: InfluenceEdgePoint[];
 	labelX: number;
 	labelY: number;
+	skipAnimation?: boolean;
 };
 
 export type InfluenceEdgeData = {

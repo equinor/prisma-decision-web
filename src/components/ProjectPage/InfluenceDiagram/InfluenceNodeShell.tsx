@@ -1,6 +1,7 @@
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position, useNodeId } from '@xyflow/react';
 import { ReactNode } from 'react';
 import { cn } from '../../../utils/cn';
+import { NodeConnector } from './NodeConnector';
 
 type InfluenceNodeShellProps = {
 	inProgress: boolean;
@@ -8,6 +9,9 @@ type InfluenceNodeShellProps = {
 	children: ReactNode;
 	expandWidth?: boolean;
 	canStartConnection?: boolean;
+	className?: string;
+	// Uses a hover connector instead of a full-size source handle so the node body can be dragged
+	useConnector?: boolean;
 };
 
 export const InfluenceNodeShell = ({
@@ -16,18 +20,30 @@ export const InfluenceNodeShell = ({
 	children,
 	expandWidth,
 	canStartConnection = true,
+	className,
+	useConnector = false,
 }: InfluenceNodeShellProps) => {
+	const nodeId = useNodeId();
 	return (
 		<div
 			className={cn(
-				`pointer-events-none relative z-10 h-full w-87.5
+				`group/node pointer-events-none relative z-10 h-full w-87.5
 				overflow-visible rounded-sm [&_button]:pointer-events-auto [&_li]:pointer-events-auto`,
 				{
 					'w-auto': expandWidth,
+					'pointer-events-auto h-auto w-auto': useConnector,
 				},
+				className,
 			)}
 		>
-			{!inProgress && (
+			{useConnector && nodeId && (
+				<NodeConnector
+					nodeId={nodeId}
+					canStartConnection={canStartConnection}
+					hidden={inProgress}
+				/>
+			)}
+			{!useConnector && !inProgress && (
 				<Handle
 					type='source'
 					position={Position.Right}

@@ -21,6 +21,7 @@ export const useAnimatedInfluenceRoute = (route?: InfluenceEdgeRoute) => {
 			previousPointsRef.current.length >= 2 ? previousPointsRef.current : nextPoints;
 
 		if (
+			resolvedRoute.skipAnimation ||
 			nextPoints.length < 2 ||
 			fromPoints.length < 2 ||
 			arePointsEqual(fromPoints, nextPoints)
@@ -68,7 +69,8 @@ export const useAnimatedInfluenceRoute = (route?: InfluenceEdgeRoute) => {
 		};
 	}, [resolvedRoute]);
 
-	return displayPath;
+	// Avoids a one-frame lag behind the node while dragging
+	return resolvedRoute.skipAnimation ? resolvedRoute.path : displayPath;
 };
 
 const arePointsEqual = (a: InfluenceEdgePoint[], b: InfluenceEdgePoint[]) => {

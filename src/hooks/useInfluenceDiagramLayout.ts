@@ -8,9 +8,15 @@ import { useSelectedProjectEdges } from './useSelectedProjectEdges';
 import { useSelectedProjectInfluenceNodes } from './useSelectedProjectInfluenceNodes';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
 import { useInfluenceDiagramSettings } from './useInfluenceDiagramSettings';
+import { useInfluenceDiagramNodeView } from './useInfluenceDiagramNodeView';
+import {
+	InfluenceNodePositions,
+	useInfluenceDiagramCustomPositions,
+} from './useInfluenceDiagramCustomPositions';
 
 const defaultNodes = [] as ReactFlowInfluenceNode[];
 const defaultEdges = [] as Edge[];
+const noCustomPositions: InfluenceNodePositions = {};
 
 export const useInfluenceDiagramLayout = () => {
 	const issues = useSelectedProjectIssues();
@@ -19,6 +25,9 @@ export const useInfluenceDiagramLayout = () => {
 	const queryClient = useQueryClient();
 	const latestLayoutNodesRef = useRef<ReactFlowInfluenceNode[]>(defaultNodes);
 	const [layoutOptions] = useInfluenceDiagramSettings();
+	const [nodeView] = useInfluenceDiagramNodeView();
+	const [storedCustomPositions] = useInfluenceDiagramCustomPositions();
+	const customPositions = nodeView === 'shape' ? storedCustomPositions : noCustomPositions;
 
 	const filteredNodes = useMemo(() => {
 		const filteredIssues = issues.filter(issue => {
@@ -37,7 +46,10 @@ export const useInfluenceDiagramLayout = () => {
 			positionedEdges: defaultEdges,
 		},
 	} = useQuery({
-		queryKey: ['influenceDiagramLayout', { nodes: filteredNodes, edges, layoutOptions }],
+		queryKey: [
+			'influenceDiagramLayout',
+			{ nodes: filteredNodes, edges, layoutOptions, nodeView, customPositions },
+		],
 		placeholderData: keepPreviousData,
 		queryFn: async () => {
 			const measuredNodes = mergeMeasuredNodes(filteredNodes, latestLayoutNodesRef.current);
@@ -45,6 +57,8 @@ export const useInfluenceDiagramLayout = () => {
 				measuredNodes,
 				convertToInfluenceEdges(edges, measuredNodes),
 				layoutOptions,
+				nodeView,
+				customPositions,
 			);
 
 			latestLayoutNodesRef.current = layout.positionedNodes;
@@ -63,7 +77,10 @@ export const useInfluenceDiagramLayout = () => {
 		latestLayoutNodesRef.current = nextLayout.positionedNodes;
 
 		queryClient.setQueryData(
-			['influenceDiagramLayout', { nodes: filteredNodes, edges, layoutOptions }],
+			[
+				'influenceDiagramLayout',
+				{ nodes: filteredNodes, edges, layoutOptions, nodeView, customPositions },
+			],
 			nextLayout,
 		);
 	};
@@ -72,6 +89,7 @@ export const useInfluenceDiagramLayout = () => {
 		positionedNodes,
 		positionedEdges,
 		updateInfluenceDiagram,
+		customPositions,
 	};
 };
 

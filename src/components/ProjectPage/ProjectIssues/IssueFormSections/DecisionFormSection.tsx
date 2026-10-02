@@ -6,8 +6,10 @@ import { ErrorMessage } from '@hookform/error-message';
 import { FormErrorMessage } from '../../../common/FormErrorMessage';
 import { useController } from 'react-hook-form';
 import { decisionTypes } from '../../../../validators';
+import { cn } from '../../../../utils/cn';
+import { ForceState, ForceStateButton } from './ForceStateButton';
 
-export const DecisionFormSection = () => {
+export const DecisionFormSection = ({ forceState }: { forceState?: ForceState }) => {
 	const { control, register } = useIssueFormContext();
 	const {
 		fields: options,
@@ -24,6 +26,10 @@ export const DecisionFormSection = () => {
 	const projectId = useWatch({
 		control,
 		name: 'project_id',
+	});
+	const watchedOptions = useWatch({
+		control,
+		name: 'decision.options',
 	});
 
 	const {
@@ -56,7 +62,19 @@ export const DecisionFormSection = () => {
 			</div>{' '}
 			<div className='grid w-full grid-cols-1 gap-4'>
 				{options.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
+					<div
+						key={field.id}
+						className={cn('relative grid grid-cols-[1fr_8rem_auto] gap-2', {
+							'grid-cols-[auto_1fr_8rem_auto]': forceState,
+						})}
+					>
+						{forceState && (
+							<ForceStateButton
+								forceState={forceState}
+								stateId={watchedOptions[index]?.id}
+								label='option'
+							/>
+						)}
 						<div>
 							<TextField
 								placeholder={`Option ${index + 1}...`}
