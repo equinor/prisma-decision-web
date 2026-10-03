@@ -20,7 +20,7 @@ export const LayoutControls = () => {
 			<Button
 				ref={referenceElement}
 				className='px-1.5!'
-				variant='outlined'
+				variant='ghost'
 				onClick={() => setIsOpen(prev => !prev)}
 			>
 				<Icon data={settingsPanelIcon} />

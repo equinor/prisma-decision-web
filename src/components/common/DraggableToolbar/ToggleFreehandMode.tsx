@@ -17,6 +17,7 @@ export const ToggleFreehandMode = () => {
 		<Button.Toggle
 			onChange={onChange}
 			selectedIndexes={checked ? [0] : []}
+			className='**:border-none!'
 			title='Freehand mode'
 		>
 			<Button className='relative px-1.5!'>

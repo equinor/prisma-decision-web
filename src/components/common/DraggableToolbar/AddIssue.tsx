@@ -33,6 +33,7 @@ export const AddIssue = () => {
 	useHotkey('6', () => setIsOpen(!isOpen));
 
 	const addAllIssues = () => {
+		if (!sheet) return;
 		createWhiteboardNodes(
 			issues.map((issue, index) => ({
 				id: crypto.randomUUID(),
@@ -51,6 +52,7 @@ export const AddIssue = () => {
 	};
 
 	const addIssue = (issue: Issue) => {
+		if (!sheet) return;
 		const position = screenToFlowPosition({
 			x: window.innerWidth / 2,
 			y: window.innerHeight / 2,
@@ -79,6 +81,7 @@ export const AddIssue = () => {
 				onChange={() => setIsOpen(!isOpen)}
 				selectedIndexes={isOpen ? [0] : []}
 				title='Add issue'
+				className='**:border-none!'
 			>
 				<Button
 					ref={referenceElement}

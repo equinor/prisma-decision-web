@@ -15,6 +15,7 @@ export const TogglePanMode = () => {
 		<Button.Toggle
 			onChange={onChange}
 			selectedIndexes={checked ? [0] : []}
+			className='**:border-none!'
 			title='Toggle pan mode'
 		>
 			<Button className='relative px-1.5!'>

@@ -9,7 +9,7 @@ export const ClearSheet = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const sheet = useSelectedWhiteboardSheet();
 	const nodes = useSelectedProjectWhiteboardNodes().filter(
-		node => node.data.board_sheet_id === sheet.id,
+		node => node.data.board_sheet_id === sheet?.id,
 	);
 	const { mutate: deleteWhiteboardNodes, isPending } = useDeleteWhiteboardNode();
 
@@ -26,7 +26,7 @@ export const ClearSheet = () => {
 				disabled={nodes.length === 0}
 				data-no-dnd
 				className='px-1.5!'
-				variant='outlined'
+				variant='ghost'
 				title='Clear sheet'
 				onClick={() => setIsOpen(true)}
 			>
@@ -42,7 +42,7 @@ export const ClearSheet = () => {
 						<div className='flex flex-col gap-4 text-center'>
 							<h2 className='text-2xl font-semibold'>Clear sheet</h2>
 							<p className='text-text-tertiary'>
-								You are about to delete all {nodes.length} items from {sheet.name}.
+								You are about to delete all {nodes.length} items from {sheet?.name}.
 								This action cannot be undone.
 							</p>
 							<div className='flex flex-col gap-2'>

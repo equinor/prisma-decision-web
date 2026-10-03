@@ -35,7 +35,7 @@ export const ChangeIssueType = () => {
 				disabled={noSelectedIssues}
 				onClick={() => setIsOpen(prev => !prev)}
 				ref={setAnchorEl}
-				variant='outlined'
+				variant='ghost'
 			>
 				<Icon data={edit} />
 			</Button>

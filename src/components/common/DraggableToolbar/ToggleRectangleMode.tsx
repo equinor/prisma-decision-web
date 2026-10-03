@@ -16,6 +16,7 @@ export const ToggleRectangleMode = () => {
 			onChange={onChange}
 			selectedIndexes={checked ? [0] : []}
 			title='Rectangle mode'
+			className='**:border-none!'
 		>
 			<Button className='relative px-1.5!'>
 				<Icon data={rectangleIcon} />

@@ -25,7 +25,7 @@ export const DeleteMenu = ({ selectedNodes }: DeleteMenuProps) => {
 				color='danger'
 				data-no-dnd
 				title='Delete'
-				variant='outlined'
+				variant='ghost'
 				onClick={() => setIsOpen(prev => !prev)}
 			>
 				<Icon data={delete_to_trash} />

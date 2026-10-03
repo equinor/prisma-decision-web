@@ -1,8 +1,9 @@
-import { Accordion, Button, Divider, Icon, Popover } from '@equinor/eds-core-react';
+import { Accordion, Button, Icon, Popover } from '@equinor/eds-core-react';
 import { check_circle_outlined, warning_outlined } from '@equinor/eds-icons';
 import { useState } from 'react';
 
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { ToolbarSeparator } from '../../common/DraggableToolbar/Toolbar';
 
 // Validation Rule Item Component
 interface ValidationRuleItemProps {
@@ -21,12 +22,11 @@ export const InfluenceDiagramValidation = () => {
 	if (!hasError) return null;
 	return (
 		<>
-			<div className='bg-background-light h-9 w-0.5' />
 			<Button
-				className='border-warning-resting! hover:bg-warning-resting/20! px-1.5!'
+				className='hover:bg-warning-resting/20! px-1.5!'
 				color='danger'
 				ref={setAnchorEl}
-				variant='outlined'
+				variant='ghost'
 				onClick={() => setShowValidation(prev => !prev)}
 			>
 				<Icon data={warning_outlined} className='fill-warning-resting' />
@@ -41,7 +41,6 @@ export const InfluenceDiagramValidation = () => {
 						<p>Validation and guidelines for building valid influence diagram.</p>
 						<Button onClick={() => setShowValidation(false)}> Hide</Button>
 					</div>
-					<Divider />
 
 					{/* Error Alert */}
 					{hasError && (
@@ -102,6 +101,7 @@ export const InfluenceDiagramValidation = () => {
 					</Accordion>
 				</Popover.Content>
 			</Popover>
+			<ToolbarSeparator />
 		</>
 	);
 };
