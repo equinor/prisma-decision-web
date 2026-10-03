@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogContent } from '@equinor/eds-core-react';
-import { useDeleteEdges } from '../../../../hooks/api/useDeleteEdges';
-import { useSelectedProjectEdges } from '../../../../hooks/useSelectedProjectEdges';
+import { useDeleteEdges } from '../../../hooks/api/useDeleteEdges';
+import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 
 export const DeleteAllEdgesDialog = ({ open, onClose }: DeleteAllEdgesDialogProps) => {
 	const { edges, isFetching } = useSelectedProjectEdges();
@@ -25,7 +25,7 @@ export const DeleteAllEdgesDialog = ({ open, onClose }: DeleteAllEdgesDialogProp
 						</Button>
 						<Button
 							color='danger'
-							disabled={isFetching || isPending}
+							disabled={isFetching || isPending || edges.length === 0}
 							onClick={() =>
 								deleteEdges(
 									edges.map(edge => edge.id),
