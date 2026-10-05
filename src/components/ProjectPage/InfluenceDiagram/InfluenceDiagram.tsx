@@ -2,7 +2,7 @@ import { Background, ConnectionMode, ReactFlow, SelectionMode } from '@xyflow/re
 
 import { ConnectionLine } from './ConnectingLine';
 import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramNodeView';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DecisionNode } from './DecisionNode';
 import { EditIssueSideSheet } from './EditIssueSideSheet';
 import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
@@ -47,6 +47,14 @@ export const InfluenceDiagram = () => {
 	const [nodeView] = useInfluenceDiagramNodeView();
 	const nodeTypes = nodeView === 'shape' ? shapeNodeTypes : cardNodeTypes;
 	const [sheetIssueId, setSheetIssueId] = useState<string | null>(null);
+	useEffect(() => {
+		if (nodeView !== 'shape' || !sheetIssueId) return;
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') setSheetIssueId(null);
+		};
+		document.addEventListener('keydown', onKeyDown);
+		return () => document.removeEventListener('keydown', onKeyDown);
+	}, [nodeView, sheetIssueId]);
 
 	return (
 		<SheetIssueIdContext value={nodeView === 'shape' ? sheetIssueId : null}>
@@ -79,7 +87,11 @@ export const InfluenceDiagram = () => {
 					onEdgeMouseEnter={onEdgeMouseEnter}
 					onEdgeMouseLeave={onEdgeMouseLeave}
 					onNodeClick={(_, node) => {
-						if (nodeView === 'shape') setSheetIssueId(node.data.issue_id);
+						if (nodeView === 'shape') {
+							setSheetIssueId(currentId =>
+								currentId === node.data.issue_id ? null : node.data.issue_id,
+							);
+						}
 					}}
 					nodeTypes={nodeTypes}
 					edgeTypes={edgeTypes}
