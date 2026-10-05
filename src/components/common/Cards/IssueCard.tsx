@@ -264,6 +264,27 @@ export const IssueCardStates = ({
 	);
 };
 
+export const IssueCardTableTrigger = ({
+	label,
+	open,
+	onClick,
+}: {
+	label: string;
+	open: boolean;
+	onClick: () => void;
+}) => (
+	<EdsProvider density='compact'>
+		<button
+			type='button'
+			onClick={onClick}
+			className='nodrag nopan pointer-events-auto flex cursor-pointer items-center gap-2'
+		>
+			<p className='text-text-tertiary text-sm'>{label}</p>
+			<Icon className='fill-primary-resting' data={open ? chevron_up : chevron_down} />
+		</button>
+	</EdsProvider>
+);
+
 export const IssueCardExpandTrigger = () => {
 	const { issue, sortedStates } = useIssueCardContext();
 	const { expanded } = useExpandCard(issue.id);

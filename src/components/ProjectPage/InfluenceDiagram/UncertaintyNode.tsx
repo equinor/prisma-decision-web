@@ -12,6 +12,7 @@ import {
 	IssueCardMenu,
 	IssueCardProbabilityTableMenuItem,
 	IssueCardStates,
+	IssueCardTableTrigger,
 } from '../../common/Cards/IssueCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
@@ -66,7 +67,14 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 					</IssueCardHeader>
 					<IssueCardExpandableContent />
 					<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
-						<IssueCardExpandTrigger />
+						<div className='flex items-center gap-2'>
+							<IssueCardTableTrigger
+								label='Probabilities'
+								open={probabilityTableOpen}
+								onClick={() => setProbabilityTableOpen(prev => !prev)}
+							/>
+							<IssueCardExpandTrigger />
+						</div>
 					</IssueCardStates>
 				</IssueCard>
 			</InfluenceNodeShell>

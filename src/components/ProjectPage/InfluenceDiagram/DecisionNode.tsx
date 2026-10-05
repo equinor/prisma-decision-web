@@ -11,6 +11,7 @@ import {
 	IssueCardMenu,
 	IssueCardPolicyTableMenuItem,
 	IssueCardStates,
+	IssueCardTableTrigger,
 } from '../../common/Cards/IssueCard';
 import { InfluenceNodeShell } from './InfluenceNodeShell';
 import { PolicyTable } from './PolicyTable/PolicyTable';
@@ -58,7 +59,14 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 				</IssueCardHeader>
 				<IssueCardExpandableContent />
 				<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
-					<IssueCardExpandTrigger />
+					<div className='flex items-center gap-2'>
+						<IssueCardTableTrigger
+							label='Policy table'
+							open={policyTableOpen}
+							onClick={() => setPolicyTableOpen(prev => !prev)}
+						/>
+						<IssueCardExpandTrigger />
+					</div>
 				</IssueCardStates>
 			</IssueCard>
 			{policyTableOpen && (
