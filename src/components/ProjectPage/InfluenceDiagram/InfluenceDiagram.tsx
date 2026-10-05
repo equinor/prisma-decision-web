@@ -88,9 +88,14 @@ export const InfluenceDiagram = () => {
 					onEdgeMouseLeave={onEdgeMouseLeave}
 					onNodeClick={(_, node) => {
 						if (nodeView === 'shape') {
-							setSheetIssueId(currentId =>
-								currentId === node.data.issue_id ? null : node.data.issue_id,
-							);
+								if (sheetIssueId === node.data.issue_id) {
+									onNodesChange([
+										{ id: node.id, type: 'select', selected: false },
+									]);
+									setSheetIssueId(null);
+								} else {
+									setSheetIssueId(node.data.issue_id);
+								}
 						}
 					}}
 					nodeTypes={nodeTypes}
