@@ -6,13 +6,31 @@ export const ZoomControls = () => {
 	const { zoomIn, zoomOut, fitView } = useReactFlow();
 	return (
 		<div className='flex gap-2'>
-			<Button className='px-1.5!' onClick={() => zoomIn()} variant='outlined'>
+			<Button
+				className='px-1.5!'
+				title='Zoom in'
+				aria-label='Zoom in'
+				onClick={() => zoomIn()}
+				variant='outlined'
+			>
 				<Icon data={zoom_in} />
 			</Button>
-			<Button className='px-1.5!' onClick={() => zoomOut()} variant='outlined'>
+			<Button
+				className='px-1.5!'
+				title='Zoom out'
+				aria-label='Zoom out'
+				onClick={() => zoomOut()}
+				variant='outlined'
+			>
 				<Icon data={zoom_out} />
 			</Button>
-			<Button className='px-1.5!' onClick={() => fitView()} variant='outlined'>
+			<Button
+				className='px-1.5!'
+				title='Fit view'
+				aria-label='Fit view'
+				onClick={() => fitView()}
+				variant='outlined'
+			>
 				<Icon data={fullscreen} />
 			</Button>
 		</div>

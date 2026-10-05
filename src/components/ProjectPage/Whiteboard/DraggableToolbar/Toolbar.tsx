@@ -1,10 +1,10 @@
 import { DragDropProvider, DragEndEvent, DragOverlay, useDraggable } from '@dnd-kit/react';
 import { Icon } from '@equinor/eds-core-react';
+import { drag_indicator } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useReactFlow } from '@xyflow/react';
 import { useCreateWhiteboardNode } from '../../../../hooks/api/useCreateWhiteboardNode ';
 import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
-import { dragHandle } from '../../../../icons';
 import { cn } from '../../../../utils/cn';
 import {
 	IssueCard as IssueCardComponent,
@@ -66,31 +66,28 @@ export const Toolbar = () => {
 		<DragDropProvider onDragEnd={onDragEnd}>
 			<div
 				ref={ref}
-				className={cn(
-					`bg-background-default shadow-tile absolute
-					left-1/2 z-10 flex w-max -translate-x-1/2 gap-2 rounded-sm p-2`,
-					{
-						'top-6': toolBarPosition === 'top',
-						'bottom-6': toolBarPosition === 'bottom',
-					},
-				)}
+				className={cn('canvas-toolbar', {
+					'top-6': toolBarPosition === 'top',
+					'bottom-6': toolBarPosition === 'bottom',
+				})}
 			>
-				<div
-					className='-mx-1.5 flex cursor-grab items-center justify-center'
-					ref={handleRef}
-				>
-					<Icon data={dragHandle} size={24} />
+				<div className='toolbar-drag-handle' ref={handleRef}>
+					<Icon data={drag_indicator} />
 				</div>
-				<ZoomControls />
-				<div className='bg-background-light h-9 w-0.5' />
-				<TogglePanMode />
-				<ToggleSelectionMode />
-				<ToggleRectangleMode />
-				<ToggleArrowMode />
-				<ToggleTextMode />
-				<ToggleFreehandMode />
-				<AddIssue />
-				<div className='bg-background-light h-9 w-0.5' />
+				<div className='toolbar-group toolbar-view-controls'>
+					<ZoomControls />
+				</div>
+				<div className='toolbar-divider' />
+				<div className='toolbar-group'>
+					<TogglePanMode />
+					<ToggleSelectionMode />
+					<ToggleRectangleMode />
+					<ToggleArrowMode />
+					<ToggleTextMode />
+					<ToggleFreehandMode />
+					<AddIssue />
+				</div>
+				<div className='toolbar-divider' />
 
 				<SheetPicker />
 				<DragOverlay dropAnimation={null}>

@@ -2,6 +2,138 @@
 @plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:is(.dark *));
+.canvas-toolbar {
+	--toolbar-selected: #bbdbdf;
+	--toolbar-switch-background: #f5f5f5;
+	--toolbar-switch-border: #d4d4d4;
+	--toolbar-switch-selected: #d4d4d4;
+	position: absolute;
+	left: 50%;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: max-content;
+	height: 44px;
+	max-width: calc(100% - 32px);
+	padding: 4px 8px;
+	border-radius: 4px;
+	background: var(--color-background-default);
+	color: var(--color-text-default);
+	box-shadow:
+		0 1px 4px rgb(0 0 0 / 20%),
+		0 4px 4px rgb(0 0 0 / 12%);
+	transform: translateX(-50%);
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+}
+
+.canvas-toolbar > * {
+	flex-shrink: 0;
+}
+
+.dark .canvas-toolbar {
+	--toolbar-selected: var(--color-primary-hover-alt);
+	--toolbar-switch-background: var(--color-background-light);
+	--toolbar-switch-border: var(--color-text-tertiary);
+	--toolbar-switch-selected: var(--color-background-medium);
+}
+
+.canvas-toolbar .toolbar-group {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.canvas-toolbar .toolbar-divider {
+	width: 2px;
+	height: 36px;
+	flex-shrink: 0;
+	background: var(--color-background-light);
+}
+
+.canvas-toolbar .toolbar-drag-handle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 24px;
+	height: 36px;
+	cursor: grab;
+	color: var(--color-text-secondary);
+}
+
+.canvas-toolbar > button,
+.canvas-toolbar > [role='group'] > button,
+.canvas-toolbar > .toolbar-group > button,
+.canvas-toolbar > .toolbar-group > div:not([role='menu'], [role='dialog']) > button {
+	min-width: 36px;
+	height: 36px;
+	padding: 0 16px !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	background: transparent !important;
+	color: var(--color-primary-resting) !important;
+	font-size: 14px;
+	font-weight: 500;
+	white-space: nowrap;
+
+	&[class~='px-1.5!'] {
+		padding: 0 8px !important;
+	}
+
+	& svg {
+		width: 20px;
+		height: 20px;
+	}
+
+	&[aria-pressed='true'],
+	&:not(:disabled):hover {
+		background: var(--toolbar-selected) !important;
+	}
+
+	&:disabled {
+		color: var(--color-text-tertiary) !important;
+		opacity: 0.5;
+	}
+}
+
+.canvas-toolbar .toolbar-drag-handle svg {
+	width: 20px;
+	height: 20px;
+}
+
+.canvas-toolbar > .toolbar-group.toolbar-view-controls > button,
+.canvas-toolbar > .toolbar-group.toolbar-view-controls > div > button {
+	color: var(--color-text-secondary) !important;
+}
+
+.canvas-toolbar .toolbar-view-controls > div {
+	gap: 4px;
+}
+
+.canvas-toolbar .toolbar-mode-switch {
+	gap: 0;
+	padding: 3px 4px;
+	border: 1px solid var(--toolbar-switch-border);
+	border-radius: 4px;
+	background: var(--toolbar-switch-background);
+}
+
+.canvas-toolbar > [role='group'].toolbar-mode-switch > button {
+	min-width: 28px;
+	height: 28px;
+	padding: 0 4px !important;
+	color: var(--color-text-secondary) !important;
+}
+
+.canvas-toolbar > [role='group'].toolbar-mode-switch > button[aria-pressed='true']:enabled,
+.canvas-toolbar > [role='group'].toolbar-mode-switch > button:not(:disabled):hover {
+	background: var(--toolbar-switch-selected) !important;
+}
+
 [data-dnd-overlay]:not([style*='--dnd-translate']) {
 	display: none;
 }

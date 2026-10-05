@@ -1,14 +1,12 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
 import { useCallback, useState } from 'react';
-import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
-import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
 import { cn } from '../../../utils/cn';
 import { Issue } from '../../../validators';
 import { EditIssueForm } from '../../common/EditIssueForm';
-import { ForceState } from '../ProjectIssues/IssueFormSections/ForceStateButton';
+import { ForceStateSelect } from './ForceStateSelect';
 import { PolicyTable } from './PolicyTable/PolicyTable';
 import { ProbabilityTable } from './ProbabilityTable/ProbabilityTable';
 import { UtilityTable } from './UtilityTable/UtilityTable';
@@ -31,7 +29,6 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 		setView('details');
 		setAnimateViewSwitch(false);
 	}
-	const forceState = useForceState(issue);
 	const { edges } = useSelectedProjectEdges();
 	const [tableWidth, setTableWidth] = useState(0);
 	const measureTable = useCallback((node: HTMLDivElement | null) => {
@@ -100,13 +97,9 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 					</Button.Toggle>
 				)}
 				{/* Kept mounted while viewing tables to preserve unsaved edits */}
-				<div className={cn(viewSwitchClass, { hidden: showTable })}>
-					<EditIssueForm
-						issue={issue}
-						onClose={onClose}
-						forceState={forceState}
-						hideHeader
-					/>
+				<div className={cn('flex flex-col gap-4', viewSwitchClass, { hidden: showTable })}>
+					<ForceStateSelect issue={issue} />
+					<EditIssueForm issue={issue} onClose={onClose} hideHeader />
 				</div>
 				{showTable && (
 					<div ref={measureTable} className={cn('w-max', viewSwitchClass)}>
@@ -128,28 +121,6 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 			</div>
 		</aside>
 	);
-};
-
-const useForceState = (issue: Issue | undefined): ForceState | undefined => {
-	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
-	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
-	if (!issue) return;
-	const savedStateIds =
-		issue.type === 'Decision'
-			? issue.decision.options.map(option => option.id)
-			: issue.type === 'Uncertainty'
-				? issue.uncertainty.outcomes.map(outcome => outcome.id)
-				: [];
-	if (!savedStateIds.length) return;
-
-	const selectedId = evidence.find(id => savedStateIds.includes(id));
-	return {
-		selectedId,
-		isDisabled: stateId =>
-			!savedStateIds.includes(stateId) ||
-			(fullyRestrictedStateIds.includes(stateId) && stateId !== selectedId),
-		onToggle: stateId => toggleEvidence(stateId, issue.id),
-	};
 };
 
 type EditIssueSideSheetProps = {

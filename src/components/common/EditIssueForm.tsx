@@ -4,17 +4,10 @@ import { FormProvider, useWatch } from 'react-hook-form';
 import { useIssueForm } from '../../hooks/useIssueForm';
 import { Issue } from '../../validators';
 import { DecisionFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/DecisionFormSection';
-import { ForceState } from '../ProjectPage/ProjectIssues/IssueFormSections/ForceStateButton';
 import { IssueFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/IssueFormSection';
 import { UncertaintyFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/UncertaintyFormSection';
 
-export const EditIssueForm = ({
-	issue,
-	onClose,
-	onSuccess,
-	forceState,
-	hideHeader,
-}: EditIssueFormProps) => {
+export const EditIssueForm = ({ issue, onClose, onSuccess, hideHeader }: EditIssueFormProps) => {
 	const formMethods = useIssueForm({ issue, onSuccess });
 	const { control, onSubmit, isPending, reset } = formMethods;
 	const selectedType = useWatch({
@@ -40,10 +33,8 @@ export const EditIssueForm = ({
 				)}
 
 				<IssueFormSection />
-				{selectedType === 'Decision' && <DecisionFormSection forceState={forceState} />}
-				{selectedType === 'Uncertainty' && (
-					<UncertaintyFormSection forceState={forceState} />
-				)}
+				{selectedType === 'Decision' && <DecisionFormSection />}
+				{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
 				<div className='flex justify-end gap-2'>
 					<Button variant='outlined' onClick={handleClose}>
 						Cancel
@@ -61,6 +52,5 @@ type EditIssueFormProps = {
 	issue: Issue;
 	onClose: () => void;
 	onSuccess?: () => void;
-	forceState?: ForceState;
 	hideHeader?: boolean;
 };

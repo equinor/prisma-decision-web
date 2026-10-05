@@ -1,7 +1,7 @@
 import { Button, Icon, Label, Popover, Slider } from '@equinor/eds-core-react';
+import { tune } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { useInfluenceDiagramSettings } from '../../../../hooks/useInfluenceDiagramSettings';
-import { settingsPanelIcon } from '../../../../icons';
 
 export const LayoutControls = () => {
 	const [layoutOptions, setLayoutOptions] = useInfluenceDiagramSettings();
@@ -21,9 +21,11 @@ export const LayoutControls = () => {
 				ref={referenceElement}
 				className='px-1.5!'
 				variant='outlined'
+				title='Layout controls'
+				aria-label='Layout controls'
 				onClick={() => setIsOpen(prev => !prev)}
 			>
-				<Icon data={settingsPanelIcon} />
+				<Icon data={tune} />
 			</Button>
 			<Popover
 				open={isOpen}

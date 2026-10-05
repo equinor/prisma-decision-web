@@ -1,5 +1,5 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { rectangleIcon } from '../../../../icons';
+import { checkbox_outline } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
 import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
@@ -18,7 +18,7 @@ export const ToggleRectangleMode = () => {
 			title='Rectangle mode'
 		>
 			<Button className='relative px-1.5!'>
-				<Icon data={rectangleIcon} />
+				<Icon data={checkbox_outline} />
 				<p className='absolute right-0.5 -bottom-0.5 text-xs'>2</p>
 			</Button>
 		</Button.Toggle>

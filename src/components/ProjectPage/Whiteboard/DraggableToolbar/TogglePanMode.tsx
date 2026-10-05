@@ -1,5 +1,5 @@
-import { Button } from '@equinor/eds-core-react';
-import { DragIcon } from '../../../common/DragIcon';
+import { Button, Icon } from '@equinor/eds-core-react';
+import { pan_tool } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
 import { activeToolAtom } from '../activeToolAtom';
 import { useHotkey } from '@tanstack/react-hotkeys';
@@ -18,7 +18,7 @@ export const TogglePanMode = () => {
 			title='Toggle pan mode'
 		>
 			<Button className='relative px-1.5!'>
-				<DragIcon />
+				<Icon data={pan_tool} />
 				<p className='absolute right-0.5 -bottom-0.5 text-xs'>1</p>
 			</Button>
 		</Button.Toggle>

@@ -36,11 +36,12 @@ export const InfluenceNodeShell = ({
 				className,
 			)}
 		>
-			{useConnector && nodeId && (
+			{nodeId && (
 				<NodeConnector
 					nodeId={nodeId}
 					canStartConnection={canStartConnection}
 					hidden={inProgress}
+					handleId={useConnector ? 'node-source' : 'node-source-connector'}
 				/>
 			)}
 			{!useConnector && !inProgress && (
