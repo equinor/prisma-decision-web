@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"public": "vite --mode public",
+		"design": "vite --mode design",
 		"research": "vite --mode research",
 		"build": "tsc && vite build",
 		"build:dev": "DISABLE_ESLINT_PLUGIN=true tsc && vite build --mode development",
