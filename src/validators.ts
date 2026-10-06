@@ -293,8 +293,8 @@ export const stakeholderMatrixSchema = z.object({
 	stakeholder_matrix_id: z.guid(),
 	stakeholder_name: z.string().min(1, 'Stakeholder name is required'),
 	stakeholder_role: z.string().min(1, 'Stakeholder role is required'),
-	affected_by_the_decision: z.union([z.literal(0), z.literal(1)]),
-	affecting_the_decision: z.union([z.literal(0), z.literal(1)]),
+	affected_by_the_decision: z.number().min(0).max(1),
+	affecting_the_decision: z.number().min(0).max(1),
 	project_id: z.guid(),
 });
 

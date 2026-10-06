@@ -19,16 +19,12 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 	const {
 		register,
 		handleSubmit,
-		setValue,
-		watch,
 		formState: { errors },
 		isPending,
 	} = useStakeholderMatrixForm({
 		stakeholder,
 		onSuccess: () => setIsOpen(false),
 	});
-	const affectingDecision = watch('affecting_the_decision');
-	const affectedByDecision = watch('affected_by_the_decision');
 
 	return (
 		<>
@@ -84,39 +80,41 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 									<p className='mb-2 text-sm font-medium'>
 										Affecting the decision
 									</p>
-									<Button.Toggle selectedIndexes={[affectingDecision]}>
-										<Button
-											type='button'
-											onClick={() => setValue('affecting_the_decision', 0)}
-										>
-											Low
-										</Button>
-										<Button
-											type='button'
-											onClick={() => setValue('affecting_the_decision', 1)}
-										>
-											High
-										</Button>
-									</Button.Toggle>
+									<TextField
+										label='Influence (0–1)'
+										type='number'
+										min={0}
+										max={1}
+										step='any'
+										{...register('affecting_the_decision', {
+											valueAsNumber: true,
+										})}
+									/>
+									<ErrorMessage
+										as={FormErrorMessage}
+										name='affecting_the_decision'
+										errors={errors}
+									/>
 								</div>
 								<div>
 									<p className='mb-2 text-sm font-medium'>
 										Affected by the decision
 									</p>
-									<Button.Toggle selectedIndexes={[affectedByDecision]}>
-										<Button
-											type='button'
-											onClick={() => setValue('affected_by_the_decision', 0)}
-										>
-											Low
-										</Button>
-										<Button
-											type='button'
-											onClick={() => setValue('affected_by_the_decision', 1)}
-										>
-											High
-										</Button>
-									</Button.Toggle>
+									<TextField
+										label='Impact (0–1)'
+										type='number'
+										min={0}
+										max={1}
+										step='any'
+										{...register('affected_by_the_decision', {
+											valueAsNumber: true,
+										})}
+									/>
+									<ErrorMessage
+										as={FormErrorMessage}
+										name='affected_by_the_decision'
+										errors={errors}
+									/>
 								</div>
 							</div>
 							<Button

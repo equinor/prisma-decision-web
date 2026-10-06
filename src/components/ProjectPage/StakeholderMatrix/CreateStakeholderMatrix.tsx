@@ -17,13 +17,9 @@ export const CreateStakeholderMatrix = () => {
 	const {
 		register,
 		handleSubmit,
-		setValue,
-		watch,
 		formState: { errors },
 		isPending,
 	} = useStakeholderMatrixForm({ onSuccess: () => setIsOpen(false) });
-	const affectingDecision = watch('affecting_the_decision');
-	const affectedByDecision = watch('affected_by_the_decision');
 
 	return (
 		<>
@@ -76,72 +72,7 @@ export const CreateStakeholderMatrix = () => {
 									errors={errors}
 								/>
 							</div>
-							<div className='grid gap-4 sm:grid-cols-2'>
-								<div>
-									<p className='mb-2 text-sm font-medium'>
-										Affecting the decision
-									</p>
-									<Button.Toggle selectedIndexes={[affectingDecision]}>
-										<Button
-											type='button'
-											onClick={() =>
-												setValue('affecting_the_decision', 0, {
-													shouldValidate: true,
-												})
-											}
-										>
-											Low (0)
-										</Button>
-										<Button
-											type='button'
-											onClick={() =>
-												setValue('affecting_the_decision', 1, {
-													shouldValidate: true,
-												})
-											}
-										>
-											High (1)
-										</Button>
-									</Button.Toggle>
-									<ErrorMessage
-										as={FormErrorMessage}
-										name='affecting_the_decision'
-										errors={errors}
-									/>
-								</div>
-								<div>
-									<p className='mb-2 text-sm font-medium'>
-										Affected by the decision
-									</p>
-									<Button.Toggle selectedIndexes={[affectedByDecision]}>
-										<Button
-											type='button'
-											onClick={() =>
-												setValue('affected_by_the_decision', 0, {
-													shouldValidate: true,
-												})
-											}
-										>
-											Low (0)
-										</Button>
-										<Button
-											type='button'
-											onClick={() =>
-												setValue('affected_by_the_decision', 1, {
-													shouldValidate: true,
-												})
-											}
-										>
-											High (1)
-										</Button>
-									</Button.Toggle>
-									<ErrorMessage
-										as={FormErrorMessage}
-										name='affected_by_the_decision'
-										errors={errors}
-									/>
-								</div>
-							</div>
+
 							<Button
 								className='w-max justify-self-end'
 								type='submit'

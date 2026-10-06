@@ -37,7 +37,7 @@ const getDefaultValues = (projectId: string): StakeholderMatrix => ({
 	stakeholder_matrix_id: crypto.randomUUID(),
 	stakeholder_name: '',
 	stakeholder_role: '',
-	affected_by_the_decision: 0,
-	affecting_the_decision: 0,
+	affected_by_the_decision: 0.5,
+	affecting_the_decision: 0.5,
 	project_id: projectId,
 });

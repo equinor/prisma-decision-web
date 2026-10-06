@@ -3,6 +3,7 @@ import { ReactFlow, useNodesState, type Node, type NodeProps } from '@xyflow/rea
 import '@xyflow/react/dist/style.css';
 import { useMemo, useState } from 'react';
 import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderMatrixes';
+import { useUpdateStakeholderMatrix } from '../../../hooks/api/useUpdateStakeholderMatrix';
 import type { StakeholderMatrix as StakeholderMatrixRecord } from '../../../validators';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
@@ -13,28 +14,6 @@ import { EditStakeholderMatrix } from './EditStakeholderMatrix';
 type StakeholderMatrixProps = {
 	className?: string;
 };
-
-const regionColors = {
-	consult: '#d1495b',
-	partnerClosely: '#007f8b',
-	observe: '#5b5bd6',
-	keepInformed: '#2e8540',
-};
-
-const stakeholderRegions = [
-	{ key: 'partnerClosely', label: 'Partner closely', affecting: 1, affected: 1 },
-	{ key: 'consult', label: 'Consult', affecting: 0, affected: 1 },
-	{ key: 'keepInformed', label: 'Keep informed', affecting: 1, affected: 0 },
-	{ key: 'observe', label: 'Observe', affecting: 0, affected: 0 },
-] as const;
-
-const getRegionKey = (affectingDecision: number, affectedByDecision: number) => {
-	if (affectedByDecision) {
-		return affectingDecision ? 'partnerClosely' : 'consult';
-	}
-	return affectingDecision ? 'keepInformed' : 'observe';
-};
-
 type MatrixBackgroundData = {
 	[key: string]: unknown;
 	width: number;
@@ -45,74 +24,95 @@ type StakeholderNodeData = {
 	[key: string]: unknown;
 	name: string;
 	role: string;
-	color: string;
+	region: keyof typeof stakeholderRegions;
 };
 
 type MatrixBackgroundNode = Node<MatrixBackgroundData, 'matrixBackground'>;
 type StakeholderNode = Node<StakeholderNodeData, 'stakeholder'>;
 type StakeholderMatrixNode = MatrixBackgroundNode | StakeholderNode;
 
-const MATRIX_WIDTH = 1000;
-const MIN_REGION_HEIGHT = 300;
-const NODE_WIDTH = 104;
-const NODE_HEIGHT = 34;
-const NODE_COLUMNS = 2;
-const NODE_GAP_X = 12;
-const NODE_GAP_Y = 8;
-const REGION_PADDING_X = 28;
-const REGION_HEADER_HEIGHT = 58;
-const AXIS_GUTTER_WIDTH = 112;
-const AXIS_GUTTER_BOTTOM = 40;
+const stakeholderRegions = {
+	partnerClosely: {
+		label: 'Partner closely',
+		background: 'bg-[#007f8b]',
+		border: 'border-l-[#007f8b]',
+		matrixClassName: 'col-start-2 row-start-1 bg-[#007f8b]/12',
+	},
+	consult: {
+		label: 'Consult',
+		background: 'bg-[#d1495b]',
+		border: 'border-l-[#d1495b]',
+		matrixClassName: 'col-start-1 row-start-1 bg-[#d1495b]/12',
+	},
+	keepInformed: {
+		label: 'Keep informed',
+		background: 'bg-[#2e8540]',
+		border: 'border-l-[#2e8540]',
+		matrixClassName: 'col-start-2 row-start-2 bg-[#2e8540]/11',
+	},
+	observe: {
+		label: 'Observe',
+		background: 'bg-[#5b5bd6]',
+		border: 'border-l-[#5b5bd6]',
+		matrixClassName: 'col-start-1 row-start-2 bg-[#5b5bd6]/11',
+	},
+} as const;
 
-const MatrixBackground = ({ data }: NodeProps<MatrixBackgroundNode>) => (
-	<div
-		className='text-text-default relative'
-		style={{
-			width: data.width + AXIS_GUTTER_WIDTH,
-			height: data.height + AXIS_GUTTER_BOTTOM,
-		}}
-	>
-		<div
-			className='border-text-tertiary absolute top-0 grid grid-cols-2 border'
-			style={{ left: AXIS_GUTTER_WIDTH, width: data.width, height: data.height }}
-		>
-			{[
-				{ label: 'CONSULT', color: 'rgba(209, 73, 91, 0.12)' },
-				{ label: 'PARTNER CLOSELY', color: 'rgba(0, 127, 139, 0.12)' },
-				{ label: 'OBSERVE', color: 'rgba(91, 91, 214, 0.11)' },
-				{ label: 'KEEP INFORMED', color: 'rgba(46, 133, 64, 0.11)' },
-			].map(region => (
+const getRegionKey = (affectingDecision: number, affectedByDecision: number) => {
+	if (affectedByDecision >= 0.5) {
+		return affectingDecision >= 0.5 ? 'partnerClosely' : 'consult';
+	}
+	return affectingDecision >= 0.5 ? 'keepInformed' : 'observe';
+};
+
+const MATRIX_WIDTH = 1200;
+const MATRIX_HEIGHT = 800;
+const NODE_WIDTH = 100;
+const NODE_HEIGHT = 34;
+
+const clampAxisValue = (value: number) => Math.min(1, Math.max(0, value));
+
+const getStakeholderPosition = (affecting: number, affected: number) => ({
+	x: clampAxisValue(affecting) * (MATRIX_WIDTH - NODE_WIDTH),
+	y: (1 - clampAxisValue(affected)) * (MATRIX_HEIGHT - NODE_HEIGHT),
+});
+
+const getStakeholderValues = (position: { x: number; y: number }) => ({
+	affecting_the_decision: clampAxisValue(position.x / (MATRIX_WIDTH - NODE_WIDTH)),
+	affected_by_the_decision: clampAxisValue(1 - position.y / (MATRIX_HEIGHT - NODE_HEIGHT)),
+});
+
+const MatrixBackground = () => (
+	<div className='text-text-default relative h-207.5 w-300.25'>
+		<div className='border-text-tertiary absolute top-0 left-px grid h-200 w-300 grid-cols-2 border'>
+			{Object.entries(stakeholderRegions).map(([regionKey, region]) => (
 				<div
-					key={region.label}
-					className='border-text-tertiary border-r border-b p-4 text-xs font-semibold last:border-r-0'
-					style={{ backgroundColor: region.color }}
+					key={regionKey}
+					className={`border-text-tertiary border-r border-b p-4 text-xs font-semibold uppercase last:border-r-0 ${region.matrixClassName}`}
 				>
 					{region.label}
 				</div>
 			))}
+
 			<div className='absolute inset-x-0 -bottom-8 text-center text-sm'>
-				<span className='absolute left-0'>Low</span>
+				<span className='absolute left-0'>Low (0)</span>
 				Affecting the decision
-				<span className='absolute right-0'>High →</span>
+				<span className='absolute right-0'>High (1) →</span>
 			</div>
-		</div>
-		<div
-			className='absolute top-0 bottom-10 flex flex-col justify-between text-sm'
-			style={{ left: AXIS_GUTTER_WIDTH - 44 }}
-		>
-			<span>High ↑</span>
-			<span>Low</span>
-		</div>
-		<div className='absolute top-1/2 left-5 -translate-y-1/2 -rotate-90 text-sm whitespace-nowrap'>
-			Affected by the decision
+			<div className='absolute inset-y-0 -left-26 flex w-24 flex-col items-center justify-between text-sm whitespace-nowrap'>
+				<span>High (1) ↑</span>
+				<span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90'>
+					Affected by the decision
+				</span>
+				<span>Low (0)</span>
+			</div>
 		</div>
 	</div>
 );
 
 const StakeholderCardNode = ({ data }: NodeProps<StakeholderNode>) => (
 	<div
-		className='bg-background-default shadow-raised flex cursor-grab rounded-sm border-l-2 px-1.5 py-0.5 active:cursor-grabbing'
-		style={{ width: NODE_WIDTH, minHeight: NODE_HEIGHT, borderLeftColor: data.color }}
+		className={`bg-background-default shadow-raised flex h-8.5 w-25 cursor-grab rounded-sm border-l-2 px-1.5 py-0.5 active:cursor-grabbing ${stakeholderRegions[data.region].border}`}
 	>
 		<span className='min-w-0'>
 			<span className='block truncate text-[11px] font-semibold' title={data.name}>
@@ -133,15 +133,20 @@ const nodeTypes = {
 type MatrixCanvasProps = {
 	initialNodes: StakeholderMatrixNode[];
 	stakeholderCount: number;
+	onStakeholderMove: (id: string, values: ReturnType<typeof getStakeholderValues>) => void;
 };
 
-const MatrixCanvas = ({ initialNodes, stakeholderCount }: MatrixCanvasProps) => {
+const MatrixCanvas = ({ initialNodes, stakeholderCount, onStakeholderMove }: MatrixCanvasProps) => {
 	const [nodes, , onNodesChange] = useNodesState<StakeholderMatrixNode>(initialNodes);
 
 	return (
 		<ReactFlow
 			nodes={nodes}
 			onNodesChange={onNodesChange}
+			onNodeDragStop={(_event, node) => {
+				if (node.type !== 'stakeholder') return;
+				onStakeholderMove(node.id, getStakeholderValues(node.position));
+			}}
 			nodeTypes={nodeTypes}
 			nodesConnectable={false}
 			elementsSelectable={false}
@@ -151,7 +156,7 @@ const MatrixCanvas = ({ initialNodes, stakeholderCount }: MatrixCanvasProps) => 
 			zoomOnPinch={false}
 			zoomOnDoubleClick={false}
 			fitView
-			fitViewOptions={{ padding: 0.15 }}
+			fitViewOptions={{ padding: 0.08 }}
 			proOptions={{ hideAttribution: true }}
 			aria-label={`Stakeholder matrix with ${stakeholderCount} stakeholders`}
 		/>
@@ -159,28 +164,12 @@ const MatrixCanvas = ({ initialNodes, stakeholderCount }: MatrixCanvasProps) => 
 };
 
 const buildMatrixNodes = (stakeholders: StakeholderMatrixRecord[]): StakeholderMatrixNode[] => {
-	const regionCounts = stakeholders.reduce<Record<string, number>>((counts, stakeholder) => {
-		const regionKey = getRegionKey(
-			stakeholder.affecting_the_decision,
-			stakeholder.affected_by_the_decision,
-		);
-		counts[regionKey] = (counts[regionKey] ?? 0) + 1;
-		return counts;
-	}, {});
-	const largestRegion = Math.max(0, ...Object.values(regionCounts));
-	const regionRows = Math.max(1, Math.ceil(largestRegion / NODE_COLUMNS));
-	const regionHeight = Math.max(
-		MIN_REGION_HEIGHT,
-		REGION_HEADER_HEIGHT + regionRows * (NODE_HEIGHT + NODE_GAP_Y) + NODE_GAP_Y,
-	);
-	const matrixHeight = regionHeight * 2;
-	const positionsByRegion = new Map<string, number>();
 	const nodes: StakeholderMatrixNode[] = [
 		{
 			id: 'matrix-background',
 			type: 'matrixBackground',
-			position: { x: -AXIS_GUTTER_WIDTH, y: 0 },
-			data: { width: MATRIX_WIDTH, height: matrixHeight },
+			position: { x: 0, y: 0 },
+			data: { width: MATRIX_WIDTH, height: MATRIX_HEIGHT },
 			draggable: false,
 			selectable: false,
 			focusable: false,
@@ -193,31 +182,24 @@ const buildMatrixNodes = (stakeholders: StakeholderMatrixRecord[]): StakeholderM
 			stakeholder.affecting_the_decision,
 			stakeholder.affected_by_the_decision,
 		);
-		const positionInRegion = positionsByRegion.get(regionKey) ?? 0;
-		positionsByRegion.set(regionKey, positionInRegion + 1);
-		const column = positionInRegion % NODE_COLUMNS;
-		const row = Math.floor(positionInRegion / NODE_COLUMNS);
-		const regionLeft = stakeholder.affecting_the_decision ? MATRIX_WIDTH / 2 : 0;
-		const regionTop = stakeholder.affected_by_the_decision ? 0 : regionHeight;
-
 		nodes.push({
 			id: stakeholder.stakeholder_matrix_id,
 			type: 'stakeholder',
-			position: {
-				x: regionLeft + REGION_PADDING_X + column * (NODE_WIDTH + NODE_GAP_X),
-				y: regionTop + REGION_HEADER_HEIGHT + row * (NODE_HEIGHT + NODE_GAP_Y),
-			},
+			position: getStakeholderPosition(
+				stakeholder.affecting_the_decision,
+				stakeholder.affected_by_the_decision,
+			),
 			data: {
 				name: stakeholder.stakeholder_name,
 				role: stakeholder.stakeholder_role,
-				color: regionColors[regionKey],
+				region: regionKey,
 			},
 			draggable: true,
 			selectable: false,
 			focusable: false,
 			extent: [
-				[regionLeft, regionTop],
-				[regionLeft + MATRIX_WIDTH / 2, regionTop + regionHeight],
+				[0, 0],
+				[MATRIX_WIDTH, MATRIX_HEIGHT],
 			],
 			zIndex: 1,
 		});
@@ -241,6 +223,14 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 	const [searchQuery, setSearchQuery] = useState('');
 	const selectedProject = useSelectedProject();
 	const { stakeholderMatrices, isLoading } = useGetStakeholderMatrixes(selectedProject.id);
+	const { mutate: updateStakeholder } = useUpdateStakeholderMatrix();
+	const handleStakeholderMove = (id: string, values: ReturnType<typeof getStakeholderValues>) => {
+		const stakeholder = stakeholderMatrices.find(
+			current => current.stakeholder_matrix_id === id,
+		);
+		if (!stakeholder) return;
+		updateStakeholder({ ...stakeholder, ...values });
+	};
 	const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
 	const filteredStakeholders = stakeholderMatrices.filter(stakeholder =>
 		`${stakeholder.stakeholder_name} ${stakeholder.stakeholder_role}`
@@ -255,8 +245,10 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 	const matrixRevision = getMatrixRevision(stakeholderMatrices);
 
 	return (
-		<div className={`flex w-full flex-col gap-5 py-2 ${className}`}>
-			<header className='flex flex-wrap items-start justify-between gap-4'>
+		<div
+			className={`flex h-[calc(100dvh-144px)] min-h-0 w-full flex-col gap-5 py-2 ${className}`}
+		>
+			<header className='flex shrink-0 flex-wrap items-start justify-between gap-4'>
 				<div>
 					<div className='flex items-center gap-3'>
 						<h1 className='text-3xl font-bold'>Stakeholder Matrix</h1>
@@ -273,9 +265,9 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 				<CreateStakeholderMatrix />
 			</header>
 
-			<div className='grid items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_320px]'>
-				<section className='bg-background-default shadow-tile min-w-0 rounded-md p-4 sm:p-6'>
-					<div className='text-text-tertiary mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs'>
+			<div className='grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_320px] xl:grid-rows-[minmax(0,1fr)]'>
+				<section className='bg-background-default shadow-tile flex min-h-0 min-w-0 flex-col rounded-md p-4 sm:p-6'>
+					<div className='text-text-tertiary mb-3 flex shrink-0 flex-wrap gap-x-5 gap-y-1 text-xs'>
 						<span>
 							<strong className='text-text-default'>Horizontal:</strong> influence on
 							the decision
@@ -285,14 +277,12 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 							decision
 						</span>
 					</div>
-					<div
-						className='bg-background-light relative min-h-125 w-full overflow-hidden rounded-sm'
-						style={{ height: 'calc(100vh - 240px)' }}
-					>
+					<div className='bg-background-light relative min-h-0 w-full flex-1 overflow-hidden rounded-sm'>
 						<MatrixCanvas
 							key={matrixRevision}
 							initialNodes={generatedMatrixNodes}
 							stakeholderCount={stakeholderMatrices.length}
+							onStakeholderMove={handleStakeholderMove}
 						/>
 						{isLoading && <LoadingSpinner />}
 					</div>
@@ -303,12 +293,12 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 					)}
 				</section>
 
-				<aside className='bg-background-default shadow-tile flex h-[calc(100vh-240px)] min-h-125 flex-col overflow-hidden rounded-md xl:w-80'>
-					<div className='border-border-medium border-b px-4 py-3'>
+				<aside className='bg-background-default shadow-tile flex min-h-0 flex-col overflow-hidden rounded-md xl:w-80'>
+					<div className='border-border-medium shrink-0 border-b px-4 py-3'>
 						<h2 className='text-base font-semibold'>Stakeholders</h2>
 						<p className='text-text-tertiary text-xs'>Grouped by matrix region</p>
 					</div>
-					<div className='border-border-medium border-b p-3'>
+					<div className='border-border-medium shrink-0 border-b p-3'>
 						<TextField
 							label='Search stakeholders'
 							placeholder='Name or role'
@@ -317,12 +307,14 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 						/>
 					</div>
 					<div className='min-h-0 flex-1 overflow-y-auto p-2'>
-						{stakeholderRegions.map(region => {
+						{Object.entries(stakeholderRegions).map(([regionKey, region]) => {
 							const regionStakeholders = filteredStakeholders
 								.filter(
 									stakeholder =>
-										stakeholder.affecting_the_decision === region.affecting &&
-										stakeholder.affected_by_the_decision === region.affected,
+										getRegionKey(
+											stakeholder.affecting_the_decision,
+											stakeholder.affected_by_the_decision,
+										) === regionKey,
 								)
 								.sort((first, second) =>
 									first.stakeholder_name.localeCompare(second.stakeholder_name),
@@ -330,13 +322,10 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 							if (regionStakeholders.length === 0) return null;
 
 							return (
-								<section key={region.key} className='mb-3 last:mb-0'>
+								<section key={regionKey} className='mb-3 last:mb-0'>
 									<div className='bg-background-light sticky top-0 z-10 flex items-center gap-2 px-3 py-2'>
 										<span
-											className='h-2.5 w-2.5 rounded-full'
-											style={{
-												backgroundColor: regionColors[region.key],
-											}}
+											className={`h-2.5 w-2.5 rounded-full ${region.background}`}
 										/>
 										<h3 className='flex-1 text-xs font-semibold uppercase'>
 											{region.label}
@@ -361,15 +350,15 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 													<span className='mt-1.5 flex flex-wrap gap-1 text-[11px]'>
 														<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
 															Affecting:{' '}
-															{stakeholder.affecting_the_decision
-																? 'High'
-																: 'Low'}
+															{stakeholder.affecting_the_decision.toFixed(
+																2,
+															)}
 														</span>
 														<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
 															Affected:{' '}
-															{stakeholder.affected_by_the_decision
-																? 'High'
-																: 'Low'}
+															{stakeholder.affected_by_the_decision.toFixed(
+																2,
+															)}
 														</span>
 													</span>
 												</span>
