@@ -75,48 +75,7 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 									errors={errors}
 								/>
 							</div>
-							<div className='grid gap-4 sm:grid-cols-2'>
-								<div>
-									<p className='mb-2 text-sm font-medium'>
-										Affecting the decision
-									</p>
-									<TextField
-										label='Influence (0–1)'
-										type='number'
-										min={0}
-										max={1}
-										step='any'
-										{...register('affecting_the_decision', {
-											valueAsNumber: true,
-										})}
-									/>
-									<ErrorMessage
-										as={FormErrorMessage}
-										name='affecting_the_decision'
-										errors={errors}
-									/>
-								</div>
-								<div>
-									<p className='mb-2 text-sm font-medium'>
-										Affected by the decision
-									</p>
-									<TextField
-										label='Impact (0–1)'
-										type='number'
-										min={0}
-										max={1}
-										step='any'
-										{...register('affected_by_the_decision', {
-											valueAsNumber: true,
-										})}
-									/>
-									<ErrorMessage
-										as={FormErrorMessage}
-										name='affected_by_the_decision'
-										errors={errors}
-									/>
-								</div>
-							</div>
+
 							<Button
 								className='w-max justify-self-end'
 								type='submit'

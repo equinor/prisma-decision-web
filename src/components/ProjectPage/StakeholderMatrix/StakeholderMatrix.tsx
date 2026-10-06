@@ -65,7 +65,7 @@ const getRegionKey = (affectingDecision: number, affectedByDecision: number) => 
 	return affectingDecision >= 0.5 ? 'keepInformed' : 'observe';
 };
 
-const MATRIX_WIDTH = 1200;
+const MATRIX_WIDTH = 1450;
 const MATRIX_HEIGHT = 800;
 const NODE_WIDTH = 100;
 const NODE_HEIGHT = 34;
@@ -83,8 +83,14 @@ const getStakeholderValues = (position: { x: number; y: number }) => ({
 });
 
 const MatrixBackground = () => (
-	<div className='text-text-default relative h-207.5 w-300.25'>
-		<div className='border-text-tertiary absolute top-0 left-px grid h-200 w-300 grid-cols-2 border'>
+	<div
+		className='text-text-default relative'
+		style={{ width: MATRIX_WIDTH, height: MATRIX_HEIGHT + 32 }}
+	>
+		<div
+			className='border-text-tertiary absolute inset-x-0 top-0 grid grid-cols-2 grid-rows-2 border'
+			style={{ height: MATRIX_HEIGHT }}
+		>
 			{Object.entries(stakeholderRegions).map(([regionKey, region]) => (
 				<div
 					key={regionKey}
@@ -267,16 +273,6 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 
 			<div className='grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] items-stretch gap-5 xl:grid-cols-[minmax(0,1fr)_320px] xl:grid-rows-[minmax(0,1fr)]'>
 				<section className='bg-background-default shadow-tile flex min-h-0 min-w-0 flex-col rounded-md p-4 sm:p-6'>
-					<div className='text-text-tertiary mb-3 flex shrink-0 flex-wrap gap-x-5 gap-y-1 text-xs'>
-						<span>
-							<strong className='text-text-default'>Horizontal:</strong> influence on
-							the decision
-						</span>
-						<span>
-							<strong className='text-text-default'>Vertical:</strong> impact from the
-							decision
-						</span>
-					</div>
 					<div className='bg-background-light relative min-h-0 w-full flex-1 overflow-hidden rounded-sm'>
 						<MatrixCanvas
 							key={matrixRevision}
