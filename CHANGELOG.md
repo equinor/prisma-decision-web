@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/prisma-decision-web/compare/v1.1.0...v1.2.0) (2026-10-07)
+
+
+### Features
+
+* add editable table cell components ([#818](https://github.com/equinor/prisma-decision-web/issues/818)) ([51c2a08](https://github.com/equinor/prisma-decision-web/commit/51c2a0819c4cf154e0fae1f181814cfe962909ee))
+* add randomize button for probabilities in development mode ([#843](https://github.com/equinor/prisma-decision-web/issues/843)) ([3639cba](https://github.com/equinor/prisma-decision-web/commit/3639cbaa8b07e00248a8b69af44887cbf40e49bf))
+* adds clear all button to prob and utility tables ([#767](https://github.com/equinor/prisma-decision-web/issues/767)) ([5afd9d0](https://github.com/equinor/prisma-decision-web/commit/5afd9d0a60dafa2c4bc27bfa31cb2cad2dff4a19))
+* change opportunity statment to rich text field ([#796](https://github.com/equinor/prisma-decision-web/issues/796)) ([14e88ef](https://github.com/equinor/prisma-decision-web/commit/14e88efdf7fd10122683cff167dbc60044fac1cb))
+* disabel state options when restricition table makes it impossible ([#752](https://github.com/equinor/prisma-decision-web/issues/752)) ([4877593](https://github.com/equinor/prisma-decision-web/commit/487759370198f942f633697f4141b7ae163208c9))
+* **project objectives:** make objective table editable ([#819](https://github.com/equinor/prisma-decision-web/issues/819)) ([380fb85](https://github.com/equinor/prisma-decision-web/commit/380fb859862b31f926bc8d6fb45cc80e46d8a297))
+* **project-issues:** make issue rows inline editable ([#820](https://github.com/equinor/prisma-decision-web/issues/820)) ([6a83ff9](https://github.com/equinor/prisma-decision-web/commit/6a83ff9215df2601948b248f53cc453e3cf0f689))
+* show all strategies by default ([#822](https://github.com/equinor/prisma-decision-web/issues/822)) ([32e3a83](https://github.com/equinor/prisma-decision-web/commit/32e3a83cb05551e2a346c5472947d142ff8f641f))
+
+
+### Bug Fixes
+
+* hide states for fact issues ([#824](https://github.com/equinor/prisma-decision-web/issues/824)) ([7767bc5](https://github.com/equinor/prisma-decision-web/commit/7767bc59631624b2442a811b98d11eeee0c00e98))
+* **objective:** keep delete error handling on shared objectives cache ([#854](https://github.com/equinor/prisma-decision-web/issues/854)) ([5f41dfd](https://github.com/equinor/prisma-decision-web/commit/5f41dfd40291958eb3201da1acfe76827b9e5067))
+* prevents board sheet race condition from happening ([#771](https://github.com/equinor/prisma-decision-web/issues/771)) ([087c1b9](https://github.com/equinor/prisma-decision-web/commit/087c1b9f99442cf7f25dffaf02be0784ac3b219e))
+* refetch board nodes and sheets after duplicating a project ([8a5a88d](https://github.com/equinor/prisma-decision-web/commit/8a5a88d69a0a91954c06d6a5c699e46d84d4b880))
+* **restriction-table:** allow deleting edge when no rows exist ([#856](https://github.com/equinor/prisma-decision-web/issues/856)) ([f342681](https://github.com/equinor/prisma-decision-web/commit/f342681cb965ae0b8c9e5c1cb202730f3b677013))
+* sort columns and rows in tables the same as in issues ([#768](https://github.com/equinor/prisma-decision-web/issues/768)) ([c3ff3f0](https://github.com/equinor/prisma-decision-web/commit/c3ff3f0782fcc3cde86d2064f873b17b23e1c8da))
+* **strategy-table:** fit decision state icons in issue cards ([#823](https://github.com/equinor/prisma-decision-web/issues/823)) ([f3db900](https://github.com/equinor/prisma-decision-web/commit/f3db900c47148b12e55bcae34cd61fcb1490bd13))
+
 ## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-09-03)
 
 
