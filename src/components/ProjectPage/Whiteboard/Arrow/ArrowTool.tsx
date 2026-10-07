@@ -3,16 +3,12 @@ import { useReactFlow, type XYPosition } from '@xyflow/react';
 import { useSetAtom } from 'jotai';
 import { useCreateWhiteboardNode } from '../../../../hooks/api/useCreateWhiteboardNode ';
 import { activeToolAtom } from '../activeToolAtom';
-import {
-	ARROW_HEAD_LENGTH,
-	ARROW_STROKE_WIDTH,
-	ARROW_VIEWBOX_SIZE,
-	createArrowGeometry,
-} from '../arrowPath';
+import { ARROW_HEAD_LENGTH, ARROW_VIEWBOX_SIZE, createArrowGeometry } from '../arrowPath';
 import { whiteboardPreviewStrokeColor } from '../selectionStyles';
 import { useWhiteboardWheelZoom } from '../useWhiteboardWheelZoom';
 import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
 import { useSelectedProject } from '../../ProjectContext';
+import { MEDIUM_STROKE_WIDTH } from '../config';
 
 export function ArrowTool() {
 	const [start, setStart] = useState<XYPosition | null>(null);
@@ -105,7 +101,7 @@ export function ArrowTool() {
 						stroke={whiteboardPreviewStrokeColor}
 						strokeLinecap='round'
 						strokeLinejoin='round'
-						strokeWidth={ARROW_STROKE_WIDTH}
+						strokeWidth={MEDIUM_STROKE_WIDTH}
 						vectorEffect='non-scaling-stroke'
 					/>
 				</svg>
