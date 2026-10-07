@@ -3,9 +3,10 @@ import { apiClient } from '../../api';
 import { Objective } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
 
-export const useUpdateObjective = (args: { onSuccess?: () => void } | void) => {
+export const useUpdateObjective = (args: { onSuccess?: () => void; scope?: string } | void) => {
 	const queryClient = useQueryClient();
 	return useMutation({
+		scope: args?.scope ? { id: args.scope } : undefined,
 		mutationFn: async (objective: Objective) => {
 			await apiClient.put('/objectives', [objective]);
 			return objective;
@@ -16,17 +17,28 @@ export const useUpdateObjective = (args: { onSuccess?: () => void } | void) => {
 			});
 
 			const previousObjectives = queryClient.getQueryData<Objective[]>(['objectives']);
+			const previousObjective = previousObjectives?.find(
+				obj => obj.id === updatedObjective.id,
+			);
 			const updatedObjectives = previousObjectives?.map(obj =>
 				obj.id === updatedObjective.id ? { ...obj, ...updatedObjective } : obj,
 			);
 			queryClient.setQueryData(['objectives'], updatedObjectives);
-			return { previousObjectives };
+			return { previousObjective };
 		},
 		onSuccess: async () => {
 			await queryClient.refetchQueries({ queryKey: ['objectives'] });
 			args?.onSuccess?.();
 		},
-		onError: () => {
+		onError: (_error, _objective, context) => {
+			const previousObjective = context?.previousObjective;
+			if (previousObjective) {
+				queryClient.setQueryData<Objective[]>(['objectives'], objectives =>
+					objectives?.map(objective =>
+						objective.id === previousObjective.id ? previousObjective : objective,
+					),
+				);
+			}
 			showErrorToast('Failed to update objective');
 		},
 	});
