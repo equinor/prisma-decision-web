@@ -3,6 +3,7 @@ import { apiClient } from '../../api';
 import useSelectedWhiteboardSheet from '../useSelectedWhiteboardSheet';
 import { useSelectedProjectWhiteboardNodes } from '../useSelectedProjectWhiteboardNodes';
 import { BOTTOM_LAYER_Z_INDEX, WhiteboardNode } from '../../validators';
+import { showErrorToast } from '../../components/ShowToast';
 
 export const useCreateWhiteboardNode = (args: { onSuccess?: () => void } | void) => {
 	const queryClient = useQueryClient();
@@ -39,6 +40,7 @@ export const useCreateWhiteboardNode = (args: { onSuccess?: () => void } | void)
 			if (context?.previousNodes) {
 				queryClient.setQueryData(['whiteboardNodes'], context.previousNodes);
 			}
+			showErrorToast('Failed to add issue to the whiteboard');
 		},
 	});
 };
