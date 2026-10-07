@@ -1,3 +1,4 @@
+import { sortByCreatedAt } from '../../../../utils/sortByCreatedAt';
 import { Issue } from '../../../../validators';
 import {
 	ParentDescriptor,
@@ -7,7 +8,11 @@ import {
 	getParentRowSpans,
 } from '../ProbabilityTable/utils';
 
-export type ParentStateInfo = { name: string; issueName: string; issueId: string };
+export type ParentStateInfo = {
+	name: string;
+	issueName: string;
+	issueId: string;
+};
 
 export type ParentStateLookups = {
 	optionMap: Map<string, ParentStateInfo>;
@@ -52,51 +57,42 @@ export const getDiscreteValueRows = <T extends ParentStateValue>(values: T[], is
 		return { lookups, parents: [], parentRowSpans: [], rows: [] };
 	}
 
-	const parentIssueMap = new Map<string, ParentDescriptor>();
-	const addParent = (
-		stateId: string,
-		kind: ParentDescriptor['kind'],
-		lookup: ParentStateLookups['optionMap'],
-	) => {
-		const info = lookup.get(stateId);
-		if (info && !parentIssueMap.has(info.issueId)) {
-			parentIssueMap.set(info.issueId, {
-				issueId: info.issueId,
-				issueName: info.issueName,
-				kind,
-				states: [],
-			});
-		}
-	};
+	const parentOptionIds = new Set(values.flatMap(value => value.parent_option_ids));
+	const parentOutcomeIds = new Set(values.flatMap(value => value.parent_outcome_ids));
+	const parents: ParentDescriptor[] = [];
 
-	for (const value of values) {
-		for (const optionId of value.parent_option_ids) {
-			addParent(optionId, 'decision', lookups.optionMap);
+	for (const issue of issues) {
+		if (issue.type === 'Decision') {
+			const states = sortByCreatedAt(issue.decision.options)
+				.filter(option => parentOptionIds.has(option.id))
+				.map(option => ({ id: option.id, name: option.name }));
+			if (states.length) {
+				parents.push({
+					issueId: issue.id,
+					issueName: issue.name,
+					kind: 'decision',
+					states,
+				});
+			}
 		}
-		for (const outcomeId of value.parent_outcome_ids) {
-			addParent(outcomeId, 'uncertainty', lookups.outcomeMap);
+
+		if (issue.type === 'Uncertainty') {
+			const states = sortByCreatedAt(issue.uncertainty.outcomes)
+				.filter(outcome => parentOutcomeIds.has(outcome.id))
+				.map(outcome => ({ id: outcome.id, name: outcome.name }));
+			if (states.length) {
+				parents.push({
+					issueId: issue.id,
+					issueName: issue.name,
+					kind: 'uncertainty',
+					states,
+				});
+			}
 		}
 	}
 
-	const addState = (stateId: string, lookup: ParentStateLookups['optionMap']) => {
-		const info = lookup.get(stateId);
-		const parent = info && parentIssueMap.get(info.issueId);
-		if (info && parent && !parent.states.some(state => state.id === stateId)) {
-			parent.states.push({ id: stateId, name: info.name });
-		}
-	};
-
-	for (const value of values) {
-		for (const optionId of value.parent_option_ids) {
-			addState(optionId, lookups.optionMap);
-		}
-		for (const outcomeId of value.parent_outcome_ids) {
-			addState(outcomeId, lookups.outcomeMap);
-		}
-	}
-
-	const parents = [...parentIssueMap.values()].sort((a, b) =>
-		a.issueName.localeCompare(b.issueName),
+	parents.sort(
+		(a, b) => a.issueName.localeCompare(b.issueName) || a.issueId.localeCompare(b.issueId),
 	);
 	const rowMap = new Map<string, T[]>();
 
