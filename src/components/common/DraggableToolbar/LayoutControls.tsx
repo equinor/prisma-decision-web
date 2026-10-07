@@ -1,7 +1,7 @@
 import { Button, Icon, Label, Popover, Slider } from '@equinor/eds-core-react';
 import { useRef, useState } from 'react';
-import { useInfluenceDiagramSettings } from '../../../../hooks/useInfluenceDiagramSettings';
-import { settingsPanelIcon } from '../../../../icons';
+import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
+import { settingsPanelIcon } from '../../../icons';
 
 export const LayoutControls = () => {
 	const [layoutOptions, setLayoutOptions] = useInfluenceDiagramSettings();
