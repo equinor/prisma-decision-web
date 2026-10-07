@@ -34,33 +34,37 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 	const hasMissingOptions = !!DecisionOptions.find(x => x === data.issue_id);
 
 	return (
-		<InfluenceNodeShell
-			inProgress={inProgress}
-			isTarget={isTarget}
-			expandWidth={policyTableOpen}
-		>
-			<IssueCard
-				issue={issue}
-				selected={selected}
-				includeBorder
-				className='min-h-35!'
-				selectedState={selectedOption}
-				onClickState={option => {
-					toggleEvidence(option.id, issue.id);
-				}}
+		<div className='flex flex-col gap-1'>
+			<InfluenceNodeShell
+				inProgress={inProgress}
+				isTarget={isTarget}
+				expandWidth={policyTableOpen}
 			>
-				<IssueCardHeader>
-					<IssueCardMenu>
-						<IssueCardEditMenuItem />
-						<IssueCardDeleteMenuItem />
-						<IssueCardPolicyTableMenuItem onClick={() => setPolicyTableOpen(true)} />
-					</IssueCardMenu>
-				</IssueCardHeader>
-				<IssueCardExpandableContent />
-				<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
-					<IssueCardExpandTrigger />
-				</IssueCardStates>
-			</IssueCard>
+				<IssueCard
+					issue={issue}
+					selected={selected}
+					includeBorder
+					className='min-h-35!'
+					selectedState={selectedOption}
+					onClickState={option => {
+						toggleEvidence(option.id, issue.id);
+					}}
+				>
+					<IssueCardHeader>
+						<IssueCardMenu>
+							<IssueCardEditMenuItem />
+							<IssueCardDeleteMenuItem />
+							<IssueCardPolicyTableMenuItem
+								onClick={() => setPolicyTableOpen(true)}
+							/>
+						</IssueCardMenu>
+					</IssueCardHeader>
+					<IssueCardExpandableContent />
+					<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
+						<IssueCardExpandTrigger />
+					</IssueCardStates>
+				</IssueCard>
+			</InfluenceNodeShell>
 			{policyTableOpen && (
 				<PolicyTable issue={issue} selected={selected} onClose={setPolicyTableOpen} />
 			)}
@@ -70,6 +74,6 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 					<p className='text-warning-resting'>Has missing options</p>
 				</div>
 			)}
-		</InfluenceNodeShell>
+		</div>
 	);
 };
