@@ -60,9 +60,9 @@ export const InfluenceShapeStates = ({ issue }: { issue: Issue }) => {
 					selectedState
 						? 'border-primary-resting text-primary-resting border-2 py-px'
 						: 'border-background-medium text-text-tertiary',
-					// Forced states stay visible so the active scenario is readable at a glance
-
-						!open &&
+					// Keep the active scenario readable when the node is not hovered.
+					!open &&
+						!selectedState &&
 						'opacity-0 group-hover/node:opacity-100 focus-visible:opacity-100',
 				)}
 			>
