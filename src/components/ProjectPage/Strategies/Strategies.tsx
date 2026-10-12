@@ -30,8 +30,8 @@ export const Strategies = () => {
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex items-center justify-between'>
-				<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
+			<div className='grid w-full grid-cols-[1fr_auto] items-center justify-between gap-2'>
+				<h1 className='truncate text-3xl font-bold'>{selectedProject.name}</h1>
 				<CreateStrategy />
 			</div>
 			{selectedStrategies.length > 0 && <StrategyTable strategies={strategiesToCompare} />}
