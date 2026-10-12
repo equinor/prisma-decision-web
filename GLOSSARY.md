@@ -19,3 +19,7 @@ The collective term for an Option or Outcome.
 **Issue name**:
 The label identifying an Issue, including when displayed as a Board card's title.
 _Avoid_: Issue title
+
+**Draft**:
+An Issue being prepared that has not yet been added to the project.
+_Avoid_: Composer
