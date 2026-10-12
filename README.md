@@ -48,11 +48,11 @@ npm install
 
 The app uses environment-specific `.env` files:
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_APP_CLIENT_ID` | Azure AD application client ID |
-| `VITE_APP_REDIRECT_URI` | OAuth redirect URI |
-| `VITE_APP_PRISMA_API_URL` | Backend API base URL |
+| Variable                    | Description                     |
+| --------------------------- | ------------------------------- |
+| `VITE_APP_CLIENT_ID`        | Azure AD application client ID  |
+| `VITE_APP_REDIRECT_URI`     | OAuth redirect URI              |
+| `VITE_APP_PRISMA_API_URL`   | Backend API base URL            |
 | `VITE_APP_PRISMA_API_SCOPE` | API scope for token acquisition |
 
 Environment files: `.env.development`, `.env.test`, `.env.production`
@@ -79,7 +79,23 @@ npm run build:prod     # Production build
 npm run lint           # ESLint
 npm run tsc            # TypeScript type-check
 npm run prettier       # Check formatting
+npm test               # Vitest + jsdom component and validation tests
 ```
+
+Tests live beside their source files and use React Testing Library. `src/test/setup.ts`
+supplies the native dialog/popover APIs missing from jsdom. Full issue-form tests
+replace the HTTP adapter; they do not require or write to a backend.
+Use Node 22.22.2+ or Node 24.15+ for the test runner.
+
+Full Create/Edit issue controls use EDS 2.0 beta from `@equinor/eds-core-react/next`,
+with its stylesheet layered after Tailwind's base reset in `src/index.css`.
+Existing Equinor typography is retained; Inter is loaded separately for beta
+controls, whose color-scheme tokens follow the existing theme preference.
+Stable Popover and CircularProgress remain because the beta does not provide
+counterparts. Reusable issue defaults are
+in `src/utils/createIssueDraft.ts`; shared issue, option, and outcome validation is
+in `src/validators.ts`. Validation rejects blank required text without trimming
+submitted values.
 
 ## Project Structure
 
@@ -128,11 +144,11 @@ Pull requests to `main` trigger GitHub Actions (`.github/workflows/run-eslint.ym
 
 Deployments are managed via [Radix](https://www.radix.equinor.com/) using tag-based triggers defined in `radixconfig.yaml`:
 
-| Environment | Trigger | DNS Alias |
-|-------------|---------|-----------|
-| **dev** | Push to `main` | `prisma-dev.radix.equinor.com` |
-| **test** | `TEST` tag | `prisma-test.radix.equinor.com` |
-| **prod** | `PROD` tag | `prisma.radix.equinor.com` |
+| Environment | Trigger        | DNS Alias                       |
+| ----------- | -------------- | ------------------------------- |
+| **dev**     | Push to `main` | `prisma-dev.radix.equinor.com`  |
+| **test**    | `TEST` tag     | `prisma-test.radix.equinor.com` |
+| **prod**    | `PROD` tag     | `prisma.radix.equinor.com`      |
 
 Release commands:
 
@@ -162,12 +178,12 @@ Important:
 
 Edit [ .env.research ](.env.research):
 
-	VITE_APP_PRISMA_API_URL="http://localhost:7075/"
+    VITE_APP_PRISMA_API_URL="http://localhost:7075/"
 
 ### 2. Build and run
 
-	docker compose build --no-cache
-	docker compose up
+    docker compose build --no-cache
+    docker compose up
 
 App URL:
 
@@ -193,11 +209,9 @@ If Docker build fails at `npm ci`:
 
 If Docker fails with `no space left on device`:
 
-	docker builder prune -af
-	docker system prune -af --volumes
+    docker builder prune -af
+    docker system prune -af --volumes
 
 To check Docker disk usage:
 
-	docker system df -v
-
-
+    docker system df -v
