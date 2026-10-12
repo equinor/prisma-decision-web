@@ -9,9 +9,8 @@ import {
 	IssueCardEditMenuItem,
 	IssueCardHeader,
 	IssueCardMenu,
-	IssueCardStates,
-	IssueCardExpandTrigger,
 } from './IssueCard';
+import { IssueCardEditableStates } from './IssueCardEditableStates';
 
 export const IssueBoardCard = ({
 	issue,
@@ -47,9 +46,7 @@ export const IssueBoardCard = ({
 					</div>
 				</div>
 				{(issue.type === 'Decision' || issue.type === 'Uncertainty') && (
-					<IssueCardStates>
-						<IssueCardExpandTrigger />
-					</IssueCardStates>
+					<IssueCardEditableStates />
 				)}
 			</IssueCard>
 		</DraggableIssueContainer>
