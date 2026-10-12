@@ -1,5 +1,5 @@
-import { Button, CircularProgress, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
-import { close } from '@equinor/eds-icons';
+import { CircularProgress } from '@equinor/eds-core-react';
+import { Button, Dialog } from '@equinor/eds-core-react/next';
 import { FormProvider, useWatch } from 'react-hook-form';
 import { useIssueForm } from '../../hooks/useIssueForm';
 import { Issue } from '../../validators';
@@ -26,33 +26,39 @@ export const EditIssueModal = ({ issue, onClose, open = false }: EditIssueModalP
 		<Dialog
 			data-no-dnd
 			open={open}
-			className='nodrag nopan nowheel pointer-events-auto fixed top-1/2 left-1/2 max-h-[90vh]
-			w-[min(700px,90vw)]! -translate-x-1/2 -translate-y-1/2 transform cursor-auto overflow-auto'
+			onOpenChange={value => {
+				if (!value) handleClose();
+			}}
+			className='nodrag nopan nowheel pointer-events-auto max-h-[90vh]
+			w-[min(700px,90vw)]! cursor-auto overflow-auto'
 		>
-			<DialogContent>
-				<FormProvider {...formMethods}>
-					<form onSubmit={onSubmit} className='flex flex-col gap-4'>
-						<div className='flex items-center justify-between'>
-							<h2 className='text-2xl font-semibold'>Edit Issue</h2>
-							<Button variant='ghost_icon' onClick={handleClose}>
-								<Icon data={close} />
-							</Button>
-						</div>
-
-						<IssueFormSection />
-						{selectedType === 'Decision' && <DecisionFormSection />}
-						{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
-						<div className='flex justify-end gap-2'>
-							<Button variant='outlined' onClick={handleClose}>
-								Cancel
-							</Button>
-							<Button type='submit' disabled={isPending}>
-								{isPending ? <CircularProgress size={16} /> : 'Update Issue'}
-							</Button>
-						</div>
-					</form>
-				</FormProvider>
-			</DialogContent>
+			<FormProvider {...formMethods}>
+				<form onSubmit={onSubmit} className='flex flex-col gap-4'>
+					<Dialog.Header>
+						<Dialog.Title>Edit Issue</Dialog.Title>
+					</Dialog.Header>
+					<Dialog.Content>
+						<fieldset disabled={isPending} className='flex w-full flex-col gap-4'>
+							<IssueFormSection />
+							{selectedType === 'Decision' && <DecisionFormSection />}
+							{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
+						</fieldset>
+					</Dialog.Content>
+					<Dialog.Actions>
+						<Button type='button' variant='secondary' onClick={handleClose}>
+							Cancel
+						</Button>
+						<Button
+							type='submit'
+							disabled={isPending}
+							aria-label='Update Issue'
+							aria-busy={isPending}
+						>
+							{isPending ? <CircularProgress size={16} /> : 'Update Issue'}
+						</Button>
+					</Dialog.Actions>
+				</form>
+			</FormProvider>
 		</Dialog>
 	);
 };

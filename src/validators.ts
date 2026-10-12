@@ -19,6 +19,9 @@ export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
 export const BOTTOM_LAYER_Z_INDEX = 0;
 
+const requiredText = (message: string) =>
+	z.string().refine(value => value.trim().length > 0, message);
+
 export const objectiveSchema = z.object({
 	id: z.guid(),
 	name: z.string().min(1, 'Objective name is required'),
@@ -42,8 +45,8 @@ export const projectRoleSchema = userSchema.extend({
 	role: z.enum(roleTypes, { error: 'Role is required' }),
 });
 
-const optionSchema = z.object({
-	name: z.string().min(1, 'Option name is required'),
+export const optionSchema = z.object({
+	name: requiredText('Option name is required'),
 	id: z.guid(),
 	decision_id: z.guid(),
 	project_id: z.guid(),
@@ -144,7 +147,7 @@ export const utilitySchema = z.object({
 export const outcomeSchema = z.object({
 	id: z.guid(),
 	utility: z.number(),
-	name: z.string().min(1, 'Outcome name is required'),
+	name: requiredText('Outcome name is required'),
 	uncertainty_id: z.uuid(),
 	created_at: z.iso.datetime().optional(),
 	project_id: z.uuid(),
@@ -185,8 +188,8 @@ export const edgeSchema = z.object({
 export const issueSchema = z.object({
 	id: z.guid(),
 	project_id: z.guid(),
-	name: z.string().min(1, 'Issue name is required'),
-	description: z.string().min(1, 'Description is required'),
+	name: requiredText('Issue name is required'),
+	description: requiredText('Issue description is required'),
 	order: z.number().int().nonnegative(),
 	type: z.enum(issueTypes),
 	boundary: z.enum(['in', 'on', 'out']),

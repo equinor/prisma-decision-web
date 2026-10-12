@@ -19,6 +19,7 @@
 		"release:prod": "npm run fetch-tags && git tag -f PROD && npm run push-tags",
 		"release:test": "npm run fetch-tags && git tag -f TEST && npm run push-tags",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"test": "vitest run",
 		"tsc": "tsc --build --noEmit",
 		"prettier": "prettier --check ./src",
 		"preview": "vite preview",
@@ -33,7 +34,7 @@
 		"@dnd-kit/collision": "^0.5.0",
 		"@dnd-kit/helpers": "^0.5.0",
 		"@dnd-kit/react": "^0.5.0",
-		"@equinor/eds-core-react": "^2.6.3",
+		"@equinor/eds-core-react": "3.0.0-beta.2",
 		"@equinor/eds-icons": "^1.6.0",
 		"@hookform/error-message": "^2.0.1",
 		"@hookform/resolvers": "^5.9.1",
@@ -61,6 +62,11 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.7",
+		"jsdom": "^30.1.2",
+		"vitest": "^5.0.3",
 		"@hookform/devtools": "^4.4.0",
 		"@rolldown/plugin-babel": "^0.2.4",
 		"@tailwindcss/vite": "^4.3.3",
