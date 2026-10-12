@@ -44,7 +44,10 @@ export const useIssueDragAndDrop = () => {
 	};
 
 	const onBeforeDragStart: DragDropEventHandlers['onBeforeDragStart'] = event => {
-		if (!canDndStartFrom(event.operation.activatorEvent?.target)) {
+		if (
+			event.operation.source?.data.editing === true ||
+			!canDndStartFrom(event.operation.activatorEvent?.target)
+		) {
 			event.preventDefault();
 		}
 	};

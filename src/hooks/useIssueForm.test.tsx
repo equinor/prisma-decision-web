@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
+import { existingIssue } from '../test/issueFixtures';
 import { Issue } from '../validators';
 import { useIssueForm } from './useIssueForm';
 
@@ -11,11 +12,13 @@ const creation = vi.hoisted(() => ({
 const updates = vi.hoisted(() => ({
 	onSuccess: () => {},
 	mutate: vi.fn<(issue: Issue) => void>(),
+	optimistic: vi.fn<(issues: Issue[], options?: { onSuccess?: () => void }) => void>(),
 }));
 
 beforeEach(() => {
 	creation.mutate.mockReset();
 	updates.mutate.mockReset();
+	updates.optimistic.mockReset();
 });
 
 vi.mock('../components/ProjectPage/ProjectContext', () => ({
@@ -39,6 +42,36 @@ vi.mock('./api/useUpdateIssue', () => ({
 		return { mutate: updates.mutate, isPending: false };
 	},
 }));
+
+vi.mock('./api/useUpdateIssues', () => ({
+	useUpdateIssuesOptimistic: () => ({ mutate: updates.optimistic, isPending: false }),
+}));
+
+test.each([undefined, false, true])(
+	'selects the update mutation with optimistic=%s',
+	async optimistic => {
+		const issue = existingIssue();
+		const onSuccess = vi.fn();
+		updates.mutate.mockImplementation(() => updates.onSuccess());
+		updates.optimistic.mockImplementation((_issues, options) => options?.onSuccess?.());
+		const { result } = renderHook(() => useIssueForm({ issue, optimistic, onSuccess }));
+		act(() => result.current.setValue('name', 'Updated issue'));
+		await act(async () => result.current.onSubmit());
+		const updated = { ...issue, name: 'Updated issue' };
+		if (optimistic) {
+			expect(updates.optimistic).toHaveBeenCalledWith(
+				[updated],
+				expect.objectContaining({ onSuccess: expect.any(Function) }),
+			);
+			expect(updates.mutate).not.toHaveBeenCalled();
+		} else {
+			expect(updates.mutate).toHaveBeenCalledWith(updated);
+			expect(updates.optimistic).not.toHaveBeenCalled();
+		}
+		expect(onSuccess).toHaveBeenCalledWith(issue.id);
+		expect(creation.mutate).not.toHaveBeenCalled();
+	},
+);
 
 test('resets to a fresh draft while retaining classification after creation', () => {
 	const onSuccess = vi.fn();
