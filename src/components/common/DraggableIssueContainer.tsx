@@ -1,13 +1,20 @@
 import { useSortable } from '@dnd-kit/react/sortable';
 import { Issue, IssueType, issueTypes } from '../../validators';
 
-export const DraggableIssueContainer = ({ issue, index, type, children }: DraggableCardProps) => {
+export const DraggableIssueContainer = ({
+	issue,
+	index,
+	type,
+	children,
+	disabled = false,
+}: DraggableCardProps) => {
 	const { ref, isDragging } = useSortable({
 		id: issue.id,
 		index,
 		type,
 		data: {
 			issue,
+			editing: disabled,
 		},
 		accept: [...issueTypes],
 		group: type,
@@ -16,6 +23,7 @@ export const DraggableIssueContainer = ({ issue, index, type, children }: Dragga
 		<div
 			ref={ref}
 			data-dragging={isDragging}
+			data-no-dnd={disabled || undefined}
 			className='data-[dragging="true"]:cursor-grabbing
 			data-[dragging="true"]:opacity-40'
 		>
@@ -29,4 +37,5 @@ type DraggableCardProps = {
 	index: number;
 	type: IssueType;
 	children: React.ReactNode;
+	disabled?: boolean;
 };

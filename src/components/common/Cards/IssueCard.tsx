@@ -1,4 +1,5 @@
-import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { Button as BetaButton, Icon as BetaIcon } from '@equinor/eds-core-react/next';
 import {
 	chevron_down,
 	chevron_up,
@@ -71,16 +72,19 @@ export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	return (
-		<div>
-			<Button
+		<div className='flex shrink-0 p-0.5'>
+			<BetaButton
 				ref={setAnchorEl}
 				onClick={() => setMenuOpen(true)}
-				variant='ghost_icon'
+				variant='ghost'
+				size='small'
+				icon
+				aria-label='Issue actions'
 				data-card-action
 				className='pointer-events-auto'
 			>
-				<Icon data={more_vertical} />
-			</Button>
+				<BetaIcon data={more_vertical} size='md' />
+			</BetaButton>
 			<Menu
 				open={menuOpen}
 				onClose={() => setMenuOpen(false)}

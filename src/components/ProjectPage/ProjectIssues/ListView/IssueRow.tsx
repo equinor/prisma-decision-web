@@ -3,8 +3,6 @@ import { Button, Icon } from '@equinor/eds-core-react/next';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useController } from 'react-hook-form';
-import { useIssueForm } from '../../../../hooks/useIssueForm';
 import { useIssueClassification } from '../../../../hooks/useIssueClassification';
 import { Issue } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
@@ -12,21 +10,14 @@ import { DecisionTypeLabel } from '../../../common/Cards/DecisionTypeLabel';
 import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
 import { KeyLabel } from '../../../common/Cards/KeyLabel';
 import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
-import { EditableTableCell } from '../../../common/EditableTableCell';
 import { EditIssueModal } from '../../../common/EditIssueModal';
+import { IssueTextField } from '../IssueTextField';
 
 export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-	const { control, onSubmit } = useIssueForm({ issue });
 	const { changeType, changeDecisionType, changeBoundary, toggleKey } =
 		useIssueClassification(issue);
-	const {
-		field: { onChange: onChangeName },
-	} = useController({ control, name: 'name' });
-	const {
-		field: { onChange: onChangeDescription },
-	} = useController({ control, name: 'description' });
 
 	return (
 		<>
@@ -56,17 +47,12 @@ export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
 						</Button>
 					</div>
 				</Table.Cell>
-				<EditableTableCell
-					value={issue.name}
-					onChange={onChangeName}
-					onBlur={() => onSubmit()}
-				/>
-				<EditableTableCell
-					className='max-w-xl truncate'
-					value={issue.description}
-					onChange={onChangeDescription}
-					onBlur={() => onSubmit()}
-				/>
+				<Table.Cell className='p-0!'>
+					<IssueTextField issue={issue} field='name' />
+				</Table.Cell>
+				<Table.Cell className='max-w-xl p-0!'>
+					<IssueTextField issue={issue} field='description' className='truncate' />
+				</Table.Cell>
 				<Table.Cell className='text-right!'>
 					{issue.type === 'Decision'
 						? issue.decision.options.length
