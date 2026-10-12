@@ -19,8 +19,8 @@ export const ListView = () => {
 				</div>
 			</div>
 			<div className='flex w-full flex-col gap-4'>
-				<IssuesInDiagramTable />
-				<IssuesNotInDiagramTable />
+				<IssuesInDiagramTable issues={issues} />
+				<IssuesNotInDiagramTable issues={issues} />
 			</div>
 		</div>
 	);
