@@ -28,9 +28,9 @@ export const useCreateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 			);
 			return { previousStakeholders };
 		},
-		onError: (_error, _stakeholder, context) => {
+		onError: (_error, stakeholder, context) => {
 			queryClient.setQueryData(
-				['stakeholder-matrixes', context?.previousStakeholders[0]?.project_id],
+				['stakeholder-matrixes', stakeholder.project_id],
 				context?.previousStakeholders,
 			);
 			showErrorToast('Failed to create stakeholder');
