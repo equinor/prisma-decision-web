@@ -14,7 +14,7 @@ export const IssueColumn = ({
 	setActiveDraft,
 }: IssueColumnProps) => {
 	return (
-		<section aria-label={`${label} issues`} className='flex min-w-79 basis-full flex-col gap-2'>
+		<section aria-label={`${label} issues`} className='flex min-w-90 basis-full flex-col gap-2'>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
