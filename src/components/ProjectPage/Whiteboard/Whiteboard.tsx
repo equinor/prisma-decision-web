@@ -47,7 +47,7 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 			className={`overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 			style={{ opacity: cardOpacity }}
 		>
-			<IssueCard issue={issue} className='w-72'>
+			<IssueCard issue={issue} className='w-84'>
 				<IssueCardHeader editable>
 					<IssueCardMenu>
 						<IssueCardEditMenuItem />
