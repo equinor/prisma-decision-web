@@ -2,17 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
+import { issueMutationScope } from './useUpdateIssues';
 
-export const useUpdateIssue = ({
-	onSuccess,
-	scope,
-}: {
-	onSuccess?: () => void;
-	scope?: string;
-}) => {
+export const useUpdateIssue = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
-		scope: scope ? { id: scope } : undefined,
+		scope: issueMutationScope,
 		mutationFn: async (issue: Issue) => {
 			const res = await apiClient.put('/issues', [issue]);
 			return res.data;
