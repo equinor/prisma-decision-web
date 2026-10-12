@@ -17,9 +17,9 @@ export const ProjectDetails = () => {
 	if (!selectedProject) return null;
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex justify-between'>
-				<div>
-					<h1 className='text-3xl font-bold'>{selectedProject.name}</h1>
+			<div className='grid w-full grid-cols-[1fr_auto] items-center justify-between gap-2'>
+				<div className='truncate'>
+					<h1 className='truncate text-3xl font-bold'>{selectedProject.name}</h1>
 					{selectedProject.parent_project_name && (
 						<p className='text-text-secondary text-sm wrap-break-word'>
 							Copied from{' '}
