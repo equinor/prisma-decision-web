@@ -8,25 +8,26 @@ export const useUpdateIssue = ({
 	onSuccess,
 	issueId,
 }: {
-	onSuccess?: () => void;
+	onSuccess?: () => void | Promise<void>;
 	issueId?: string;
 }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		scope: issueMutationScope,
 		meta: { issueId },
-		mutationFn: async (issue: Issue) => {
-			const res = await apiClient.put('/issues', [issue]);
+		mutationFn: async (issue: Issue | (() => Issue)) => {
+			const updated = typeof issue === 'function' ? issue() : issue;
+			const res = await apiClient.put('/issues', [updated]);
 			return res.data;
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			queryClient.refetchQueries({ queryKey: ['issues'] });
 			queryClient.invalidateQueries({ queryKey: ['probabilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['solution'] });
 			queryClient.invalidateQueries({ queryKey: ['restrictionTables'] });
-			onSuccess?.();
+			await onSuccess?.();
 		},
 		onError: () => {
 			showErrorToast('Failed to update issue');

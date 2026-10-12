@@ -19,8 +19,8 @@ export const IssueBoardCardHeader = ({
 		useIssueClassification(issue);
 
 	return (
-		<div className='flex items-center justify-between gap-1'>
-			<div className='flex flex-wrap items-center gap-1'>
+		<div className='flex items-center justify-between gap-1 py-1.5'>
+			<div className='flex min-w-0 flex-1 flex-wrap items-center gap-1'>
 				<IssueTypeControl issue={issue} onChange={changeType} />
 				<BoundaryControl issue={issue} onChange={changeBoundary} />
 				<DecisionTypeControl issue={issue} onChange={changeDecisionType} />

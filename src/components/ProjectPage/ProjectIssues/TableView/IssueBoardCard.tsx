@@ -14,6 +14,7 @@ import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer
 import { IssueTextField } from '../IssueTextField';
 import { IssueBoardCardHeader } from './IssueBoardCardHeader';
 import { IssueBoardEditingContext, useIssueBoardEditing } from './IssueBoardEditingContext';
+import { IssueBoardStates } from './IssueBoardStates';
 
 export const IssueBoardCard = ({
 	issue,
@@ -37,6 +38,10 @@ export const IssueBoardCard = ({
 			return next;
 		});
 	}, []);
+	const onStateEditingChange = useCallback(
+		(issueId: string, active: boolean) => setEditing(`states:${issueId}`, active),
+		[setEditing],
+	);
 	const editing = activeEditors.size > 0;
 	return (
 		<IssueBoardEditingContext value={{ editing, setEditing }}>
@@ -70,10 +75,14 @@ export const IssueBoardCard = ({
 							/>
 						</div>
 					</div>
-					{issue.type !== 'Fact' && (
-						<IssueCardStates>
-							<IssueCardExpandTrigger />
-						</IssueCardStates>
+					{issue.type === 'Decision' || issue.type === 'Uncertainty' ? (
+						<IssueBoardStates issue={issue} onEditingChange={onStateEditingChange} />
+					) : (
+						issue.type !== 'Fact' && (
+							<IssueCardStates>
+								<IssueCardExpandTrigger />
+							</IssueCardStates>
+						)
 					)}
 				</IssueCard>
 			</DraggableIssueContainer>
