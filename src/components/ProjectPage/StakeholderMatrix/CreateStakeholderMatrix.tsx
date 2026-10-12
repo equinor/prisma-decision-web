@@ -41,6 +41,7 @@ export const CreateStakeholderMatrix = () => {
 								</p>
 							</div>
 							<Button
+								type='button'
 								variant='ghost_icon'
 								className='absolute! top-2 right-2'
 								aria-label='Close'
