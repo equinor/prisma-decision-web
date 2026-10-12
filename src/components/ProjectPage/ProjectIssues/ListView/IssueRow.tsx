@@ -15,7 +15,7 @@ import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
 import { EditableTableCell } from '../../../common/EditableTableCell';
 import { EditIssueModal } from '../../../common/EditIssueModal';
 
-export const IssueRow = ({ issue }: IssueRowProps) => {
+export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const { control, onSubmit } = useIssueForm({ issue });
@@ -30,7 +30,10 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 
 	return (
 		<>
-			<Table.Row key={issue.id}>
+			<Table.Row
+				key={issue.id}
+				className={highlighted ? '[&>td]:bg-primary-selected-highlight!' : undefined}
+			>
 				<Table.Cell className='px-0! pl-1!'>
 					<div className='flex items-center'>
 						<Button
@@ -102,4 +105,5 @@ export const IssueRow = ({ issue }: IssueRowProps) => {
 
 type IssueRowProps = {
 	issue: Issue;
+	highlighted?: boolean;
 };
