@@ -165,10 +165,9 @@ test('List keeps state counts and full Edit uses its existing non-optimistic sav
 	const user = renderIssues();
 	await user.click(await screen.findByRole('button', { name: 'Edit issue: Drill well' }));
 	expect(screen.getByRole('cell', { name: '1' })).toBeInTheDocument();
-	const name = within(screen.getByRole('dialog', { name: 'Edit Issue' })).getByRole(
-		'textbox',
-		{ name: 'Issue name' },
-	);
+	const name = within(screen.getByRole('dialog', { name: 'Edit Issue' })).getByRole('textbox', {
+		name: 'Issue name',
+	});
 	await user.clear(name);
 	await user.type(name, 'Renamed issue');
 	await user.click(screen.getByRole('button', { name: 'Update Issue' }));
@@ -722,7 +721,7 @@ test('Board retains its existing full Edit action and expandable states', async 
 	await screen.findByText('Drill well');
 	await user.click(within(column).getByRole('button', { name: '1 States' }));
 	expect(await screen.findByText('Drill now')).toBeInTheDocument();
-	await user.click(within(column).getByRole('button', { name: '' }));
+	await user.click(within(column).getByRole('button', { name: 'Issue actions' }));
 	await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
 	expect(screen.getByRole('textbox', { name: 'Issue name' })).toHaveValue('Drill well');
 });

@@ -1,4 +1,5 @@
 import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { Button as BetaButton, Icon as BetaIcon } from '@equinor/eds-core-react/next';
 import {
 	chevron_down,
 	chevron_up,
@@ -79,19 +80,39 @@ export const IssueCard = ({
 	);
 };
 
-export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
+export const IssueCardMenu = ({
+	children,
+	compact = false,
+}: {
+	children: React.ReactNode;
+	compact?: boolean;
+}) => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	return (
-		<div>
-			<Button
-				ref={setAnchorEl}
-				onClick={() => setMenuOpen(true)}
-				variant='ghost_icon'
-				className='nodrag nopan pointer-events-auto'
-			>
-				<Icon data={more_vertical} />
-			</Button>
+		<div className={compact ? 'flex' : undefined}>
+			{compact ? (
+				<BetaButton
+					ref={setAnchorEl}
+					onClick={() => setMenuOpen(true)}
+					variant='ghost'
+					size='small'
+					icon
+					aria-label='Issue actions'
+					className='nodrag nopan pointer-events-auto'
+				>
+					<BetaIcon data={more_vertical} />
+				</BetaButton>
+			) : (
+				<Button
+					ref={setAnchorEl}
+					onClick={() => setMenuOpen(true)}
+					variant='ghost_icon'
+					className='nodrag nopan pointer-events-auto'
+				>
+					<Icon data={more_vertical} />
+				</Button>
+			)}
 			<Menu
 				open={menuOpen}
 				onClose={() => setMenuOpen(false)}

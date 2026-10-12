@@ -1,19 +1,9 @@
 import { cn } from '../../../../utils/cn';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
 import { Issue, IssueType } from '../../../../validators';
-import {
-	IssueCard,
-	IssueCardDeleteMenuItem,
-	IssueCardEditMenuItem,
-	IssueCardExpandableContent,
-	IssueCardExpandTrigger,
-	IssueCardMenu,
-	IssueCardStates,
-} from '../../../common/Cards/IssueCard';
-import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
-import { IssueBoardCardHeader } from './IssueBoardCardHeader';
 import { ReactNode } from 'react';
+import { IssueBoardCard } from './IssueBoardCard';
 
 export const IssueColumn = ({
 	issueType,
@@ -40,43 +30,13 @@ export const IssueColumn = ({
 				{quickAdd?.('top')}
 				{issues.map((issue, index) => {
 					return (
-						<DraggableIssueContainer
+						<IssueBoardCard
 							key={issue.id}
 							issue={issue}
 							index={index}
 							type={issueType}
-						>
-							<IssueCard
-								issue={issue}
-								className={
-									highlightedIssueIds.includes(issue.id)
-										? 'ring-primary-resting ring-2'
-										: undefined
-								}
-							>
-								{highlightedIssueIds.includes(issue.id) && (
-									<span
-										role='status'
-										aria-label='Issue created'
-										className='sr-only'
-									>
-										Issue created: {issue.name}
-									</span>
-								)}
-								<IssueBoardCardHeader issue={issue}>
-									<IssueCardMenu>
-										<IssueCardEditMenuItem />
-										<IssueCardDeleteMenuItem />
-									</IssueCardMenu>
-								</IssueBoardCardHeader>
-								<IssueCardExpandableContent />
-								{issue.type !== 'Fact' && (
-									<IssueCardStates>
-										<IssueCardExpandTrigger />
-									</IssueCardStates>
-								)}
-							</IssueCard>
-						</DraggableIssueContainer>
+							highlighted={highlightedIssueIds.includes(issue.id)}
+						/>
 					);
 				})}
 				{quickAdd?.('bottom')}
