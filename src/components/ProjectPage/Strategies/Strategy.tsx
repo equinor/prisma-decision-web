@@ -99,7 +99,7 @@ export const Strategy = ({
 							<IssueCard
 								key={issue.id}
 								selectedState={existingOption}
-								className='mas max-w-24 cursor-default'
+								className='w-74 cursor-default'
 								issue={issue}
 								onClickState={state => onStateClick(issue, state as Option)}
 							>

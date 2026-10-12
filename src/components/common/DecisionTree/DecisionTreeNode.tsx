@@ -53,14 +53,14 @@ export const DecisionTreeNode = ({
 					</Fragment>
 				))}
 				<div className='h-full max-w-87.5 overflow-hidden'>
-					<IssueCard issue={issue} className={'h-20'} includeBorder selected={selected}>
+					<IssueCard issue={issue} className='h-25' includeBorder selected={selected}>
 						<IssueCardHeader>
 							<IssueCardMenu>
 								<IssueCardEditMenuItem />
 								<IssueCardDeleteMenuItem />
 							</IssueCardMenu>
 						</IssueCardHeader>
-						<IssueCardContent />
+						<IssueCardContent nameClassName='truncate' />
 					</IssueCard>
 				</div>
 			</div>
