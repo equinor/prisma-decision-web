@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
-import { Issue, issueSchema } from '../validators';
-import { useCreateIssue } from './api/useCreateIssue';
-import { useUpdateIssue } from './api/useUpdateIssue';
-import { useGetIssues } from './api/useGetIssues';
-import { getNextIssuePosition } from '../utils/getNextIssuePosition';
-import { sortByCreatedAt } from '../utils/sortByCreatedAt';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { createIssueDraft } from '../utils/createIssueDraft';
+import { getNextIssuePosition } from '../utils/getNextIssuePosition';
+import { sortByCreatedAt } from '../utils/sortByCreatedAt';
+import { Issue, issueSchema } from '../validators';
+import { useCreateIssue } from './api/useCreateIssue';
+import { useGetIssues } from './api/useGetIssues';
+import { useUpdateIssue } from './api/useUpdateIssue';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
@@ -29,19 +29,23 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 		};
 	}, [issue]);
 	const formMethods = useForm({
+		mode: 'onChange',
 		values: { ...defaultValues, ...sortedIssue },
 		resolver: zodResolver(issueSchema),
 	});
 	const { issues } = useGetIssues();
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
 		onSuccess: () => {
-			formMethods.reset(createIssueDraft(selectedProject.id));
-			onSuccess?.();
+			const { id, type, boundary } = formMethods.getValues();
+			formMethods.reset({ ...createIssueDraft(selectedProject.id), type, boundary });
+			onSuccess?.(id);
 		},
 	});
 
 	const { mutate: updateIssue, isPending: isUpdating } = useUpdateIssue({
-		onSuccess: onSuccess,
+		onSuccess: () => {
+			if (issue) onSuccess?.(issue.id);
+		},
 		issueId: issue?.id,
 	});
 	const onSubmit = formMethods.handleSubmit(
@@ -79,5 +83,5 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 
 type UseIssueFormArgs = {
 	issue?: Issue;
-	onSuccess?: () => void;
+	onSuccess?: (id: string) => void;
 };
