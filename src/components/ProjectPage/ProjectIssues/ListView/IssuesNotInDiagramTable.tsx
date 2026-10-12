@@ -1,16 +1,17 @@
-import { Button, EdsProvider, Icon, Popover, Table } from '@equinor/eds-core-react';
+import { EdsProvider, Popover, Table } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { info_circle } from '@equinor/eds-icons';
 import { useState } from 'react';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
+import { Issue } from '../../../../validators';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { FactLabel, UnassignedLabel } from '../../../common/Cards/IssueTypeLabel';
 import { IssueRow } from './IssueRow';
 
-export const IssuesNotInDiagramTable = () => {
+export const IssuesNotInDiagramTable = ({ issues: projectIssues }: { issues: Issue[] }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-	const issues = useSelectedProjectIssues().filter(issue => {
+	const issues = projectIssues.filter(issue => {
 		const inOrOnBoundary = issue.boundary === 'out';
 		if (issue.type === 'Decision') {
 			return inOrOnBoundary || issue.decision.type !== 'Focus';
@@ -31,7 +32,14 @@ export const IssuesNotInDiagramTable = () => {
 			<EdsProvider density='comfortable'>
 				<div className='flex items-center gap-2'>
 					<p>Issues filtered out</p>
-					<Button variant='ghost_icon' ref={setAnchorEl} onClick={() => setIsOpen(true)}>
+					<Button
+						variant='ghost'
+						size='small'
+						icon
+						aria-label='About issues filtered out'
+						ref={setAnchorEl}
+						onClick={() => setIsOpen(true)}
+					>
 						<Icon data={info_circle} />
 					</Button>
 					<Popover open={isOpen} anchorEl={anchorEl} onClose={() => setIsOpen(false)}>
@@ -53,7 +61,7 @@ export const IssuesNotInDiagramTable = () => {
 					</Popover>
 				</div>
 				<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
-					<Table className='w-full'>
+					<Table className='w-full' aria-label='Issues filtered out'>
 						<Table.Head>
 							<Table.Row>
 								<Table.Cell className='w-21 pl-1!'></Table.Cell>
@@ -61,13 +69,10 @@ export const IssuesNotInDiagramTable = () => {
 								<Table.Cell className='w-337.5'>Description</Table.Cell>
 								<Table.Cell className='w-24'>Outcomes/&#10;&#13;Options</Table.Cell>
 								<Table.Cell className='w-30'>Issue Type</Table.Cell>
+								<Table.Cell className='w-34 whitespace-nowrap'>
+									Decision type / Key
+								</Table.Cell>
 								<Table.Cell className='w-12'>Boundary</Table.Cell>
-								<Table.Cell className='w-34 whitespace-nowrap'>
-									Date Added
-								</Table.Cell>
-								<Table.Cell className='w-34 whitespace-nowrap'>
-									Date Updated
-								</Table.Cell>
 							</Table.Row>
 						</Table.Head>
 						<Table.Body>

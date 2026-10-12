@@ -42,7 +42,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 
 	const { mutate: updateIssue, isPending: isUpdating } = useUpdateIssue({
 		onSuccess: onSuccess,
-		scope: issue?.id,
+		issueId: issue?.id,
 	});
 	const onSubmit = formMethods.handleSubmit(
 		async data => {

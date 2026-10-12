@@ -7,16 +7,19 @@ import {
 	IssueCardEditMenuItem,
 	IssueCardExpandableContent,
 	IssueCardExpandTrigger,
-	IssueCardHeader,
 	IssueCardMenu,
 	IssueCardStates,
 } from '../../../common/Cards/IssueCard';
 import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
+import { IssueBoardCardHeader } from './IssueBoardCardHeader';
 
 export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps) => {
 	return (
-		<div className='flex min-w-64.25 basis-full flex-col gap-2'>
+		<section
+			aria-label={`${label} issues`}
+			className='flex min-w-64.25 basis-full flex-col gap-2'
+		>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
@@ -39,12 +42,12 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 							type={issueType}
 						>
 							<IssueCard issue={issue}>
-								<IssueCardHeader>
+								<IssueBoardCardHeader issue={issue}>
 									<IssueCardMenu>
 										<IssueCardEditMenuItem />
 										<IssueCardDeleteMenuItem />
 									</IssueCardMenu>
-								</IssueCardHeader>
+								</IssueBoardCardHeader>
 								<IssueCardExpandableContent />
 								{issue.type !== 'Fact' && (
 									<IssueCardStates>
@@ -56,7 +59,7 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 					);
 				})}
 			</DroppableIssueContainer>
-		</div>
+		</section>
 	);
 };
 
