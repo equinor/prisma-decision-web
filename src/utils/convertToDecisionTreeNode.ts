@@ -16,8 +16,8 @@ export const convertToDecisionTreeNode = (
 	return {
 		id,
 		type,
-		height: 80,
-		width: type === 'treeNode' ? 250 : 1,
+		height: type === 'treeNode' ? 100 : 80,
+		width: type === 'treeNode' ? 350 : 1,
 		position: { x: 0, y: 0 },
 		data: {
 			issueId,
