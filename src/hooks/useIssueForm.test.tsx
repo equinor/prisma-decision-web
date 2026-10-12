@@ -1,15 +1,25 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, expect, test, vi } from 'vitest';
+import { existingIssue } from '../test/issueFixtures';
 import { Issue } from '../validators';
 import { useIssueForm } from './useIssueForm';
 
 const creation = vi.hoisted(() => ({
 	onSuccess: () => {},
+	position: undefined as 'top' | 'bottom' | undefined,
 	mutate: vi.fn<(issue: Issue) => void>(),
+}));
+
+const updates = vi.hoisted(() => ({
+	onSuccess: () => {},
+	mutate: vi.fn<(issue: Issue) => void>(),
+	optimistic: vi.fn<(issues: Issue[], options?: { onSuccess?: () => void }) => void>(),
 }));
 
 beforeEach(() => {
 	creation.mutate.mockReset();
+	updates.mutate.mockReset();
+	updates.optimistic.mockReset();
 });
 
 vi.mock('../components/ProjectPage/ProjectContext', () => ({
@@ -21,15 +31,55 @@ vi.mock('./api/useGetIssues', () => ({
 }));
 
 vi.mock('./api/useCreateIssue', () => ({
-	useCreateIssue: ({ onSuccess }: { onSuccess: () => void }) => {
+	useCreateIssue: ({
+		onSuccess,
+		position,
+	}: {
+		onSuccess: () => void;
+		position?: 'top' | 'bottom';
+	}) => {
 		creation.onSuccess = onSuccess;
+		creation.position = position;
 		return { mutate: creation.mutate, isPending: false };
 	},
 }));
 
 vi.mock('./api/useUpdateIssue', () => ({
-	useUpdateIssue: () => ({ mutate: vi.fn(), isPending: false }),
+	useUpdateIssue: ({ onSuccess }: { onSuccess: () => void }) => {
+		updates.onSuccess = onSuccess;
+		return { mutate: updates.mutate, isPending: false };
+	},
 }));
+
+vi.mock('./api/useUpdateIssues', () => ({
+	useUpdateIssuesOptimistic: () => ({ mutate: updates.optimistic, isPending: false }),
+}));
+
+test.each([undefined, false, true])(
+	'selects the update mutation with optimistic=%s',
+	async optimistic => {
+		const issue = existingIssue();
+		const onSuccess = vi.fn();
+		updates.mutate.mockImplementation(() => updates.onSuccess());
+		updates.optimistic.mockImplementation((_issues, options) => options?.onSuccess?.());
+		const { result } = renderHook(() => useIssueForm({ issue, optimistic, onSuccess }));
+		act(() => result.current.setValue('name', 'Updated issue'));
+		await act(async () => result.current.onSubmit());
+		const updated = { ...issue, name: 'Updated issue' };
+		if (optimistic) {
+			expect(updates.optimistic).toHaveBeenCalledWith(
+				[updated],
+				expect.objectContaining({ onSuccess: expect.any(Function) }),
+			);
+			expect(updates.mutate).not.toHaveBeenCalled();
+		} else {
+			expect(updates.mutate).toHaveBeenCalledWith(updated);
+			expect(updates.optimistic).not.toHaveBeenCalled();
+		}
+		expect(onSuccess).toHaveBeenCalledWith(issue.id);
+		expect(creation.mutate).not.toHaveBeenCalled();
+	},
+);
 
 test('resets to a fresh draft while retaining classification after creation', () => {
 	const onSuccess = vi.fn();
@@ -77,6 +127,23 @@ test('submits creation through the shared form and reports the submitted ID', as
 	expect(onSuccess).toHaveBeenCalledWith(originalId);
 	expect(result.current.getValues('name')).toBe('');
 });
+
+test.each(['top', 'bottom'] as const)(
+	'initializes a Board draft and delegates %s placement to shared creation',
+	async position => {
+		const { result } = renderHook(() => useIssueForm({ issueType: 'Decision', position }));
+		expect(result.current.getValues('type')).toBe('Decision');
+		expect(result.current.getValues('boundary')).toBe('in');
+		expect(creation.position).toBe(position);
+		act(() => {
+			result.current.setValue('name', 'New decision');
+			result.current.setValue('description', 'A Board decision');
+		});
+		const draft = result.current.getValues();
+		await act(async () => result.current.onSubmit());
+		expect(creation.mutate).toHaveBeenCalledWith(draft);
+	},
+);
 
 test('retains the draft until creation succeeds', async () => {
 	const onSuccess = vi.fn();

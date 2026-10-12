@@ -5,15 +5,25 @@ import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { createIssueDraft } from '../utils/createIssueDraft';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
 import { sortByCreatedAt } from '../utils/sortByCreatedAt';
-import { Issue, issueSchema } from '../validators';
+import { Issue, IssueType, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { useUpdateIssue } from './api/useUpdateIssue';
+import { useUpdateIssuesOptimistic } from './api/useUpdateIssues';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
-export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
+export const useIssueForm = ({
+	issue,
+	issueType,
+	position,
+	onSuccess,
+	optimistic = false,
+}: UseIssueFormArgs) => {
 	const selectedProject = useSelectedProject();
-	const defaultValues = useMemo(() => createIssueDraft(selectedProject.id), [selectedProject.id]);
+	const defaultValues = useMemo(
+		() => ({ ...createIssueDraft(selectedProject.id), ...(issueType && { type: issueType }) }),
+		[selectedProject.id, issueType],
+	);
 	const sortedIssue = useMemo(() => {
 		if (!issue) return;
 		return {
@@ -35,6 +45,7 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	});
 	const { issues } = useGetIssues();
 	const { mutate: createIssue, isPending: isCreating } = useCreateIssue({
+		position,
 		onSuccess: () => {
 			const { id, type, boundary } = formMethods.getValues();
 			formMethods.reset({ ...createIssueDraft(selectedProject.id), type, boundary });
@@ -48,10 +59,15 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 		},
 		issueId: issue?.id,
 	});
+	const { mutate: updateIssueOptimistic, isPending: isUpdatingOptimistic } =
+		useUpdateIssuesOptimistic({ errorMessage: 'Failed to update issue' });
 	const onSubmit = formMethods.handleSubmit(
 		async data => {
+			if (issue && optimistic) {
+				return updateIssueOptimistic([data], { onSuccess: () => onSuccess?.(issue.id) });
+			}
 			const mutationFn = issue ? updateIssue : createIssue;
-			if (issue) return await mutationFn(data);
+			if (issue || position) return await mutationFn(data);
 
 			const projectId = selectedProject.id;
 			const projectIssues = issues.filter(i => i.project_id === projectId);
@@ -77,11 +93,14 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 	return {
 		...formMethods,
 		onSubmit,
-		isPending: isCreating || isUpdating,
+		isPending: isCreating || (optimistic ? isUpdatingOptimistic : isUpdating),
 	};
 };
 
 type UseIssueFormArgs = {
 	issue?: Issue;
+	issueType?: IssueType;
+	position?: 'top' | 'bottom';
 	onSuccess?: (id: string) => void;
+	optimistic?: boolean;
 };

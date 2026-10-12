@@ -13,8 +13,11 @@ import {
 	IssueCardStates,
 } from '../../../common/Cards/IssueCard';
 import { IssueColumn } from './IssueColumn';
+import { BoardQuickAdd } from './BoardQuickAdd';
+import { useBoardQuickCreation } from './useBoardQuickCreation';
 
 export const TableView = () => {
+	const creation = useBoardQuickCreation();
 	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop();
 	return (
 		<DragDropProvider
@@ -24,8 +27,8 @@ export const TableView = () => {
 			modifiers={[RestrictToElement]}
 		>
 			<div className='bg-background-default shadow-tile rounded-sm p-4'>
-				<div className=' h-[calc(100vh-285px)] w-full overflow-auto'>
-					<div className='flex min-h-full flex-1 items-stretch gap-4'>
+				<div className='h-[calc(100vh-208px)] w-full overflow-auto'>
+					<div className='flex min-h-full flex-1 items-stretch gap-2'>
 						{issueTypes
 							.filter(type => type !== 'Utility')
 							.map(issueType => (
@@ -34,6 +37,14 @@ export const TableView = () => {
 									issues={issues[issueType]}
 									issueType={issueType}
 									label={issueType}
+									highlightedIssueIds={creation.highlightedIssueIds}
+									quickAdd={position => (
+										<BoardQuickAdd
+											issueType={issueType}
+											position={position}
+											creation={creation}
+										/>
+									)}
 								/>
 							))}
 					</div>
