@@ -5,15 +5,18 @@ import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { createIssueDraft } from '../utils/createIssueDraft';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
 import { sortByCreatedAt } from '../utils/sortByCreatedAt';
-import { Issue, issueSchema } from '../validators';
+import { Issue, IssueType, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { useUpdateIssue } from './api/useUpdateIssue';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
-export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
+export const useIssueForm = ({ issue, issueType, onSuccess }: UseIssueFormArgs) => {
 	const selectedProject = useSelectedProject();
-	const defaultValues = useMemo(() => createIssueDraft(selectedProject.id), [selectedProject.id]);
+	const defaultValues = useMemo(
+		() => ({ ...createIssueDraft(selectedProject.id), ...(issueType && { type: issueType }) }),
+		[selectedProject.id, issueType],
+	);
 	const sortedIssue = useMemo(() => {
 		if (!issue) return;
 		return {
@@ -82,5 +85,6 @@ export const useIssueForm = ({ issue, onSuccess }: UseIssueFormArgs) => {
 
 type UseIssueFormArgs = {
 	issue?: Issue;
+	issueType?: IssueType;
 	onSuccess?: (id: string) => void;
 };
