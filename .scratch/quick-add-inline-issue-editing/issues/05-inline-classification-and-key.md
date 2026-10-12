@@ -11,39 +11,39 @@ saves and correct movement between columns or influence-diagram groups.
 ## Acceptance criteria
 
 - [x] Use EDS 2.0 beta components wherever a suitable beta equivalent exists for
-  components touched by this ticket. This applies generally, not to a particular
-  component type. Retain existing components where no suitable beta counterpart
-  exists.
+      components touched by this ticket. This applies generally, not to a particular
+      component type. Retain existing components where no suitable beta counterpart
+      exists.
 - [x] Do not migrate simple card surfaces, layout wrappers, typography, or plain
-  text to beta components. This is not a wholesale component migration.
+      text to beta components. This is not a wholesale component migration.
 - [x] Clicking an issue type label, decision type chip, or boundary chip opens
-  an anchored menu titled "ISSUE TYPE", "DECISION TYPE", or "BOUNDARY".
+      an anchored menu titled "ISSUE TYPE", "DECISION TYPE", or "BOUNDARY".
 - [x] Issue type lists Unassigned, Decision, Uncertainty, Fact, and Utility.
-  Decision type lists Policy, Focus, and Tactical. Boundary lists In, On, and Out.
-  The current value is checked.
+      Decision type lists Policy, Focus, and Tactical. Boundary lists In, On, and Out.
+      The current value is checked.
 - [x] Selecting a different value closes the menu and saves immediately through
-  the existing whole-issue update API. Escape or outside click closes without
-  saving; selecting the current value does not send an unnecessary update.
+      the existing whole-issue update API. Escape or outside click closes without
+      saving; selecting the current value does not send an unnecessary update.
 - [x] Show decision type only for Decisions and the key toggle only for
-  Uncertainties.
+      Uncertainties.
 - [x] The key toggle is an accessible button with aria-pressed matching its
-  selected state. Clicking it updates the displayed state without waiting for
-  the server, then saves the new value.
+      selected state. Clicking it updates the displayed state without waiting for
+      the server, then saves the new value.
 - [x] Changes move List rows between the existing influence-diagram groups when
-  relevant. Decisions require Focus and In/On; Uncertainties require key and In/On;
-  Utilities require In/On. Preserve the existing rules for other issues.
+      relevant. Decisions require Focus and In/On; Uncertainties require key and In/On;
+      Utilities require In/On. Preserve the existing rules for other issues.
 - [x] A Board type change moves the card to the appropriate existing column.
-  Preserve nested data and other classification values when changing type.
+      Preserve nested data and other classification values when changing type.
 - [x] Do not change existing Utility behavior: no additional column,
-  conversion-specific notification, or new conversion restriction.
+      conversion-specific notification, or new conversion restriction.
 - [x] Replace List Date Added/Date Updated columns with a Decision type / Key
-  column. Retain existing issue actions, state counts, and other fields.
+      column. Retain existing issue actions, state counts, and other fields.
 - [x] A failed update shows the existing error notification and restores the
-  saved value and corresponding row/card placement.
+      saved value and corresponding row/card placement.
 - [x] Scope the new card interactions to the Issues Board; retain other
-  shared-card behavior, existing permissions, and full Edit access.
+      shared-card behavior, existing permissions, and full Edit access.
 - [x] Verify every menu's options and selected state, dismissal, immediate key
-  updates, accessibility, column/group movement, data preservation, and rollback.
+      updates, accessibility, column/group movement, data preservation, and rollback.
 
 ## Design references
 
@@ -113,3 +113,43 @@ Figma Issues reference `1913:875` was inspected through MCP and the shared
 `874-issues-view.png` artifact. Integrated browser validation remains with the
 parent against the already-running remote dev API; no local API/backend was
 started and no remote data was changed.
+
+### Post-integration classification concurrency diagnosis
+
+This historical diagnosis predates the shared-scope consolidation described
+above; its per-Issue scope and view-projection details are no longer current.
+
+Investigated on integrated base
+`91a415def11997247a83961850460416458d9682`, whose tree matched the prior ticket-07
+fixup tip exactly. No production change was retained.
+
+The proposed state/text → queued-classification scenario is blocked by the
+existing Board header's shared pending guard:
+`useIsMutating` matches every mutation with `scope.id === issue.id`, disabling
+issue type, boundary and Decision type/key controls until the active inline
+save completes. Issue text editing remains available, as required for the
+verified state → queued-text behavior.
+
+An initial synthetic click probe opened a menu without native focus/blur
+ordering and produced a stale payload. That probe was discarded: it bypassed
+the interaction sequence that disables the control and is not evidence of a
+reachable product defect. The speculative classification-command refactor was
+fully reverted; `useIssueClassification`, full forms, mutation lifecycle,
+optimistic display, rollback and parent-owned guards are unchanged.
+
+Added four missing real Board guard cases in
+`classificationConcurrency.test.tsx`: Decision/Uncertainty × state add/remove.
+They use real project/query providers, Jotai, mouse/keyboard user interactions
+and the Axios HTTP boundary only. A held PUT disables all classification
+controls; clicking them opens no menu and sends no second PUT. The issue-name
+editor remains usable, cancelling it does not release the state-save guard,
+and resolving the PUT re-enables classification while retaining the saved
+state count/list. Existing state-edit and text-save guard cases remain in their
+own suites. No forced clicks, direct hook calls or per-test popover overrides
+are retained.
+
+Verification: all four new cases pass on unchanged production code: **43 related
+classification tests** and **250 total tests across 9 files** pass, along with
+TypeScript, touched-source ESLint/Prettier and `git diff --check`.
+Native browser confirmation and final autosquashing
+remain parent-owned; no remote data or root spec was changed.
