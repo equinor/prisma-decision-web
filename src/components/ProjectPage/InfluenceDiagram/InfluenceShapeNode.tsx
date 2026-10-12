@@ -3,6 +3,7 @@ import {
 	chevron_down,
 	delete_to_trash,
 	edit,
+	error_outlined,
 	functions,
 	more_vertical,
 	warning_outlined,
@@ -10,6 +11,7 @@ import {
 import { NodeProps, useEdges } from '@xyflow/react';
 import { ReactNode, use, useState } from 'react';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
+import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { percentageIcon, utilityIcon } from '../../../icons';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { cn } from '../../../utils/cn';
@@ -56,7 +58,9 @@ type InfluenceShapeNodeProps = {
 	issueId: string;
 	selected: boolean;
 	shape: Shape;
-	getWarnings: (issue: Issue) => string[];
+	// Errors block the base EV calculation; warnings don't
+	getErrors?: (issue: Issue) => string[];
+	getWarnings?: (issue: Issue) => string[];
 	canStartConnection?: boolean;
 	showStates?: boolean;
 	tableType: 'policy' | 'probability' | 'utility';
@@ -69,7 +73,8 @@ const InfluenceShapeNode = ({
 	issueId,
 	selected,
 	shape,
-	getWarnings,
+	getErrors = () => [],
+	getWarnings = () => [],
 	canStartConnection,
 	showStates = true,
 	tableType,
@@ -83,8 +88,17 @@ const InfluenceShapeNode = ({
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
+	const { evidence } = useInfluenceDiagramEvidence();
 	if (!issue) return null;
+	const errors = getErrors(issue);
 	const warnings = getWarnings(issue);
+	const states =
+		issue.type === 'Uncertainty'
+			? issue.uncertainty.outcomes
+			: issue.type === 'Decision'
+				? issue.decision.options
+				: [];
+	const hasEvidence = showStates && states.some(state => evidence.includes(state.id));
 	const colors = shapeColorClasses[shape];
 	const fill = selected || sheetIssueId === issue.id ? colors.active : colors.resting;
 	const tableLabel =
@@ -130,12 +144,22 @@ const InfluenceShapeNode = ({
 								/>
 							</svg>
 						) : (
-							<div
-								className={cn('absolute inset-0 border-2', fill, colors.border, {
-									'rounded-sm': shape === 'rectangle',
-									'rounded-[50%]': shape === 'ellipse',
-								})}
-							/>
+							<>
+								<div
+									className={cn('absolute inset-0 border-2', fill, colors.border, {
+										'rounded-sm': shape === 'rectangle',
+										'rounded-[50%]': shape === 'ellipse',
+									})}
+								/>
+								{hasEvidence && (
+									<div
+										className={cn('absolute inset-1 border-2', colors.border, {
+											'rounded-xs': shape === 'rectangle',
+											'rounded-[50%]': shape === 'ellipse',
+										})}
+									/>
+								)}
+							</>
 						)}
 						<h3
 							className={cn(
@@ -147,7 +171,18 @@ const InfluenceShapeNode = ({
 						>
 							{issue.name}
 						</h3>
-						{warnings.length > 0 && (
+						{errors.length > 0 && (
+							<Tooltip title={errors.join('\n')}>
+								<div
+									className='bg-diagram-error-fill border-diagram-error-border pointer-events-auto
+										absolute -top-4 -right-4 z-10 flex size-8 items-center justify-center
+										rounded-full border-2'
+								>
+									<Icon className='fill-diagram-error-icon' data={error_outlined} />
+								</div>
+							</Tooltip>
+						)}
+						{errors.length === 0 && warnings.length > 0 && (
 							<Tooltip title={warnings.join('\n')}>
 								<div className='pointer-events-auto absolute -top-3 -right-3'>
 									<Icon
@@ -157,7 +192,7 @@ const InfluenceShapeNode = ({
 								</div>
 							</Tooltip>
 						)}
-						{showStates && <InfluenceShapeStates issue={issue} />}
+						{showStates && <InfluenceShapeStates issue={issue} hidden={tableOpen} />}
 						<div
 							className={cn(
 								`bg-background-default shadow-tile absolute top-1/2 right-[calc(100%+10px)] z-20 flex
@@ -193,7 +228,8 @@ const InfluenceShapeNode = ({
 								left-1/2 z-10 flex max-w-40 -translate-x-1/2 cursor-pointer items-center
 								gap-0.5 rounded-xl border py-0.5 pr-1 pl-2 text-xs leading-4
 								font-medium whitespace-nowrap shadow-[0px_3px_4px_rgba(0,0,0,0.06)]
-								transition-opacity`,
+								transition-opacity enabled:hover:bg-diagram-pill-hover
+								enabled:hover:text-diagram-text-strong before:absolute before:-inset-2`,
 								tableOpen
 									? 'opacity-100'
 									: 'opacity-0 group-hover/node:opacity-100 focus-visible:opacity-100',
@@ -283,7 +319,7 @@ export const DecisionShapeNode = ({ id, data, selected }: NodeProps<ReactFlowInf
 			issueId={data.issue_id}
 			selected={selected}
 			shape='rectangle'
-			getWarnings={issue =>
+			getErrors={issue =>
 				DecisionOptions.includes(issue.id) ? ['Has missing options'] : []
 			}
 			tableType='policy'
@@ -305,7 +341,7 @@ export const UncertaintyShapeNode = ({ id, data, selected }: NodeProps<ReactFlow
 			issueId={data.issue_id}
 			selected={selected}
 			shape='ellipse'
-			getWarnings={issue => [
+			getErrors={issue => [
 				...(UncertaintyOutcomes.includes(issue.id) ? ['Has missing outcomes'] : []),
 				...(ProbabilityTable.includes(issue.id) ? ['Has invalid probability table'] : []),
 			]}

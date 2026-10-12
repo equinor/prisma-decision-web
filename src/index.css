@@ -189,6 +189,10 @@ input[type='color']::-webkit-color-swatch {
 	--color-diagram-edge: rgba(var(--diagram_edge), 1);
 	--color-diagram-connector: #21767e;
 	--color-diagram-connector-hover: #cfe7e9;
+	--color-diagram-pill-hover: #d4d4d4;
+	--color-diagram-error-fill: #ffd0ce;
+	--color-diagram-error-border: #ff7a7d;
+	--color-diagram-error-icon: #a50827;
 	--color-infographic-primary-moss-green-21: rgba(
 		var(--eds_infographic_primary_moss_green_21),
 		1

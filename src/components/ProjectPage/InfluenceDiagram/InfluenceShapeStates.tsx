@@ -9,7 +9,7 @@ import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { Issue, Option, Outcome } from '../../../validators';
 
 // States chip below a shape node; opens a popover for picking evidence (scenario EV).
-export const InfluenceShapeStates = ({ issue }: { issue: Issue }) => {
+export const InfluenceShapeStates = ({ issue, hidden }: { issue: Issue; hidden?: boolean }) => {
 	const [open, setOpen] = useState(false);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
@@ -53,17 +53,21 @@ export const InfluenceShapeStates = ({ issue }: { issue: Issue }) => {
 					setOpen(prev => !prev);
 				}}
 				className={cn(
-					`nodrag nopan bg-background-default absolute top-[calc(100%-3px)] left-1/2 z-10
+					`nodrag nopan bg-background-default absolute left-1/2 z-10
 					flex max-w-40 -translate-x-1/2 cursor-pointer items-center gap-0.5 rounded-xl
 					border py-0.5 pr-1 pl-2 text-xs leading-4 font-medium whitespace-nowrap
-					shadow-[0px_3px_4px_rgba(0,0,0,0.06)]`,
+					shadow-[0px_3px_4px_rgba(0,0,0,0.06)] hover:bg-diagram-pill-hover
+					hover:text-diagram-text-strong before:absolute before:-inset-2`,
+					// With evidence the chip overlaps the shape's bottom edge
 					selectedState
-						? 'border-primary-resting text-primary-resting border-2 py-px'
-						: 'border-background-medium text-text-tertiary',
+						? 'border-primary-resting text-primary-resting top-[calc(100%-8px)] border-2 py-px'
+						: 'border-background-medium text-text-tertiary top-[calc(100%+8px)]',
 					// Keep the active scenario readable when the node is not hovered.
 					!open &&
 						!selectedState &&
 						'opacity-0 group-hover/node:opacity-100 focus-visible:opacity-100',
+					// The open table covers the chip
+					hidden && 'invisible',
 				)}
 			>
 				<span className='truncate'>
@@ -78,7 +82,8 @@ export const InfluenceShapeStates = ({ issue }: { issue: Issue }) => {
 			<NodeToolbar
 				isVisible={open}
 				position={Position.Bottom}
-				offset={-3}
+				// Popover top aligns with the chip top
+				offset={selectedState ? -8 : 8}
 				style={{ zIndex: 1003 }}
 			>
 				<div
@@ -101,18 +106,13 @@ export const InfluenceShapeStates = ({ issue }: { issue: Issue }) => {
 										toggleEvidence(state.id, issue.id);
 										setOpen(false);
 									}}
-									className={cn(
-										'bg-background-light flex justify-between gap-2 rounded-sm px-2 py-1',
-										{
-											'hover:bg-primary-hover-alt cursor-pointer': !disabled,
-											'cursor-not-allowed opacity-50': disabled,
-											'outline-primary-resting outline-2 -outline-offset-2':
-												isSelected,
-										},
-									)}
+									className={cn('bg-background-light rounded-sm px-2 py-1', {
+										'hover:bg-primary-hover-alt cursor-pointer': !disabled,
+										'cursor-not-allowed opacity-50': disabled,
+										'outline-primary-resting outline-2 -outline-offset-2': isSelected,
+									})}
 								>
 									<p className='truncate'>{state.name}</p>
-									<p className='truncate'>{state.utility}</p>
 								</li>
 							);
 						})}
