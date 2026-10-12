@@ -64,6 +64,7 @@ export const useBulkDeleteEdges = () => {
 			showErrorToast('Failed to delete edges');
 			if (context?.previousEdges) {
 				queryClient.setQueryData(['edges'], context.previousEdges);
+				queryClient.invalidateQueries({ queryKey: ['influenceDiagramLayout'] });
 			}
 		},
 	});
