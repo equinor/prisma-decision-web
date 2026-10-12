@@ -10,6 +10,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
+import { useIssueClassification } from '../../../hooks/useIssueClassification';
 import { percentageIcon, utilityIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
@@ -18,8 +19,11 @@ import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
+import { DecisionTypeLabel } from './DecisionTypeLabel';
 import { IssueTypeLabel } from './IssueTypeLabel';
+import { KeyLabel } from './KeyLabel';
 import { IssueCardContext, useIssueCardContext } from './useIssueCardContext';
+import { useIssueCardPointerInteraction } from './useIssueCardPointerInteraction';
 
 type IssueCardProps = {
 	issue: Issue;
@@ -41,6 +45,7 @@ export const IssueCard = ({
 }: IssueCardProps) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const pointerInteraction = useIssueCardPointerInteraction();
 	const sortedStates =
 		issue.type === 'Uncertainty'
 			? sortByCreatedAt(issue.uncertainty.outcomes)
@@ -49,7 +54,7 @@ export const IssueCard = ({
 		<IssueCardContext
 			value={{ issue, sortedStates, setEditOpen, setDeleteOpen, onClickState, selectedState }}
 		>
-			<CardContainer {...rest} issueType={issue.type}>
+			<CardContainer {...rest} {...pointerInteraction} issueType={issue.type}>
 				{children}
 			</CardContainer>
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
@@ -71,7 +76,8 @@ export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
 				ref={setAnchorEl}
 				onClick={() => setMenuOpen(true)}
 				variant='ghost_icon'
-				className='nodrag nopan pointer-events-auto'
+				data-card-action
+				className='pointer-events-auto'
 			>
 				<Icon data={more_vertical} />
 			</Button>
@@ -152,13 +158,36 @@ export const IssueCardPolicyTableMenuItem = ({
 	);
 };
 
-export const IssueCardHeader = ({ children }: { children?: React.ReactNode }) => {
+export const IssueCardHeader = ({
+	children,
+	editable = false,
+}: {
+	children?: React.ReactNode;
+	editable?: boolean;
+}) => {
 	const { issue } = useIssueCardContext();
+	const { changeType, changeDecisionType, changeBoundary, toggleKey } =
+		useIssueClassification(issue);
 	return (
 		<div className='flex items-center justify-between'>
 			<div className='flex gap-1'>
-				<IssueTypeLabel type={issue.type} />
-				<BoundaryLabel boundary={issue.boundary} />
+				<IssueTypeLabel type={issue.type} onChange={editable ? changeType : undefined} />
+				<BoundaryLabel
+					boundary={issue.boundary}
+					onChange={editable ? changeBoundary : undefined}
+				/>
+				{issue.type === 'Decision' && (
+					<DecisionTypeLabel
+						type={issue.decision.type}
+						onChange={editable ? changeDecisionType : undefined}
+					/>
+				)}
+				{issue.type === 'Uncertainty' && (
+					<KeyLabel
+						isKey={issue.uncertainty.is_key}
+						onChange={editable ? toggleKey : undefined}
+					/>
+				)}
 			</div>
 			{children}
 		</div>
@@ -268,7 +297,10 @@ export const IssueCardExpandTrigger = () => {
 	return (
 		<EdsProvider density='compact'>
 			<CollapsibleTrigger asChild>
-				<button className='nodrag nopan pointer-events-auto ml-auto flex cursor-pointer items-center gap-2'>
+				<button
+					data-card-action
+					className='pointer-events-auto ml-auto flex cursor-pointer items-center gap-2'
+				>
 					<p className='text-text-tertiary text-sm'>{sortedStates.length} States</p>
 					<Icon
 						className='fill-primary-resting'

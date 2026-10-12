@@ -2,10 +2,12 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { Edge, Issue } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
+import { issueMutationScope } from './useUpdateIssues';
 
 export const useDeleteIssue = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
+		scope: issueMutationScope,
 		mutationFn: async (issueId: string) => {
 			await apiClient.delete(`/issues/${issueId}`);
 		},
@@ -35,6 +37,12 @@ export const useDeleteIssue = () => {
 			queryClient.invalidateQueries({ queryKey: ['utilityTables'] });
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });
 			queryClient.invalidateQueries({ queryKey: ['solution'] });
+		},
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['issues'] }),
+				queryClient.invalidateQueries({ queryKey: ['edges'] }),
+			]);
 		},
 	});
 };
