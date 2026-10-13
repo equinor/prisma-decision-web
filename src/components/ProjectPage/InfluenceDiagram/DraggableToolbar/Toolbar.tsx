@@ -17,6 +17,7 @@ import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
 import { SolutionEvidenceResponse } from '../../../../validators';
 import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
+import { useSelectedProject } from '../../ProjectContext';
 
 export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) => {
 	const [toolBarPosition] = useLocalStorage('toolbar-position', 'top');
@@ -26,7 +27,7 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 	const isSelecting = useStore(state => state.selectNodesOnDrag);
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const selectedNodes = nodes.filter(node => node.selected);
-	const projectId = nodes.find(n => n.data.project_id)?.data.project_id;
+	const { id: projectId } = useSelectedProject();
 	const { evidence } = useInfluenceDiagramEvidence();
 	if (!projectId) return;
 	const selectedEvidence: SolutionEvidenceResponse[] = [
