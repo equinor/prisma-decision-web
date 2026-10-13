@@ -8,10 +8,12 @@ import {
 	IsValidConnection,
 	NodeChange,
 	OnConnect,
+	OnEdgesDelete,
 	OnReconnect,
 } from '@xyflow/react';
 import { MouseEvent, useRef, useState } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
+import { useBulkDeleteEdges } from '../../../hooks/api/useDeleteEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
 import { useInfluenceDiagramSettings } from '../../../hooks/useInfluenceDiagramSettings';
@@ -23,6 +25,7 @@ import { useSelectedProject } from '../ProjectContext';
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
 	const { mutate: createEdge } = useCreateEdge();
+	const { mutate: deleteEdges } = useBulkDeleteEdges();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
 	const [layoutOptions] = useInfluenceDiagramSettings();
@@ -64,6 +67,10 @@ export const useInfluenceDiagram = () => {
 			id: crypto.randomUUID(),
 		};
 		createEdge(newEdge);
+	};
+
+	const onEdgesDelete: OnEdgesDelete = edges => {
+		if (edges.length) deleteEdges(edges.map(edge => edge.id));
 	};
 
 	const onReconnect: OnReconnect = async (oldEdge, newConnection) => {
@@ -150,6 +157,7 @@ export const useInfluenceDiagram = () => {
 		nodes: positionedNodes,
 		edges: positionedEdges,
 		onConnect,
+		onEdgesDelete,
 		onReconnect,
 		onReconnectStart,
 		onNodesChange,
