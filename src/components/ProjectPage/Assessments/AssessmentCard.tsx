@@ -97,7 +97,7 @@ export const AssessmentCard = ({
 								<div>
 									<p className='text-2xl font-medium'>
 										{averagedMetrics?.[metric.key]} /{' '}
-										<span className='text-text-tertiary text-lg'>100</span>
+										<span className='text-text-tertiary text-lg'>5</span>
 										{changes && prevAveragedMetrics && (
 											<span
 												className={cn('ml-2 text-sm font-semibold', {
