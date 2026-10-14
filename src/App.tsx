@@ -10,6 +10,7 @@ import { ProjectIssues } from './components/ProjectPage/ProjectIssues/ProjectIss
 import { ProjectObjectives } from './components/ProjectPage/ProjectObjectives/ProjectObjectives';
 import { ProjectPage } from './components/ProjectPage/ProjectPage';
 import { SolutionTree } from './components/ProjectPage/SolutionTree/SolutionTree';
+import { StakeholderMatrix } from './components/ProjectPage/StakeholderMatrix/StakeholderMatrix';
 import { Strategies } from './components/ProjectPage/Strategies/Strategies';
 import { Whiteboard } from './components/ProjectPage/Whiteboard/Whiteboard';
 
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
 				<Route path='compact-tree' element={<CompactTree />} />
 				<Route path='solution-tree' element={<SolutionTree />} />
 				<Route path='strategies' element={<Strategies />} />
+				<Route path='stakeholder-matrix' element={<StakeholderMatrix />} />
 				<Route path='assessments' element={<Assessments />} />
 			</Route>
 		</Route>,
