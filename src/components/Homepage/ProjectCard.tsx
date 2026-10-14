@@ -14,7 +14,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 		<Link to={`/project/${project.id}`}>
 			<div
 				className='bg-background-default outline-background-medium
-                hover:bg-background-light shadow-tile grid h-38 cursor-pointer
+                hover:bg-background-light shadow-tile grid cursor-pointer
                 grid-rows-[1fr_auto] overflow-hidden rounded-sm transition-all duration-1000
                 hover:outline'
 			>
@@ -41,11 +41,6 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 						<Chip variant='default' className='w-fit'>
 							{userRole}
 						</Chip>
-					)}
-					{project.opportunity_statement && (
-						<p className='text-text-secondary line-clamp-3 text-sm'>
-							{project.opportunity_statement}
-						</p>
 					)}
 				</div>
 			</div>

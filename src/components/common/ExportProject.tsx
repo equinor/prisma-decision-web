@@ -74,7 +74,9 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `${data.projects.name}.json`;
+		const downloadFilename = data.projects.name.replace(/ /g, '_');
+
+		a.download = `${downloadFilename}.json`;
 		a.click();
 		URL.revokeObjectURL(url);
 	};

@@ -235,7 +235,11 @@ export const projectImportSchema = z.object({
 	board_sheets: z.array(whiteboardSheet).optional(),
 });
 const metricScore = () =>
-	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
+	z
+		.number()
+		.int('Value must be a whole number')
+		.min(0, 'Value must be at least 0')
+		.max(5, 'Value must be 5 or less');
 
 export const DecisionQualityAssessmentSchema = z.object({
 	id: z.guid(),
@@ -303,12 +307,12 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export const evaluationMetrics = [
-	{ key: 'appropriate_frame', label: 'Appropriate Frame', defaultValue: 50 },
-	{ key: 'trade_off_analysis', label: 'Trade-off Analysis', defaultValue: 50 },
-	{ key: 'doable_alternatives', label: 'Doable Alternatives', defaultValue: 50 },
-	{ key: 'information_reliability', label: 'Information Reliability', defaultValue: 50 },
-	{ key: 'reasoning_correctness', label: 'Reasoning Correctness', defaultValue: 50 },
-	{ key: 'commitment_to_action', label: 'Commitment to Action', defaultValue: 50 },
+	{ key: 'appropriate_frame', label: 'Appropriate Frame', defaultValue: 3 },
+	{ key: 'trade_off_analysis', label: 'Trade-off Analysis', defaultValue: 3 },
+	{ key: 'doable_alternatives', label: 'Doable Alternatives', defaultValue: 3 },
+	{ key: 'information_reliability', label: 'Information Reliability', defaultValue: 3 },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness', defaultValue: 3 },
+	{ key: 'commitment_to_action', label: 'Commitment to Action', defaultValue: 3 },
 ] as const;
 
 export type Project = z.infer<typeof projectSchema>;
