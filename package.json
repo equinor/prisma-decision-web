@@ -29,6 +29,7 @@
 		"@azure/msal-browser": "^5.25.0",
 		"@azure/msal-react": "^5.7.2",
 		"@dagrejs/dagre": "^3.1.1",
+		"@ariakit/react": "^0.4.38",
 		"@dnd-kit/abstract": "^0.5.0",
 		"@dnd-kit/collision": "^0.5.0",
 		"@dnd-kit/helpers": "^0.5.0",
