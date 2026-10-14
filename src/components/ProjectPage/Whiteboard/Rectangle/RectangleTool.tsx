@@ -7,6 +7,7 @@ import { whiteboardPreviewStrokeColor } from '../selectionStyles';
 import { useWhiteboardWheelZoom } from '../useWhiteboardWheelZoom';
 import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
 import { useSelectedProject } from '../../ProjectContext';
+import { MEDIUM_STROKE_WIDTH } from '../config';
 
 function getPosition(start: XYPosition, end: XYPosition) {
 	return {
@@ -67,7 +68,7 @@ export function RectangleTool() {
 			data: '',
 			rotation: 0,
 			stroke_style: 'Solid',
-			stroke_width: 8,
+			stroke_width: MEDIUM_STROKE_WIDTH,
 			new: true,
 			board_sheet_id: sheet.id,
 			zIndex: 0,
@@ -99,7 +100,7 @@ export function RectangleTool() {
 					style={{
 						...rect.dimension,
 						transform: `translate(${rect.position.x - 75}px, ${rect.position.y - 65}px)`,
-						border: `2px dashed ${whiteboardPreviewStrokeColor}`,
+						border: `${MEDIUM_STROKE_WIDTH}px dashed ${whiteboardPreviewStrokeColor}`,
 						pointerEvents: 'none',
 					}}
 				></div>

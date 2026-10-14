@@ -6,6 +6,7 @@ import { whiteboardPreviewStrokeColor } from './selectionStyles';
 import { useWhiteboardWheelZoom } from './useWhiteboardWheelZoom';
 import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
 import { useSelectedProject } from '../ProjectContext';
+import { MEDIUM_STROKE_WIDTH } from './config';
 
 export const FreehandTool = () => {
 	const [points, setPoints] = useState<FreehandInputPoint[]>([]);
@@ -23,7 +24,7 @@ export const FreehandTool = () => {
 
 		return createFreehandGeometry(
 			points.map(([x, y]) => [x - bounds.left, y - bounds.top]),
-			{ size: 12 * zoom },
+			{ size: 4 * zoom },
 		);
 	}, [points, zoom]);
 
@@ -74,7 +75,7 @@ export const FreehandTool = () => {
 			data: geometry.path,
 			rotation: 0,
 			stroke_style: 'Solid',
-			stroke_width: 8,
+			stroke_width: MEDIUM_STROKE_WIDTH,
 			color: 'default',
 			board_sheet_id: sheet?.id,
 			zIndex: 0,
