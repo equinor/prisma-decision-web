@@ -2,13 +2,13 @@ import { Button, EdsProvider, Icon, Menu, TextField } from '@equinor/eds-core-re
 import { add, check, close, delete_forever, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { useCreateWhiteboardSheet } from '../../../../hooks/api/useCreateWhiteboardSheet';
-import { useDeleteWhiteboardSheet } from '../../../../hooks/api/useDeleteWhiteboardSheet';
-import { useUpdateWhiteboardSheets } from '../../../../hooks/api/useUpdateWhiteboardSheets';
-import { useSelectedProjectWhiteboardSheets } from '../../../../hooks/useSelectedProjectWhiteboardSheets';
-import useSelectedWhiteboardSheet from '../../../../hooks/useSelectedWhiteboardSheet';
-import { WhiteboardSheet } from '../../../../validators';
-import { useSelectedProject } from '../../ProjectContext';
+import { useCreateWhiteboardSheet } from '../../../hooks/api/useCreateWhiteboardSheet';
+import { useDeleteWhiteboardSheet } from '../../../hooks/api/useDeleteWhiteboardSheet';
+import { useUpdateWhiteboardSheets } from '../../../hooks/api/useUpdateWhiteboardSheets';
+import { useSelectedProjectWhiteboardSheets } from '../../../hooks/useSelectedProjectWhiteboardSheets';
+import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
+import { WhiteboardSheet } from '../../../validators';
+import { useSelectedProject } from '../../ProjectPage/ProjectContext';
 
 export const SheetPicker = () => {
 	const sheet = useSelectedWhiteboardSheet();

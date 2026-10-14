@@ -2,10 +2,10 @@ import { Button, Icon, Menu } from '@equinor/eds-core-react';
 import { edit } from '@equinor/eds-icons';
 import { useNodes } from '@xyflow/react';
 import { useState } from 'react';
-import { useUpdateIssuesOptimistic } from '../../../../hooks/api/useUpdateIssues';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import { ReactFlowInfluenceNode } from '../../../../types';
-import { IssueType } from '../../../../validators';
+import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { ReactFlowInfluenceNode } from '../../../types';
+import { IssueType } from '../../../validators';
 
 export const ChangeIssueType = () => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
