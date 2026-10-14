@@ -7,7 +7,7 @@ export const useGetStakeholderMatrixes = (projectId: string) => {
 		queryKey: ['stakeholder-matrixes', projectId],
 		queryFn: async () => {
 			const response = await apiClient.get<StakeholderMatrix[]>(
-				`/projects/${projectId}/stakeholder-matrix`,
+				`/projects/${projectId}/stakeholder-matrix-entry`,
 			);
 			return response.data;
 		},

@@ -8,9 +8,10 @@ export const useCreateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 
 	return useMutation({
 		mutationFn: async (stakeholder: StakeholderMatrix) => {
-			const response = await apiClient.post<StakeholderMatrix[]>('/stakeholder-matrix', [
-				stakeholder,
-			]);
+			const response = await apiClient.post<StakeholderMatrix[]>(
+				'/stakeholder-matrix-entry',
+				[stakeholder],
+			);
 			return response.data[0];
 		},
 		onMutate: async stakeholder => {
