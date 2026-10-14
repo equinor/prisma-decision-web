@@ -23,13 +23,13 @@ export const ToolPanel = () => {
 	const selectedNode = nodes.length > 0 ? nodes[0] : null;
 
 	const updateNode = (updated: Partial<WhiteboardNode>) => {
-		if (!selectedNode) return;
-		updateWhiteboardNodes([
-			{
-				...selectedNode.data,
+		if (nodes.length === 0) return;
+		updateWhiteboardNodes(
+			nodes.map(node => ({
+				...node.data,
 				...updated,
-			},
-		]);
+			})),
+		);
 	};
 
 	if (!selectedNode) return null;
