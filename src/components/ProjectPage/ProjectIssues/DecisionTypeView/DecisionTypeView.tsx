@@ -5,65 +5,28 @@ import {
 	PointerSensor,
 } from '@dnd-kit/react';
 import { useMeasure } from '@uidotdev/usehooks';
-import { Fragment, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUpdateIssuesOptimistic } from '../../../../hooks/api/useUpdateIssues';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { cn } from '../../../../utils/cn';
 import { DecisionType, Issue } from '../../../../validators';
 import { decisionChipClassName } from './DecisionChip';
-import { DecisionTier, DecisionTierConfig } from './DecisionTier';
+import { DecisionTier } from './DecisionTier';
 import { DecisionTierSheet } from './DecisionTierSheet';
+import { decisionTiers } from './decisionTiers';
 
-const decisionTiers: DecisionTierConfig[] = [
-	{
-		type: 'Policy',
-		title: 'Policy',
-		subtitle: 'Taken as given',
-		shapeClassName: 'fill-tier-policy-fill stroke-tier-policy-border',
-		dropTargetClassName: 'fill-tier-policy-hover',
-		surfaceClassName: 'bg-tier-policy-fill',
-		surfaceDropTargetClassName: 'bg-tier-policy-hover',
-		accentClassName: 'text-tier-policy-border',
-		titleClassName: 'text-text-secondary',
-		subtitleClassName: 'text-text-secondary',
-	},
-	{
-		type: 'Focus',
-		title: 'Strategic',
-		subtitle: 'Focus on in this analysis',
-		shapeClassName: 'fill-tier-focus-fill stroke-tier-focus-border',
-		dropTargetClassName: 'fill-tier-focus-hover',
-		surfaceClassName: 'bg-tier-focus-fill',
-		surfaceDropTargetClassName: 'bg-tier-focus-hover',
-		accentClassName: 'text-tier-focus-border',
-		titleClassName: 'text-tier-focus-text-subtle',
-		subtitleClassName: 'text-tier-focus-text-strong',
-	},
-	{
-		type: 'Tactical',
-		title: 'Tactical',
-		subtitle: 'Decide later',
-		shapeClassName: 'fill-tier-tactical-fill stroke-tier-tactical-border',
-		dropTargetClassName: 'fill-tier-tactical-hover',
-		surfaceClassName: 'bg-tier-tactical-fill',
-		surfaceDropTargetClassName: 'bg-tier-tactical-hover',
-		accentClassName: 'text-tier-tactical-border',
-		titleClassName: 'text-text-secondary',
-		subtitleClassName: 'text-text-secondary',
-	},
-];
-
-const ASPECT_RATIO = 1110 / 784;
-const TIER_GAP = 6;
-const LABEL_GAP = 48;
+const ASPECT_RATIO = 1000 / 720;
+const TIER_GAP = 12;
+const LEGEND_WIDTH = 200;
 const MIN_PYRAMID_WIDTH = 360;
-const COMPACT_BREAKPOINT = 900;
-// The bottom label is anchored at the tactical tier's midpoint, 5/6 down the pyramid.
-const LABEL_ANCHOR_RATIO = 0.5 + 0.5 * (5 / 6);
+// The header sits 8px outside the card's content box (24px vs 32px card padding).
+const HEADER_OFFSET = 8;
+const HEADER_CLEARANCE = 16;
 
 export const DecisionTypeView = () => {
 	const issues = useSelectedProjectIssues();
 	const [ref, { width, height }] = useMeasure<HTMLDivElement>();
+	const [headerRef, headerSize] = useMeasure<HTMLDivElement>();
 	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
 	const [sheetType, setSheetType] = useState<DecisionType | null>(null);
 	const sheetTier = decisionTiers.find(tier => tier.type === sheetType);
@@ -92,19 +55,35 @@ export const DecisionTypeView = () => {
 	return (
 		// Pointer only: the keyboard sensor would take over Enter, which opens the edit dialog
 		<DragDropProvider sensors={[PointerSensor]} onDragEnd={onDragEnd}>
-			<div className='flex h-[calc(100vh-260px)] min-h-105 w-full gap-4'>
-				<div ref={ref} className='min-w-0 flex-1 overflow-auto'>
-					{width !== null && height !== null && (
-						<DecisionPyramid
-							availableWidth={width}
-							availableHeight={height}
-							decisionsByType={decisionsByType}
-							sheetType={sheetType}
-							onShowAll={type =>
-								setSheetType(current => (current === type ? null : type))
-							}
-						/>
-					)}
+			{/* Ends 24px above the viewport; -mb-4 offsets the layout's 40px bottom padding to avoid a scrollbar */}
+			<div className='-mb-4 flex h-[calc(100vh-180px)] min-h-105 w-full gap-4'>
+				<div className='bg-background-default border-background-medium relative min-w-0 flex-1 rounded-sm border p-8'>
+					<div ref={ref} className='size-full overflow-auto'>
+						{width !== null && height !== null && (
+							<DecisionPyramid
+								availableWidth={width}
+								availableHeight={height}
+								headerWidth={(headerSize.width ?? 0) - HEADER_OFFSET}
+								headerHeight={(headerSize.height ?? 0) - HEADER_OFFSET}
+								decisionsByType={decisionsByType}
+								sheetType={sheetType}
+								onShowAll={type =>
+									setSheetType(current => (current === type ? null : type))
+								}
+							/>
+						)}
+					</div>
+					<div
+						ref={headerRef}
+						className='pointer-events-none absolute top-6 left-6 flex max-w-[calc(100%-3rem)] flex-col gap-1'
+					>
+						<h2 className='text-text-default text-2xl leading-7.5'>
+							Decision hierarchy
+						</h2>
+						<p className='text-text-default text-sm leading-4 font-medium'>
+							Organise decisions by what is given, in focus, or left for later.
+						</p>
+					</div>
 				</div>
 				{sheetTier && (
 					<DecisionTierSheet
@@ -129,19 +108,27 @@ export const DecisionTypeView = () => {
 const DecisionPyramid = ({
 	availableWidth,
 	availableHeight,
+	headerWidth,
+	headerHeight,
 	decisionsByType,
 	sheetType,
 	onShowAll,
 }: DecisionPyramidProps) => {
-	const compact = availableWidth < COMPACT_BREAKPOINT;
-	const labelWidth = compact ? 180 : 240;
-	const pyramidWidth = Math.max(
-		MIN_PYRAMID_WIDTH,
-		Math.min(
-			(availableWidth - LABEL_GAP - labelWidth) / LABEL_ANCHOR_RATIO,
-			availableHeight * ASPECT_RATIO,
-		),
-	);
+	const fitWidth = (height: number) =>
+		Math.max(MIN_PYRAMID_WIDTH, Math.min(availableWidth - LEGEND_WIDTH, height * ASPECT_RATIO));
+	const leftOffset = (width: number) => Math.max(0, (availableWidth - width - LEGEND_WIDTH) / 2);
+	const overlapsHeader = (width: number) => {
+		const apexX = leftOffset(width) + width / 2;
+		const halfWidthBelowHeader = (width / 2) * (headerHeight / (width / ASPECT_RATIO));
+		return apexX - halfWidthBelowHeader < headerWidth + HEADER_CLEARANCE;
+	};
+
+	let topOffset = 0;
+	let pyramidWidth = fitWidth(availableHeight);
+	if (headerWidth > 0 && overlapsHeader(pyramidWidth)) {
+		topOffset = headerHeight + HEADER_CLEARANCE;
+		pyramidWidth = fitWidth(availableHeight - topOffset);
+	}
 	const pyramidHeight = pyramidWidth / ASPECT_RATIO;
 	const centerX = pyramidWidth / 2;
 	const tierHeight = (pyramidHeight - 2 * TIER_GAP) / 3;
@@ -149,51 +136,30 @@ const DecisionPyramid = ({
 
 	return (
 		<div
-			className='relative mx-auto'
+			className='relative'
 			style={{
-				width: pyramidWidth * LABEL_ANCHOR_RATIO + LABEL_GAP + labelWidth,
+				marginTop: topOffset,
+				marginLeft: leftOffset(pyramidWidth),
+				width: pyramidWidth + LEGEND_WIDTH,
 				height: pyramidHeight,
 			}}
 		>
 			{decisionTiers.map((tier, index) => {
 				const top = index * (tierHeight + TIER_GAP);
-				const middle = top + tierHeight / 2;
 				return (
-					<Fragment key={tier.type}>
-						<DecisionTier
-							tier={tier}
-							issues={decisionsByType.get(tier.type) ?? []}
-							top={top}
-							centerX={centerX}
-							height={tierHeight}
-							topWidth={2 * halfWidthAt(top)}
-							bottomWidth={2 * halfWidthAt(top + tierHeight)}
-							showingAll={sheetType === tier.type}
-							onShowAll={() => onShowAll(tier.type)}
-						/>
-						<div
-							className='absolute flex -translate-y-1/2 flex-col gap-0.5 whitespace-nowrap'
-							style={{ top: middle, left: centerX + halfWidthAt(middle) + LABEL_GAP }}
-						>
-							<p
-								className={cn(
-									compact ? 'text-2xl leading-8' : 'text-[32px] leading-10',
-									tier.titleClassName,
-								)}
-							>
-								{tier.title}
-							</p>
-							<p
-								className={cn(
-									'font-medium tracking-[0.2px]',
-									compact ? 'text-sm leading-5' : 'text-lg leading-6',
-									tier.subtitleClassName,
-								)}
-							>
-								{tier.subtitle}
-							</p>
-						</div>
-					</Fragment>
+					<DecisionTier
+						key={tier.type}
+						tier={tier}
+						issues={decisionsByType.get(tier.type) ?? []}
+						top={top}
+						centerX={centerX}
+						height={tierHeight}
+						topWidth={2 * halfWidthAt(top)}
+						bottomWidth={2 * halfWidthAt(top + tierHeight)}
+						legendX={pyramidWidth}
+						showingAll={sheetType === tier.type}
+						onShowAll={() => onShowAll(tier.type)}
+					/>
 				);
 			})}
 		</div>
@@ -203,6 +169,8 @@ const DecisionPyramid = ({
 type DecisionPyramidProps = {
 	availableWidth: number;
 	availableHeight: number;
+	headerWidth: number;
+	headerHeight: number;
 	decisionsByType: Map<DecisionType, Issue[]>;
 	sheetType: DecisionType | null;
 	onShowAll: (type: DecisionType) => void;

@@ -4,7 +4,7 @@ import { close } from '@equinor/eds-icons';
 import { cn } from '../../../../utils/cn';
 import { Issue } from '../../../../validators';
 import { DECISION_DRAG_TYPE, DraggableDecisionChip } from './DecisionChip';
-import type { DecisionTierConfig } from './DecisionTier';
+import { DecisionTierConfig, tierSurfaceClassName } from './decisionTiers';
 
 export const DecisionTierSheet = ({ tier, issues, onClose }: DecisionTierSheetProps) => {
 	const { ref, isDropTarget } = useDroppable({
@@ -32,9 +32,8 @@ export const DecisionTierSheet = ({ tier, issues, onClose }: DecisionTierSheetPr
 			<div
 				ref={ref}
 				className={cn(
-					'flex flex-1 flex-wrap content-start gap-3 overflow-auto rounded-sm p-4',
-					tier.surfaceClassName,
-					isDropTarget && tier.surfaceDropTargetClassName,
+					'flex flex-1 flex-wrap content-start gap-2 overflow-auto rounded-sm p-4',
+					tierSurfaceClassName(tier, isDropTarget),
 				)}
 			>
 				{issues.map(issue => (

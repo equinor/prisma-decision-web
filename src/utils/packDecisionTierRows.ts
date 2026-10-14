@@ -18,6 +18,8 @@ export type PackedDecisionTier = {
 	hiddenCount: number;
 };
 
+const SLIDE_STEP = 4;
+
 const rowWidth = (row: number[], itemWidths: number[], columnGap: number) =>
 	row.reduce((sum, index, i) => sum + itemWidths[index] + (i > 0 ? columnGap : 0), 0);
 
@@ -57,15 +59,16 @@ export const packDecisionTierRows = ({
 
 	const maxRows = Math.max(1, Math.floor((height - 2 * paddingY + rowGap) / rowStep));
 
-	// Fewest rows that fit everything, centred vertically if possible, else pushed to the wider bottom.
+	// Fewest rows that fit everything, centred if possible, else slid down towards the wider bottom.
 	for (let rowCount = 1; rowCount <= maxRows; rowCount++) {
 		const centred = (height - blockHeight(rowCount)) / 2;
-		const bottom = height - paddingY - blockHeight(rowCount);
-		for (const top of [centred, bottom]) {
+		const lowest = Math.max(centred, height - paddingY - blockHeight(rowCount));
+		for (let top = centred; ; top = Math.min(top + SLIDE_STEP, lowest)) {
 			const { rows, placed } = fill(rowCount, top);
 			if (placed === itemWidths.length && rows.every(row => row.length > 0)) {
 				return { top, rows, hiddenCount: 0 };
 			}
+			if (top >= lowest) break;
 		}
 	}
 

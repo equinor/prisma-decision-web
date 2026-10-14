@@ -7,7 +7,7 @@ import { EditIssueModal } from '../../../common/EditIssueModal';
 export const DECISION_DRAG_TYPE = 'decision';
 
 export const decisionChipClassName =
-	'shadow-raised bg-background-default text-text-default block h-9 max-w-60 shrink-0 truncate rounded-sm p-2 text-base leading-5 font-bold whitespace-nowrap';
+	'shadow-raised bg-background-default text-text-default block h-7 max-w-60 shrink-0 truncate rounded-sm p-1 text-base leading-5 font-bold whitespace-nowrap';
 
 export const DecisionChip = ({
 	issue,
