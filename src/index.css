@@ -325,7 +325,6 @@ input[type='color']::-webkit-color-swatch {
 		background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
 		border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
 		outline-color 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-	will-change: transform;
 }
 
 .influence-diagram .react-flow__node.dragging {

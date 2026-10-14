@@ -1,4 +1,4 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { pan_tool } from '@equinor/eds-icons';
 
 export const TogglePanMode = ({ checked, onChange }: TogglePanModeProps) => {
@@ -6,11 +6,12 @@ export const TogglePanMode = ({ checked, onChange }: TogglePanModeProps) => {
 		<Button.Toggle
 			onChange={onChange}
 			selectedIndexes={checked ? [0] : []}
-			title='Toggle pan mode'
 		>
-			<Button className='px-1.5!' title='Pan mode' aria-label='Pan mode'>
-				<Icon data={pan_tool} />
-			</Button>
+			<Tooltip title='Pan mode'>
+				<Button className='px-1.5!' aria-label='Pan mode'>
+					<Icon data={pan_tool} />
+				</Button>
+			</Tooltip>
 		</Button.Toggle>
 	);
 };

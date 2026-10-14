@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/react';
-import { Icon } from '@equinor/eds-core-react';
+import { Icon, Tooltip } from '@equinor/eds-core-react';
 import { drag_indicator } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import { useNodes, useStore } from '@xyflow/react';
@@ -17,6 +17,7 @@ import { ResetLayout } from './ResetLayout';
 import { ToggleNodeView } from './ToggleNodeView';
 import { TogglePanMode } from './TogglePanMode';
 import { ToggleSelectionMode } from './ToggleSelectionMode';
+import { ToggleStatePills } from './ToggleStatePills';
 import { SolutionEvidenceResponse } from '../../../../validators';
 import { useInfluenceDiagramEvidence } from '../../../../hooks/useInfluenceDiagramEvidence';
 import { useInfluenceDiagramNodeView } from '../../../../hooks/useInfluenceDiagramNodeView';
@@ -50,10 +51,13 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 				'bottom-6': toolBarPosition === 'bottom',
 			})}
 		>
-			<div className='toolbar-drag-handle' ref={handleRef}>
-				<Icon data={drag_indicator} />
-			</div>
+			<Tooltip title='Move toolbar'>
+				<div className='toolbar-drag-handle' ref={handleRef}>
+					<Icon data={drag_indicator} />
+				</div>
+			</Tooltip>
 			<ToggleNodeView />
+			{isShapeView && <ToggleStatePills />}
 			<div className='toolbar-divider' />
 			<div className='toolbar-group toolbar-view-controls'>
 				<ZoomControls />
@@ -64,14 +68,36 @@ export const Toolbar = ({ onClickPanMode, onClickSelectionMode }: ToolBarProps) 
 			<div className='toolbar-group'>
 				<TogglePanMode checked={!isSelecting} onChange={onClickPanMode} />
 				<ToggleSelectionMode checked={isSelecting} onChange={onClickSelectionMode} />
-				{!isShapeView && <ToggleExpandAll />}
+				{!isShapeView && (
+					<Tooltip title='Expand or collapse all nodes'>
+						<span className='inline-flex'>
+							<ToggleExpandAll />
+						</span>
+					</Tooltip>
+				)}
 			</div>
 			<div className='toolbar-divider' />
 			<div className='toolbar-group'>
-				<DeleteIssuesDialog nodes={selectedNodes} />
-				<ChangeIssueType />
-				<CreateIssues />
-				<InfluenceDiagramValidation />
+				<Tooltip title='Delete selected issues'>
+					<span className='inline-flex'>
+						<DeleteIssuesDialog nodes={selectedNodes} />
+					</span>
+				</Tooltip>
+				<Tooltip title='Change selected issue types'>
+					<span className='inline-flex'>
+						<ChangeIssueType />
+					</span>
+				</Tooltip>
+				<Tooltip title='Create issues'>
+					<span className='inline-flex'>
+						<CreateIssues />
+					</span>
+				</Tooltip>
+				<Tooltip title='Diagram validation'>
+					<span className='inline-flex gap-2'>
+						<InfluenceDiagramValidation />
+					</span>
+				</Tooltip>
 			</div>
 			{selectedEvidence.length > 0 && (
 				<>

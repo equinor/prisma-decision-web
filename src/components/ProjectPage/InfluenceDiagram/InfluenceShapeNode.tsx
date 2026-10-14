@@ -12,6 +12,7 @@ import { NodeProps, useEdges } from '@xyflow/react';
 import { ReactNode, use, useState } from 'react';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
+import { useInfluenceDiagramStatePills } from '../../../hooks/useInfluenceDiagramStatePills';
 import { percentageIcon, utilityIcon } from '../../../icons';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { cn } from '../../../utils/cn';
@@ -89,6 +90,7 @@ const InfluenceShapeNode = ({
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
 	const { evidence } = useInfluenceDiagramEvidence();
+	const [showStatePills] = useInfluenceDiagramStatePills();
 	if (!issue) return null;
 	const errors = getErrors(issue);
 	const warnings = getWarnings(issue);
@@ -192,7 +194,13 @@ const InfluenceShapeNode = ({
 								</div>
 							</Tooltip>
 						)}
-						{showStates && <InfluenceShapeStates issue={issue} hidden={tableOpen} />}
+						{showStates && (
+							<InfluenceShapeStates
+								issue={issue}
+								hidden={tableOpen}
+								alwaysVisible={showStatePills}
+							/>
+						)}
 						<div
 							className={cn(
 								`bg-background-default shadow-tile absolute top-1/2 right-[calc(100%+10px)] z-20 flex

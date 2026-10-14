@@ -9,7 +9,15 @@ import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { Issue, Option, Outcome } from '../../../validators';
 
 // States chip below a shape node; opens a popover for picking evidence (scenario EV).
-export const InfluenceShapeStates = ({ issue, hidden }: { issue: Issue; hidden?: boolean }) => {
+export const InfluenceShapeStates = ({
+	issue,
+	hidden,
+	alwaysVisible = false,
+}: {
+	issue: Issue;
+	hidden?: boolean;
+	alwaysVisible?: boolean;
+}) => {
 	const [open, setOpen] = useState(false);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
@@ -63,6 +71,7 @@ export const InfluenceShapeStates = ({ issue, hidden }: { issue: Issue; hidden?:
 						? 'border-primary-resting text-primary-resting top-[calc(100%-8px)] border-2 py-px'
 						: 'border-background-medium text-text-tertiary top-[calc(100%+8px)]',
 					// Keep the active scenario readable when the node is not hovered.
+					!alwaysVisible &&
 					!open &&
 						!selectedState &&
 						'opacity-0 group-hover/node:opacity-100 focus-visible:opacity-100',

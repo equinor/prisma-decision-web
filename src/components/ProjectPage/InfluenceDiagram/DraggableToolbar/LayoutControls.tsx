@@ -1,4 +1,4 @@
-import { Button, Icon, Label, Popover, Slider } from '@equinor/eds-core-react';
+import { Button, Icon, Label, Popover, Slider, Tooltip } from '@equinor/eds-core-react';
 import { tune } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { useInfluenceDiagramSettings } from '../../../../hooks/useInfluenceDiagramSettings';
@@ -17,16 +17,17 @@ export const LayoutControls = () => {
 
 	return (
 		<>
-			<Button
-				ref={referenceElement}
-				className='px-1.5!'
-				variant='outlined'
-				title='Layout controls'
-				aria-label='Layout controls'
-				onClick={() => setIsOpen(prev => !prev)}
-			>
-				<Icon data={tune} />
-			</Button>
+			<Tooltip title='Layout controls'>
+				<Button
+					ref={referenceElement}
+					className='px-1.5!'
+					variant='outlined'
+					aria-label='Layout controls'
+					onClick={() => setIsOpen(prev => !prev)}
+				>
+					<Icon data={tune} />
+				</Button>
+			</Tooltip>
 			<Popover
 				open={isOpen}
 				anchorEl={referenceElement.current}
