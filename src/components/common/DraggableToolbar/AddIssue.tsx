@@ -1,4 +1,10 @@
-import { PointerSensor, useDraggable } from '@dnd-kit/react';
+import {
+	DragDropProvider,
+	DragEndEvent,
+	DragOverlay,
+	PointerSensor,
+	useDraggable,
+} from '@dnd-kit/react';
 import { Button, Icon, Popover } from '@equinor/eds-core-react';
 import { Composite, CompositeItem, CompositeProvider } from '@ariakit/react';
 import { add, assignment_important } from '@equinor/eds-icons';
@@ -51,12 +57,14 @@ export const AddIssue = () => {
 		);
 	};
 
-	const addIssue = (issue: Issue) => {
-		if (!sheet) return;
-		const position = screenToFlowPosition({
+	const addIssue = (
+		issue: Issue,
+		position = screenToFlowPosition({
 			x: window.innerWidth / 2,
 			y: window.innerHeight / 2,
-		});
+		}),
+	) => {
+		if (!sheet) return;
 		createWhiteboardNodes([
 			{
 				id: crypto.randomUUID(),
@@ -74,9 +82,20 @@ export const AddIssue = () => {
 		]);
 	};
 
+	const onDragEnd = (event: DragEndEvent) => {
+		const issue = event.operation.source?.data.issue;
+		if (event.canceled || !issue || !sheet) return;
+
+		const bounds = event.operation.shape?.current.boundingRectangle;
+		const position = screenToFlowPosition(
+			bounds ? { x: bounds.left, y: bounds.top } : event.operation.position.current,
+		);
+		addIssue(issue, position);
+	};
+
 	if (issues.length === 0) return null;
 	return (
-		<>
+		<DragDropProvider onDragEnd={onDragEnd}>
 			<Button.Toggle
 				onChange={() => setIsOpen(!isOpen)}
 				selectedIndexes={isOpen ? [0] : []}
@@ -125,7 +144,15 @@ export const AddIssue = () => {
 					</Popover.Content>
 				</Popover>
 			</CompositeProvider>
-		</>
+			<DragOverlay dropAnimation={null}>
+				{source => (
+					<IssueCardComponent issue={source.data.issue} className='w-64'>
+						<IssueCardHeader />
+						<IssueCardContent />
+					</IssueCardComponent>
+				)}
+			</DragOverlay>
+		</DragDropProvider>
 	);
 };
 

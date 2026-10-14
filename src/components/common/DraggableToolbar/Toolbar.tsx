@@ -37,10 +37,12 @@ export const ToolbarDragDropProvider = ({ children }: { children: React.ReactNod
 		<DragDropProvider
 			onDragEnd={e => {
 				setIsDragging(false);
-				if (!e.operation.target?.id) return;
-				setToolBarPosition(e.operation.target.id as 'top' | 'bottom');
+				if (e.canceled || e.operation.source?.id !== 'toolbar') return;
+				const position = e.operation.target?.id;
+				if (position !== 'top' && position !== 'bottom') return;
+				setToolBarPosition(position);
 			}}
-			onDragStart={() => setIsDragging(true)}
+			onDragStart={e => setIsDragging(e.operation.source?.id === 'toolbar')}
 		>
 			{children}
 			{isDragging && <ToolbarOverlay />}
