@@ -1,6 +1,8 @@
+import { KeyboardSensor, PointerSensor } from '@dnd-kit/dom';
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import { useIssueDragAndDrop } from '../../../../hooks/useIssueDragAndDrop';
+import { canDndStartFrom } from '../../../../utils/canDndStartFrom';
 import { issueTypes } from '../../../../validators';
 import {
 	IssueCard,
@@ -14,10 +16,23 @@ import {
 } from '../../../common/Cards/IssueCard';
 import { IssueColumn } from './IssueColumn';
 
+const sensors = [
+	PointerSensor.configure({
+		preventActivation: (event, source) => {
+			if (!canDndStartFrom(event.target)) return true;
+			if (event.target instanceof Element && event.target.closest('[data-card-action]'))
+				return false;
+			return PointerSensor.defaults.preventActivation?.(event, source) ?? false;
+		},
+	}),
+	KeyboardSensor,
+];
+
 export const TableView = () => {
 	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop();
 	return (
 		<DragDropProvider
+			sensors={sensors}
 			onBeforeDragStart={onBeforeDragStart}
 			onDragOver={onDragOver}
 			onDragEnd={onDragEnd}
