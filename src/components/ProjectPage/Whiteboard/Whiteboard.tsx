@@ -18,11 +18,10 @@ import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorder
 import {
 	IssueCard,
 	IssueCardEditMenuItem,
-	IssueCardExpandTrigger,
-	IssueCardStates,
 	IssueCardHeader,
 	IssueCardMenu,
 } from '../../common/Cards/IssueCard';
+import { IssueCardEditableStates } from '../../common/Cards/IssueCardEditableStates';
 import { IssueTextField } from '../ProjectIssues/IssueTextField';
 import { activeToolAtom } from './activeToolAtom';
 import { ArrowNode } from './Arrow/ArrowNode';
@@ -68,9 +67,9 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 						/>
 					</div>
 				</div>
-				<IssueCardStates>
-					<IssueCardExpandTrigger />
-				</IssueCardStates>
+				{(issue.type === 'Decision' || issue.type === 'Uncertainty') && (
+					<IssueCardEditableStates />
+				)}
 			</IssueCard>
 		</div>
 	);
