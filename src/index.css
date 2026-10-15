@@ -1,5 +1,15 @@
+@layer theme, base, eds-elements, eds-components, components, utilities;
 @import 'tailwindcss';
+@import '@equinor/eds-core-react/next/index.css';
 @plugin 'tailwindcss-animate';
+
+@font-face {
+	font-family: Inter;
+	src: url('https://cdn.eds.equinor.com/font/InterVariable.woff2') format('woff2');
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 [data-dnd-overlay]:not([style*='--dnd-translate']) {
