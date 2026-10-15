@@ -1,4 +1,4 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import '@xyflow/react/dist/style.css';
@@ -25,14 +25,26 @@ export const ProjectIssues = () => {
 				<div className='flex items-center gap-4'>
 					<CreateIssues />
 					{activeView !== 0 && <ToggleExpandAll />}
-					<Button.Toggle selectedIndexes={[activeView]}>
-						<Button onClick={() => setIssuesView('list')}>
+					<div role='group' aria-label='Issues view' className='flex gap-1'>
+						<Button
+							icon
+							aria-label='List view'
+							aria-pressed={activeView === 0}
+							variant={activeView === 0 ? 'primary' : 'secondary'}
+							onClick={() => setIssuesView('list')}
+						>
 							<Icon data={view_list} />
 						</Button>
-						<Button onClick={() => setIssuesView('table')}>
+						<Button
+							icon
+							aria-label='Board view'
+							aria-pressed={activeView === 1}
+							variant={activeView === 1 ? 'primary' : 'secondary'}
+							onClick={() => setIssuesView('table')}
+						>
 							<Icon data={view_column} />
 						</Button>
-					</Button.Toggle>
+					</div>
 				</div>
 			</div>
 			<IssueView />
