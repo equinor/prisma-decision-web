@@ -12,6 +12,7 @@ import { Issue, issueSchema, Option, Outcome } from '../../../validators';
 import {
 	IssueCard,
 	IssueCardContent,
+	IssueCardExpandTrigger,
 	IssueCardHeader,
 	IssueCardStates,
 } from '../../common/Cards/IssueCard';
@@ -580,19 +581,62 @@ test.each(['success', 'failure'])(
 	},
 );
 
-const SharedCardExample = () => {
+const SharedCardExample = ({ issue = existingIssue() }: { issue?: Issue }) => {
 	const [selected, setSelected] = useState<Option | Outcome>();
 	return (
 		<>
-			<IssueCard issue={existingIssue()} onClickState={setSelected} selectedState={selected}>
-				<IssueCardHeader />
+			<IssueCard issue={issue} onClickState={setSelected} selectedState={selected}>
+				<section aria-label='Card classifications'>
+					<IssueCardHeader />
+				</section>
 				<IssueCardContent />
-				<IssueCardStates expandedProp />
+				<IssueCardStates expandedProp>
+					<IssueCardExpandTrigger />
+				</IssueCardStates>
 			</IssueCard>
 			<p role='status'>{selected ? `Selected: ${selected.name}` : 'No state selected'}</p>
 		</>
 	);
 };
+
+test('Shared Decision cards show their decision type without adding classification editing', () => {
+	const issue: Issue = {
+		...existingIssue(),
+		decision: { ...existingIssue().decision, type: 'Focus' },
+	};
+	renderIssues(<SharedCardExample issue={issue} />);
+	const header = within(screen.getByRole('region', { name: 'Card classifications' }));
+	expect(header.getByText('Focus')).toBeVisible();
+	for (const label of header.getAllByRole('button')) {
+		expect(label).toHaveAttribute('tabindex', '-1');
+		expect(label).toHaveClass('pointer-events-none');
+		expect(label).not.toHaveAttribute('aria-haspopup');
+	}
+	expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+	expect(apiClient.put).not.toHaveBeenCalled();
+});
+
+test.each(['Utility', 'Fact', 'Unassigned'] as const)(
+	'Shared %s cards show their label without displaying inactive states or an expansion control',
+	type => {
+		const issue: Issue = { ...existingIssue(), type };
+		renderIssues(<SharedCardExample issue={issue} />);
+		const header = within(screen.getByRole('region', { name: 'Card classifications' }));
+		expect(header.getByText(type)).toBeVisible();
+		expect(screen.queryByText('Existing option')).not.toBeInTheDocument();
+		expect(screen.queryByText('Existing outcome')).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: /States$/ })).not.toBeInTheDocument();
+		for (const label of header.getAllByRole('button')) {
+			expect(label).toHaveAttribute('tabindex', '-1');
+			expect(label).toHaveClass('pointer-events-none');
+			expect(label).not.toHaveAttribute('aria-haspopup');
+		}
+		expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+		expect(issue.decision.options).toHaveLength(1);
+		expect(issue.uncertainty.outcomes).toHaveLength(1);
+		expect(apiClient.put).not.toHaveBeenCalled();
+	},
+);
 
 test('Shared non-Board cards retain plain issue text and existing state selection', async () => {
 	const user = renderIssues(<SharedCardExample />);
