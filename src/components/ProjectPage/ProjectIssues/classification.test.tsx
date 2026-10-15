@@ -624,7 +624,7 @@ test('Board retains its existing full Edit action and expandable states', async 
 	await screen.findByText('Drill well');
 	await user.click(within(column).getByRole('button', { name: '1 States' }));
 	expect(await screen.findByText('Drill now')).toBeInTheDocument();
-	await user.click(within(column).getByRole('button', { name: '' }));
+	await user.click(within(column).getByRole('button', { name: 'Issue actions' }));
 	await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
 	expect(screen.getByRole('textbox', { name: 'Issue name' })).toHaveValue('Drill well');
 });

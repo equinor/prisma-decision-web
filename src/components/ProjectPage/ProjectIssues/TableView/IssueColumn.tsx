@@ -2,18 +2,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { cn } from '../../../../utils/cn';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
 import { Issue } from '../../../../validators';
-import {
-	IssueCard,
-	IssueCardDeleteMenuItem,
-	IssueCardEditMenuItem,
-	IssueCardExpandableContent,
-	IssueCardExpandTrigger,
-	IssueCardHeader,
-	IssueCardMenu,
-	IssueCardStates,
-} from '../../../common/Cards/IssueCard';
-import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
+import { IssueBoardCard } from '../../../common/Cards/IssueBoardCard';
 import { BoardDraftLocation, IssueDraftControl } from './IssueDraftControl';
 
 export const IssueColumn = ({
@@ -46,27 +36,12 @@ export const IssueColumn = ({
 				/>
 				{issues.map((issue, index) => {
 					return (
-						<DraggableIssueContainer
+						<IssueBoardCard
 							key={issue.id}
 							issue={issue}
 							index={index}
 							type={issueType}
-						>
-							<IssueCard issue={issue}>
-								<IssueCardHeader editable>
-									<IssueCardMenu>
-										<IssueCardEditMenuItem />
-										<IssueCardDeleteMenuItem />
-									</IssueCardMenu>
-								</IssueCardHeader>
-								<IssueCardExpandableContent />
-								{issue.type !== 'Fact' && (
-									<IssueCardStates>
-										<IssueCardExpandTrigger />
-									</IssueCardStates>
-								)}
-							</IssueCard>
-						</DraggableIssueContainer>
+						/>
 					);
 				})}
 				<IssueDraftControl
