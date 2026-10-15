@@ -20,8 +20,10 @@ export const ProjectIssues = () => {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex items-center justify-between'>
-				<h1 className='text-[32px] leading-10 font-bold'>{selectedProject.name}</h1>
+			<div className='grid w-full grid-cols-[1fr_auto] items-center justify-between gap-2'>
+				<h1 className='truncate text-[32px] leading-10 font-bold'>
+					{selectedProject.name}
+				</h1>
 				<div className='flex items-center gap-4'>
 					<CreateIssues />
 					{activeView !== 0 && <ToggleExpandAll />}
