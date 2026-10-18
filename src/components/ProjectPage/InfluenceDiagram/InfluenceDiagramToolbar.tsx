@@ -7,7 +7,6 @@ import { EVMetrics } from '../../common/EVMetrics';
 import { useSelectedProject } from '../ProjectContext';
 import { ToggleExpandAll } from '../ToggleExpandAll';
 import { ZoomControls } from '../../common/DraggableToolbar/ZoomControls';
-import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 import { ChangeIssueType } from '../../common/DraggableToolbar/ChangeIssueType';
 import { DeleteMenu } from '../../common/DraggableToolbar/DeleteMenu';
 import { LayoutControls } from '../../common/DraggableToolbar/LayoutControls';
@@ -32,7 +31,6 @@ export const InfluenceDiagramToolbar = () => {
 				<DeleteMenu selectedNodes={selectedNodes} />
 				<ChangeIssueType />
 				<CreateIssues />
-				<InfluenceDiagramValidation />
 				<ToolbarSeparator />
 				<BarMetrics />
 			</ToolBar>

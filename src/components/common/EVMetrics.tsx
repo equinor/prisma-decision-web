@@ -1,8 +1,9 @@
-import { Tooltip } from '@equinor/eds-core-react';
+import { useState } from 'react';
 import { useGetExpectedValue } from '../../hooks/api/useGetExpectedValue';
 import { useHasInfluenceDiagramError } from '../../hooks/useHasInfluenceDiagramError';
 import { cn } from '../../utils/cn';
 import { SolutionEvidenceResponse } from '../../validators';
+import { InfluenceDiagramValidation } from '../ProjectPage/InfluenceDiagram/InfluenceDiagramValidation';
 import { useSelectedProject } from '../ProjectPage/ProjectContext';
 
 export const EVMetrics = ({
@@ -11,6 +12,8 @@ export const EVMetrics = ({
 	selectedEvidence: SolutionEvidenceResponse[];
 }) => {
 	const selectedProject = useSelectedProject();
+	const [showValidation, setShowValidation] = useState(false);
+	const [validationAnchorEl, setValidationAnchorEl] = useState<HTMLButtonElement | null>(null);
 
 	const formatEv = (value: number) => value.toFixed(2);
 	const baseEvidence = [{ evidence_id: selectedProject.id, state_ids: [], expected_utility: 0 }];
@@ -48,20 +51,22 @@ export const EVMetrics = ({
 	if (hasValidationError) scenarioEvValue = 'Error';
 
 	return (
-		<Tooltip title='Can not calculate EV with an invalid influence diagram'>
-			<div
-				className={cn('flex items-center ', {
-					'gap-2': true,
-					'flex-col items-start justify-center gap-1': false,
-					'**:text-text-danger  outline-text-danger rounded-sm px-2  py-0.5 outline-2 dark:outline-red-400 dark:**:text-red-400':
+		<>
+			<button
+				ref={setValidationAnchorEl}
+				type='button'
+				disabled={!hasValidationError}
+				aria-label={hasValidationError ? 'Open influence diagram validation' : undefined}
+				className={cn('flex items-center gap-3 text-left', {
+					'**:text-warning-resting hover:bg-background-warning focus-visible:bg-background-warning cursor-pointer rounded-sm px-2 py-0.5 transition-colors':
 						hasValidationError,
 				})}
+				onClick={() => setShowValidation(prev => !prev)}
 			>
 				<div className='flex flex-col items-start justify-center'>
 					<p className='text-text-tertiary text-[10px] uppercase'>Base EV</p>
 					<p className='text-xs font-medium'>{baseEvValue}</p>
 				</div>
-				<div className='bg-background-light h-7 w-px' />
 				<div className='flex flex-col items-start justify-center'>
 					<p className='text-text-tertiary text-[10px] uppercase'>Scenario EV</p>
 					<p className='text-xs font-medium'>{scenarioEvValue}</p>
@@ -81,7 +86,12 @@ export const EVMetrics = ({
 						{formatEv(evDelta)}
 					</div>
 				)}
-			</div>
-		</Tooltip>
+			</button>
+			<InfluenceDiagramValidation
+				anchorEl={validationAnchorEl}
+				open={showValidation}
+				onClose={() => setShowValidation(false)}
+			/>
+		</>
 	);
 };
