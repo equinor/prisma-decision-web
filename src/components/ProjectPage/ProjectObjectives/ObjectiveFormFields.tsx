@@ -1,8 +1,9 @@
-import { TextField, Textarea, Autocomplete } from '@equinor/eds-core-react';
+import { TextArea, TextField } from '@equinor/eds-core-react/next';
 import { ErrorMessage } from '@hookform/error-message';
 import { useController, UseFormRegister, FieldErrors, Control } from 'react-hook-form';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
 import { Objective, objectiveTypes } from '../../../validators';
+import { SegmentedSelector } from '../../common/SegmentedSelector';
 
 interface ObjectiveFormFieldsProps {
 	register: UseFormRegister<Objective>;
@@ -12,7 +13,7 @@ interface ObjectiveFormFieldsProps {
 
 export const ObjectiveFormFields = ({ register, errors, control }: ObjectiveFormFieldsProps) => {
 	const {
-		field: { onChange: onChangeType, ref: typeRef, value: selectedType },
+		field: { name: typeName, onBlur: onBlurType, onChange: onChangeType, ref: typeRef, value },
 	} = useController({
 		control,
 		name: 'type',
@@ -29,22 +30,19 @@ export const ObjectiveFormFields = ({ register, errors, control }: ObjectiveForm
 				<ErrorMessage as={FormErrorMessage} name='name' errors={errors} />
 			</div>
 			<div>
-				<Autocomplete
+				<SegmentedSelector
 					label='Objective Type'
-					options={Array.from(objectiveTypes)}
-					hideClearButton
-					selectedOptions={selectedType ? [selectedType] : []}
+					name={typeName}
+					value={value}
+					options={objectiveTypes.map(type => ({ value: type, label: type }))}
 					ref={typeRef}
-					placeholder='Select objective type...'
-					onOptionsChange={({ selectedItems }) => {
-						if (selectedItems.length === 0) return;
-						onChangeType(selectedItems[0]);
-					}}
+					onBlur={onBlurType}
+					onChange={onChangeType}
 				/>
 				<ErrorMessage as={FormErrorMessage} name='type' errors={errors} />
 			</div>
 			<div>
-				<Textarea
+				<TextArea
 					label='Description'
 					placeholder='Enter objective description...'
 					rows={6}

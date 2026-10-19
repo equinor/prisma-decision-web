@@ -81,13 +81,14 @@ export const IssueTextField = ({
 				className={cn('nodrag nopan pointer-events-auto', {
 					'flex min-h-12 items-center px-2': variant === 'table',
 					'pt-1': variant === 'card' && multiline,
+					'pb-1': variant === 'card',
 				})}
 				data-no-dnd='true'
 			>
 				<Editor
 					aria-label={label}
 					className={cn(
-						'[&_input:not(:disabled)]:text-text-default! [&_textarea:not(:disabled)]:text-text-default! gap-1! text-sm leading-5 font-normal [&_.helper-message]:text-xs!',
+						'[&_input:not(:disabled)]:text-text-default! text-sm font-normal',
 						{
 							'[&_.helper-message]:text-text-tertiary!': !error,
 							'[&_.eds-input]:min-h-13.5! [&_.eds-input]:py-1.5!':
