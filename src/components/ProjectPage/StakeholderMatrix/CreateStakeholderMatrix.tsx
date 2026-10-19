@@ -1,11 +1,5 @@
-import {
-	Button,
-	CircularProgress,
-	Dialog,
-	DialogContent,
-	Icon,
-	TextField,
-} from '@equinor/eds-core-react';
+import { Button, CircularProgress, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { add, close } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';

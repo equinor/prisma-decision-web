@@ -1,4 +1,4 @@
-import { Switch } from '@equinor/eds-core-react';
+import { Switch } from '@equinor/eds-core-react/next';
 import { useUpdateRestrictionEntries } from '../../../../hooks/api/useUpdateRestrictionEntries';
 import { RestrictionEntry } from '../../../../validators';
 
@@ -13,6 +13,7 @@ export const RestrictionToggleCell = ({
 	return (
 		<td className='bg-background-default rounded-sm px-3 py-2 text-center'>
 			<Switch
+				label={`${parentState.name} allows ${childState.name}`}
 				aria-label={`${parentState.name} allows ${childState.name}`}
 				className='nopan nodrag justify-center [&>label]:sr-only'
 				checked={isEnabled}

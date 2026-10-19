@@ -1,4 +1,5 @@
-import { TextField, Tooltip } from '@equinor/eds-core-react';
+import { Tooltip } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { useUpdateDiscreteProbabilities } from '../../../../hooks/api/useUpdateDiscreteProbabilities';
 import { DiscreteProbability } from '../../../../validators';
 import { useState } from 'react';
@@ -34,7 +35,7 @@ export const DiscreteProbabilityCell = ({
 							mutate({ ...dp, probability: parsedValue });
 						}}
 						inputMode='decimal'
-						className='nopan nodrag [&_input]:bg-background-default!'
+						className='nopan nodrag'
 						value={newValue}
 					/>
 				</div>

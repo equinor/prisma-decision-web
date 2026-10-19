@@ -1,4 +1,4 @@
-import { TextField } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { useUpdateDiscreteUtilities } from '../../../../hooks/api/useUpdateDiscreteUtilities';
 import { DiscreteUtility } from '../../../../validators';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ export const DiscreteUtilityCell = ({ utilityId, discreteUtilities }: DiscretePr
 					mutate({ ...du, utility_value: parsedValue });
 				}}
 				inputMode='decimal'
-				className='nopan nodrag [&_input]:bg-background-default! w-full'
+				className='nopan nodrag w-full'
 				value={newValue}
 				data-probability-id={du?.id}
 				step={0.01}
