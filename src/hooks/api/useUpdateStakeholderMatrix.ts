@@ -12,7 +12,7 @@ export const useUpdateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 			return stakeholder;
 		},
 		onMutate: async stakeholder => {
-			const queryKey = ['stakeholder-matrixes', stakeholder.project_id];
+			const queryKey = ['stakeholderMatrixes'];
 			await queryClient.cancelQueries({ queryKey });
 			const previousStakeholders =
 				queryClient.getQueryData<StakeholderMatrix[]>(queryKey) ?? [];
@@ -26,17 +26,14 @@ export const useUpdateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 			);
 			return { previousStakeholders };
 		},
-		onError: (_error, stakeholder, context) => {
-			queryClient.setQueryData(
-				['stakeholder-matrixes', stakeholder.project_id],
-				context?.previousStakeholders,
-			);
+		onError: (_error, _stakeholder, context) => {
+			queryClient.setQueryData(['stakeholderMatrixes'], context?.previousStakeholders);
 			showErrorToast('Failed to update stakeholder');
 		},
-		onSuccess: async stakeholder => {
+		onSuccess: async () => {
 			args?.onSuccess?.();
 			await queryClient.refetchQueries({
-				queryKey: ['stakeholder-matrixes', stakeholder.project_id],
+				queryKey: ['stakeholderMatrixes'],
 			});
 		},
 	});

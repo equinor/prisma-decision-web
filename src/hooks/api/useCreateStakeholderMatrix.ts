@@ -16,30 +16,24 @@ export const useCreateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 		},
 		onMutate: async stakeholder => {
 			await queryClient.cancelQueries({
-				queryKey: ['stakeholder-matrixes', stakeholder.project_id],
+				queryKey: ['stakeholderMatrixes'],
 			});
 			const previousStakeholders =
-				queryClient.getQueryData<StakeholderMatrix[]>([
-					'stakeholder-matrixes',
-					stakeholder.project_id,
-				]) ?? [];
+				queryClient.getQueryData<StakeholderMatrix[]>(['stakeholderMatrixes']) ?? [];
 			queryClient.setQueryData(
-				['stakeholder-matrixes', stakeholder.project_id],
+				['stakeholderMatrixes'],
 				[...previousStakeholders, stakeholder],
 			);
 			return { previousStakeholders };
 		},
-		onError: (_error, stakeholder, context) => {
-			queryClient.setQueryData(
-				['stakeholder-matrixes', stakeholder.project_id],
-				context?.previousStakeholders,
-			);
+		onError: (_error, _stakeholder, context) => {
+			queryClient.setQueryData(['stakeholderMatrixes'], context?.previousStakeholders);
 			showErrorToast('Failed to create stakeholder');
 		},
-		onSuccess: async (_data, stakeholder) => {
+		onSuccess: async () => {
 			args?.onSuccess?.();
 			await queryClient.refetchQueries({
-				queryKey: ['stakeholder-matrixes', stakeholder.project_id],
+				queryKey: ['stakeholderMatrixes'],
 			});
 		},
 	});

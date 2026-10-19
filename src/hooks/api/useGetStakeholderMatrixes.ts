@@ -2,13 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { StakeholderMatrix } from '../../validators';
 
-export const useGetStakeholderMatrixes = (projectId: string) => {
-	const { data: stakeholderMatrices = [], ...rest } = useQuery({
-		queryKey: ['stakeholder-matrixes', projectId],
+const defaultValue: StakeholderMatrix[] = [];
+
+export const useGetStakeholderMatrixes = () => {
+	const query = useQuery({
+		queryKey: ['stakeholderMatrixes'],
 		queryFn: async () => {
-			const response = await apiClient.get<StakeholderMatrix[]>(
-				`/projects/${projectId}/stakeholder-matrix-entry`,
-			);
+			const response = await apiClient.get<StakeholderMatrix[]>('/stakeholder-matrix-entry');
 			return response.data;
 		},
 		meta: {
@@ -16,5 +16,5 @@ export const useGetStakeholderMatrixes = (projectId: string) => {
 		},
 	});
 
-	return { stakeholderMatrices, ...rest };
+	return { ...query, data: query.data ?? defaultValue };
 };
