@@ -48,6 +48,8 @@ export const getInfluenceDiagramLayout = async (
 		layoutOptions: {
 			...layoutOptions,
 			'elk.algorithm.graphviz': 'dot',
+			'elk.spacing.edgeEdge': '35',
+			'elk.layered.spacing.edgeEdgeBetweenLayers': '35',
 		},
 		children: nodes.map(node => ({
 			id: node.id,

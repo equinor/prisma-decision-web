@@ -98,7 +98,7 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 			<BaseEdge
 				id={id}
 				path={path}
-				interactionWidth={60}
+				interactionWidth={16}
 				markerEnd={`url(#${id})`}
 				style={{ strokeDasharray: hasRestriction ? '12 8' : undefined }}
 				className={cn('stroke-primary-resting! stroke-4!', {
