@@ -1,4 +1,4 @@
-import { TextField } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { ErrorMessage } from '@hookform/error-message';
 import { useController, useFormContext } from 'react-hook-form';
 import { Project } from '../../../validators';

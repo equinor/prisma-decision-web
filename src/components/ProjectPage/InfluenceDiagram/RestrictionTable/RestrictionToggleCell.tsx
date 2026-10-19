@@ -1,4 +1,5 @@
-import { Icon, Switch, Tooltip } from '@equinor/eds-core-react';
+import { Icon, Tooltip } from '@equinor/eds-core-react';
+import { Switch } from '@equinor/eds-core-react/next';
 import { warning_outlined } from '@equinor/eds-icons';
 import { RestrictionEntry } from '../../../../validators';
 import { RestrictionToggleContext, RestrictionToggleViolation } from './useRestrictionToggle';
@@ -15,6 +16,7 @@ export const RestrictionToggleCell = ({
 	return (
 		<td className='bg-background-default relative rounded-sm px-3 py-2 text-center'>
 			<Switch
+				label={`${parentState.name} allows ${childState.name}`}
 				aria-label={`${parentState.name} allows ${childState.name}`}
 				className='nopan nodrag justify-center [&>label]:sr-only'
 				checked={isEnabled}
