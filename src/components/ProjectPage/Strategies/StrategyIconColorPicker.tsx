@@ -1,16 +1,22 @@
-import { useFormContext } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 import { Strategy } from '../../../validators';
-import { Tooltip } from '@equinor/eds-core-react';
+import { ColorPickerLauncher } from '../../common/ColorPickerLauncher';
 
 export const StrategyIconColorPicker = () => {
-	const { register } = useFormContext<Strategy>();
+	const { control } = useFormContext<Strategy>();
+	const {
+		field: { value, onChange: onCommit },
+	} = useController({
+		name: 'icon_color',
+		control,
+	});
+
 	return (
-		<Tooltip title='Select icon strategy color'>
-			<input
-				type='color'
-				className='border-primary-resting mt-4 size-9 rounded-sm border'
-				{...register('icon_color')}
-			/>
-		</Tooltip>
+		<ColorPickerLauncher
+			title='Choose strategy icon color'
+			value={value ?? '#007079'}
+			onChange={onCommit}
+			className='mt-4 h-9'
+		/>
 	);
 };
