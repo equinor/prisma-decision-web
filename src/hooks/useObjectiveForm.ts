@@ -16,13 +16,15 @@ export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
 	);
 
 	const formMethods = useForm({
+		mode: 'onChange',
 		values: defaultValues,
 		resolver: zodResolver(objectiveSchema),
 	});
 
 	const { mutate: createObjective, isPending: isCreating } = useCreateObjectiveOptimistic({
 		onSuccess: () => {
-			formMethods.reset(getDefaultValues(selectedProject.id));
+			const type = formMethods.getValues('type');
+			formMethods.reset({ ...getDefaultValues(selectedProject.id), type });
 			onSuccess?.();
 		},
 	});
