@@ -11,7 +11,7 @@ import { close, edit } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';
 import { useStakeholderMatrixForm } from '../../../hooks/useStakeholderMatrixForm';
-import type { StakeholderMatrix } from '../../../validators';
+import type { StakeholderMatrixEntry } from '../../../validators';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
 
 export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProps) => {
@@ -92,5 +92,5 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 };
 
 type EditStakeholderMatrixProps = {
-	stakeholder: StakeholderMatrix;
+	stakeholder: StakeholderMatrixEntry;
 };

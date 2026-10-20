@@ -4,11 +4,12 @@ import '@xyflow/react/dist/style.css';
 import { useMemo, useState } from 'react';
 import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderMatrixes';
 import { useUpdateStakeholderMatrix } from '../../../hooks/api/useUpdateStakeholderMatrix';
-import type { StakeholderMatrix as StakeholderMatrixRecord } from '../../../validators';
+import type { StakeholderMatrixEntry as StakeholderMatrixRecord } from '../../../validators';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { DeleteStakeholderMatrixDialog } from './DeleteStakeholderMatrixDialog';
 import { EditStakeholderMatrix } from './EditStakeholderMatrix';
+import { useSelectedProject } from '../ProjectContext';
 
 type StakeholderMatrixProps = {
 	className?: string;
@@ -227,7 +228,13 @@ const getMatrixRevision = (stakeholders: StakeholderMatrixRecord[]) =>
 export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const { data: stakeholderMatrices, isLoading } = useGetStakeholderMatrixes();
+	const projectId = useSelectedProject()?.id;
+	const projectStakeholderMatrices = stakeholderMatrices.filter(
+		matrix => matrix.project_id === projectId,
+	);
+
 	const { mutate: updateStakeholder } = useUpdateStakeholderMatrix();
+
 	const handleStakeholderMove = (id: string, values: ReturnType<typeof getStakeholderValues>) => {
 		const stakeholder = stakeholderMatrices.find(
 			current => current.stakeholder_matrix_id === id,
@@ -236,17 +243,17 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 		updateStakeholder({ ...stakeholder, ...values });
 	};
 	const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
-	const filteredStakeholders = stakeholderMatrices.filter(stakeholder =>
+	const filteredStakeholders = projectStakeholderMatrices.filter(stakeholder =>
 		`${stakeholder.stakeholder_name} ${stakeholder.stakeholder_role}`
 			.toLocaleLowerCase()
 			.includes(normalizedSearchQuery),
 	);
 
 	const generatedMatrixNodes = useMemo(
-		() => buildMatrixNodes(stakeholderMatrices),
-		[stakeholderMatrices],
+		() => buildMatrixNodes(projectStakeholderMatrices),
+		[projectStakeholderMatrices],
 	);
-	const matrixRevision = getMatrixRevision(stakeholderMatrices);
+	const matrixRevision = getMatrixRevision(projectStakeholderMatrices);
 
 	return (
 		<div
@@ -257,8 +264,10 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 					<div className='flex items-center gap-3'>
 						<h1 className='text-3xl font-bold'>Stakeholder Matrix</h1>
 						<span className='bg-background-medium rounded-sm px-2 py-1 text-xs font-semibold'>
-							{stakeholderMatrices.length}{' '}
-							{stakeholderMatrices.length === 1 ? 'stakeholder' : 'stakeholders'}
+							{projectStakeholderMatrices.length}{' '}
+							{projectStakeholderMatrices.length === 1
+								? 'stakeholder'
+								: 'stakeholders'}
 						</span>
 					</div>
 					<p className='text-text-tertiary mt-1 text-sm'>
@@ -275,12 +284,12 @@ export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) =>
 						<MatrixCanvas
 							key={matrixRevision}
 							initialNodes={generatedMatrixNodes}
-							stakeholderCount={stakeholderMatrices.length}
+							stakeholderCount={projectStakeholderMatrices.length}
 							onStakeholderMove={handleStakeholderMove}
 						/>
 						{isLoading && <LoadingSpinner />}
 					</div>
-					{!isLoading && stakeholderMatrices.length === 0 && (
+					{!isLoading && projectStakeholderMatrices.length === 0 && (
 						<p className='text-text-tertiary text-center text-sm'>
 							No stakeholders yet. Create one to add it to the matrix.
 						</p>

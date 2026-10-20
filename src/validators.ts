@@ -222,7 +222,7 @@ export const restrictionTableSchema = z.object({
 	restriction_entries: z.array(restrictionEntrySchema),
 });
 
-export const stakeholderMatrixSchema = z.object({
+export const stakeholderMatrixEntrySchema = z.object({
 	stakeholder_matrix_id: z.guid(),
 	stakeholder_name: z.string().min(1, 'Stakeholder name is required'),
 	stakeholder_role: z.string().min(1, 'Stakeholder role is required'),
@@ -242,7 +242,7 @@ export const projectImportSchema = z.object({
 	restriction_tables: z.array(restrictionTableSchema).optional(),
 	board_nodes: z.array(whiteboardNode).optional(),
 	board_sheets: z.array(whiteboardSheet).optional(),
-	stakeholder_matrices: z.array(stakeholderMatrixSchema).optional(),
+	stakeholder_matrix_entries: z.array(stakeholderMatrixEntrySchema).optional(),
 });
 const metricScore = () =>
 	z
@@ -344,4 +344,4 @@ export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
 export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
 export type DiscretePolicy = z.infer<typeof discretePolicySchema>;
 export type PolicyTable = z.infer<typeof policyTableSchema>;
-export type StakeholderMatrix = z.infer<typeof stakeholderMatrixSchema>;
+export type StakeholderMatrixEntry = z.infer<typeof stakeholderMatrixEntrySchema>;

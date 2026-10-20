@@ -19,7 +19,7 @@ import {
 	Objective,
 	Project,
 	RestrictionTable,
-	StakeholderMatrix,
+	StakeholderMatrixEntry,
 	Strategy,
 	WhiteboardNode,
 	WhiteboardSheet,
@@ -58,7 +58,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 	const projectRestrictionTables: RestrictionTable[] = restrictionTables.filter(
 		table => table.project_id === project.id,
 	);
-	const projectStakeholderMatrixes: StakeholderMatrix[] = stakeholderMatrixes.filter(
+	const projectStakeholderMatrixes: StakeholderMatrixEntry[] = stakeholderMatrixes.filter(
 		table => table.project_id === project.id,
 	);
 
@@ -74,7 +74,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 		strategies: Strategy[];
 		board_nodes: WhiteboardNode[];
 		board_sheets: WhiteboardSheet[];
-		stakeholder_matrixes: StakeholderMatrix[];
+		stakeholder_matrix_entries: StakeholderMatrixEntry[];
 	}) => {
 		const json = JSON.stringify(data, null, 2);
 		const blob = new Blob([json], { type: 'application/json' });
@@ -108,7 +108,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 						strategies: projectStrategies,
 						board_nodes: projectWhiteboardNodes,
 						board_sheets: projectWhiteboardSheets,
-						stakeholder_matrixes: projectStakeholderMatrixes,
+						stakeholder_matrix_entries: projectStakeholderMatrixes,
 					});
 				}}
 			>

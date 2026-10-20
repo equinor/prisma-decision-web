@@ -2,7 +2,7 @@ import { Button, Dialog, DialogContent, Icon, Tooltip } from '@equinor/eds-core-
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useDeleteStakeholderMatrix } from '../../../hooks/api/useDeleteStakeholderMatrix';
-import type { StakeholderMatrix } from '../../../validators';
+import type { StakeholderMatrixEntry } from '../../../validators';
 
 export const DeleteStakeholderMatrixDialog = ({
 	stakeholder,
@@ -63,5 +63,5 @@ export const DeleteStakeholderMatrixDialog = ({
 };
 
 type DeleteStakeholderMatrixDialogProps = {
-	stakeholder: StakeholderMatrix;
+	stakeholder: StakeholderMatrixEntry;
 };
