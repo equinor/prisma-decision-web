@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
-import { StakeholderMatrix } from '../../validators';
-
+import { StakeholderMatrixEntry } from '../../validators';
+const defaultValue: StakeholderMatrixEntry[] = [];
 export const useCreateStakeholderMatrix = (args?: { onSuccess?: () => void }) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (stakeholder: StakeholderMatrix) => {
-			const response = await apiClient.post<StakeholderMatrix[]>(
+		mutationFn: async (stakeholder: StakeholderMatrixEntry) => {
+			const response = await apiClient.post<StakeholderMatrixEntry[]>(
 				'/stakeholder-matrix-entry',
 				[stakeholder],
 			);
@@ -19,7 +19,8 @@ export const useCreateStakeholderMatrix = (args?: { onSuccess?: () => void }) =>
 				queryKey: ['stakeholderMatrixes'],
 			});
 			const previousStakeholders =
-				queryClient.getQueryData<StakeholderMatrix[]>(['stakeholderMatrixes']) ?? [];
+				queryClient.getQueryData<StakeholderMatrixEntry[]>(['stakeholderMatrixes']) ??
+				defaultValue;
 			queryClient.setQueryData(
 				['stakeholderMatrixes'],
 				[...previousStakeholders, stakeholder],

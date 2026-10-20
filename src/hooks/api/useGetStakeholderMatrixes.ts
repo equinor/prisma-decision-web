@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../api';
-import { StakeholderMatrix } from '../../validators';
+import { StakeholderMatrixEntry } from '../../validators';
 
-const defaultValue: StakeholderMatrix[] = [];
+const defaultValue: StakeholderMatrixEntry[] = [];
 
 export const useGetStakeholderMatrixes = () => {
 	const query = useQuery({
 		queryKey: ['stakeholderMatrixes'],
 		queryFn: async () => {
-			const response = await apiClient.get<StakeholderMatrix[]>('/stakeholder-matrix-entry');
+			const response = await apiClient.get<StakeholderMatrixEntry[]>(
+				'/stakeholder-matrix-entry',
+			);
 			return response.data;
 		},
 		meta: {

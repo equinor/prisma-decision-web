@@ -26,6 +26,7 @@ export const useImportProject = () => {
 				queryClient.refetchQueries({ queryKey: ['whiteboardNodes'] }),
 				queryClient.refetchQueries({ queryKey: ['whiteboardSheets'] }),
 				queryClient.invalidateQueries({ queryKey: ['influenceDiagramErrors'] }),
+				queryClient.invalidateQueries({ queryKey: ['stakeholderMatrixes'] }),
 			]);
 		},
 		onError: () => {

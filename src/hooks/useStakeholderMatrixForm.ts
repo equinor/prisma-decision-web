@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
-import { StakeholderMatrix, stakeholderMatrixSchema } from '../validators';
+import { StakeholderMatrixEntry, stakeholderMatrixEntrySchema } from '../validators';
 import { useCreateStakeholderMatrix } from './api/useCreateStakeholderMatrix';
 import { useUpdateStakeholderMatrix } from './api/useUpdateStakeholderMatrix';
 
 export const useStakeholderMatrixForm = (args?: {
-	stakeholder?: StakeholderMatrix;
+	stakeholder?: StakeholderMatrixEntry;
 	onSuccess?: () => void;
 }) => {
 	const selectedProject = useSelectedProject();
-	const formMethods = useForm<StakeholderMatrix>({
+	const formMethods = useForm<StakeholderMatrixEntry>({
 		values: args?.stakeholder ?? getDefaultValues(selectedProject.id),
-		resolver: zodResolver(stakeholderMatrixSchema),
+		resolver: zodResolver(stakeholderMatrixEntrySchema),
 	});
 	const { mutate: createStakeholder, isPending: isCreating } = useCreateStakeholderMatrix({
 		onSuccess: () => {
@@ -33,7 +33,7 @@ export const useStakeholderMatrixForm = (args?: {
 	};
 };
 
-const getDefaultValues = (projectId: string): StakeholderMatrix => ({
+const getDefaultValues = (projectId: string): StakeholderMatrixEntry => ({
 	stakeholder_matrix_id: crypto.randomUUID(),
 	stakeholder_name: '',
 	stakeholder_role: '',

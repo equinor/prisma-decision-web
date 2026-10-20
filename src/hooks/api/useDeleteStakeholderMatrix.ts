@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
-import { StakeholderMatrix } from '../../validators';
+import type { StakeholderMatrixEntry } from '../../validators';
 
 export const useDeleteStakeholderMatrix = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (stakeholder: StakeholderMatrix) => {
+		mutationFn: async (stakeholder: StakeholderMatrixEntry) => {
 			await apiClient.delete(
 				`/stakeholder-matrix-entry/${stakeholder.stakeholder_matrix_id}`,
 			);
@@ -18,7 +18,7 @@ export const useDeleteStakeholderMatrix = () => {
 				queryKey: ['stakeholderMatrixes'],
 			});
 			const previousStakeholders =
-				queryClient.getQueryData<StakeholderMatrix[]>(['stakeholderMatrixes']) ?? [];
+				queryClient.getQueryData<StakeholderMatrixEntry[]>(['stakeholderMatrixes']) ?? [];
 			queryClient.setQueryData(
 				['stakeholderMatrixes'],
 				previousStakeholders.filter(
