@@ -222,6 +222,15 @@ export const restrictionTableSchema = z.object({
 	restriction_entries: z.array(restrictionEntrySchema),
 });
 
+export const stakeholderMatrixSchema = z.object({
+	stakeholder_matrix_id: z.guid(),
+	stakeholder_name: z.string().min(1, 'Stakeholder name is required'),
+	stakeholder_role: z.string().min(1, 'Stakeholder role is required'),
+	affected_by_the_decision: z.number().min(0).max(1),
+	affecting_the_decision: z.number().min(0).max(1),
+	project_id: z.guid(),
+});
+
 export const projectImportSchema = z.object({
 	projects: projectSchema,
 	objectives: z.array(objectiveSchema).optional(),
@@ -233,6 +242,7 @@ export const projectImportSchema = z.object({
 	restriction_tables: z.array(restrictionTableSchema).optional(),
 	board_nodes: z.array(whiteboardNode).optional(),
 	board_sheets: z.array(whiteboardSheet).optional(),
+	stakeholder_matrices: z.array(stakeholderMatrixSchema).optional(),
 });
 const metricScore = () =>
 	z
@@ -292,14 +302,6 @@ export const discretePolicySchema = z.object({
 export const policyTableSchema = z.object({
 	issue_id: z.guid(),
 	discrete_policies: z.array(discretePolicySchema),
-});
-export const stakeholderMatrixSchema = z.object({
-	stakeholder_matrix_id: z.guid(),
-	stakeholder_name: z.string().min(1, 'Stakeholder name is required'),
-	stakeholder_role: z.string().min(1, 'Stakeholder role is required'),
-	affected_by_the_decision: z.number().min(0).max(1),
-	affecting_the_decision: z.number().min(0).max(1),
-	project_id: z.guid(),
 });
 
 export type ErrorHandlingState = {

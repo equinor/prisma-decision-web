@@ -6,7 +6,6 @@ import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderM
 import { useUpdateStakeholderMatrix } from '../../../hooks/api/useUpdateStakeholderMatrix';
 import type { StakeholderMatrix as StakeholderMatrixRecord } from '../../../validators';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
-import { useSelectedProject } from '../ProjectContext';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { DeleteStakeholderMatrixDialog } from './DeleteStakeholderMatrixDialog';
 import { EditStakeholderMatrix } from './EditStakeholderMatrix';
@@ -227,8 +226,7 @@ const getMatrixRevision = (stakeholders: StakeholderMatrixRecord[]) =>
 
 export const StakeholderMatrix = ({ className = '' }: StakeholderMatrixProps) => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const selectedProject = useSelectedProject();
-	const { stakeholderMatrices, isLoading } = useGetStakeholderMatrixes(selectedProject.id);
+	const { data: stakeholderMatrices, isLoading } = useGetStakeholderMatrixes();
 	const { mutate: updateStakeholder } = useUpdateStakeholderMatrix();
 	const handleStakeholderMove = (id: string, values: ReturnType<typeof getStakeholderValues>) => {
 		const stakeholder = stakeholderMatrices.find(

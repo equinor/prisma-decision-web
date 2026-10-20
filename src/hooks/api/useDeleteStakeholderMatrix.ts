@@ -8,20 +8,19 @@ export const useDeleteStakeholderMatrix = () => {
 
 	return useMutation({
 		mutationFn: async (stakeholder: StakeholderMatrix) => {
-			await apiClient.delete(`/stakeholder-matrix/${stakeholder.stakeholder_matrix_id}`);
+			await apiClient.delete(
+				`/stakeholder-matrix-entry/${stakeholder.stakeholder_matrix_id}`,
+			);
 			return stakeholder;
 		},
 		onMutate: async stakeholder => {
 			await queryClient.cancelQueries({
-				queryKey: ['stakeholder-matrixes', stakeholder.project_id],
+				queryKey: ['stakeholderMatrixes'],
 			});
 			const previousStakeholders =
-				queryClient.getQueryData<StakeholderMatrix[]>([
-					'stakeholder-matrixes',
-					stakeholder.project_id,
-				]) ?? [];
+				queryClient.getQueryData<StakeholderMatrix[]>(['stakeholderMatrixes']) ?? [];
 			queryClient.setQueryData(
-				['stakeholder-matrixes', stakeholder.project_id],
+				['stakeholderMatrixes'],
 				previousStakeholders.filter(
 					current => current.stakeholder_matrix_id !== stakeholder.stakeholder_matrix_id,
 				),
@@ -29,15 +28,12 @@ export const useDeleteStakeholderMatrix = () => {
 			return { previousStakeholders };
 		},
 		onError: (_error, _stakeholder, context) => {
-			queryClient.setQueryData(
-				['stakeholder-matrixes', context?.previousStakeholders[0]?.project_id],
-				context?.previousStakeholders,
-			);
+			queryClient.setQueryData(['stakeholderMatrixes'], context?.previousStakeholders);
 			showErrorToast('Failed to delete stakeholder');
 		},
-		onSuccess: async (_data, stakeholder) => {
+		onSuccess: async () => {
 			await queryClient.refetchQueries({
-				queryKey: ['stakeholder-matrixes', stakeholder.project_id],
+				queryKey: ['stakeholderMatrixes'],
 			});
 		},
 	});
