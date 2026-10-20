@@ -16,6 +16,7 @@ export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
 	);
 
 	const formMethods = useForm({
+		mode: 'onChange',
 		values: defaultValues,
 		resolver: zodResolver(objectiveSchema),
 	});
