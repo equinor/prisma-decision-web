@@ -1,7 +1,7 @@
-import { Button } from '@equinor/eds-core-react';
 import { Node } from '@xyflow/react';
 import { useSetAtom } from 'jotai';
 import { expandedDecisionTreeNodes, isSameDecisionPath } from '../../../hooks/useExpandedTreeNodes';
+import { ToolbarButton } from '../../common/DraggableToolbar/Toolbar';
 import { useSelectedProject } from '../ProjectContext';
 
 type ExpandNodeData = {
@@ -34,8 +34,8 @@ export const ExpandAllDecisionTreeNodes = ({ nodes }: { nodes: Node[] }) => {
 	};
 
 	return (
-		<Button variant='outlined' onClick={expandAll} disabled={expandablePaths.length === 0}>
+		<ToolbarButton onClick={expandAll} disabled={expandablePaths.length === 0}>
 			Expand All
-		</Button>
+		</ToolbarButton>
 	);
 };

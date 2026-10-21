@@ -10,6 +10,7 @@ import { useSelectedProjectWhiteboardSheets } from '../../../hooks/useSelectedPr
 import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
 import { WhiteboardSheet } from '../../../validators';
 import { useSelectedProject } from '../../ProjectPage/ProjectContext';
+import { ToolbarButton } from './Toolbar';
 
 export const SheetPicker = () => {
 	const sheet = useSelectedWhiteboardSheet();
@@ -22,9 +23,15 @@ export const SheetPicker = () => {
 	const [editing, setEditing] = useState<string | null>(null);
 	return (
 		<>
-			<Button ref={setAnchorEl} variant='outlined' onClick={() => setIsOpen(true)}>
+			<ToolbarButton
+				ref={setAnchorEl}
+				active={isOpen}
+				aria-haspopup='menu'
+				aria-expanded={isOpen}
+				onClick={() => setIsOpen(true)}
+			>
 				{sheet?.name}
-			</Button>
+			</ToolbarButton>
 			<EdsProvider density='compact'>
 				<Menu
 					anchorEl={anchorEl}

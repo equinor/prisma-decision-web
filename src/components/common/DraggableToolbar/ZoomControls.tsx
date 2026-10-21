@@ -1,20 +1,21 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
 import { zoom_in, zoom_out, fullscreen } from '@equinor/eds-icons';
 import { useReactFlow } from '@xyflow/react';
+import { ToolbarButton, ToolbarGroup } from './Toolbar';
 
 export const ZoomControls = () => {
 	const { zoomIn, zoomOut, fitView } = useReactFlow();
 	return (
-		<div className='flex gap-2'>
-			<Button className='px-1.5!' onClick={() => zoomIn()} variant='outlined'>
+		<ToolbarGroup aria-label='Viewport controls'>
+			<ToolbarButton icon tooltip='Zoom in' onClick={() => zoomIn()}>
 				<Icon data={zoom_in} />
-			</Button>
-			<Button className='px-1.5!' onClick={() => zoomOut()} variant='outlined'>
+			</ToolbarButton>
+			<ToolbarButton icon tooltip='Zoom out' onClick={() => zoomOut()}>
 				<Icon data={zoom_out} />
-			</Button>
-			<Button className='px-1.5!' onClick={() => fitView()} variant='outlined'>
+			</ToolbarButton>
+			<ToolbarButton icon tooltip='Fit view' onClick={() => fitView()}>
 				<Icon data={fullscreen} />
-			</Button>
-		</div>
+			</ToolbarButton>
+		</ToolbarGroup>
 	);
 };
