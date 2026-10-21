@@ -64,7 +64,7 @@ export const BottomNavigation = () => {
 	return (
 		<>
 			{!back.invisible && (
-				<div className='bg-background-default shadow-tile fixed! bottom-6 left-26 rounded-md p-2 **:capitalize!'>
+				<div className='bg-background-default shadow-tile fixed! bottom-6 left-26 z-50 rounded-md p-2 **:capitalize!'>
 					<Button variant='outlined' onClick={() => navigate(back.to)}>
 						<Icon data={arrow_back} />
 						{back.label}
@@ -72,7 +72,7 @@ export const BottomNavigation = () => {
 				</div>
 			)}
 			{!next.invisible && (
-				<div className='bg-background-default shadow-tile fixed! right-6 bottom-6 rounded-md p-2'>
+				<div className='bg-background-default shadow-tile fixed! right-6 bottom-6 z-50 rounded-md p-2'>
 					<Button variant='outlined' onClick={() => navigate(next.to)}>
 						{next.label}
 						<Icon data={arrow_forward} />

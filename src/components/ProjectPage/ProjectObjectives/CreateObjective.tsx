@@ -1,12 +1,15 @@
 import { Button, Icon, CircularProgress, Popover } from '@equinor/eds-core-react';
 import { add, close } from '@equinor/eds-icons';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
+import { useObjectiveLinkSelection } from '../../../hooks/useObjectiveLinkSelection';
 import { useRef, useState } from 'react';
 import { ObjectiveFormFields } from './ObjectiveFormFields';
+import { ObjectiveLinkFields } from './ObjectiveLinkFields';
 
 export const CreateObjective = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const referenceElement = useRef<HTMLButtonElement>(null);
+	const linkSelection = useObjectiveLinkSelection();
 
 	const {
 		register,
@@ -16,13 +19,17 @@ export const CreateObjective = () => {
 		control,
 	} = useObjectiveForm({
 		onSuccess: () => setIsOpen(false),
+		onValidSubmit: linkSelection.save,
 	});
 	return (
 		<>
 			<Button
 				ref={referenceElement}
 				variant='outlined'
-				onClick={() => setIsOpen(prev => !prev)}
+				onClick={() => {
+					if (!isOpen) linkSelection.reset();
+					setIsOpen(prev => !prev);
+				}}
 			>
 				<Icon data={add} />
 				Create Objective
@@ -54,6 +61,11 @@ export const CreateObjective = () => {
 							register={register}
 							errors={errors}
 							control={control}
+						/>
+						<ObjectiveLinkFields
+							control={control}
+							selection={linkSelection.selection}
+							onChange={linkSelection.setSelection}
 						/>
 
 						<Button

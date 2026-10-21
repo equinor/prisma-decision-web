@@ -21,7 +21,8 @@ export const ProjectPage = () => {
 
 	return (
 		<ProjectContext value={selectedProject}>
-			<div className='mx-auto w-[min(2400px,90%)]'>
+			{/* Bottom padding keeps content scrollable clear of the floating step navigation */}
+			<div className='mx-auto w-[min(2400px,90%)] pb-14'>
 				<Outlet />
 			</div>
 			<BottomNavigation />

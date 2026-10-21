@@ -6,7 +6,7 @@ import { useUpdateObjective } from './api/useUpdateObjective';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
-export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs) => {
+export const useObjectiveForm = ({ objective, onSuccess, onValidSubmit }: UseObjectiveFormArgs) => {
 	const selectedProject = useSelectedProject();
 
 	const defaultValues = useMemo(
@@ -32,6 +32,7 @@ export const useObjectiveForm = ({ objective, onSuccess }: UseObjectiveFormArgs)
 
 	const handleSubmit = formMethods.handleSubmit(
 		data => {
+			onValidSubmit?.(data);
 			const mutationFn = objective ? updateObjective : createObjective;
 			return mutationFn({
 				...data,
@@ -62,4 +63,5 @@ const getDefaultValues = (projectId: string): Objective => ({
 type UseObjectiveFormArgs = {
 	objective?: Objective;
 	onSuccess?: () => void;
+	onValidSubmit?: (data: Objective) => void;
 };

@@ -2,14 +2,18 @@ import { Button, Dialog, CircularProgress, DialogContent, Icon } from '@equinor/
 import { useState } from 'react';
 import { Objective } from '../../../validators';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
+import { useObjectiveLinkSelection } from '../../../hooks/useObjectiveLinkSelection';
 import { close, edit } from '@equinor/eds-icons';
 import { ObjectiveFormFields } from './ObjectiveFormFields';
+import { ObjectiveLinkFields } from './ObjectiveLinkFields';
 
 export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const linkSelection = useObjectiveLinkSelection(objective.id);
 	const formMethods = useObjectiveForm({
 		objective,
 		onSuccess: () => setIsOpen(false),
+		onValidSubmit: linkSelection.save,
 	});
 	const {
 		register,
@@ -21,7 +25,13 @@ export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 
 	return (
 		<>
-			<Button variant='ghost_icon' onClick={() => setIsOpen(true)}>
+			<Button
+				variant='ghost_icon'
+				onClick={() => {
+					linkSelection.reset();
+					setIsOpen(true);
+				}}
+			>
 				<Icon data={edit} />
 			</Button>
 			{isOpen && (
@@ -50,6 +60,11 @@ export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 								register={register}
 								errors={errors}
 								control={control}
+							/>
+							<ObjectiveLinkFields
+								control={control}
+								selection={linkSelection.selection}
+								onChange={linkSelection.setSelection}
 							/>
 							<Button
 								className='w-max justify-self-end'
