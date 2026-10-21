@@ -6,12 +6,9 @@ import { useDecisionTree } from '../../../hooks/useDecisionTree';
 import { expandedDecisionTreeNodes } from '../../../hooks/useExpandedTreeNodes';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { InvalidDiagramDialog } from '../../common/DecisionTree/InvalidDiagramDialog';
+import { DraggableToolbar } from '../../common/DraggableToolbar/DraggableToolbar';
 import { useSelectedProject } from '../ProjectContext';
-import {
-	ToolBar,
-	ToolbarDragDropProvider,
-	ToolbarSeparator,
-} from '../../common/DraggableToolbar/Toolbar';
+import { ToolbarGroup, ToolbarSeparator } from '../../common/DraggableToolbar/Toolbar';
 import { ZoomControls } from '../../common/DraggableToolbar/ZoomControls';
 import { BarMetrics } from '../InfluenceDiagram/InfluenceDiagramToolbar';
 import { ExpandAllDecisionTreeNodes } from './ExpandAllDecisionTreeNodes';
@@ -38,14 +35,16 @@ export const DecisionTree = () => {
 			>
 				{hasValidationError && <InvalidDiagramDialog />}
 				<Background />
-				<ToolbarDragDropProvider>
-					<ToolBar>
+				<DraggableToolbar aria-label='Decision tree toolbar'>
+					<ToolbarGroup aria-label='Decision tree controls'>
 						<ZoomControls />
 						<ExpandAllDecisionTreeNodes nodes={nodes} />
-						<ToolbarSeparator />
+					</ToolbarGroup>
+					<ToolbarSeparator />
+					<ToolbarGroup aria-label='Expected value metrics'>
 						<BarMetrics />
-					</ToolBar>
-				</ToolbarDragDropProvider>
+					</ToolbarGroup>
+				</DraggableToolbar>
 			</ReactFlow>
 		</div>
 	);

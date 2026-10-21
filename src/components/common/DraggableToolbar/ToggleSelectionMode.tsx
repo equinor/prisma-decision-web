@@ -1,7 +1,8 @@
-import { Button } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
+import { select_all } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
-import { DragToSelectIcon } from '../DragToSelectIcon';
+import { ToolbarToolButton } from './Toolbar';
 
 export const ToggleSelectionMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
@@ -10,14 +11,8 @@ export const ToggleSelectionMode = () => {
 		setActiveToolbar(checked ? 'pan' : 'selection');
 	};
 	return (
-		<Button.Toggle
-			onChange={onChange}
-			selectedIndexes={checked ? [0] : []}
-			title='Toggle selection mode'
-		>
-			<Button className='px-1.5!'>
-				<DragToSelectIcon />
-			</Button>
-		</Button.Toggle>
+		<ToolbarToolButton icon selected={checked} tooltip='Selection mode' onClick={onChange}>
+			<Icon data={select_all} />
+		</ToolbarToolButton>
 	);
 };
