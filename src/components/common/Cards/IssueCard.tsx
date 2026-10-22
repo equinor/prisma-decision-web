@@ -215,11 +215,9 @@ export const IssueCardExpandableContent = ({ expandedProp }: { expandedProp?: bo
 export const IssueCardStates = ({
 	children,
 	expandedProp,
-	disabledStateIds,
 }: {
 	children?: React.ReactNode;
 	expandedProp?: boolean;
-	disabledStateIds?: readonly string[];
 }) => {
 	const { issue, onClickState, selectedState, sortedStates } = useIssueCardContext();
 	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
@@ -233,19 +231,15 @@ export const IssueCardStates = ({
 				{hasOptions && (
 					<ul className='flex flex-col gap-2 rounded-sm text-sm'>
 						{sortedStates.map(option => {
-							const disabled =
-								disabledStateIds?.includes(option.id) &&
-								option.id !== selectedState?.id;
 							return (
 								<IssueCardState
-									onClick={() => !disabled && onClickState?.(option)}
+									onClick={() => onClickState?.(option)}
 									key={option.id}
 									className={cn(
 										'bg-background-light pointer-events-auto flex justify-between rounded-sm px-2 py-1',
 										{
 											'hover:bg-primary-hover-alt cursor-pointer':
-												onClickState && !disabled,
-											'cursor-not-allowed opacity-50': disabled,
+												onClickState,
 											'outline-primary-resting outline-2':
 												option.id === selectedState?.id,
 										},
