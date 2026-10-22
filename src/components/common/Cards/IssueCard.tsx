@@ -1,4 +1,4 @@
-import { EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { Menu } from '@equinor/eds-core-react';
 import { Button as BetaButton, Icon as BetaIcon } from '@equinor/eds-core-react/next';
 import {
 	chevron_down,
@@ -12,12 +12,13 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/r
 import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { useIssueClassification } from '../../../hooks/useIssueClassification';
-import { percentageIcon, utilityIcon } from '../../../icons';
+import { percentageIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { Issue, Option, Outcome } from '../../../validators';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
 import { EditIssueModal } from '../EditIssueModal';
+import { IssueTypeIcon } from '../IssueTypeIcon';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
 import { DecisionTypeLabel } from './DecisionTypeLabel';
@@ -42,6 +43,7 @@ export const IssueCard = ({
 	issue,
 	onClickState,
 	selectedState,
+	className,
 	...rest
 }: IssueCardProps) => {
 	const [editOpen, setEditOpen] = useState(false);
@@ -50,12 +52,19 @@ export const IssueCard = ({
 	const sortedStates =
 		issue.type === 'Uncertainty'
 			? sortByCreatedAt(issue.uncertainty.outcomes)
-			: sortByCreatedAt(issue.decision.options);
+			: issue.type === 'Decision'
+				? sortByCreatedAt(issue.decision.options)
+				: [];
 	return (
 		<IssueCardContext
 			value={{ issue, sortedStates, setEditOpen, setDeleteOpen, onClickState, selectedState }}
 		>
-			<CardContainer {...rest} {...pointerInteraction} issueType={issue.type}>
+			<CardContainer
+				{...rest}
+				{...pointerInteraction}
+				className={cn('gap-0', className)}
+				issueType={issue.type}
+			>
 				{children}
 			</CardContainer>
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
@@ -101,7 +110,7 @@ export const IssueCardEditMenuItem = () => {
 	const { setEditOpen } = useIssueCardContext();
 	return (
 		<Menu.Item onClick={() => setEditOpen(true)}>
-			<Icon data={edit} />
+			<BetaIcon data={edit} size='md' className='size-5!' />
 			<p>Edit</p>
 		</Menu.Item>
 	);
@@ -111,7 +120,7 @@ export const IssueCardDeleteMenuItem = () => {
 	const { setDeleteOpen } = useIssueCardContext();
 	return (
 		<Menu.Item onClick={() => setDeleteOpen(true)}>
-			<Icon data={delete_to_trash} />
+			<BetaIcon data={delete_to_trash} size='md' className='size-5!' />
 			<p>Delete</p>
 		</Menu.Item>
 	);
@@ -126,7 +135,7 @@ export const IssueCardProbabilityTableMenuItem = ({
 }) => {
 	return (
 		<Menu.Item onClick={onClick} disabled={disabled}>
-			<Icon data={percentageIcon} className='ml-1' />
+			<BetaIcon data={percentageIcon} size='md' className='ml-1 size-5!' />
 			<p>Probabilities</p>
 		</Menu.Item>
 	);
@@ -141,7 +150,7 @@ export const IssueCardUtilityTableMenuItem = ({
 }) => {
 	return (
 		<Menu.Item onClick={onClick} disabled={disabled}>
-			<Icon data={utilityIcon} className='ml-1' />
+			<IssueTypeIcon type='Utility' />
 			<p>Utility Table</p>
 		</Menu.Item>
 	);
@@ -156,7 +165,7 @@ export const IssueCardPolicyTableMenuItem = ({
 }) => {
 	return (
 		<Menu.Item onClick={onClick} disabled={disabled}>
-			<Icon data={functions} />
+			<BetaIcon data={functions} size='md' className='size-5!' />
 			<p>Policy Table</p>
 		</Menu.Item>
 	);
@@ -174,7 +183,7 @@ export const IssueCardHeader = ({
 		useIssueClassification(issue);
 	return (
 		<div className='flex items-center justify-between'>
-			<div className='flex gap-1'>
+			<div className='flex min-w-0 flex-1 flex-wrap items-start gap-1 py-1.5'>
 				<IssueTypeLabel type={issue.type} onChange={editable ? changeType : undefined} />
 				<BoundaryLabel
 					boundary={issue.boundary}
@@ -198,12 +207,25 @@ export const IssueCardHeader = ({
 	);
 };
 
-export const IssueCardContent = ({ descriptionClassName }: { descriptionClassName?: string }) => {
+export const IssueCardContent = ({
+	descriptionClassName,
+	nameClassName,
+}: {
+	descriptionClassName?: string;
+	nameClassName?: string;
+}) => {
 	const { issue } = useIssueCardContext();
 	return (
-		<div>
-			<h3 className='font-semibold '>{issue.name}</h3>
-			<p className={cn('text-text-tertiary line-clamp-1 text-sm', descriptionClassName)}>
+		<div className='pb-1'>
+			<h3 className={cn('text-text-default text-base leading-6 font-bold', nameClassName)}>
+				{issue.name}
+			</h3>
+			<p
+				className={cn(
+					'text-text-tertiary line-clamp-1 text-sm leading-5',
+					descriptionClassName,
+				)}
+			>
 				{issue.description}
 			</p>
 		</div>
@@ -215,10 +237,10 @@ export const IssueCardExpandableContent = ({ expandedProp }: { expandedProp?: bo
 	const { expanded: _expanded } = useExpandCard(issue.id);
 	const expanded = expandedProp ?? _expanded;
 	return (
-		<div>
-			<h3 className='font-semibold '>{issue.name}</h3>
+		<div className='pb-1'>
+			<h3 className='text-text-default text-base leading-6 font-bold'>{issue.name}</h3>
 			<p
-				className={cn('text-text-tertiary line-clamp-1 text-sm', {
+				className={cn('text-text-tertiary line-clamp-1 text-sm leading-5', {
 					'line-clamp-none': expanded,
 				})}
 			>
@@ -239,13 +261,15 @@ export const IssueCardStates = ({
 	const { expanded: _expanded, toggle } = useExpandCard(issue.id);
 	const expanded = expandedProp ?? _expanded;
 
+	if (issue.type !== 'Decision' && issue.type !== 'Uncertainty') return null;
+
 	const hasOptions = sortedStates.length > 0;
 
 	return (
-		<Collapsible open={expanded} onOpenChange={toggle} className=''>
-			<CollapsibleContent className='mb-2 w-full' asChild>
+		<Collapsible open={expanded} onOpenChange={toggle} className='flex flex-1 flex-col'>
+			<CollapsibleContent className='mb-2 w-full pt-2' asChild>
 				{hasOptions && (
-					<ul className='flex flex-col gap-2 rounded-sm text-sm'>
+					<ul className='flex flex-col gap-2 rounded-sm text-sm leading-5'>
 						{sortedStates.map(option => {
 							return (
 								<IssueCardState
@@ -298,20 +322,21 @@ export const IssueCardState = ({
 export const IssueCardExpandTrigger = () => {
 	const { issue, sortedStates } = useIssueCardContext();
 	const { expanded } = useExpandCard(issue.id);
+	if (issue.type !== 'Decision' && issue.type !== 'Uncertainty') return null;
 	return (
-		<EdsProvider density='compact'>
-			<CollapsibleTrigger asChild>
-				<button
-					data-card-action
-					className='pointer-events-auto ml-auto flex cursor-pointer items-center gap-2'
-				>
-					<p className='text-text-tertiary text-sm'>{sortedStates.length} States</p>
-					<Icon
-						className='fill-primary-resting'
-						data={expanded ? chevron_up : chevron_down}
-					/>
-				</button>
-			</CollapsibleTrigger>
-		</EdsProvider>
+		<CollapsibleTrigger asChild>
+			<BetaButton
+				variant='ghost'
+				size='small'
+				data-card-action
+				className='text-text-tertiary! pointer-events-auto mt-auto self-end px-1.5!'
+			>
+				{sortedStates.length} States
+				<BetaIcon
+					className='text-primary-resting'
+					data={expanded ? chevron_up : chevron_down}
+				/>
+			</BetaButton>
+		</CollapsibleTrigger>
 	);
 };

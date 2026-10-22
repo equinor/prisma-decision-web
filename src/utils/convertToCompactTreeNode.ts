@@ -4,8 +4,8 @@ export const convertToCompactTreeNode = (issues: Issue[]) => {
 	return issues.map((issue, index) => ({
 		id: issue?.id,
 		type: 'treeNode',
-		height: 80,
-		width: 250,
+		height: 100,
+		width: 350,
 		position: {
 			x: index * 500,
 			y: 100,
