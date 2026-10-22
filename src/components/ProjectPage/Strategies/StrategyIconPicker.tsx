@@ -4,8 +4,9 @@ import { useController, useFormContext, useWatch } from 'react-hook-form';
 import { Strategy } from '../../../validators';
 import { strategyIconKeys, strategyIcons } from './icons';
 import { useSelectedProjectStrategies } from '../../../hooks/useSelectedProjectStrategies';
+import { cn } from '../../../utils/cn';
 
-export const StrategyIconPicker = () => {
+export const StrategyIconPicker = ({ className }: { className?: string }) => {
 	const referenceElement = useRef<HTMLButtonElement>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const { selectedStrategies } = useSelectedProjectStrategies();
@@ -25,9 +26,10 @@ export const StrategyIconPicker = () => {
 			<Tooltip title='Select strategy icon'>
 				<Button
 					ref={referenceElement}
+					aria-label='Strategy icon'
 					onClick={() => setIsOpen(prev => !prev)}
 					variant='outlined'
-					className='mt-4! size-9!'
+					className={cn('mt-4! size-9!', className)}
 				>
 					<Icon data={strategyIcons[icon]} color={iconColor} />
 				</Button>
@@ -47,6 +49,7 @@ export const StrategyIconPicker = () => {
 							.map(iconKey => (
 								<Button
 									key={iconKey}
+									aria-label={`Use ${iconKey} icon`}
 									variant='ghost'
 									className='size-10!'
 									onClick={() => {
