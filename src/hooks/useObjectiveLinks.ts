@@ -56,6 +56,10 @@ export const useObjectiveLinks = () => {
 		setLinks(links.filter(link => link.id !== linkId));
 	};
 
+	const restoreLinks = (restored: ObjectiveLink[]) => {
+		setLinks([...links, ...restored.filter(link => !links.some(({ id }) => id === link.id))]);
+	};
+
 	// Replaces all links of one objective, keeping the ids of links that stay
 	const setLinksFor = (objectiveId: string, parentIds: string[], childIds: string[]) => {
 		const linkBetween = (parentId: string, childId: string) =>
@@ -73,5 +77,5 @@ export const useObjectiveLinks = () => {
 		]);
 	};
 
-	return { links, addLink, removeLink, setLinksFor };
+	return { links, addLink, removeLink, setLinksFor, restoreLinks };
 };

@@ -1,5 +1,5 @@
 import { Button, Dialog, CircularProgress, DialogContent, Icon } from '@equinor/eds-core-react';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Objective } from '../../../validators';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
 import { useObjectiveLinkSelection } from '../../../hooks/useObjectiveLinkSelection';
@@ -7,7 +7,7 @@ import { close, edit } from '@equinor/eds-icons';
 import { ObjectiveFormFields } from './ObjectiveFormFields';
 import { ObjectiveLinkFields } from './ObjectiveLinkFields';
 
-export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
+export const EditObjectiveDialog = ({ objective, trigger }: EditObjectiveProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const linkSelection = useObjectiveLinkSelection(objective.id);
 	const formMethods = useObjectiveForm({
@@ -22,18 +22,20 @@ export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 		formState: { errors },
 		control,
 	} = formMethods;
+	const open = () => {
+		linkSelection.reset();
+		setIsOpen(true);
+	};
 
 	return (
 		<>
-			<Button
-				variant='ghost_icon'
-				onClick={() => {
-					linkSelection.reset();
-					setIsOpen(true);
-				}}
-			>
-				<Icon data={edit} />
-			</Button>
+			{trigger ? (
+				trigger(open)
+			) : (
+				<Button variant='ghost_icon' onClick={open}>
+					<Icon data={edit} />
+				</Button>
+			)}
 			{isOpen && (
 				<Dialog
 					data-no-dnd
@@ -83,4 +85,5 @@ export const EditObjectiveDialog = ({ objective }: EditObjectiveProps) => {
 
 type EditObjectiveProps = {
 	objective: Objective;
+	trigger?: (open: () => void) => ReactNode;
 };

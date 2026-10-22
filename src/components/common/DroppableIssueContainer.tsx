@@ -1,16 +1,16 @@
 import { CollisionPriority } from '@dnd-kit/abstract';
 import { useDroppable } from '@dnd-kit/react';
-import { issueTypes, IssueType } from '../../validators';
 
 export const DroppableIssueContainer = ({
-	issueType,
+	columnId,
+	accept,
 	children,
 	className,
 }: DroppableIssueContainerProps) => {
 	const { ref } = useDroppable({
-		id: issueType,
+		id: columnId,
 		type: 'column',
-		accept: [...issueTypes],
+		accept,
 		collisionPriority: CollisionPriority.Low,
 	});
 	return (
@@ -20,7 +20,8 @@ export const DroppableIssueContainer = ({
 	);
 };
 type DroppableIssueContainerProps = {
-	issueType: IssueType;
+	columnId: string;
+	accept: string[];
 	children: React.ReactNode;
 	className?: string;
 };

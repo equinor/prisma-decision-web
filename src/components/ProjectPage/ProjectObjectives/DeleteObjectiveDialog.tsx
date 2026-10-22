@@ -1,22 +1,26 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { delete_to_trash } from '@equinor/eds-icons';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { useDeleteObjective } from '../../../hooks/api/useDeleteObjective';
 import { Objective } from '../../../validators';
 
-export const DeleteObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
+export const DeleteObjectiveDialog = ({ objective, trigger }: DeleteObjectiveProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { mutate: deleteObjective } = useDeleteObjective();
 	return (
 		<>
-			<Button
-				variant='ghost_icon'
-				onPointerDown={() => {
-					setIsOpen(true);
-				}}
-			>
-				<Icon data={delete_to_trash} />
-			</Button>
+			{trigger ? (
+				trigger(() => setIsOpen(true))
+			) : (
+				<Button
+					variant='ghost_icon'
+					onPointerDown={() => {
+						setIsOpen(true);
+					}}
+				>
+					<Icon data={delete_to_trash} />
+				</Button>
+			)}
 			{isOpen && (
 				<Dialog
 					open
@@ -53,4 +57,5 @@ export const DeleteObjectiveDialog = ({ objective }: DeleteObjectiveProps) => {
 
 type DeleteObjectiveProps = {
 	objective: Objective;
+	trigger?: (open: () => void) => ReactNode;
 };

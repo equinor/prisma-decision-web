@@ -1,6 +1,5 @@
 import { cn } from '../../../../utils/cn';
-import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
-import { Issue, IssueType } from '../../../../validators';
+import { Issue } from '../../../../validators';
 import {
 	IssueCard,
 	IssueCardDeleteMenuItem,
@@ -13,22 +12,21 @@ import {
 } from '../../../common/Cards/IssueCard';
 import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
+import { BoardColumn } from './boardColumns';
 
-export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps) => {
+export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) => {
 	return (
 		<div className='flex min-w-64.25 basis-full flex-col gap-2'>
 			<div className='flex items-center justify-between'>
-				<h3 className='font-medium'>{label}</h3>
+				<h3 className='font-medium'>{column.label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
 					{issues.length}
 				</span>
 			</div>
 			<DroppableIssueContainer
-				issueType={issueType}
-				className={cn(
-					'flex h-full flex-col gap-2 rounded-sm p-2',
-					getIssueColumnColor(issueType),
-				)}
+				columnId={column.id}
+				accept={accept}
+				className={cn('flex h-full flex-col gap-2 rounded-sm p-2', column.className)}
 			>
 				{issues.map((issue, index) => {
 					return (
@@ -36,7 +34,8 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 							key={issue.id}
 							issue={issue}
 							index={index}
-							type={issueType}
+							columnId={column.id}
+							accept={accept}
 						>
 							<IssueCard issue={issue}>
 								<IssueCardHeader>
@@ -59,7 +58,7 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 };
 
 type IssueColumnProps = {
-	issueType: Exclude<IssueType, 'Utility'>;
+	column: BoardColumn;
+	accept: string[];
 	issues: Issue[];
-	label: string;
 };

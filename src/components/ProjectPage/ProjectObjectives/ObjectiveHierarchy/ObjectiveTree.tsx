@@ -234,7 +234,7 @@ const TreeNodeCard = ({
 			`bg-background-default absolute top-0 z-20 flex items-center gap-2 rounded-sm
 			border-2 border-transparent py-1.5 pr-2.5 pl-1.5
 			shadow-[0px_2px_2px_rgba(0,0,0,0.14),0px_3px_2px_rgba(0,0,0,0.12)]`,
-			{ 'border-diagram-connector bg-[#eaf8fa]': highlighted },
+			{ 'border-diagram-connector bg-accent-canvas': highlighted },
 		)}
 		style={{ left, width: nodeWidth }}
 	>

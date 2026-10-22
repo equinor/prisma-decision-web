@@ -1,4 +1,4 @@
-import { Icon } from '@equinor/eds-core-react';
+import { Button, Icon, Snackbar } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
 import {
 	PointerEvent,
@@ -12,10 +12,12 @@ import {
 import {
 	childObjectiveType,
 	filterValidLinks,
+	ObjectiveLink,
 	objectiveTypeLabel,
 	parentObjectiveType,
 	useObjectiveLinks,
 } from '../../../../hooks/useObjectiveLinks';
+import { useUpdateObjective } from '../../../../hooks/api/useUpdateObjective';
 import { useSelectedProjectObjectives } from '../../../../hooks/useSelectedProjectObjectives';
 import { useTweenedValues } from '../../../../hooks/useTweenedValues';
 import {
@@ -29,11 +31,13 @@ import {
 	layoutObjectiveHierarchy,
 } from '../../../../utils/layoutObjectiveHierarchy';
 import { orderObjectivesByLinks } from '../../../../utils/orderObjectivesByLinks';
+import { cn } from '../../../../utils/cn';
 import { Objective, ObjectiveType } from '../../../../validators';
 import { ConnectorDirection, ObjectiveCard, ObjectiveCardState } from './ObjectiveCard';
 import { ObjectiveLinkEdges } from './ObjectiveLinkEdges';
 import { LinkedObjective, ObjectiveLinksPanel } from './ObjectiveLinksPanel';
 import { ComposerLocation, ObjectiveQuickAdd } from './ObjectiveQuickAdd';
+import { ObjectiveTypeBadge } from './ObjectiveTypeBadge';
 
 const columnTypes: ObjectiveType[] = ['Strategic', 'Fundamental', 'Mean'];
 
@@ -45,6 +49,18 @@ type PendingConnection = {
 	targetId: string | null;
 };
 type ColumnBox = { x: number; y: number; width: number };
+type PendingMove = {
+	objective: Objective;
+	pointer: Point;
+	// Where the card was grabbed, so the preview doesn't jump under the pointer
+	grab: Point;
+	targetType: ObjectiveType | null;
+};
+type Reclassification = {
+	objective: Objective;
+	type: ObjectiveType;
+	removedLinks: ObjectiveLink[];
+};
 
 const dragThreshold = 4;
 
@@ -52,7 +68,14 @@ const sameJson = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringif
 
 export const ObjectiveHierarchy = () => {
 	const { selectedObjectives: objectives } = useSelectedProjectObjectives();
-	const { links: storedLinks, addLink, removeLink } = useObjectiveLinks();
+	const {
+		links: storedLinks,
+		addLink,
+		removeLink,
+		setLinksFor,
+		restoreLinks,
+	} = useObjectiveLinks();
+	const { mutate: updateObjective } = useUpdateObjective();
 	const boardRef = useRef<HTMLDivElement>(null);
 	const [sizes, setSizes] = useState<Record<string, CardSize>>({});
 	const [columnBoxes, setColumnBoxes] = useState<Partial<Record<ObjectiveType, ColumnBox>>>({});
@@ -60,6 +83,9 @@ export const ObjectiveHierarchy = () => {
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
 	const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
 	const [connection, setConnection] = useState<PendingConnection | null>(null);
+	const [move, setMove] = useState<PendingMove | null>(null);
+	const [lastReclassification, setLastReclassification] = useState<Reclassification | null>(null);
+	const justDragged = useRef(false);
 	const [composer, setComposer] = useState<ComposerLocation | null>(null);
 	const [highlightedIds, setHighlightedIds] = useState<string[]>([]);
 	const highlightTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -345,6 +371,90 @@ export const ObjectiveHierarchy = () => {
 		window.addEventListener('pointercancel', onCancel);
 	};
 
+	// A new level makes all of the objective's links invalid, so they are removed (undoable)
+	const reclassify = (objective: Objective, type: ObjectiveType) => {
+		const removedLinks = storedLinks.filter(
+			link => link.parent_id === objective.id || link.child_id === objective.id,
+		);
+		updateObjective({ ...objective, type });
+		setExpandedId(null);
+		if (removedLinks.length === 0) return;
+		setLinksFor(objective.id, [], []);
+		setLastReclassification({ objective, type, removedLinks });
+	};
+
+	const undoReclassification = () => {
+		if (!lastReclassification) return;
+		updateObjective(lastReclassification.objective);
+		restoreLinks(lastReclassification.removedLinks);
+		setLastReclassification(null);
+	};
+
+	// Nearest column to the pointer, so drops in the gaps between columns still count
+	const columnAt = (x: number) => {
+		let nearest: ObjectiveType | null = null;
+		let nearestDistance = Infinity;
+		columnTypes.forEach(type => {
+			const box = columnBoxes[type];
+			if (!box) return;
+			const distance = Math.max(box.x - x, 0, x - (box.x + box.width));
+			if (distance < nearestDistance) {
+				nearest = type;
+				nearestDistance = distance;
+			}
+		});
+		return nearest;
+	};
+
+	const startMove = (objective: Objective, event: PointerEvent) => {
+		if (event.button !== 0) return;
+		event.preventDefault();
+		const start = { x: event.clientX, y: event.clientY };
+		const card = (event.currentTarget as HTMLElement)
+			.closest('[data-objective-id]')!
+			.getBoundingClientRect();
+		const grab = { x: event.clientX - card.left, y: event.clientY - card.top };
+		let dragging = false;
+
+		const toBoard = (pointerEvent: globalThis.PointerEvent) => {
+			const origin = boardRef.current?.getBoundingClientRect();
+			return {
+				x: pointerEvent.clientX - (origin?.left ?? 0),
+				y: pointerEvent.clientY - (origin?.top ?? 0),
+			};
+		};
+		const cleanup = () => {
+			window.removeEventListener('pointermove', onMove);
+			window.removeEventListener('pointerup', onUp);
+			window.removeEventListener('pointercancel', onCancel);
+			setMove(null);
+		};
+		const onMove = (pointerEvent: globalThis.PointerEvent) => {
+			const distance = Math.hypot(
+				pointerEvent.clientX - start.x,
+				pointerEvent.clientY - start.y,
+			);
+			if (!dragging && distance < dragThreshold) return;
+			dragging = true;
+			const pointer = toBoard(pointerEvent);
+			setMove({ objective, pointer, grab, targetType: columnAt(pointer.x) });
+		};
+		const onUp = (pointerEvent: globalThis.PointerEvent) => {
+			cleanup();
+			if (!dragging) return;
+			// The click that follows the drop must not toggle the card
+			justDragged.current = true;
+			setTimeout(() => (justDragged.current = false));
+			const targetType = columnAt(toBoard(pointerEvent).x);
+			if (targetType && targetType !== objective.type) reclassify(objective, targetType);
+		};
+		const onCancel = () => cleanup();
+
+		window.addEventListener('pointermove', onMove);
+		window.addEventListener('pointerup', onUp);
+		window.addEventListener('pointercancel', onCancel);
+	};
+
 	const cardState = (objective: Objective): ObjectiveCardState => {
 		if (connection) {
 			if (connection.targetId === objective.id) return 'dropHover';
@@ -418,8 +528,15 @@ export const ObjectiveHierarchy = () => {
 								</span>
 							</div>
 							<div
-								className='flex flex-1 flex-col items-start gap-4 rounded-sm
-									bg-[rgba(209,213,220,0.25)] px-7 py-4'
+								className={cn(
+									`flex flex-1 flex-col items-start gap-4 rounded-sm
+									bg-[rgba(209,213,220,0.25)] px-7 py-4 outline-2 outline-transparent`,
+									{
+										'bg-accent-canvas outline-accent-border outline-dashed':
+											move?.targetType === type &&
+											move.objective.type !== type,
+									},
+								)}
 							>
 								{/* Always rendered so the card areas start at the same height in every column */}
 								<ObjectiveQuickAdd {...quickAddProps} position='top' />
@@ -443,6 +560,7 @@ export const ObjectiveHierarchy = () => {
 												expanded={expandedId === objective.id}
 												parentCount={parentCount(objective.id)}
 												connecting={connection !== null}
+												isDragSource={move?.objective.id === objective.id}
 												activeConnector={
 													connection?.sourceId === objective.id
 														? connection.direction
@@ -475,6 +593,7 @@ export const ObjectiveHierarchy = () => {
 													/>
 												}
 												onToggleExpanded={() => {
+													if (justDragged.current) return;
 													setSelectedLinkId(null);
 													setExpandedId(current =>
 														current === objective.id
@@ -482,6 +601,9 @@ export const ObjectiveHierarchy = () => {
 															: objective.id,
 													);
 												}}
+												onDragHandlePointerDown={event =>
+													startMove(objective, event)
+												}
 												onConnectorPointerDown={(
 													event,
 													direction,
@@ -556,7 +678,48 @@ export const ObjectiveHierarchy = () => {
 						<Icon data={close} size={16} className='fill-diagram-connector' />
 					</button>
 				)}
+				{move && (
+					<div
+						className='bg-background-default border-diagram-connector shadow-raised
+							pointer-events-none absolute z-50 flex rotate-1 items-center gap-2 rounded-sm
+							border-2 py-1.5 pr-2.5 pl-1.5'
+						style={{
+							left: move.pointer.x - move.grab.x,
+							top: move.pointer.y - move.grab.y,
+							width: columnBoxes[move.objective.type]?.width,
+						}}
+					>
+						<ObjectiveTypeBadge type={move.targetType ?? move.objective.type} />
+						<p className='min-w-0 flex-1 text-sm leading-5 font-medium break-words'>
+							{move.objective.name}
+						</p>
+					</div>
+				)}
 			</div>
+			<Snackbar
+				open={lastReclassification !== null}
+				autoHideDuration={8000}
+				onClose={() => setLastReclassification(null)}
+				placement='bottom'
+			>
+				{lastReclassification &&
+					`"${lastReclassification.objective.name}" is now ${objectiveTypeLabel[
+						lastReclassification.type
+					].toLowerCase()}. ${lastReclassification.removedLinks.length} ${
+						lastReclassification.removedLinks.length === 1 ? 'link was' : 'links were'
+					} removed.`}
+				<Snackbar.Action>
+					<Button
+						variant='ghost'
+						onClick={event => {
+							event.stopPropagation();
+							undoReclassification();
+						}}
+					>
+						Undo
+					</Button>
+				</Snackbar.Action>
+			</Snackbar>
 		</div>
 	);
 };

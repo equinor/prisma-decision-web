@@ -12,7 +12,7 @@ import { useUpdateObjectives } from '../../../hooks/api/useUpdateObjective';
 import { Objective } from '../../../validators';
 import { ObjectiveHierarchy } from './ObjectiveHierarchy/ObjectiveHierarchy';
 import { ObjectiveTree } from './ObjectiveHierarchy/ObjectiveTree';
-import { cn } from '../../../utils/cn';
+import { SegmentedControl } from '../../common/SegmentedControl';
 
 const hierarchyLayouts = [
 	{ value: 'diagram', label: 'Diagram' },
@@ -55,27 +55,12 @@ export const ProjectObjectives = () => {
 				<div className='flex items-center gap-4'>
 					<CreateObjective />
 					{objectivesView === 'hierarchy' && (
-						<div
-							role='group'
-							aria-label='Hierarchy layout'
-							className='border-background-medium flex gap-0.5 rounded-sm border p-0.5'
-						>
-							{hierarchyLayouts.map(option => (
-								<button
-									key={option.value}
-									type='button'
-									aria-pressed={hierarchyLayout === option.value}
-									className={cn(
-										`text-primary-resting hover:bg-diagram-connector-hover cursor-pointer
-										rounded-sm px-4 py-2 text-sm font-medium`,
-										{ 'bg-[#bbdbdf]!': hierarchyLayout === option.value },
-									)}
-									onClick={() => setHierarchyLayout(option.value)}
-								>
-									{option.label}
-								</button>
-							))}
-						</div>
+						<SegmentedControl
+							label='Hierarchy layout'
+							options={hierarchyLayouts}
+							value={hierarchyLayout}
+							onChange={setHierarchyLayout}
+						/>
 					)}
 					<Button.Toggle selectedIndexes={[objectivesView === 'hierarchy' ? 1 : 0]}>
 						<Button aria-label='List view' onClick={() => setObjectivesView('list')}>

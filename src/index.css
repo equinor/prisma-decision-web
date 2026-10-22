@@ -194,6 +194,8 @@ input[type='color']::-webkit-color-swatch {
 	--color-tier-emphasis-hover: var(--tier_emphasis_hover);
 	--color-tier-border: var(--tier_border);
 	--color-tier-leader: var(--tier_leader);
+	--color-accent-canvas: var(--accent_canvas);
+	--color-accent-border: var(--accent_border);
 	--color-diagram-connector: #21767e;
 	--color-diagram-connector-hover: #cfe7e9;
 	--color-diagram-pill-hover: #d4d4d4;
@@ -376,6 +378,8 @@ html {
 	--tier_emphasis_hover: #205c62;
 	--tier_border: #bbdbdf;
 	--tier_leader: #aeaeae;
+	--accent_canvas: #eaf8fa;
+	--accent_border: #7cbac1;
 	--eds_warning_text: 157, 105, 63;
 	--eds_danger_text: 179, 13, 47;
 	--eds_primary: 0, 112, 121;
@@ -417,6 +421,8 @@ html {
 	--tier_emphasis_hover: #ace3e9;
 	--tier_border: #3c6266;
 	--tier_leader: #738696;
+	--accent_canvas: #1f3d42;
+	--accent_border: #4f8f96;
 	--eds_primary: 222, 229, 231;
 	--eds_primary_resting: 151, 202, 206;
 	--eds_primary_hover: 173, 226, 230;

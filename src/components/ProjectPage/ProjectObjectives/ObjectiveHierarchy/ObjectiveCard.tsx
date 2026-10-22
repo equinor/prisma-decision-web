@@ -20,12 +20,15 @@ type ObjectiveCardProps = {
 	expanded: boolean;
 	parentCount: number;
 	connecting: boolean;
+	isDragSource: boolean;
 	activeConnector: ConnectorDirection | null;
 	// Undefined when the objective's level has no children / parents
 	childOptions?: Objective[];
 	parentOptions?: Objective[];
 	panel: ReactNode;
 	onToggleExpanded: () => void;
+	// Dragging the title row moves the objective to another column (reclassifies it)
+	onDragHandlePointerDown: (event: PointerEvent) => void;
 	onConnectorPointerDown: (
 		event: PointerEvent,
 		direction: ConnectorDirection,
@@ -43,11 +46,13 @@ export const ObjectiveCard = ({
 	expanded,
 	parentCount,
 	connecting,
+	isDragSource,
 	activeConnector,
 	childOptions,
 	parentOptions,
 	panel,
 	onToggleExpanded,
+	onDragHandlePointerDown,
 	onConnectorPointerDown,
 	onLinkChild,
 	onLinkParent,
@@ -68,7 +73,7 @@ export const ObjectiveCard = ({
 		<div
 			data-objective-id={objective.id}
 			className={cn('group/node relative z-20 w-full cursor-pointer', {
-				'opacity-40': dimmed,
+				'opacity-40': dimmed || isDragSource,
 			})}
 			onClick={event => {
 				event.stopPropagation();
@@ -95,14 +100,23 @@ export const ObjectiveCard = ({
 					border-transparent shadow-[0px_2px_2px_rgba(0,0,0,0.14),0px_3px_2px_rgba(0,0,0,0.12)]`,
 					{
 						'border-diagram-connector': isConnectionSource || state === 'dropHover',
-						'border-dashed border-[#7cbac1] bg-[#eaf8fa]': state === 'dropCandidate',
-						'bg-[#eaf8fa]': state === 'dropHover' || highlighted,
+						'border-accent-border bg-accent-canvas border-dashed':
+							state === 'dropCandidate',
+						'bg-accent-canvas': state === 'dropHover' || highlighted,
 						'shadow-[0px_2px_4px_rgba(0,0,0,0.14),0px_3px_4px_rgba(0,0,0,0.12)]':
 							expanded,
 					},
 				)}
 			>
-				<div data-objective-anchor className='flex items-center gap-2 py-1.5 pr-2.5 pl-1.5'>
+				<div
+					data-objective-anchor
+					className='flex cursor-grab touch-none items-center gap-2 py-1.5 pr-2.5 pl-1.5'
+					onPointerDown={event => {
+						if (event.target instanceof Element && event.target.closest('button'))
+							return;
+						onDragHandlePointerDown(event);
+					}}
+				>
 					<ObjectiveTypeBadge type={objective.type} />
 					<p className='min-w-16 flex-1 text-sm leading-5 font-medium break-words'>
 						{objective.name}

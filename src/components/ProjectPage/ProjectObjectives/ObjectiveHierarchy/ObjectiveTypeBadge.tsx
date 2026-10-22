@@ -14,7 +14,7 @@ export const ObjectiveTypeBadge = ({ type }: { type: ObjectiveType }) => (
 		className={cn(
 			'flex size-6 shrink-0 items-center justify-center rounded-sm border',
 			type === 'Fundamental'
-				? 'border-[#7cbac1] bg-[#eaf8fa]'
+				? 'border-accent-border bg-accent-canvas'
 				: 'bg-background-light border-[#aeaeae]',
 		)}
 	>

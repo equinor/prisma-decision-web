@@ -1,5 +1,5 @@
 import { Button, Icon } from '@equinor/eds-core-react';
-import { link, link_off } from '@equinor/eds-icons';
+import { delete_to_trash, link, link_off } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import {
 	childObjectiveType,
@@ -7,6 +7,8 @@ import {
 	parentObjectiveType,
 } from '../../../../hooks/useObjectiveLinks';
 import { Objective, ObjectiveType } from '../../../../validators';
+import { DeleteObjectiveDialog } from '../DeleteObjectiveDialog';
+import { EditObjectiveDialog } from '../EditObjectiveDialog';
 import { ObjectivePickerMenu } from './ObjectivePickerMenu';
 import { ObjectiveTypeBadge } from './ObjectiveTypeBadge';
 
@@ -64,6 +66,25 @@ export const ObjectiveLinksPanel = ({
 					onUnlink={onUnlink}
 				/>
 			)}
+			<div className='flex items-start justify-between'>
+				<DeleteObjectiveDialog
+					objective={objective}
+					trigger={open => (
+						<Button variant='ghost' color='danger' onClick={open}>
+							<Icon data={delete_to_trash} />
+							Delete
+						</Button>
+					)}
+				/>
+				<EditObjectiveDialog
+					objective={objective}
+					trigger={open => (
+						<Button variant='outlined' onClick={open}>
+							Edit
+						</Button>
+					)}
+				/>
+			</div>
 		</div>
 	);
 };
