@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Icon, Popover } from '@equinor/eds-core-react';
+import { CircularProgress, Popover } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { add, close } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
@@ -23,7 +24,8 @@ export const CreateIssues = () => {
 		<>
 			<Button
 				ref={referenceElement}
-				variant='outlined'
+				type='button'
+				variant='secondary'
 				onClick={() => setIsOpen(prev => !prev)}
 			>
 				<Icon data={add} />
@@ -33,22 +35,26 @@ export const CreateIssues = () => {
 				open={isOpen}
 				onClose={() => setIsOpen(false)}
 				anchorEl={referenceElement.current}
+				className='[&>div:last-child]:max-w-none!'
 			>
-				<Popover.Content className='relative w-[min(543px,90vw)]'>
+				<Popover.Content className='relative w-[min(640px,90vw)]'>
 					<FormProvider {...formMethods}>
 						<form
 							onSubmit={onSubmit}
 							className='flex flex-col items-start gap-4 rounded-sm'
 						>
 							<div className='w-full pr-16'>
-								<h2 className='text-2xl font-semibold'>Create Issue</h2>
+								<h2 className='text-2xl font-bold'>Create Issue</h2>
 								<p className='text-text-tertiary'>
 									Add issues related to decisions, uncertainties, and value
 									drivers
 								</p>
 							</div>
 							<Button
-								variant='ghost_icon'
+								type='button'
+								variant='ghost'
+								icon
+								aria-label='Close Create Issue'
 								className='absolute! top-2 right-2'
 								onClick={e => {
 									e.stopPropagation();
@@ -57,10 +63,18 @@ export const CreateIssues = () => {
 							>
 								<Icon data={close} />
 							</Button>
-							<IssueFormSection />
-							{selectedType === 'Decision' && <DecisionFormSection />}
-							{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
-							<Button className='md:self-end' type='submit' disabled={isPending}>
+							<fieldset disabled={isPending} className='flex w-full flex-col gap-4'>
+								<IssueFormSection />
+								{selectedType === 'Decision' && <DecisionFormSection />}
+								{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
+							</fieldset>
+							<Button
+								className='md:self-end'
+								type='submit'
+								disabled={isPending}
+								aria-label='Add Issue'
+								aria-busy={isPending}
+							>
 								{isPending ? <CircularProgress size={16} /> : 'Add Issue'}
 							</Button>
 						</form>

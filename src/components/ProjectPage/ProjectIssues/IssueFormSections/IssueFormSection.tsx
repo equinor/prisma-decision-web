@@ -1,72 +1,83 @@
-import { Autocomplete, Textarea, TextField } from '@equinor/eds-core-react';
-import { useController } from 'react-hook-form';
+import { TextArea, TextField } from '@equinor/eds-core-react/next';
+import { useWatch } from 'react-hook-form';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
-import { ErrorMessage } from '@hookform/error-message';
 import { issueTypes } from '../../../../validators';
-import { FormErrorMessage } from '../../../common/FormErrorMessage';
+import { SegmentedSelector } from '../../../common/SegmentedSelector';
+import { IssueTypeIcon } from '../../../common/IssueTypeIcon';
+
+const issueTypeDescriptions = {
+	Unassigned: 'Not classified yet. You can set the type later.',
+	Decision: 'A choice the decision makers control.',
+	Uncertainty: 'Something that affects the outcome but cannot be controlled.',
+	Fact: 'A given that is taken as known.',
+	Utility: 'A value used to measure how good an outcome is.',
+};
+
+const typeOptions = issueTypes.map(value => ({
+	value,
+	label: (
+		<>
+			<IssueTypeIcon type={value} />
+			{value}
+		</>
+	),
+}));
 
 export const IssueFormSection = () => {
-	const { register, control } = useIssueFormContext();
 	const {
-		field: { onChange: onChangeType, ref: typeRef, value: selectedType },
-	} = useController({
+		register,
 		control,
-		name: 'type',
-	});
-	const {
-		field: { onChange: onBoundaryType, ref: boundaryRef, value: selectedBoundary },
-	} = useController({
+		formState: { errors },
+	} = useIssueFormContext();
+	const [type, boundary] = useWatch({
 		control,
-		name: 'boundary',
+		name: ['type', 'boundary'],
 	});
 	return (
-		<div className='grid w-full grid-cols-2 gap-4'>
-			<div className='col-span-2'>
-				<TextField
-					placeholder='Enter issue name...'
-					label='Issue Name'
-					{...register('name')}
-				/>
-				<ErrorMessage as={FormErrorMessage} name='name' />
-			</div>
-			<div>
-				<Autocomplete
-					label='Issue Type'
-					options={issueTypes}
-					hideClearButton
-					selectedOptions={[selectedType]}
-					ref={typeRef}
-					onOptionsChange={({ selectedItems }) => {
-						if (selectedItems.length === 0) return;
-						onChangeType(selectedItems[0]);
-					}}
-				/>
-				<ErrorMessage as={FormErrorMessage} name='type' />
-			</div>
-
-			<div>
-				<Autocomplete
-					label='Boundary'
-					hideClearButton
-					options={['in', 'on', 'out']}
-					selectedOptions={[selectedBoundary]}
-					ref={boundaryRef}
-					onOptionsChange={({ selectedItems }) => {
-						if (selectedItems.length === 0) return;
-						onBoundaryType(selectedItems[0]);
-					}}
-				/>
-				<ErrorMessage as={FormErrorMessage} name='boundary' />
-			</div>
-			<div className='col-span-2'>
-				<Textarea
-					label='Description'
-					placeholder='Enter description...'
-					{...register('description')}
-					rows={4}
-				/>
-				<ErrorMessage as={FormErrorMessage} name='description' />
-			</div>
+		<div className='flex w-full flex-col gap-4'>
+			<TextField
+				placeholder='Enter issue name...'
+				label='Issue name'
+				{...register('name')}
+				invalid={!!errors.name}
+				helperMessage={errors.name?.message}
+			/>
+			<TextArea
+				label='Description'
+				placeholder='Enter description...'
+				{...register('description')}
+				onKeyDown={event => {
+					if (
+						event.key === 'Enter' &&
+						!event.shiftKey &&
+						!event.nativeEvent.isComposing
+					) {
+						event.preventDefault();
+						event.currentTarget.form?.requestSubmit();
+					}
+				}}
+				rows={4}
+				invalid={!!errors.description}
+				helperMessage={errors.description?.message}
+			/>
+			<SegmentedSelector
+				label='Issue type'
+				{...register('type')}
+				value={type}
+				options={typeOptions}
+				description={issueTypeDescriptions[type]}
+			/>
+			<SegmentedSelector
+				label='Boundary'
+				{...register('boundary')}
+				value={boundary}
+				options={[
+					{ value: 'in', label: 'In' },
+					{ value: 'on', label: 'On' },
+					{ value: 'out', label: 'Out' },
+				]}
+				description='Whether the issue is inside, on, or outside the scope of this decision.'
+			/>
 		</div>
 	);
 };
