@@ -1,10 +1,12 @@
-import { Button, Icon, Menu } from '@equinor/eds-core-react';
+import { Menu } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useSelectedProjectEdges } from '../../../hooks/useSelectedProjectEdges';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { DeleteIssuesDialog } from '../DeleteIssuesDialog';
 import { DeleteAllEdgesDialog } from './DeleteAllEdgesDialog';
+import { ToolbarButton } from './Toolbar';
 
 export const DeleteMenu = ({ selectedNodes }: DeleteMenuProps) => {
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -19,17 +21,19 @@ export const DeleteMenu = ({ selectedNodes }: DeleteMenuProps) => {
 
 	return (
 		<>
-			<Button
+			<ToolbarButton
 				ref={setAnchorEl}
-				className='px-1.5!'
-				color='danger'
 				data-no-dnd
-				title='Delete'
-				variant='outlined'
+				icon
+				tone='accent'
+				tooltip='Delete'
+				active={isOpen}
+				aria-haspopup='menu'
+				aria-expanded={isOpen}
 				onClick={() => setIsOpen(prev => !prev)}
 			>
 				<Icon data={delete_to_trash} />
-			</Button>
+			</ToolbarButton>
 			<Menu open={isOpen} anchorEl={anchorEl} onClose={() => setIsOpen(false)}>
 				<Menu.Item
 					disabled={selectedNodes.length === 0}

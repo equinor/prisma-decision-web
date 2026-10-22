@@ -9,8 +9,14 @@ import { apiClient } from '../../api';
 import { existingIssue, project } from '../../test/issueFixtures';
 import { Issue } from '../../validators';
 import { ProjectContext } from '../ProjectPage/ProjectContext';
-import { CreateIssues } from './CreateIssue';
+import { CreateIssueButton } from './CreateIssueButton';
+import { CreateIssueToolbarButton } from './CreateIssueToolbarButton';
 import { EditIssueModal } from './EditIssueModal';
+
+const createIssueButtons = [
+	{ label: 'regular button', CreateIssue: CreateIssueButton },
+	{ label: 'toolbar button', CreateIssue: CreateIssueToolbarButton },
+];
 
 let savedIssues: Issue[];
 let savedRequests: { method: string; url: string | undefined }[];
@@ -114,7 +120,7 @@ describe('full issue forms', () => {
 			const issue = { ...existingIssue(), name: '   ', description: '  \n ' };
 			renderForm(
 				mode === 'Create' ? (
-					<CreateIssues />
+					<CreateIssueButton />
 				) : (
 					<EditIssueModal issue={issue} open onClose={vi.fn()} />
 				),
@@ -160,7 +166,7 @@ describe('full issue forms', () => {
 			renderForm(
 				<>
 					{mode === 'Create' ? (
-						<CreateIssues />
+						<CreateIssueButton />
 					) : (
 						<EditIssueModal issue={issue} open onClose={onClose} />
 					)}
@@ -220,7 +226,7 @@ describe('full issue forms', () => {
 			const onClose = vi.fn();
 			renderForm(
 				mode === 'Create' ? (
-					<CreateIssues />
+					<CreateIssueButton />
 				) : (
 					<EditIssueModal issue={existingIssue()} open onClose={onClose} />
 				),
@@ -283,43 +289,69 @@ describe('full issue forms', () => {
 		expect(onClose).toHaveBeenCalledWith(false);
 	});
 
-	it('closes Create without losing the draft when the labelled close control is used', async () => {
-		const user = userEvent.setup();
-		renderForm(<CreateIssues />);
-		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
-		await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Draft');
-		await user.click(screen.getByRole('button', { name: 'Close Create Issue' }));
-		expect(screen.queryByRole('textbox', { name: /issue name/i })).not.toBeInTheDocument();
-		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
-		expect(screen.getByRole('textbox', { name: /issue name/i })).toHaveValue('Draft');
-		expect(savedIssues).toHaveLength(0);
-	});
+	it.each(createIssueButtons)(
+		'closes Create without losing the draft ($label)',
+		async ({ CreateIssue }) => {
+			const user = userEvent.setup();
+			renderForm(<CreateIssue />);
+			await user.click(screen.getByRole('button', { name: 'Create Issue' }));
+			await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Draft');
+			await user.type(
+				screen.getByRole('textbox', { name: 'Description' }),
+				'Draft description',
+			);
+			await user.click(screen.getByRole('radio', { name: 'Decision' }));
+			await user.click(screen.getByRole('button', { name: 'Add Option' }));
+			await user.type(screen.getByRole('textbox', { name: 'Option 1' }), 'Draft option');
+			await user.click(screen.getByRole('button', { name: 'Close Create Issue' }));
+			expect(screen.queryByRole('textbox', { name: /issue name/i })).not.toBeInTheDocument();
+			await user.click(screen.getByRole('button', { name: 'Create Issue' }));
+			expect(screen.getByRole('textbox', { name: /issue name/i })).toHaveValue('Draft');
+			expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
+				'Draft description',
+			);
+			expect(screen.getByRole('radio', { name: 'Decision' })).toBeChecked();
+			expect(screen.getByRole('textbox', { name: 'Option 1' })).toHaveValue('Draft option');
+			expect(savedIssues).toHaveLength(0);
+		},
+	);
 
-	it('submits the description with Enter while Shift+Enter preserves a meaningful newline', async () => {
-		const user = userEvent.setup();
-		renderForm(<CreateIssues />);
-		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
-		await user.type(screen.getByRole('textbox', { name: /issue name/i }), ' a ');
-		await user.type(screen.getByRole('textbox', { name: 'Description' }), ' First line ');
-		await user.keyboard('{Shift>}{Enter}{/Shift}');
-		await user.keyboard(' Second line ');
-		expect(savedIssues).toHaveLength(0);
-		expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
-			' First line \n Second line ',
-		);
-		await user.keyboard('{Enter}');
-		await waitFor(() => expect(savedIssues).toHaveLength(1));
-		expect(savedIssues[0]).toMatchObject({
-			name: ' a ',
-			description: ' First line \n Second line ',
-		});
-	});
+	it.each(createIssueButtons)(
+		'submits the description with Enter while Shift+Enter preserves a newline ($label)',
+		async ({ CreateIssue }) => {
+			const user = userEvent.setup();
+			renderForm(<CreateIssue />);
+			await user.click(screen.getByRole('button', { name: 'Create Issue' }));
+			await user.type(screen.getByRole('textbox', { name: /issue name/i }), ' a ');
+			await user.type(screen.getByRole('textbox', { name: 'Description' }), ' First line ');
+			await user.keyboard('{Shift>}{Enter}{/Shift}');
+			await user.keyboard(' Second line ');
+			expect(savedIssues).toHaveLength(0);
+			expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
+				' First line \n Second line ',
+			);
+			await user.keyboard('{Enter}');
+			await waitFor(() => expect(savedIssues).toHaveLength(1));
+			expect(savedIssues[0]).toMatchObject({
+				name: ' a ',
+				description: ' First line \n Second line ',
+			});
+			await waitFor(() =>
+				expect(
+					screen.queryByRole('textbox', { name: /issue name/i }),
+				).not.toBeInTheDocument(),
+			);
+			await user.click(screen.getByRole('button', { name: 'Create Issue' }));
+			expect(screen.getByRole('textbox', { name: /issue name/i })).toHaveValue('');
+			expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue('');
+		},
+	);
 
 	it.each(['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const)(
 		'creates %s with In boundary and empty decision/uncertainty defaults',
 		async type => {
 			const user = userEvent.setup();
-			renderForm(<CreateIssues />);
+			renderForm(<CreateIssueButton />);
 			await user.click(screen.getByRole('button', { name: 'Create Issue' }));
 			await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'A new issue');
 			await user.type(screen.getByRole('textbox', { name: 'Description' }), 'A description');
@@ -344,7 +376,7 @@ describe('full issue forms', () => {
 
 	it('offers labelled issue type and boundary segments with keyboard selection and focus', async () => {
 		const user = userEvent.setup();
-		renderForm(<CreateIssues />);
+		renderForm(<CreateIssueButton />);
 		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
 		const types = within(screen.getByRole('radiogroup', { name: 'Issue type' }));
 		expect(types.getAllByRole('radio').map(radio => radio.getAttribute('value'))).toEqual([
@@ -376,7 +408,7 @@ describe('full issue forms', () => {
 
 	it('creates a Decision using Policy/Focus/Tactical segments and optional empty utility', async () => {
 		const user = userEvent.setup();
-		renderForm(<CreateIssues />);
+		renderForm(<CreateIssueButton />);
 		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
 		await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Decision');
 		await user.type(screen.getByRole('textbox', { name: 'Description' }), 'Choose a direction');
@@ -407,7 +439,7 @@ describe('full issue forms', () => {
 
 	it('creates a key Uncertainty, rejects a blank outcome and can remove a draft outcome', async () => {
 		const user = userEvent.setup();
-		renderForm(<CreateIssues />);
+		renderForm(<CreateIssueButton />);
 		await user.click(screen.getByRole('button', { name: 'Create Issue' }));
 		await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Uncertainty');
 		await user.type(screen.getByRole('textbox', { name: 'Description' }), 'Possible results');
