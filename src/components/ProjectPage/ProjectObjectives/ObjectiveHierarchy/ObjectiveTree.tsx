@@ -1,9 +1,19 @@
 import { Icon } from '@equinor/eds-core-react';
 import { link } from '@equinor/eds-icons';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
+	PointerEvent,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
+import {
+	childObjectiveType,
 	filterValidLinks,
 	objectiveTypeLabel,
+	parentObjectiveType,
 	useObjectiveLinks,
 } from '../../../../hooks/useObjectiveLinks';
 import { useSelectedProjectObjectives } from '../../../../hooks/useSelectedProjectObjectives';
@@ -15,28 +25,51 @@ import {
 	ObjectiveTreeNode,
 } from '../../../../utils/layoutObjectiveTree';
 import { orderObjectivesByLinks } from '../../../../utils/orderObjectivesByLinks';
-import { ObjectiveType } from '../../../../validators';
+import { Objective, ObjectiveType } from '../../../../validators';
+import { ObjectiveCardState } from './ObjectiveCard';
+import { ConnectorDirection, ObjectiveConnector } from './ObjectiveConnector';
 import { ObjectiveTypeBadge } from './ObjectiveTypeBadge';
 
 const levelTypes: ObjectiveType[] = ['Strategic', 'Fundamental', 'Mean'];
 const nodeWidth = 200;
 const defaultNodeHeight = 40;
+const dragThreshold = 4;
 
 type RowBox = { x: number; y: number };
+type Point = { x: number; y: number };
+type PendingConnection = {
+	sourceKey: string;
+	sourceId: string;
+	direction: ConnectorDirection;
+	pointer: Point;
+	// The hovered occurrence, so the line snaps to the copy under the pointer
+	targetKey: string | null;
+};
 
 const sameJson = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 const flatten = (nodes: ObjectiveTreeNode[]): ObjectiveTreeNode[] =>
 	nodes.flatMap(node => [node, ...flatten(node.children)]);
 
-// Read-only top-down tree: an objective linked to several parents is repeated under each of them
+// Vertical counterpart of the board's bezier: direction 1 leaves downwards, -1 upwards
+const buildVerticalBezierPath = (
+	[x1, y1]: [number, number],
+	[x2, y2]: [number, number],
+	direction: 1 | -1,
+) => {
+	const bend = Math.max(Math.abs(y2 - y1) / 2, 24) * direction;
+	return `M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}`;
+};
+
+// Top-down tree: an objective linked to several parents is repeated under each of them
 export const ObjectiveTree = () => {
 	const { selectedObjectives: objectives } = useSelectedProjectObjectives();
-	const { links: storedLinks } = useObjectiveLinks();
+	const { links: storedLinks, addLink } = useObjectiveLinks();
 	const boardRef = useRef<HTMLDivElement>(null);
 	const [heights, setHeights] = useState<Record<string, number>>({});
 	const [rowBoxes, setRowBoxes] = useState<Partial<Record<ObjectiveType, RowBox>>>({});
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
+	const [connection, setConnection] = useState<PendingConnection | null>(null);
 
 	const objectivesById = useMemo(
 		() => new Map(objectives.map(objective => [objective.id, objective])),
@@ -46,10 +79,8 @@ export const ObjectiveTree = () => {
 		() => filterValidLinks(storedLinks, objectivesById),
 		[storedLinks, objectivesById],
 	);
-	const forest = useMemo(
-		() => buildObjectiveForest(orderObjectivesByLinks(objectives, links), links),
-		[objectives, links],
-	);
+	const ordered = useMemo(() => orderObjectivesByLinks(objectives, links), [objectives, links]);
+	const forest = useMemo(() => buildObjectiveForest(ordered, links), [ordered, links]);
 	const nodes = useMemo(() => flatten(forest), [forest]);
 	const nodesByKey = useMemo(() => new Map(nodes.map(node => [node.key, node])), [nodes]);
 	const occurrences = useMemo(() => {
@@ -133,6 +164,126 @@ export const ObjectiveTree = () => {
 		];
 	});
 
+	const canLink = (parentId: string, childId: string) => {
+		const parent = objectivesById.get(parentId);
+		const child = objectivesById.get(childId);
+		if (!parent || !child || childObjectiveType[parent.type] !== child.type) return false;
+		return !links.some(link => link.parent_id === parentId && link.child_id === childId);
+	};
+	const canConnect = (sourceId: string, direction: ConnectorDirection, targetId: string) =>
+		direction === 'child' ? canLink(sourceId, targetId) : canLink(targetId, sourceId);
+	const connect = (sourceId: string, direction: ConnectorDirection, targetId: string) =>
+		direction === 'child' ? addLink(sourceId, targetId) : addLink(targetId, sourceId);
+
+	const childOptions = (objective: Objective) => {
+		const childType = childObjectiveType[objective.type];
+		return childType
+			? ordered[childType].filter(child => canLink(objective.id, child.id))
+			: undefined;
+	};
+	const parentOptions = (objective: Objective) => {
+		const parentType = parentObjectiveType[objective.type];
+		return parentType
+			? ordered[parentType].filter(parent => canLink(parent.id, objective.id))
+			: undefined;
+	};
+
+	// Same interaction as the board: drag from a connector onto a card, or click to pick one
+	const startConnection = (
+		source: ObjectiveTreeNode,
+		direction: ConnectorDirection,
+		event: PointerEvent,
+		openMenu: () => void,
+	) => {
+		if (event.button !== 0) return;
+		event.preventDefault();
+		event.stopPropagation();
+		const start = { x: event.clientX, y: event.clientY };
+		const sourceId = source.objective.id;
+		let dragging = false;
+
+		const toBoard = (pointerEvent: globalThis.PointerEvent) => {
+			const origin = boardRef.current?.getBoundingClientRect();
+			return {
+				x: pointerEvent.clientX - (origin?.left ?? 0),
+				y: pointerEvent.clientY - (origin?.top ?? 0),
+			};
+		};
+		const findTarget = (pointerEvent: globalThis.PointerEvent) => {
+			const element = document
+				.elementFromPoint(pointerEvent.clientX, pointerEvent.clientY)
+				?.closest<HTMLElement>('[data-tree-key]');
+			const targetId = element?.dataset.treeObjective;
+			return targetId && canConnect(sourceId, direction, targetId)
+				? { key: element.dataset.treeKey!, id: targetId }
+				: null;
+		};
+		const cleanup = () => {
+			window.removeEventListener('pointermove', onMove);
+			window.removeEventListener('pointerup', onUp);
+			window.removeEventListener('pointercancel', onCancel);
+			setConnection(null);
+		};
+		const onMove = (pointerEvent: globalThis.PointerEvent) => {
+			const distance = Math.hypot(
+				pointerEvent.clientX - start.x,
+				pointerEvent.clientY - start.y,
+			);
+			if (!dragging && distance < dragThreshold) return;
+			dragging = true;
+			setConnection({
+				sourceKey: source.key,
+				sourceId,
+				direction,
+				pointer: toBoard(pointerEvent),
+				targetKey: findTarget(pointerEvent)?.key ?? null,
+			});
+		};
+		const onUp = (pointerEvent: globalThis.PointerEvent) => {
+			cleanup();
+			if (!dragging) {
+				openMenu();
+				return;
+			}
+			const target = findTarget(pointerEvent);
+			if (target) connect(sourceId, direction, target.id);
+		};
+		const onCancel = () => cleanup();
+
+		window.addEventListener('pointermove', onMove);
+		window.addEventListener('pointerup', onUp);
+		window.addEventListener('pointercancel', onCancel);
+	};
+
+	const cardState = (node: ObjectiveTreeNode): ObjectiveCardState => {
+		if (!connection) return 'default';
+		if (connection.targetKey === node.key) return 'dropHover';
+		if (connection.sourceKey === node.key) return 'connectionSource';
+		return canConnect(connection.sourceId, connection.direction, node.objective.id)
+			? 'dropCandidate'
+			: 'default';
+	};
+
+	const nodeAnchor = (key: string, edge: 'top' | 'bottom'): [number, number] | null => {
+		const node = nodesByKey.get(key);
+		const row = node && rowBoxes[node.objective.type];
+		if (!node || !row) return null;
+		const x = row.x + layout.offsets[node.key] + nodeWidth / 2;
+		return [x, edge === 'top' ? row.y : row.y + heightOf(node.objective.id)];
+	};
+
+	const connectionPath = (() => {
+		if (!connection) return null;
+		const toChild = connection.direction === 'child';
+		const from = nodeAnchor(connection.sourceKey, toChild ? 'bottom' : 'top');
+		if (!from) return null;
+		const to =
+			(connection.targetKey &&
+				nodeAnchor(connection.targetKey, toChild ? 'top' : 'bottom')) ||
+			([connection.pointer.x, connection.pointer.y] as [number, number]);
+		return { d: buildVerticalBezierPath(from, to, toChild ? 1 : -1), to };
+	})();
+
 	return (
 		// Height = viewport minus top bar, page padding, page header and the step navigation spacer
 		<div className='bg-background-default shadow-tile flex h-[calc(100vh-264px)] min-h-96 w-full flex-col rounded-sm p-4'>
@@ -176,7 +327,40 @@ export const ObjectiveTree = () => {
 												occurrences={
 													occurrences.get(node.objective.id) ?? 1
 												}
-												highlighted={hoveredId === node.objective.id}
+												highlighted={
+													!connection && hoveredId === node.objective.id
+												}
+												state={cardState(node)}
+												dimmed={
+													connection !== null &&
+													cardState(node) === 'default'
+												}
+												connecting={connection !== null}
+												activeConnector={
+													connection?.sourceKey === node.key
+														? connection.direction
+														: null
+												}
+												childOptions={childOptions(node.objective)}
+												parentOptions={parentOptions(node.objective)}
+												onConnectorPointerDown={(
+													event,
+													direction,
+													openMenu,
+												) =>
+													startConnection(
+														node,
+														direction,
+														event,
+														openMenu,
+													)
+												}
+												onLinkChild={childId =>
+													addLink(node.objective.id, childId)
+												}
+												onLinkParent={parentId =>
+													addLink(parentId, node.objective.id)
+												}
 											/>
 										))}
 								</div>
@@ -211,10 +395,49 @@ export const ObjectiveTree = () => {
 							/>
 						))}
 					</svg>
+					{connectionPath && (
+						<svg className='pointer-events-none absolute inset-0 z-40 size-full overflow-visible'>
+							<path
+								d={connectionPath.d}
+								fill='none'
+								strokeWidth={2}
+								strokeDasharray='5 5'
+								className='stroke-primary-resting'
+							/>
+							<circle
+								cx={connectionPath.to[0]}
+								cy={connectionPath.to[1]}
+								r={3}
+								strokeWidth={1.5}
+								className='fill-background-default stroke-primary-resting'
+							/>
+						</svg>
+					)}
 				</div>
 			</div>
 		</div>
 	);
+};
+
+type TreeNodeCardProps = {
+	node: ObjectiveTreeNode;
+	left: number;
+	occurrences: number;
+	highlighted: boolean;
+	state: ObjectiveCardState;
+	dimmed: boolean;
+	connecting: boolean;
+	activeConnector: ConnectorDirection | null;
+	// Undefined when the objective's level has no children / parents
+	childOptions?: Objective[];
+	parentOptions?: Objective[];
+	onConnectorPointerDown: (
+		event: PointerEvent,
+		direction: ConnectorDirection,
+		openMenu: () => void,
+	) => void;
+	onLinkChild: (childId: string) => void;
+	onLinkParent: (parentId: string) => void;
 };
 
 const TreeNodeCard = ({
@@ -222,34 +445,75 @@ const TreeNodeCard = ({
 	left,
 	occurrences,
 	highlighted,
-}: {
-	node: ObjectiveTreeNode;
-	left: number;
-	occurrences: number;
-	highlighted: boolean;
-}) => (
-	<div
-		data-tree-objective={node.objective.id}
-		className={cn(
-			`bg-background-default absolute top-0 z-20 flex items-center gap-2 rounded-sm
-			border-2 border-transparent py-1.5 pr-2.5 pl-1.5
-			shadow-[0px_2px_2px_rgba(0,0,0,0.14),0px_3px_2px_rgba(0,0,0,0.12)]`,
-			{ 'border-diagram-connector bg-accent-canvas': highlighted },
-		)}
-		style={{ left, width: nodeWidth }}
-	>
-		<ObjectiveTypeBadge type={node.objective.type} />
-		<p className='min-w-0 flex-1 text-sm leading-5 font-medium break-words'>
-			{node.objective.name}
-		</p>
-		{occurrences > 1 && (
-			<span
-				className='text-text-tertiary flex shrink-0 items-center gap-0.5 text-xs font-medium'
-				title={`Shown ${occurrences} times – once under each objective it supports`}
+	state,
+	dimmed,
+	connecting,
+	activeConnector,
+	childOptions,
+	parentOptions,
+	onConnectorPointerDown,
+	onLinkChild,
+	onLinkParent,
+}: TreeNodeCardProps) => {
+	const connectorProps = (direction: ConnectorDirection) => ({
+		objective: node.objective,
+		direction,
+		side: direction === 'child' ? ('bottom' as const) : ('top' as const),
+		active: activeConnector === direction,
+		hidden: connecting && activeConnector !== direction,
+		onPointerDown: (event: PointerEvent, openMenu: () => void) =>
+			onConnectorPointerDown(event, direction, openMenu),
+	});
+
+	return (
+		<div
+			data-tree-objective={node.objective.id}
+			data-tree-key={node.key}
+			className={cn('group/node absolute top-0 z-20', { 'opacity-40': dimmed })}
+			style={{ left, width: nodeWidth }}
+		>
+			{parentOptions && (
+				<ObjectiveConnector
+					{...connectorProps('parent')}
+					options={parentOptions}
+					onPick={onLinkParent}
+				/>
+			)}
+			{childOptions && (
+				<ObjectiveConnector
+					{...connectorProps('child')}
+					options={childOptions}
+					onPick={onLinkChild}
+				/>
+			)}
+			<div
+				className={cn(
+					`bg-background-default relative z-10 flex items-center gap-2 rounded-sm border-2
+					border-transparent py-1.5 pr-2.5 pl-1.5
+					shadow-[0px_2px_2px_rgba(0,0,0,0.14),0px_3px_2px_rgba(0,0,0,0.12)]`,
+					{
+						'border-diagram-connector bg-accent-canvas':
+							highlighted || state === 'dropHover',
+						'border-diagram-connector': state === 'connectionSource',
+						'border-accent-border bg-accent-canvas border-dashed':
+							state === 'dropCandidate',
+					},
+				)}
 			>
-				<Icon data={link} size={16} className='fill-text-tertiary' />
-				{occurrences}
-			</span>
-		)}
-	</div>
-);
+				<ObjectiveTypeBadge type={node.objective.type} />
+				<p className='min-w-0 flex-1 text-sm leading-5 font-medium break-words'>
+					{node.objective.name}
+				</p>
+				{occurrences > 1 && (
+					<span
+						className='text-text-tertiary flex shrink-0 items-center gap-0.5 text-xs font-medium'
+						title={`Shown ${occurrences} times – once under each objective it supports`}
+					>
+						<Icon data={link} size={16} className='fill-text-tertiary' />
+						{occurrences}
+					</span>
+				)}
+			</div>
+		</div>
+	);
+};

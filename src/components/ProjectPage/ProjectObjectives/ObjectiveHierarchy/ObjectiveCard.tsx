@@ -1,24 +1,22 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { chevron_down, chevron_up, link } from '@equinor/eds-icons';
-import { PointerEvent, ReactNode, useRef, useState } from 'react';
+import { PointerEvent, ReactNode } from 'react';
 import { cn } from '../../../../utils/cn';
 import { Objective } from '../../../../validators';
-import { ConnectorGlyph } from '../../../common/ConnectorGlyph';
-import { ObjectivePickerMenu } from './ObjectivePickerMenu';
+import { ConnectorDirection, ObjectiveConnector } from './ObjectiveConnector';
 import { ObjectiveTypeBadge } from './ObjectiveTypeBadge';
 
 export type ObjectiveCardState = 'default' | 'connectionSource' | 'dropCandidate' | 'dropHover';
-
-// 'child': right side, links to a supporting objective. 'parent': left side, links to one it contributes to.
-export type ConnectorDirection = 'child' | 'parent';
 
 type ObjectiveCardProps = {
 	objective: Objective;
 	state: ObjectiveCardState;
 	dimmed: boolean;
 	highlighted: boolean;
-	expanded: boolean;
-	parentCount: number;
+	// Content = description + actions (chevron), connections = link lists (link-count toggle)
+	contentOpen: boolean;
+	connectionsOpen: boolean;
+	linkCount: number;
 	connecting: boolean;
 	isDragSource: boolean;
 	activeConnector: ConnectorDirection | null;
@@ -26,7 +24,8 @@ type ObjectiveCardProps = {
 	childOptions?: Objective[];
 	parentOptions?: Objective[];
 	panel: ReactNode;
-	onToggleExpanded: () => void;
+	onToggleContent: () => void;
+	onToggleConnections: () => void;
 	// Dragging the title row moves the objective to another column (reclassifies it)
 	onDragHandlePointerDown: (event: PointerEvent) => void;
 	onConnectorPointerDown: (
@@ -43,26 +42,34 @@ export const ObjectiveCard = ({
 	state,
 	dimmed,
 	highlighted,
-	expanded,
-	parentCount,
+	contentOpen,
+	connectionsOpen,
+	linkCount,
 	connecting,
 	isDragSource,
 	activeConnector,
 	childOptions,
 	parentOptions,
 	panel,
-	onToggleExpanded,
+	onToggleContent,
+	onToggleConnections,
 	onDragHandlePointerDown,
 	onConnectorPointerDown,
 	onLinkChild,
 	onLinkParent,
 }: ObjectiveCardProps) => {
 	const isConnectionSource = state === 'connectionSource';
+	const expanded = contentOpen || connectionsOpen;
+	const revealClassName = cn(
+		'focus-visible:opacity-100 group-focus-within/node:opacity-100 group-hover/node:opacity-100',
+		{ 'opacity-0': !expanded },
+	);
 
 	const connectorProps = (direction: ConnectorDirection) => ({
 		objective,
 		direction,
-		expanded,
+		side: direction === 'child' ? ('right' as const) : ('left' as const),
+		topClassName: expanded ? 'top-6' : 'top-1/2',
 		active: activeConnector === direction,
 		hidden: connecting && activeConnector !== direction,
 		onPointerDown: (event: PointerEvent, openMenu: () => void) =>
@@ -77,18 +84,18 @@ export const ObjectiveCard = ({
 			})}
 			onClick={event => {
 				event.stopPropagation();
-				onToggleExpanded();
+				onToggleContent();
 			}}
 		>
 			{parentOptions && (
-				<CardConnector
+				<ObjectiveConnector
 					{...connectorProps('parent')}
 					options={parentOptions}
 					onPick={onLinkParent}
 				/>
 			)}
 			{childOptions && (
-				<CardConnector
+				<ObjectiveConnector
 					{...connectorProps('child')}
 					options={childOptions}
 					onPick={onLinkChild}
@@ -121,98 +128,42 @@ export const ObjectiveCard = ({
 					<p className='min-w-16 flex-1 text-sm leading-5 font-medium break-words'>
 						{objective.name}
 					</p>
-					{parentCount > 1 && (
-						<span
-							className='text-text-tertiary flex shrink-0 items-center gap-0.5 text-xs font-medium'
-							title={`Supports ${parentCount} objectives`}
-						>
-							<Icon data={link} size={16} className='fill-text-tertiary' />
-							{parentCount}
-						</span>
-					)}
-					<Button
-						variant='ghost_icon'
-						className={cn('-my-1 size-8!', {
-							'opacity-0 group-hover/node:opacity-100 focus-visible:opacity-100':
-								!expanded,
-						})}
-						aria-label={
-							expanded ? `Collapse ${objective.name}` : `Expand ${objective.name}`
-						}
-						aria-expanded={expanded}
+					<button
+						type='button'
+						aria-label={`${linkCount} connections`}
+						aria-expanded={connectionsOpen}
+						title={connectionsOpen ? 'Hide connections' : 'Show connections'}
+						className={cn(
+							`text-primary-resting hover:bg-tier-fill -my-1 flex shrink-0 cursor-pointer
+							items-center gap-1.5 rounded-sm px-3 py-2 text-xs leading-4 font-medium`,
+							{ 'bg-tier-fill-hover!': connectionsOpen },
+							revealClassName,
+						)}
 						onClick={event => {
 							event.stopPropagation();
-							onToggleExpanded();
+							onToggleConnections();
 						}}
 					>
-						<Icon data={expanded ? chevron_up : chevron_down} size={18} />
+						<Icon data={link} size={16} className='fill-primary-resting' />
+						{linkCount}
+					</button>
+					<Button
+						variant='ghost_icon'
+						className={cn('-my-1 size-8!', revealClassName)}
+						aria-label={
+							contentOpen ? `Collapse ${objective.name}` : `Expand ${objective.name}`
+						}
+						aria-expanded={contentOpen}
+						onClick={event => {
+							event.stopPropagation();
+							onToggleContent();
+						}}
+					>
+						<Icon data={contentOpen ? chevron_up : chevron_down} size={18} />
 					</Button>
 				</div>
 				{expanded && panel}
 			</div>
 		</div>
-	);
-};
-
-type CardConnectorProps = {
-	objective: Objective;
-	direction: ConnectorDirection;
-	expanded: boolean;
-	active: boolean;
-	hidden: boolean;
-	options: Objective[];
-	onPointerDown: (event: PointerEvent, openMenu: () => void) => void;
-	onPick: (objectiveId: string) => void;
-};
-
-// Hover handle beside the card: drag onto a card in the neighbouring column, or click to pick one
-const CardConnector = ({
-	objective,
-	direction,
-	expanded,
-	active,
-	hidden,
-	options,
-	onPointerDown,
-	onPick,
-}: CardConnectorProps) => {
-	const ref = useRef<HTMLButtonElement>(null);
-	const [menuOpen, setMenuOpen] = useState(false);
-	const isChild = direction === 'child';
-	const title = isChild ? 'Supported by' : 'Contributes to';
-
-	return (
-		<>
-			<button
-				ref={ref}
-				type='button'
-				aria-label={
-					isChild
-						? `Link ${objective.name} to a supporting objective`
-						: `Link ${objective.name} to an objective it contributes to`
-				}
-				className={cn(
-					`group/connector absolute flex h-11.5 w-12 -translate-y-1/2 cursor-pointer
-					touch-none items-center`,
-					isChild ? 'left-full justify-start pl-2' : 'right-full justify-end pr-2',
-					expanded ? 'top-6' : 'top-1/2',
-					{ 'pointer-events-none opacity-0': hidden },
-				)}
-				onPointerDown={event => onPointerDown(event, () => setMenuOpen(true))}
-				onClick={event => event.stopPropagation()}
-			>
-				<ConnectorGlyph open={menuOpen || active} side={isChild ? 'right' : 'left'} />
-			</button>
-			{menuOpen && (
-				<ObjectivePickerMenu
-					anchorEl={ref.current}
-					title={title}
-					options={options}
-					placement={isChild ? 'right-start' : 'left-start'}
-					onPick={onPick}
-					onClose={() => setMenuOpen(false)}
-				/>
-			)}
-		</>
 	);
 };

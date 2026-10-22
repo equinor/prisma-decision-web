@@ -2,13 +2,23 @@ import { Icon } from '@equinor/eds-core-react';
 import { add } from '@equinor/eds-icons';
 import { cn } from '../../utils/cn';
 
+export type ConnectorSide = 'left' | 'right' | 'top' | 'bottom';
+
+// Where the glyph hides before it slides out from under the node
+const hiddenOffset: Record<ConnectorSide, string> = {
+	right: '-translate-x-10',
+	left: 'translate-x-10',
+	bottom: '-translate-y-10',
+	top: 'translate-y-10',
+};
+
 // Animated "+" connector visual. Expects a `group/node` ancestor (reveal) and a `group/connector` ancestor (hover).
 export const ConnectorGlyph = ({
 	open,
 	side = 'right',
 }: {
 	open: boolean;
-	side?: 'left' | 'right';
+	side?: ConnectorSide;
 }) => (
 	// Transitions use `!` to beat the global `* { transition: ... !important }` in index.css
 	// Slides out from under the node (the node surface must be painted on top)
@@ -16,12 +26,12 @@ export const ConnectorGlyph = ({
 		className={cn(
 			'pointer-events-none relative flex size-7 items-center justify-center',
 			open
-				? 'translate-x-0 opacity-100'
+				? 'translate-0 opacity-100'
 				: `opacity-0
 					[transition:translate_185ms_cubic-bezier(0.4,0,1,1),opacity_65ms_linear_135ms]!
-					group-hover/node:translate-x-0 group-hover/node:opacity-100
+					group-hover/node:translate-0 group-hover/node:opacity-100
 					group-hover/node:[transition:translate_375ms_cubic-bezier(0.34,1.4,0.64,1),opacity_85ms_ease-out]!`,
-			!open && (side === 'right' ? '-translate-x-10' : 'translate-x-10'),
+			!open && hiddenOffset[side],
 		)}
 	>
 		{/* Background grows from the small dot (22px) into the full button (28px) */}

@@ -33,7 +33,8 @@ import {
 import { orderObjectivesByLinks } from '../../../../utils/orderObjectivesByLinks';
 import { cn } from '../../../../utils/cn';
 import { Objective, ObjectiveType } from '../../../../validators';
-import { ConnectorDirection, ObjectiveCard, ObjectiveCardState } from './ObjectiveCard';
+import { ObjectiveCard, ObjectiveCardState } from './ObjectiveCard';
+import { ConnectorDirection } from './ObjectiveConnector';
 import { ObjectiveLinkEdges } from './ObjectiveLinkEdges';
 import { LinkedObjective, ObjectiveLinksPanel } from './ObjectiveLinksPanel';
 import { ComposerLocation, ObjectiveQuickAdd } from './ObjectiveQuickAdd';
@@ -80,6 +81,8 @@ export const ObjectiveHierarchy = () => {
 	const [sizes, setSizes] = useState<Record<string, CardSize>>({});
 	const [columnBoxes, setColumnBoxes] = useState<Partial<Record<ObjectiveType, ColumnBox>>>({});
 	const [expandedId, setExpandedId] = useState<string | null>(null);
+	// Sections of the expanded card; only one card is open at a time
+	const [openSections, setOpenSections] = useState({ content: false, connections: false });
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
 	const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
 	const [connection, setConnection] = useState<PendingConnection | null>(null);
@@ -167,7 +170,7 @@ export const ObjectiveHierarchy = () => {
 		setColumnBoxes(current => (sameJson(current, nextBoxes) ? current : nextBoxes));
 	}, []);
 
-	useLayoutEffect(measure, [measure, objectives, expandedId]);
+	useLayoutEffect(measure, [measure, objectives, expandedId, openSections]);
 
 	useEffect(() => {
 		const board = boardRef.current;
@@ -283,8 +286,19 @@ export const ObjectiveHierarchy = () => {
 			.map(link => ({ linkId: link.id, objective: objectivesById.get(link.child_id)! }))
 			.toSorted(byColumnOrder);
 
-	const parentCount = (objectiveId: string) =>
-		links.filter(link => link.child_id === objectiveId).length;
+	const linkCount = (objectiveId: string) =>
+		links.filter(link => link.child_id === objectiveId || link.parent_id === objectiveId)
+			.length;
+
+	const toggleSection = (objectiveId: string, section: 'content' | 'connections') => {
+		if (justDragged.current) return;
+		setSelectedLinkId(null);
+		const current =
+			expandedId === objectiveId ? openSections : { content: false, connections: false };
+		const next = { ...current, [section]: !current[section] };
+		setOpenSections(next);
+		setExpandedId(next.content || next.connections ? objectiveId : null);
+	};
 
 	const linkTargets = (sourceId: string) => {
 		const childType = childObjectiveType[objectivesById.get(sourceId)?.type ?? 'Mean'];
@@ -557,8 +571,15 @@ export const ObjectiveHierarchy = () => {
 												state={cardState(objective)}
 												dimmed={isDimmed(objective)}
 												highlighted={highlightedIds.includes(objective.id)}
-												expanded={expandedId === objective.id}
-												parentCount={parentCount(objective.id)}
+												contentOpen={
+													expandedId === objective.id &&
+													openSections.content
+												}
+												connectionsOpen={
+													expandedId === objective.id &&
+													openSections.connections
+												}
+												linkCount={linkCount(objective.id)}
 												connecting={connection !== null}
 												isDragSource={move?.objective.id === objective.id}
 												activeConnector={
@@ -579,6 +600,8 @@ export const ObjectiveHierarchy = () => {
 												panel={
 													<ObjectiveLinksPanel
 														objective={objective}
+														showContent={openSections.content}
+														showConnections={openSections.connections}
 														contributesTo={linkedParents(objective.id)}
 														supportedBy={linkedChildren(objective.id)}
 														parentOptions={parentOptions(objective.id)}
@@ -592,15 +615,12 @@ export const ObjectiveHierarchy = () => {
 														onUnlink={removeLink}
 													/>
 												}
-												onToggleExpanded={() => {
-													if (justDragged.current) return;
-													setSelectedLinkId(null);
-													setExpandedId(current =>
-														current === objective.id
-															? null
-															: objective.id,
-													);
-												}}
+												onToggleContent={() =>
+													toggleSection(objective.id, 'content')
+												}
+												onToggleConnections={() =>
+													toggleSection(objective.id, 'connections')
+												}
 												onDragHandlePointerDown={event =>
 													startMove(objective, event)
 												}

@@ -16,6 +16,8 @@ export type LinkedObjective = { linkId: string; objective: Objective };
 
 type ObjectiveLinksPanelProps = {
 	objective: Objective;
+	showContent: boolean;
+	showConnections: boolean;
 	contributesTo: LinkedObjective[];
 	supportedBy: LinkedObjective[];
 	parentOptions: Objective[];
@@ -27,6 +29,8 @@ type ObjectiveLinksPanelProps = {
 
 export const ObjectiveLinksPanel = ({
 	objective,
+	showContent,
+	showConnections,
 	contributesTo,
 	supportedBy,
 	parentOptions,
@@ -43,48 +47,54 @@ export const ObjectiveLinksPanel = ({
 			className='flex cursor-default flex-col gap-4 px-4 pt-2 pb-4'
 			onClick={event => event.stopPropagation()}
 		>
-			{objective.description && (
-				<p className='px-2 text-sm leading-5 break-words'>{objective.description}</p>
+			{showContent && objective.description && (
+				<p className='text-sm leading-5 break-words'>{objective.description}</p>
 			)}
-			{parentType && (
-				<LinkSection
-					title='Contributes to'
-					linkType={parentType}
-					linked={contributesTo}
-					options={parentOptions}
-					onLink={onLinkParent}
-					onUnlink={onUnlink}
-				/>
-			)}
-			{childType && (
-				<LinkSection
-					title='Supported by'
-					linkType={childType}
-					linked={supportedBy}
-					options={childOptions}
-					onLink={onLinkChild}
-					onUnlink={onUnlink}
-				/>
-			)}
-			<div className='flex items-start justify-between'>
-				<DeleteObjectiveDialog
-					objective={objective}
-					trigger={open => (
-						<Button variant='ghost' color='danger' onClick={open}>
-							<Icon data={delete_to_trash} />
-							Delete
-						</Button>
+			{showConnections && (
+				<div className='bg-background-light flex flex-col gap-4 rounded-sm p-3'>
+					{parentType && (
+						<LinkSection
+							title='Contributes to'
+							linkType={parentType}
+							linked={contributesTo}
+							options={parentOptions}
+							onLink={onLinkParent}
+							onUnlink={onUnlink}
+						/>
 					)}
-				/>
-				<EditObjectiveDialog
-					objective={objective}
-					trigger={open => (
-						<Button variant='outlined' onClick={open}>
-							Edit
-						</Button>
+					{childType && (
+						<LinkSection
+							title='Supported by'
+							linkType={childType}
+							linked={supportedBy}
+							options={childOptions}
+							onLink={onLinkChild}
+							onUnlink={onUnlink}
+						/>
 					)}
-				/>
-			</div>
+				</div>
+			)}
+			{showContent && (
+				<div className='flex items-start justify-between'>
+					<DeleteObjectiveDialog
+						objective={objective}
+						trigger={open => (
+							<Button variant='ghost' color='danger' onClick={open}>
+								<Icon data={delete_to_trash} />
+								Delete
+							</Button>
+						)}
+					/>
+					<EditObjectiveDialog
+						objective={objective}
+						trigger={open => (
+							<Button variant='outlined' onClick={open}>
+								Edit
+							</Button>
+						)}
+					/>
+				</div>
+			)}
 		</div>
 	);
 };
