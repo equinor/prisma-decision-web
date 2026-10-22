@@ -1,6 +1,7 @@
+import { Dispatch, SetStateAction } from 'react';
 import { cn } from '../../../../utils/cn';
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
-import { Issue, IssueType } from '../../../../validators';
+import { Issue } from '../../../../validators';
 import {
 	IssueCard,
 	IssueCardDeleteMenuItem,
@@ -13,13 +14,17 @@ import {
 } from '../../../common/Cards/IssueCard';
 import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
+import { BoardDraftLocation, IssueDraftControl } from './IssueDraftControl';
 
-export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps) => {
+export const IssueColumn = ({
+	issueType,
+	issues = [],
+	label,
+	activeDraft,
+	setActiveDraft,
+}: IssueColumnProps) => {
 	return (
-		<section
-			aria-label={`${label} issues`}
-			className='flex min-w-64.25 basis-full flex-col gap-2'
-		>
+		<section aria-label={`${label} issues`} className='flex min-w-79 basis-full flex-col gap-2'>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
@@ -33,6 +38,12 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 					getIssueColumnColor(issueType),
 				)}
 			>
+				<IssueDraftControl
+					issueType={issueType}
+					position='top'
+					activeDraft={activeDraft}
+					setActiveDraft={setActiveDraft}
+				/>
 				{issues.map((issue, index) => {
 					return (
 						<DraggableIssueContainer
@@ -58,13 +69,21 @@ export const IssueColumn = ({ issueType, issues = [], label }: IssueColumnProps)
 						</DraggableIssueContainer>
 					);
 				})}
+				<IssueDraftControl
+					issueType={issueType}
+					position='bottom'
+					activeDraft={activeDraft}
+					setActiveDraft={setActiveDraft}
+				/>
 			</DroppableIssueContainer>
 		</section>
 	);
 };
 
 type IssueColumnProps = {
-	issueType: Exclude<IssueType, 'Utility'>;
+	issueType: BoardDraftLocation['type'];
 	issues: Issue[];
 	label: string;
+	activeDraft: BoardDraftLocation | null;
+	setActiveDraft: Dispatch<SetStateAction<BoardDraftLocation | null>>;
 };
