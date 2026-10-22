@@ -28,7 +28,7 @@ export const SegmentedSelector = <Value extends string>({
 				</legend>
 				<div
 					className={cn(
-						'flex gap-0.5 rounded-sm max-[480px]:flex-wrap [&>.eds-tooltip-anchor]:min-w-0 [&>.eds-tooltip-anchor]:flex-1 max-[480px]:[&>.eds-tooltip-anchor]:basis-[calc(100%/3-2px)] [&>.eds-tooltip-anchor>.eds-radio]:w-full',
+						'flex gap-0.5 rounded-sm max-[480px]:flex-wrap [&>.eds-tooltip-anchor]:min-w-max [&>.eds-tooltip-anchor]:flex-1 max-[480px]:[&>.eds-tooltip-anchor]:basis-[calc(100%/3-2px)] [&>.eds-tooltip-anchor>.eds-radio]:w-full',
 						!compact && 'border-background-medium border',
 					)}
 				>
@@ -36,7 +36,14 @@ export const SegmentedSelector = <Value extends string>({
 						<Tooltip key={option.value} title={option.tooltip}>
 							<Radio
 								render={<EdsRadio label={option.label} />}
-								className='has-[input:focus-visible]:outline-primary-resting relative min-w-0 flex-1 gap-0! rounded-[3px]! p-0! text-(--eds-color-text-accent-subtle)! has-[input:checked]:bg-(--eds-color-bg-accent-fill-muted-hover)! has-[input:disabled]:opacity-50 has-[input:focus-visible]:z-1 has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 max-[480px]:basis-[calc(100%/3-2px)] [&:has(input:disabled)>label]:cursor-default! [&>.icon-wrapper]:hidden! [&>label]:m-0! [&>label]:flex! [&>label]:min-h-9! [&>label]:w-full! [&>label]:cursor-pointer! [&>label]:items-center! [&>label]:justify-center! [&>label]:gap-1! [&>label]:p-1! [&>label]:[font-family:Inter]! [&>label]:text-sm! [&>label]:text-inherit! max-[480px]:[&>label]:gap-0.5! max-[480px]:[&>label]:text-xs!'
+								className='has-[input:focus-visible]:outline-primary-resting relative min-w-max flex-1 gap-0!
+								rounded-[3px]! p-0! text-(--eds-color-text-accent-subtle)! has-[input:checked]:bg-(--eds-color-bg-accent-fill-muted-hover)!
+								has-[input:disabled]:opacity-50 has-[input:focus-visible]:z-1 has-[input:focus-visible]:outline-2
+								has-[input:focus-visible]:outline-offset-2 max-[480px]:basis-[calc(100%/3-2px)]
+								[&:has(input:disabled)>label]:cursor-default! [&>.icon-wrapper]:hidden! [&>label]:m-0!
+								[&>label]:flex! [&>label]:min-h-9! [&>label]:w-full! [&>label]:cursor-pointer!
+								[&>label]:items-center! [&>label]:justify-center! [&>label]:gap-1! [&>label]:p-1! [&>label]:text-sm!
+								[&>label]:text-inherit! max-[480px]:[&>label]:gap-0.5! max-[480px]:[&>label]:text-xs!'
 								name={name}
 								value={option.value}
 								checked={value === option.value}

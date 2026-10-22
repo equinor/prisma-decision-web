@@ -1,19 +1,30 @@
 import { Button, Icon, Table } from '@equinor/eds-core-react';
 import { arrow_down, arrow_up } from '@equinor/eds-icons';
 import { format } from 'date-fns';
-import { useController } from 'react-hook-form';
 import { useUpdateObjectives } from '../../../hooks/api/useUpdateObjective';
 import { useObjectiveForm } from '../../../hooks/useObjectiveForm';
 import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
 import { Objective, objectiveTypes } from '../../../validators';
-import { DropdownTableCell } from '../../common/DropdownTableCell';
-import { EditableTableCell } from '../../common/EditableTableCell';
+import { InlineTextField } from '../../common/InlineTextField';
+import { showSuccessToast } from '../../ShowToast';
 import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+import { CardLabelMenu } from '../../common/Cards/CardLabelMenu';
 
 export const ObjectiveRow = ({ objective }: { objective: Objective }) => {
 	const { selectedObjectives } = useSelectedProjectObjectives();
 	const { mutate: updateObjectives } = useUpdateObjectives();
-	const { control, handleSubmit } = useObjectiveForm({ objective });
+	const {
+		register,
+		handleSubmit,
+		reset,
+		getValues,
+		getFieldState,
+		setValue,
+		formState: { errors },
+	} = useObjectiveForm({
+		objective,
+		onSuccess: () => showSuccessToast('Objective updated'),
+	});
 	const objectiveIndex = selectedObjectives.findIndex(item => item.id === objective.id);
 
 	const handleMoveObjective = (direction: 'up' | 'down') => {
@@ -30,26 +41,10 @@ export const ObjectiveRow = ({ objective }: { objective: Objective }) => {
 		updateObjectives(reorderedObjectives.map((item, index) => ({ ...item, ordering: index })));
 	};
 
-	const {
-		field: { onChange },
-	} = useController({
-		control,
-		name: 'description',
-	});
-
-	const {
-		field: { onChange: onChangeTitle },
-	} = useController({
-		control,
-		name: 'name',
-	});
-
-	const {
-		field: { onChange: onChangeType },
-	} = useController({
-		control,
-		name: 'type',
-	});
+	const saveText = async (field: 'name' | 'description') => {
+		if (getValues(field) !== objective[field]) await handleSubmit();
+		return !getFieldState(field).invalid;
+	};
 
 	return (
 		<Table.Row>
@@ -74,25 +69,43 @@ export const ObjectiveRow = ({ objective }: { objective: Objective }) => {
 					</Button>
 				</div>
 			</Table.Cell>
-			<EditableTableCell
-				onBlur={() => handleSubmit()}
-				onChange={onChangeTitle}
-				className='max-w-xl truncate'
-				value={objective.name}
-			/>
-			<EditableTableCell
-				onBlur={() => handleSubmit()}
-				onChange={onChange}
-				className='max-w-xl truncate'
-				value={objective.description}
-			/>
-			<DropdownTableCell
-				className='w-30'
-				value={objective.type}
-				options={objectiveTypes}
-				onChange={onChangeType}
-				onBlur={() => handleSubmit()}
-			/>
+			<Table.Cell className='p-0!'>
+				<InlineTextField
+					value={objective.name}
+					label='Objective name'
+					inputProps={register('name')}
+					error={errors.name?.message}
+					onEdit={() => reset(objective)}
+					onSave={() => saveText('name')}
+				/>
+			</Table.Cell>
+			<Table.Cell className='max-w-xl p-0!'>
+				<InlineTextField
+					value={objective.description}
+					label='Objective description'
+					inputProps={register('description')}
+					error={errors.description?.message}
+					multiline
+					className='truncate'
+					onEdit={() => reset(objective)}
+					onSave={() => saveText('description')}
+				/>
+			</Table.Cell>
+			<Table.Cell>
+				<CardLabelMenu
+					title='OBJECTIVE TYPE'
+					label={`Objective type: ${objective.type}`}
+					value={objective.type}
+					options={objectiveTypes}
+					onChange={type => {
+						reset(objective);
+						setValue('type', type);
+						void handleSubmit();
+					}}
+				>
+					{objective.type}
+				</CardLabelMenu>
+			</Table.Cell>
 			<Table.Cell className='whitespace-nowrap'>
 				{objective.created_at ? format(objective.created_at, 'yyyy-MM-dd') : '-'}
 			</Table.Cell>

@@ -12,30 +12,26 @@ export const ProjectObjectives = () => {
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='grid w-full grid-cols-[1fr_auto] items-center justify-between gap-2'>
+			<div className='w-full'>
 				<h1 className='truncate text-3xl font-bold'>{selectedProject.name}</h1>
-				<CreateObjective />
 			</div>
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
 			>
-				<div className='grid w-full grid-cols-[1fr_auto] items-center'>
-					<div>
-						<div className='flex gap-2'>
-							<h2 className='text-2xl font-semibold'>Objectives</h2>
-							<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
-								{selectedObjectives?.length ?? 0}
-							</span>
-						</div>
-						<p className='text-text-tertiary'>
-							Define the objectives that will help achieve the desired outcome
-						</p>
+				<div className='grid w-full items-center gap-4 text-start xl:grid-cols-[auto_1fr]'>
+					<div className='flex gap-2'>
+						<h2 className='text-2xl font-semibold'>Objectives</h2>
+						<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
+							{selectedObjectives?.length ?? 0}
+						</span>
 					</div>
+					<CreateObjective key={selectedProject.id} />
 				</div>
+
 				{selectedObjectives.length > 0 && (
 					<div className='outline-background-medium w-full overflow-x-auto overflow-y-hidden rounded-sm outline-1'>
-						<Table className='w-full'>
+						<Table className='w-full' aria-label='Objectives'>
 							<Table.Head>
 								<Table.Row>
 									<Table.Cell className='w-21 pl-1!'></Table.Cell>
