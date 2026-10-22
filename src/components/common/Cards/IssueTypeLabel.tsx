@@ -1,79 +1,31 @@
-import { Icon } from '@equinor/eds-core-react';
-import { bookmarks, check_circle_outlined, inbox, info_circle } from '@equinor/eds-icons';
-import { utilityIcon } from '../../../icons';
-import { IssueType } from '../../../validators';
+import { IssueType, issueTypes } from '../../../validators';
+import { issueTypeTones } from '../../../utils/issueTypeTones';
+import { IssueTypeIcon } from '../IssueTypeIcon';
+import { CardLabelMenu } from './CardLabelMenu';
 
-export const IssueTypeLabel = ({ type }: { type: IssueType }) => {
-	switch (type) {
-		case 'Decision':
-			return <DecisionLabel />;
-		case 'Unassigned':
-			return <UnassignedLabel />;
-		case 'Uncertainty':
-			return <UncertaintyLabel />;
-		case 'Fact':
-			return <FactLabel />;
-		case 'Utility':
-			return <UtilityLabel />;
-	}
-};
+export const IssueTypeLabel = ({
+	type,
+	onChange,
+}: {
+	type: IssueType;
+	onChange?: (type: IssueType) => void;
+}) => (
+	<CardLabelMenu
+		title='ISSUE TYPE'
+		label={`Issue type: ${type}`}
+		value={type}
+		options={issueTypes}
+		onChange={onChange}
+		tone={issueTypeTones[type]}
+		className='text-(--eds-color-text-neutral-subtle)!'
+	>
+		<IssueTypeIcon type={type} />
+		{type}
+	</CardLabelMenu>
+);
 
-export const DecisionLabel = () => {
-	return (
-		<div
-			className='flex items-center justify-center gap-1 rounded-xl
-            bg-[#FFF7D0] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
-		>
-			<Icon className='min-h-6' data={check_circle_outlined} size={16} />
-			<p className='pt-0.5'>Decision</p>
-		</div>
-	);
-};
-
-export const UnassignedLabel = () => {
-	return (
-		<div
-			className='flex items-center justify-center gap-1 rounded-xl
-            bg-[#FFE8E8] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
-		>
-			<Icon className='min-h-6' data={inbox} size={16} />
-			<p className='pt-0.5'>Unassigned</p>
-		</div>
-	);
-};
-
-export const UncertaintyLabel = () => {
-	return (
-		<div
-			className='flex items-center justify-center gap-1 rounded-xl
-            bg-[#E1FCEA] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
-		>
-			<Icon className='min-h-6' data={info_circle} size={16} />
-			<p className='pt-0.5'>Uncertainty</p>
-		</div>
-	);
-};
-
-export const FactLabel = () => {
-	return (
-		<div
-			className='flex items-center justify-center gap-1 rounded-xl
-            bg-[#FBDAC1] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
-		>
-			<Icon className='min-h-6' data={bookmarks} size={16} />
-			<p className='pt-0.5'>Fact</p>
-		</div>
-	);
-};
-
-export const UtilityLabel = () => {
-	return (
-		<div
-			className='flex items-center justify-center gap-1 rounded-xl
-            bg-[#CAE6FA] px-2 text-center text-xs leading-4 font-medium text-[#585858]'
-		>
-			<Icon className='min-h-6' data={utilityIcon} size={16} />
-			<p className='pt-0.5'>Utility</p>
-		</div>
-	);
-};
+export const DecisionLabel = () => <IssueTypeLabel type='Decision' />;
+export const UnassignedLabel = () => <IssueTypeLabel type='Unassigned' />;
+export const UncertaintyLabel = () => <IssueTypeLabel type='Uncertainty' />;
+export const FactLabel = () => <IssueTypeLabel type='Fact' />;
+export const UtilityLabel = () => <IssueTypeLabel type='Utility' />;
