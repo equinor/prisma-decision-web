@@ -1,7 +1,7 @@
 import { ObjectiveLink } from '../hooks/useObjectiveLinks';
 import { Objective, ObjectiveType } from '../validators';
 
-// One node per occurrence: an objective under several parents appears once under each of them
+// One node per objective, placed under its primary parent; links to other parents are cross-links
 export type ObjectiveTreeNode = {
 	key: string;
 	objective: Objective;
@@ -21,27 +21,32 @@ export const buildObjectiveForest = (
 	const objectivesById = new Map(
 		levels.flatMap(type => ordered[type].map(objective => [objective.id, objective])),
 	);
-	const childIds = new Map<string, string[]>();
-	links.forEach(link =>
-		childIds.set(link.parent_id, [...(childIds.get(link.parent_id) ?? []), link.child_id]),
-	);
-	const hasParent = new Set(links.map(link => link.child_id));
+	const positionOf = (objectiveId: string) => position.get(objectiveId) ?? 0;
 
-	const build = (objective: Objective, parentKey: string | null): ObjectiveTreeNode => {
-		const key = parentKey ? `${parentKey}/${objective.id}` : objective.id;
-		return {
-			key,
-			objective,
-			parentKey,
-			children: (childIds.get(objective.id) ?? [])
-				.toSorted((a, b) => (position.get(a) ?? 0) - (position.get(b) ?? 0))
-				.map(id => build(objectivesById.get(id)!, key)),
-		};
-	};
+	// The primary parent is the first linked parent in row order
+	const primaryParent = new Map<string, string>();
+	links
+		.toSorted((a, b) => positionOf(a.parent_id) - positionOf(b.parent_id))
+		.forEach(link => {
+			if (!primaryParent.has(link.child_id)) primaryParent.set(link.child_id, link.parent_id);
+		});
+	const childIds = new Map<string, string[]>();
+	primaryParent.forEach((parentId, childId) =>
+		childIds.set(parentId, [...(childIds.get(parentId) ?? []), childId]),
+	);
+
+	const build = (objective: Objective, parentKey: string | null): ObjectiveTreeNode => ({
+		key: objective.id,
+		objective,
+		parentKey,
+		children: (childIds.get(objective.id) ?? [])
+			.toSorted((a, b) => positionOf(a) - positionOf(b))
+			.map(id => build(objectivesById.get(id)!, objective.id)),
+	});
 
 	// Every Strategic objective is a root; lower objectives only when nothing links to them
 	const roots = levels.flatMap(type =>
-		ordered[type].filter(objective => type === 'Strategic' || !hasParent.has(objective.id)),
+		ordered[type].filter(objective => type === 'Strategic' || !primaryParent.has(objective.id)),
 	);
 	return roots.map(root => build(root, null));
 };

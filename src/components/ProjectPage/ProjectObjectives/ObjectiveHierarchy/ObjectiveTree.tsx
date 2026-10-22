@@ -1,5 +1,3 @@
-import { Icon } from '@equinor/eds-core-react';
-import { link } from '@equinor/eds-icons';
 import {
 	PointerEvent,
 	useCallback,
@@ -42,7 +40,6 @@ type PendingConnection = {
 	sourceId: string;
 	direction: ConnectorDirection;
 	pointer: Point;
-	// The hovered occurrence, so the line snaps to the copy under the pointer
 	targetKey: string | null;
 };
 
@@ -61,7 +58,7 @@ const buildVerticalBezierPath = (
 	return `M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}`;
 };
 
-// Top-down tree: an objective linked to several parents is repeated under each of them
+// Top-down tree: each objective is shown once, under its primary parent
 export const ObjectiveTree = () => {
 	const { selectedObjectives: objectives } = useSelectedProjectObjectives();
 	const { links: storedLinks, addLink } = useObjectiveLinks();
@@ -83,13 +80,6 @@ export const ObjectiveTree = () => {
 	const forest = useMemo(() => buildObjectiveForest(ordered, links), [ordered, links]);
 	const nodes = useMemo(() => flatten(forest), [forest]);
 	const nodesByKey = useMemo(() => new Map(nodes.map(node => [node.key, node])), [nodes]);
-	const occurrences = useMemo(() => {
-		const counts = new Map<string, number>();
-		nodes.forEach(node =>
-			counts.set(node.objective.id, (counts.get(node.objective.id) ?? 0) + 1),
-		);
-		return counts;
-	}, [nodes]);
 
 	const layout = useMemo(
 		() => layoutObjectiveTree(forest, () => nodeWidth, { nodeGap: 16, treeGap: 48 }),
@@ -104,7 +94,6 @@ export const ObjectiveTree = () => {
 				.map(node => heightOf(node.objective.id)),
 		);
 
-	// Every occurrence of an objective has the same width and content, so one height per objective
 	const measure = useCallback(() => {
 		const board = boardRef.current;
 		if (!board) return;
@@ -136,30 +125,35 @@ export const ObjectiveTree = () => {
 		return () => observer.disconnect();
 	}, [measure]);
 
-	// Org-chart connectors: down from the parent, along a shared line between the rows, down to the child
-	const edges = nodes.flatMap(node => {
-		const parent = node.parentKey ? nodesByKey.get(node.parentKey) : undefined;
+	// Primary links are org-chart connectors (down, along a shared line between the rows, down);
+	// links to other parents are curves so they don't merge into another parent's line
+	const edges = links.flatMap(link => {
+		const parent = nodesByKey.get(link.parent_id);
+		const child = nodesByKey.get(link.child_id);
 		const parentRow = parent && rowBoxes[parent.objective.type];
-		const childRow = rowBoxes[node.objective.type];
-		if (!parent || !parentRow || !childRow) return [];
+		const childRow = child && rowBoxes[child.objective.type];
+		if (!parent || !child || !parentRow || !childRow) return [];
 		const startX = parentRow.x + layout.offsets[parent.key] + nodeWidth / 2;
 		const startY = parentRow.y + heightOf(parent.objective.id);
-		const endX = childRow.x + layout.offsets[node.key] + nodeWidth / 2;
+		const endX = childRow.x + layout.offsets[child.key] + nodeWidth / 2;
 		const endY = childRow.y;
 		const busY = (parentRow.y + rowHeight(parent.objective.type) + endY) / 2;
 		return [
 			{
-				key: node.key,
-				objectiveIds: [parent.objective.id, node.objective.id],
-				path: buildRoundedPolylinePath(
-					[
-						[startX, startY],
-						[startX, busY],
-						[endX, busY],
-						[endX, endY],
-					],
-					6,
-				),
+				key: link.id,
+				objectiveIds: [parent.objective.id, child.objective.id],
+				path:
+					child.parentKey === parent.key
+						? buildRoundedPolylinePath(
+								[
+									[startX, startY],
+									[startX, busY],
+									[endX, busY],
+									[endX, endY],
+								],
+								6,
+							)
+						: buildVerticalBezierPath([startX, startY], [endX, endY], 1),
 			},
 		];
 	});
@@ -324,9 +318,6 @@ export const ObjectiveTree = () => {
 												key={node.key}
 												node={node}
 												left={layout.offsets[node.key] ?? 0}
-												occurrences={
-													occurrences.get(node.objective.id) ?? 1
-												}
 												highlighted={
 													!connection && hoveredId === node.objective.id
 												}
@@ -422,7 +413,6 @@ export const ObjectiveTree = () => {
 type TreeNodeCardProps = {
 	node: ObjectiveTreeNode;
 	left: number;
-	occurrences: number;
 	highlighted: boolean;
 	state: ObjectiveCardState;
 	dimmed: boolean;
@@ -443,7 +433,6 @@ type TreeNodeCardProps = {
 const TreeNodeCard = ({
 	node,
 	left,
-	occurrences,
 	highlighted,
 	state,
 	dimmed,
@@ -504,15 +493,6 @@ const TreeNodeCard = ({
 				<p className='min-w-0 flex-1 text-sm leading-5 font-medium break-words'>
 					{node.objective.name}
 				</p>
-				{occurrences > 1 && (
-					<span
-						className='text-text-tertiary flex shrink-0 items-center gap-0.5 text-xs font-medium'
-						title={`Shown ${occurrences} times – once under each objective it supports`}
-					>
-						<Icon data={link} size={16} className='fill-text-tertiary' />
-						{occurrences}
-					</span>
-				)}
 			</div>
 		</div>
 	);
