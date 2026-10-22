@@ -11,15 +11,14 @@ export const IssueCardEditableStates = () => {
 	const { issue } = useIssueCardContext();
 	const { expanded, toggle } = useExpandCard(issue.id);
 	const form = useIssueForm({ issue, optimistic: true });
-	const name = issue.type === 'Uncertainty' ? 'uncertainty.outcomes' : 'decision.options';
+	const isUncertainty = issue.type === 'Uncertainty';
 	const { fields, append, remove } = useFieldArray({
 		control: form.control,
-		name,
+		name: isUncertainty ? 'uncertainty.outcomes' : 'decision.options',
 		keyName: 'formId',
 	});
-	const states =
-		issue.type === 'Uncertainty' ? issue.uncertainty.outcomes : issue.decision.options;
-	const stateType = issue.type === 'Uncertainty' ? 'outcome' : 'option';
+	const states = isUncertainty ? issue.uncertainty.outcomes : issue.decision.options;
+	const stateType = isUncertainty ? 'outcome' : 'option';
 
 	const addState = () => {
 		const common = {
