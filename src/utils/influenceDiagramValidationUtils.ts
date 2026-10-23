@@ -135,3 +135,90 @@ export const hasOutcomesMissing = (nodes: Node<InfluenceNodeType>[], issues: Iss
 		})
 		.map(node => node.data.issue_id);
 };
+
+export const validateTotalRestriction = (
+	nodes: Node<InfluenceNodeType>[],
+	issues: Issue[],
+	edges: InfluenceEdge[],
+	restrictionTables: RestrictionTable[],
+): { uncertaintyParentRestriction: string[]; missingGrandchildEdges: string[] } => {
+	const issuesById = new Map(issues.map(issue => [issue.id, issue]));
+	const nodesById = new Map(nodes.map(node => [node.id, node]));
+	const restrictionTablesByEdgeId = new Map(
+		restrictionTables.map(table => [table.edge_id, table]),
+	);
+	const edgePairs = new Set(edges.map(edge => `${edge.tail_id}:${edge.head_id}`));
+	const uncertaintyParentRestrictionIssueIds = new Set<string>();
+	const missingGrandchildEdgeIssueIds = new Set<string>();
+
+	for (const node of nodes) {
+		const targetIssue = issuesById.get(node.data.issue_id);
+		if (!targetIssue) continue;
+
+		const childStateIds =
+			targetIssue.type === 'Decision'
+				? targetIssue.decision.options.map(option => option.id)
+				: targetIssue.type === 'Uncertainty'
+					? targetIssue.uncertainty.outcomes.map(outcome => outcome.id)
+					: [];
+		if (!childStateIds.length) continue;
+
+		const incomingEdges = edges.filter(edge => edge.head_id === node.id);
+		for (const edge of incomingEdges) {
+			const parentNode = nodesById.get(edge.tail_id);
+			const parentIssue = parentNode ? issuesById.get(parentNode.data.issue_id) : undefined;
+			const parentStateIds =
+				parentIssue?.type === 'Decision'
+					? parentIssue.decision.options.map(option => option.id)
+					: parentIssue?.type === 'Uncertainty'
+						? parentIssue.uncertainty.outcomes.map(outcome => outcome.id)
+						: [];
+			const restrictionTable = restrictionTablesByEdgeId.get(edge.id);
+			if (!parentIssue || !parentNode || !restrictionTable) continue;
+
+			const completelyRestricted = parentStateIds.some(parentStateId =>
+				childStateIds.every(childStateId =>
+					restrictionTable.restriction_entries.some(
+						entry =>
+							entry.parent_state_id === parentStateId &&
+							entry.child_state_id === childStateId &&
+							entry.restriction_value === 0,
+					),
+				),
+			);
+			const feedsUncertainty = edges.some(candidate => {
+				if (candidate.tail_id !== node.id) return false;
+				const childNode = nodesById.get(candidate.head_id);
+				return childNode && issuesById.get(childNode.data.issue_id)?.type === 'Uncertainty';
+			});
+
+			if (completelyRestricted && feedsUncertainty) {
+				uncertaintyParentRestrictionIssueIds.add(targetIssue.id);
+				continue;
+			}
+
+			const restrictedChildStateIds = new Set(
+				restrictionTable.restriction_entries
+					.filter(
+						entry =>
+							parentStateIds.includes(entry.parent_state_id) &&
+							childStateIds.includes(entry.child_state_id) &&
+							entry.restriction_value === 0,
+					)
+					.map(entry => entry.child_state_id),
+			);
+			if (!restrictedChildStateIds.size) continue;
+
+			for (const grandchildEdge of edges.filter(candidate => candidate.tail_id === node.id)) {
+				if (edgePairs.has(`${parentNode.id}:${grandchildEdge.head_id}`)) continue;
+				const grandchildNode = nodesById.get(grandchildEdge.head_id);
+				if (grandchildNode) missingGrandchildEdgeIssueIds.add(grandchildNode.data.issue_id);
+			}
+		}
+	}
+
+	return {
+		uncertaintyParentRestriction: [...uncertaintyParentRestrictionIssueIds],
+		missingGrandchildEdges: [...missingGrandchildEdgeIssueIds],
+	};
+};

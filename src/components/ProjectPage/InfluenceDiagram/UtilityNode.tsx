@@ -3,6 +3,7 @@ import { warning_outlined } from '@equinor/eds-icons';
 import { NodeProps, useEdges } from '@xyflow/react';
 import { useState } from 'react';
 import { ReactFlowInfluenceNode } from '../../../types';
+import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import {
 	IssueCard,
 	IssueCardContent,
@@ -21,6 +22,13 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 	const edges = useEdges();
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
+	const { validationErrors } = useHasInfluenceDiagramError();
+	const hasInvalidRestrictions = validationErrors.UncertaintyParentRestriction.includes(
+		data.issue_id,
+	);
+	const hasMissingGrandchildEdges = validationErrors.MissingGrandchildEdges.includes(
+		data.issue_id,
+	);
 	if (!issue) return null;
 
 	return (
@@ -45,12 +53,34 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 					<IssueCardContent descriptionClassName='line-clamp-2' />
 				</IssueCard>
 			</InfluenceNodeShell>
-			{!hasTwoOrMoreParents && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>
-						Connect 2+ parent nodes to enable utility table and solver
-					</p>
+			{(!hasTwoOrMoreParents || hasInvalidRestrictions || hasMissingGrandchildEdges) && (
+				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
+					{!hasTwoOrMoreParents && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Connect 2+ parent nodes to enable utility table and solver
+							</p>
+						</div>
+					)}
+					{hasInvalidRestrictions && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Has invalid restrictions. You cannot fully restrict a parent of an
+								uncertainty.
+							</p>
+						</div>
+					)}
+					{hasMissingGrandchildEdges && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Missing a direct edge from the restricting parent to this
+								grandchild.
+							</p>
+						</div>
+					)}
 				</div>
 			)}
 			{utilityTableOpen && (

@@ -99,6 +99,12 @@ export const InfluenceDiagramValidation = () => {
 							fix='Add the outcome values that sum up to 1.'
 							isError={validationErrors.ProbabilityTable.length > 0}
 						/>
+						<ValidationRuleItem
+							label='Restrictions'
+							warning='A parent state restricts every state of an uncertainty or of a node that directly parents an uncertainty, or a restricted child has a grandchild without a direct edge from that parent.'
+							fix='Allow at least one state, or connect the restricting parent directly to each immediate grandchild.'
+							isError={validationErrors.UncertaintyParentRestriction.length > 0}
+						/>
 					</Accordion>
 				</Popover.Content>
 			</Popover>

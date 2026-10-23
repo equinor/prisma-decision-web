@@ -33,6 +33,12 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 	const hasInvalidProbabilityTable = !!validationErrors.ProbabilityTable.find(
 		x => x === data.issue_id,
 	);
+	const hasInvalidRestrictions = validationErrors.UncertaintyParentRestriction.includes(
+		data.issue_id,
+	);
+	const hasMissingGrandchildEdges = validationErrors.MissingGrandchildEdges.includes(
+		data.issue_id,
+	);
 
 	if (!issue) return null;
 
@@ -68,16 +74,41 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 					</IssueCardStates>
 				</IssueCard>
 			</InfluenceNodeShell>
-			{hasMissingOutcomes && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>Has missing outcomes</p>
-				</div>
-			)}
-			{hasInvalidProbabilityTable && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>Has invalid probability table</p>
+			{(hasMissingOutcomes ||
+				hasInvalidProbabilityTable ||
+				hasInvalidRestrictions ||
+				hasMissingGrandchildEdges) && (
+				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
+					{hasMissingOutcomes && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>Has missing outcomes</p>
+						</div>
+					)}
+					{hasInvalidProbabilityTable && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>Has invalid probability table</p>
+						</div>
+					)}
+					{hasInvalidRestrictions && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Has invalid restrictions. You cannot fully restrict a parent of an
+								uncertainty.
+							</p>
+						</div>
+					)}
+					{hasMissingGrandchildEdges && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Missing a direct edge from the restricting parent to this
+								grandchild.
+							</p>
+						</div>
+					)}
 				</div>
 			)}
 			{probabilityTableOpen && (

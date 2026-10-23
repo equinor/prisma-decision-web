@@ -26,10 +26,12 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
 	const selectedOption = issue?.decision.options.find(o => evidence.includes(o.id));
 	const {
-		validationErrors: { DecisionOptions },
+		validationErrors: { DecisionOptions, UncertaintyParentRestriction, MissingGrandchildEdges },
 	} = useHasInfluenceDiagramError();
 	if (!issue) return null;
 	const hasMissingOptions = !!DecisionOptions.find(x => x === data.issue_id);
+	const hasInvalidRestrictions = UncertaintyParentRestriction.includes(data.issue_id);
+	const hasMissingGrandchildEdges = MissingGrandchildEdges.includes(data.issue_id);
 
 	return (
 		<div className='flex flex-col gap-1'>
@@ -66,10 +68,32 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 			{policyTableOpen && (
 				<PolicyTable issue={issue} selected={selected} onClose={setPolicyTableOpen} />
 			)}
-			{hasMissingOptions && (
-				<div className='absolute -top-7 flex  gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>Has missing options</p>
+			{(hasMissingOptions || hasInvalidRestrictions || hasMissingGrandchildEdges) && (
+				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
+					{hasMissingOptions && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>Has missing options</p>
+						</div>
+					)}
+					{hasInvalidRestrictions && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Has invalid restrictions. You cannot fully restrict a parent of an
+								uncertainty.
+							</p>
+						</div>
+					)}
+					{hasMissingGrandchildEdges && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Missing a direct edge from the restricting parent to this
+								grandchild.
+							</p>
+						</div>
+					)}
 				</div>
 			)}
 		</div>
