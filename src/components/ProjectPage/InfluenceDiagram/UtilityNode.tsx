@@ -3,7 +3,6 @@ import { warning_outlined } from '@equinor/eds-icons';
 import { NodeProps, useEdges } from '@xyflow/react';
 import { useState } from 'react';
 import { ReactFlowInfluenceNode } from '../../../types';
-import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import {
 	IssueCard,
 	IssueCardContent,
