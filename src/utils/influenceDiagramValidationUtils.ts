@@ -136,46 +136,52 @@ export const hasOutcomesMissing = (nodes: Node<InfluenceNodeType>[], issues: Iss
 		.map(node => node.data.issue_id);
 };
 
+const getIssueStateIds = (issue: Issue): string[] => {
+	if (issue.type === 'Decision') return issue.decision.options.map(option => option.id);
+	if (issue.type === 'Uncertainty') return issue.uncertainty.outcomes.map(outcome => outcome.id);
+	return [];
+};
+
 export const validateTotalRestriction = (
 	nodes: Node<InfluenceNodeType>[],
 	issues: Issue[],
 	edges: InfluenceEdge[],
 	restrictionTables: RestrictionTable[],
 ): { uncertaintyParentRestriction: string[]; missingGrandchildEdges: string[] } => {
+	const diagramNodes = getNodesInOrOnBoundary(nodes, issues);
 	const issuesById = new Map(issues.map(issue => [issue.id, issue]));
-	const nodesById = new Map(nodes.map(node => [node.id, node]));
+	const nodesById = new Map(diagramNodes.map(node => [node.id, node]));
+	const diagramEdges = edges.filter(
+		edge => nodesById.has(edge.tail_id) && nodesById.has(edge.head_id),
+	);
 	const restrictionTablesByEdgeId = new Map(
 		restrictionTables.map(table => [table.edge_id, table]),
 	);
-	const edgePairs = new Set(edges.map(edge => `${edge.tail_id}:${edge.head_id}`));
+	const edgePairs = new Set(diagramEdges.map(edge => `${edge.tail_id}:${edge.head_id}`));
 	const uncertaintyParentRestrictionIssueIds = new Set<string>();
 	const missingGrandchildEdgeIssueIds = new Set<string>();
 
-	for (const node of nodes) {
+	for (const node of diagramNodes) {
 		const targetIssue = issuesById.get(node.data.issue_id);
 		if (!targetIssue) continue;
 
-		const childStateIds =
-			targetIssue.type === 'Decision'
-				? targetIssue.decision.options.map(option => option.id)
-				: targetIssue.type === 'Uncertainty'
-					? targetIssue.uncertainty.outcomes.map(outcome => outcome.id)
-					: [];
+		const childStateIds = getIssueStateIds(targetIssue);
 		if (!childStateIds.length) continue;
 
-		const incomingEdges = edges.filter(edge => edge.head_id === node.id);
+		const incomingEdges = diagramEdges.filter(edge => edge.head_id === node.id);
+		const outgoingEdges = diagramEdges.filter(edge => edge.tail_id === node.id);
+		const hasUncertaintyChild = outgoingEdges.some(edge => {
+			const childNode = nodesById.get(edge.head_id);
+			return childNode && issuesById.get(childNode.data.issue_id)?.type === 'Uncertainty';
+		});
+
 		for (const edge of incomingEdges) {
 			const parentNode = nodesById.get(edge.tail_id);
 			const parentIssue = parentNode ? issuesById.get(parentNode.data.issue_id) : undefined;
-			const parentStateIds =
-				parentIssue?.type === 'Decision'
-					? parentIssue.decision.options.map(option => option.id)
-					: parentIssue?.type === 'Uncertainty'
-						? parentIssue.uncertainty.outcomes.map(outcome => outcome.id)
-						: [];
 			const restrictionTable = restrictionTablesByEdgeId.get(edge.id);
 			if (!parentIssue || !parentNode || !restrictionTable) continue;
 
+			const parentStateIds = getIssueStateIds(parentIssue);
 			const completelyRestricted = parentStateIds.some(parentStateId =>
 				childStateIds.every(childStateId =>
 					restrictionTable.restriction_entries.some(
@@ -186,32 +192,22 @@ export const validateTotalRestriction = (
 					),
 				),
 			);
-			const feedsUncertainty = edges.some(candidate => {
-				if (candidate.tail_id !== node.id) return false;
-				const childNode = nodesById.get(candidate.head_id);
-				return childNode && issuesById.get(childNode.data.issue_id)?.type === 'Uncertainty';
-			});
+			if (!completelyRestricted) continue;
 
-			if (completelyRestricted && feedsUncertainty) {
+			if (hasUncertaintyChild) {
 				uncertaintyParentRestrictionIssueIds.add(targetIssue.id);
 				continue;
 			}
 
-			const restrictedChildStateIds = new Set(
-				restrictionTable.restriction_entries
-					.filter(
-						entry =>
-							parentStateIds.includes(entry.parent_state_id) &&
-							childStateIds.includes(entry.child_state_id) &&
-							entry.restriction_value === 0,
-					)
-					.map(entry => entry.child_state_id),
-			);
-			if (!restrictedChildStateIds.size) continue;
-
-			for (const grandchildEdge of edges.filter(candidate => candidate.tail_id === node.id)) {
+			for (const grandchildEdge of outgoingEdges) {
 				if (edgePairs.has(`${parentNode.id}:${grandchildEdge.head_id}`)) continue;
 				const grandchildNode = nodesById.get(grandchildEdge.head_id);
+				if (
+					grandchildNode &&
+					issuesById.get(grandchildNode.data.issue_id)?.type === 'Utility'
+				) {
+					continue;
+				}
 				if (grandchildNode) missingGrandchildEdgeIssueIds.add(grandchildNode.data.issue_id);
 			}
 		}
