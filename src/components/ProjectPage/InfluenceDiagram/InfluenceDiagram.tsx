@@ -72,12 +72,12 @@ export const InfluenceDiagram = () => {
 					onEdgesChange={onEdgesChange}
 					onEdgesDelete={onEdgesDelete}
 					zoomOnDoubleClick={false}
-					panOnDrag={!isSelecting}
+					panOnDrag
 					connectOnClick={false}
 					nodesDraggable={nodeView === 'shape'}
 					nodeDragThreshold={4}
 					onNodeDragStop={onNodeDragStop}
-					selectNodesOnDrag={isSelecting}
+					selectNodesOnDrag={false}
 					selectionKeyCode={['Control']}
 					onReconnect={onReconnect}
 					selectionOnDrag={true}

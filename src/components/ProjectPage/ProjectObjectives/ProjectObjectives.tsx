@@ -1,4 +1,8 @@
-import { Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
+import { CreateObjective } from './CreateObjective';
+import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
+import { format } from 'date-fns';
+import { EditObjectiveDialog } from './EditObjectiveDialog';
 import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
@@ -9,7 +13,6 @@ import { Objective } from '../../../validators';
 import { ObjectiveHierarchy } from './ObjectiveHierarchy/ObjectiveHierarchy';
 import { ObjectiveTree } from './ObjectiveHierarchy/ObjectiveTree';
 import { SegmentedControl } from '../../common/SegmentedControl';
-import { CreateObjective } from './CreateObjective';
 
 const hierarchyLayouts = [
 	{ value: 'diagram', label: 'Diagram' },

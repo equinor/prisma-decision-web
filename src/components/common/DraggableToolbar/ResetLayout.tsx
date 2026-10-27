@@ -1,7 +1,7 @@
 import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { restore } from '@equinor/eds-icons';
 import { useNodes } from '@xyflow/react';
-import { useInfluenceDiagramCustomPositions } from '../../../../hooks/useInfluenceDiagramCustomPositions';
+import { useInfluenceDiagramCustomPositions } from '../../../hooks/useInfluenceDiagramCustomPositions';
 
 export const ResetLayout = () => {
 	const [customPositions, setCustomPositions] = useInfluenceDiagramCustomPositions();

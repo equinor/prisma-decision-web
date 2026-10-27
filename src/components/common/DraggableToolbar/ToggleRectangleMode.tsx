@@ -18,7 +18,7 @@ export const ToggleRectangleMode = () => {
 			title='Rectangle mode'
 		>
 			<Button className='relative px-1.5!'>
-				<Icon data={checkbox_outline} />
+				<Icon data={rectangleIcon} />
 				<p className='absolute right-0.5 -bottom-0.5 text-xs'>2</p>
 			</Button>
 		</Button.Toggle>

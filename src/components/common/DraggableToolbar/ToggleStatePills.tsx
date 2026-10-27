@@ -1,6 +1,6 @@
 import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { visibility } from '@equinor/eds-icons';
-import { useInfluenceDiagramStatePills } from '../../../../hooks/useInfluenceDiagramStatePills';
+import { useInfluenceDiagramStatePills } from '../../../hooks/useInfluenceDiagramStatePills';
 
 export const ToggleStatePills = () => {
 	const [showStatePills, setShowStatePills] = useInfluenceDiagramStatePills();

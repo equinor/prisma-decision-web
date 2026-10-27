@@ -1,5 +1,4 @@
-import { Button, Icon } from '@equinor/eds-core-react';
-import { select_all } from '@equinor/eds-icons';
+import { Button } from '@equinor/eds-core-react';
 import { useAtom } from 'jotai';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
 import { DragToSelectIcon } from '../DragToSelectIcon';
@@ -17,7 +16,7 @@ export const ToggleSelectionMode = () => {
 			title='Toggle selection mode'
 		>
 			<Button className='px-1.5!'>
-				<Icon data={select_all} />
+				<DragToSelectIcon />
 			</Button>
 		</Button.Toggle>
 	);

@@ -1,6 +1,6 @@
 import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { category, credit_card } from '@equinor/eds-icons';
-import { useInfluenceDiagramNodeView } from '../../../../hooks/useInfluenceDiagramNodeView';
+import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramNodeView';
 
 export const ToggleNodeView = () => {
 	const [nodeView, setNodeView] = useInfluenceDiagramNodeView();

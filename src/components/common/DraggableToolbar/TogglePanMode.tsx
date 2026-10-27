@@ -18,7 +18,7 @@ export const TogglePanMode = () => {
 			title='Toggle pan mode'
 		>
 			<Button className='relative px-1.5!'>
-				<Icon data={pan_tool} />
+				<DragIcon />
 				<p className='absolute right-0.5 -bottom-0.5 text-xs'>1</p>
 			</Button>
 		</Button.Toggle>
