@@ -9,6 +9,7 @@ import { useGetRestrictionTables } from '../../hooks/api/useGetRestrictionTables
 import { useGetUtilityTables } from '../../hooks/api/useGetUtilityTables';
 import { useGetWhiteboardNodes } from '../../hooks/api/useGetWhiteboardNodes';
 import { useGetWhiteboardSheets } from '../../hooks/api/useGetWhiteboardSheets';
+import { useGetStakeholderMatrixes } from '../../hooks/api/useGetStakeholderMatrixes';
 import {
 	DiscretePolicy,
 	DiscreteProbability,
@@ -18,6 +19,7 @@ import {
 	Objective,
 	Project,
 	RestrictionTable,
+	StakeholderMatrixEntry,
 	Strategy,
 	WhiteboardNode,
 	WhiteboardSheet,
@@ -35,6 +37,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 	const { nodes: whiteboardNodes } = useGetWhiteboardNodes();
 	const { strategies } = useGetStrategies();
 	const { data: whiteboardSheets } = useGetWhiteboardSheets();
+	const { data: stakeholderMatrixes } = useGetStakeholderMatrixes();
 	const projectIssues: Issue[] = issues.filter(issue => issue.project_id === project.id);
 	const projectEdges = edges.filter(edge => edge.project_id === project.id);
 	const projectObjectives: Objective[] = objectives.filter(
@@ -55,6 +58,9 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 	const projectRestrictionTables: RestrictionTable[] = restrictionTables.filter(
 		table => table.project_id === project.id,
 	);
+	const projectStakeholderMatrixes: StakeholderMatrixEntry[] = stakeholderMatrixes.filter(
+		table => table.project_id === project.id,
+	);
 
 	const convertToJson = (data: {
 		projects: Project;
@@ -68,6 +74,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 		strategies: Strategy[];
 		board_nodes: WhiteboardNode[];
 		board_sheets: WhiteboardSheet[];
+		stakeholder_matrix_entries: StakeholderMatrixEntry[];
 	}) => {
 		const json = JSON.stringify(data, null, 2);
 		const blob = new Blob([json], { type: 'application/json' });
@@ -101,6 +108,7 @@ export const ExportProject = ({ project, showLabel }: DownloadProjectJsonButtonP
 						strategies: projectStrategies,
 						board_nodes: projectWhiteboardNodes,
 						board_sheets: projectWhiteboardSheets,
+						stakeholder_matrix_entries: projectStakeholderMatrixes,
 					});
 				}}
 			>

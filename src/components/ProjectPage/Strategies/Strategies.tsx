@@ -9,24 +9,24 @@ import { useSelectedProject } from '../ProjectContext';
 export const Strategies = () => {
 	const selectedProject = useSelectedProject();
 	const { selectedStrategies, isLoading } = useSelectedProjectStrategies();
-	const [selectedStrategyIds, setSelectedStrategyIds] = useState<Set<string>>(new Set());
+	const [hiddenStrategyIds, setHiddenStrategyIds] = useState<Set<string>>(new Set());
 
 	const handleClickAddToStrategyTable = (id: string) => {
-		if (selectedStrategyIds.has(id)) {
-			setSelectedStrategyIds(prev => {
+		if (hiddenStrategyIds.has(id)) {
+			setHiddenStrategyIds(prev => {
 				const newSet = new Set(prev);
 				newSet.delete(id);
 				return newSet;
 			});
 		} else {
-			setSelectedStrategyIds(prev => {
+			setHiddenStrategyIds(prev => {
 				const newSet = new Set(prev);
 				newSet.add(id);
 				return newSet;
 			});
 		}
 	};
-	const strategiesToCompare = selectedStrategies.filter(s => selectedStrategyIds.has(s.id)) ?? [];
+	const strategiesToCompare = selectedStrategies.filter(s => !hiddenStrategyIds.has(s.id)) ?? [];
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
@@ -55,7 +55,7 @@ export const Strategies = () => {
 						<Strategy
 							key={strategy.id}
 							strategy={strategy}
-							selectedStrategyIds={selectedStrategyIds}
+							hiddenStrategyIds={hiddenStrategyIds}
 							onClickAddToStrategyTable={handleClickAddToStrategyTable}
 						/>
 					);

@@ -47,7 +47,7 @@ export const AssessmentTrend = () => {
 					>
 						<CartesianGrid className='stroke-gray-500/30' vertical={false} />
 						<XAxis dataKey='name' tickLine={false} axisLine={false} tickMargin={8} />
-						<YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
+						<YAxis domain={[0, 5]} tickLine={false} axisLine={false} />
 						<Tooltip cursor={false} />
 						<Legend />
 						{evaluationMetrics.map(metric => (

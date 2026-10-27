@@ -1,4 +1,5 @@
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -14,7 +15,9 @@ const queryClient = new QueryClient({
 	},
 	queryCache: new QueryCache({
 		onError: (error, query) => {
-			if (query.meta?.errorMessage) {
+			if (isAxiosError(error) && error.response?.status === 501) {
+				showErrorToast('Total restrictions not supported yet');
+			} else if (query.meta?.errorMessage) {
 				showErrorToast(query.meta.errorMessage as string);
 			} else {
 				showErrorToast((error as Error).message);

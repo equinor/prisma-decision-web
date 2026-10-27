@@ -30,7 +30,7 @@ export const DecisionQualityAssessmentForm = ({
 			<div className='mb-4'>
 				<h3 className='text-lg font-semibold'>{assessment.name ?? 'New Evaluation'}</h3>
 				<p className='text-text-tertiary text-sm'>
-					Rate each metric from 0 to 100 to evaluate this project.
+					Rate each metric from 0 to 5 to evaluate this project.
 				</p>
 			</div>
 
@@ -42,13 +42,15 @@ export const DecisionQualityAssessmentForm = ({
 								<TextField
 									label={m.label}
 									type='number'
-									step='any'
+									min={0}
+									max={5}
+									step={1}
 									{...register(m.key, {
 										setValueAs: value => {
 											return Number(value);
 										},
 									})}
-									meta='0-100'
+									meta='0-5'
 								/>
 								<ErrorMessage as={FormErrorMessage} name={m.key} errors={errors} />
 							</div>

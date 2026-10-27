@@ -3,6 +3,7 @@ import { useSelectedProjectEdges } from '../../../../hooks/useSelectedProjectEdg
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { useSelectedProjectRestrictionTables } from '../../../../hooks/useSelectedProjectRestrictionTables';
 import { getRestrictedEntriesForTargetNode } from '../../../../utils/getProbabilityRestrictions';
+import { sortByCreatedAt } from '../../../../utils/sortByCreatedAt';
 import { Issue } from '../../../../validators';
 import { useGetProbabilityTables } from '../../../../hooks/api/useGetProbabilityTables';
 import { getDiscreteValueRows } from '../DiscreteValueTable/getDiscreteValueRows';
@@ -11,7 +12,7 @@ export const useProbablityTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();
 	const { edges } = useSelectedProjectEdges();
 	const { restrictionTables } = useSelectedProjectRestrictionTables();
-	const childOutcomes = issue.uncertainty.outcomes;
+	const childOutcomes = sortByCreatedAt(issue.uncertainty.outcomes);
 	const { data: probabilityTables } = useGetProbabilityTables();
 	const discreteProbabilities =
 		probabilityTables.find(pt => pt.issue_id === issue.id)?.discrete_probabilities || [];

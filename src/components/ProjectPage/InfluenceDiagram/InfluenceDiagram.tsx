@@ -5,13 +5,13 @@ import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramN
 import { useEffect, useState } from 'react';
 import { DecisionNode } from './DecisionNode';
 import { EditIssueSideSheet } from './EditIssueSideSheet';
-import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { InfluenceEdge } from './InfluenceEdge';
 import { DecisionShapeNode, UncertaintyShapeNode, UtilityShapeNode } from './InfluenceShapeNode';
 import { SheetIssueIdContext } from './SheetIssueIdContext';
 import { UncertaintyNode } from './UncertaintyNode';
 import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
+import { InfluenceDiagramToolbar } from './InfluenceDiagramToolbar';
 
 const cardNodeTypes = {
 	decision: DecisionNode,
@@ -32,15 +32,13 @@ export const InfluenceDiagram = () => {
 		nodes,
 		edges,
 		onConnect,
+		onEdgesDelete,
 		isValidConnection,
 		onNodesChange,
 		onNodeDragStop,
 		onEdgesChange,
 		onReconnect,
 		onReconnectStart,
-		onClickPanMode,
-		onClickSelectionMode,
-		isSelecting,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	} = useInfluenceDiagram();
@@ -72,6 +70,7 @@ export const InfluenceDiagram = () => {
 					selectionMode={SelectionMode.Partial}
 					connectionMode={ConnectionMode.Strict}
 					onEdgesChange={onEdgesChange}
+					onEdgesDelete={onEdgesDelete}
 					zoomOnDoubleClick={false}
 					panOnDrag={!isSelecting}
 					connectOnClick={false}
@@ -88,14 +87,14 @@ export const InfluenceDiagram = () => {
 					onEdgeMouseLeave={onEdgeMouseLeave}
 					onNodeClick={(_, node) => {
 						if (nodeView === 'shape') {
-								if (sheetIssueId === node.data.issue_id) {
-									onNodesChange([
-										{ id: node.id, type: 'select', selected: false },
-									]);
-									setSheetIssueId(null);
-								} else {
-									setSheetIssueId(node.data.issue_id);
-								}
+							if (sheetIssueId === node.data.issue_id) {
+								onNodesChange([
+									{ id: node.id, type: 'select', selected: false },
+								]);
+								setSheetIssueId(null);
+							} else {
+								setSheetIssueId(node.data.issue_id);
+							}
 						}
 					}}
 					nodeTypes={nodeTypes}
@@ -107,10 +106,7 @@ export const InfluenceDiagram = () => {
 					fitView
 				>
 					<Background />
-					<DraggableToolbar
-						onClickPanMode={onClickPanMode}
-						onClickSelectionMode={onClickSelectionMode}
-					/>
+					<InfluenceDiagramToolbar />
 				</ReactFlow>
 				{nodeView === 'shape' && sheetIssueId && (
 					<EditIssueSideSheet

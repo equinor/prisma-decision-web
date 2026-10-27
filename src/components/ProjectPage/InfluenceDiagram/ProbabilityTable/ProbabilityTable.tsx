@@ -1,6 +1,6 @@
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
-import { getDiagramIssueBorderColor } from '../../../../utils/getDiagramIssueBorderColor';
+import { useBulkUpdateDiscreteProbabilities } from '../../../../hooks/api/useUpdateDiscreteProbabilities';
 import { isDevelopment } from '../../../../utils/getEnvironment';
 import { getRestrictedOutcomeIds } from '../../../../utils/getProbabilityRestrictions';
 import { Issue } from '../../../../validators';
@@ -9,7 +9,6 @@ import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
 import { DiscreteProbabilityCell } from './DiscreteProbabilityCell';
 import { useProbablityTable } from './useProbablityTable';
 import { calculateRowSum, isRowSumValid } from './utils';
-import { useBulkUpdateDiscreteProbabilities } from '../../../../hooks/api/useUpdateDiscreteProbabilities';
 
 const getRandomProbabilities = (count: number): number[] => {
 	const cutPoints = Array.from({ length: Math.max(0, count - 1) }, () =>
@@ -68,7 +67,7 @@ export const ProbabilityTable = ({ issue, selected, onClose, ref }: ProbabilityT
 			ref={ref}
 			issueType={issue.type}
 			selected={!!selected}
-			className={`w-auto rounded-sm border-2 px-2 pt-1 pb-2 ${getDiagramIssueBorderColor(issue.type, !!selected)}`}
+			className='w-auto rounded-sm border-2 px-2 pt-1 pb-2'
 		>
 			<div className='flex flex-col'>
 				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>

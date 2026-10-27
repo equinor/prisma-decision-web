@@ -22,6 +22,8 @@ export const useDuplicateProject = () => {
 			queryClient.refetchQueries({ queryKey: ['utilityTables'] });
 			queryClient.refetchQueries({ queryKey: ['whiteboardNodes'] });
 			queryClient.refetchQueries({ queryKey: ['whiteboardSheets'] });
+			queryClient.refetchQueries({ queryKey: ['restrictionTables'] });
+			queryClient.refetchQueries({ queryKey: ['stakeholderMatrixes'] });
 			await queryClient.refetchQueries({ queryKey: ['projects'] });
 			navigate(`/project/${data.id}`);
 		},

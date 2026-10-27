@@ -45,9 +45,11 @@ export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) =
 									</IssueCardMenu>
 								</IssueCardHeader>
 								<IssueCardExpandableContent />
-								<IssueCardStates>
-									<IssueCardExpandTrigger />
-								</IssueCardStates>
+								{issue.type !== 'Fact' && (
+									<IssueCardStates>
+										<IssueCardExpandTrigger />
+									</IssueCardStates>
+								)}
 							</IssueCard>
 						</DraggableIssueContainer>
 					);

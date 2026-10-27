@@ -6,8 +6,10 @@ import { useUpdateObjective } from './api/useUpdateObjective';
 import { useCreateObjectiveOptimistic } from './api/useCreateObjective';
 import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 
-export const useObjectiveForm = ({ objective, onSuccess, onValidSubmit }: UseObjectiveFormArgs) => {
+export const useObjectiveForm = (props: UseObjectiveFormArgs) => {
+	const { onValidSubmit } = props || {};
 	const selectedProject = useSelectedProject();
+	const { objective, onSuccess } = props || {};
 
 	const defaultValues = useMemo(
 		() => objective || getDefaultValues(selectedProject.id),
@@ -15,7 +17,7 @@ export const useObjectiveForm = ({ objective, onSuccess, onValidSubmit }: UseObj
 	);
 
 	const formMethods = useForm({
-		defaultValues,
+		values: defaultValues,
 		resolver: zodResolver(objectiveSchema),
 	});
 
@@ -28,6 +30,7 @@ export const useObjectiveForm = ({ objective, onSuccess, onValidSubmit }: UseObj
 
 	const { mutate: updateObjective, isPending: isUpdating } = useUpdateObjective({
 		onSuccess: onSuccess,
+		scope: objective?.id,
 	});
 
 	const handleSubmit = formMethods.handleSubmit(
@@ -64,4 +67,4 @@ type UseObjectiveFormArgs = {
 	objective?: Objective;
 	onSuccess?: () => void;
 	onValidSubmit?: (data: Objective) => void;
-};
+} | void;

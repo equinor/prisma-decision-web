@@ -15,19 +15,17 @@ import { EVMetrics } from '../../common/EVMetrics';
 import { DeleteStrategyDialog } from './DeleteStrategyDialog';
 import { EditStrategy } from './EditStrategy';
 import { strategyIcons } from './icons';
-import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
 
 export const Strategy = ({
 	strategy,
 	onClickAddToStrategyTable,
-	selectedStrategyIds,
+	hiddenStrategyIds,
 }: {
 	strategy: StrategyType;
 	onClickAddToStrategyTable: (id: string) => void;
-	selectedStrategyIds: Set<string>;
+	hiddenStrategyIds: Set<string>;
 }) => {
 	const { mutate: updateStrategy } = useUpdateStrategy();
-	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
 	const selectedEvidence = [
 		{
 			evidence_id: strategy.id,
@@ -84,7 +82,7 @@ export const Strategy = ({
 					<Checkbox
 						label='Add to compare'
 						className='flex-row-reverse'
-						checked={selectedStrategyIds?.has(strategy.id)}
+						checked={!hiddenStrategyIds?.has(strategy.id)}
 						onChange={() => onClickAddToStrategyTable(strategy.id)}
 					/>
 					<EditStrategy strategy={strategy} />
@@ -112,10 +110,7 @@ export const Strategy = ({
 									</IssueCardMenu>
 								</IssueCardHeader>
 								<IssueCardContent />
-								<IssueCardStates
-									expandedProp
-									disabledStateIds={fullyRestrictedStateIds}
-								/>
+								<IssueCardStates expandedProp />
 							</IssueCard>
 						);
 					})}

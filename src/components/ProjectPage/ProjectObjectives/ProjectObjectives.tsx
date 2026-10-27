@@ -1,8 +1,4 @@
-import { Button, Icon, Table } from '@equinor/eds-core-react';
-import { CreateObjective } from './CreateObjective';
-import { DeleteObjectiveDialog } from './DeleteObjectiveDialog';
-import { format } from 'date-fns';
-import { EditObjectiveDialog } from './EditObjectiveDialog';
+import { Table } from '@equinor/eds-core-react';
 import { useSelectedProjectObjectives } from '../../../hooks/useSelectedProjectObjectives';
 import { LoadingSpinner } from '../../common/LoadingSpinner';
 import { useSelectedProject } from '../ProjectContext';
@@ -13,6 +9,7 @@ import { Objective } from '../../../validators';
 import { ObjectiveHierarchy } from './ObjectiveHierarchy/ObjectiveHierarchy';
 import { ObjectiveTree } from './ObjectiveHierarchy/ObjectiveTree';
 import { SegmentedControl } from '../../common/SegmentedControl';
+import { CreateObjective } from './CreateObjective';
 
 const hierarchyLayouts = [
 	{ value: 'diagram', label: 'Diagram' },
@@ -100,7 +97,7 @@ export const ProjectObjectives = () => {
 						</div>
 					</div>
 					{selectedObjectives.length > 0 && (
-						<div className='outline-background-medium w-full overflow-auto rounded-sm outline-1'>
+						<div className='outline-background-medium w-full overflow-x-auto overflow-y-hidden rounded-sm outline-1'>
 							<Table className='w-full'>
 								<Table.Head>
 									<Table.Row>

@@ -9,10 +9,12 @@ import {
 	NodeChange,
 	OnConnect,
 	OnNodeDrag,
+	OnEdgesDelete,
 	OnReconnect,
 } from '@xyflow/react';
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useRef } from 'react';
 import { useCreateEdge } from '../../../hooks/api/useCreateEdge';
+import { useBulkDeleteEdges } from '../../../hooks/api/useDeleteEdge';
 import { useUpdateEdge } from '../../../hooks/api/useUpdateEdge';
 import { useInfluenceDiagramCustomPositions } from '../../../hooks/useInfluenceDiagramCustomPositions';
 import { useInfluenceDiagramLayout } from '../../../hooks/useInfluenceDiagramLayout';
@@ -29,6 +31,7 @@ import { useSelectedProject } from '../ProjectContext';
 export const useInfluenceDiagram = () => {
 	const issues = useSelectedProjectIssues();
 	const { mutate: createEdge } = useCreateEdge();
+	const { mutate: deleteEdges } = useBulkDeleteEdges();
 	const { mutate: updateEdge } = useUpdateEdge();
 	const selectedProject = useSelectedProject();
 	const [layoutOptions] = useInfluenceDiagramSettings();
@@ -39,7 +42,6 @@ export const useInfluenceDiagram = () => {
 
 	const draggingEdge = useRef<FlowEdge | null>(null);
 	const hoveredEdgeId = useRef<string | null>(null);
-	const [isSelecting, setIsSelecting] = useState(false);
 
 	const updateHoveredEdge = (edgeId: string | null) => {
 		hoveredEdgeId.current = edgeId;
@@ -74,6 +76,10 @@ export const useInfluenceDiagram = () => {
 		createEdge(newEdge);
 	};
 
+	const onEdgesDelete: OnEdgesDelete = edges => {
+		if (edges.length) deleteEdges(edges.map(edge => edge.id));
+	};
+
 	const onReconnect: OnReconnect = async (oldEdge, newConnection) => {
 		if (sourceIsUtility(newConnection.source)) return;
 		const updatedEdge = {
@@ -88,14 +94,6 @@ export const useInfluenceDiagram = () => {
 
 	const onReconnectStart = (_: MouseEvent, edge: FlowEdge) => {
 		draggingEdge.current = edge;
-	};
-
-	const onClickSelectionMode = () => {
-		setIsSelecting(true);
-	};
-
-	const onClickPanMode = () => {
-		setIsSelecting(false);
 	};
 
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
@@ -205,15 +203,13 @@ export const useInfluenceDiagram = () => {
 		nodes: positionedNodes,
 		edges: positionedEdges,
 		onConnect,
+		onEdgesDelete,
 		onReconnect,
 		onReconnectStart,
 		onNodesChange,
 		onNodeDragStop,
 		onEdgesChange,
 		isValidConnection,
-		isSelecting,
-		onClickSelectionMode,
-		onClickPanMode,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	};

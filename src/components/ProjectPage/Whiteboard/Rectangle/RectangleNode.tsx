@@ -71,16 +71,6 @@ export const RectangleNode = ({
 				preserveAspectRatio='none'
 			>
 				<rect
-					x={0}
-					y={0}
-					width={resolvedWidth}
-					height={resolvedHeight}
-					rx={2}
-					ry={2}
-					fill='transparent'
-					pointerEvents='all'
-				/>
-				<rect
 					x={strokeInset}
 					y={strokeInset}
 					width={rectWidth}
@@ -99,7 +89,7 @@ export const RectangleNode = ({
 					vectorEffect='non-scaling-stroke'
 					strokeLinecap='round'
 					strokeLinejoin='round'
-					pointerEvents='none'
+					pointerEvents='stroke'
 				/>
 			</svg>
 		</>

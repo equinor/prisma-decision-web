@@ -20,13 +20,11 @@ import { useInfluenceNodeCommon } from './useInfluenceNodeCommon';
 import { useHasInfluenceDiagramError } from '../../../hooks/useHasInfluenceDiagramError';
 import { Icon } from '@equinor/eds-core-react';
 import { warning_outlined } from '@equinor/eds-icons';
-import { useSelectedProjectRestrictionTables } from '../../../hooks/useSelectedProjectRestrictionTables';
 
 export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenceNode>) => {
 	const { issue, inProgress, isTarget } = useInfluenceNodeCommon(id, data.issue_id);
 	const [probabilityTableOpen, setProbabilityTableOpen] = useState(false);
 	const { evidence, toggleEvidence } = useInfluenceDiagramEvidence();
-	const { fullyRestrictedStateIds } = useSelectedProjectRestrictionTables();
 	const selectedOutcome = issue?.uncertainty.outcomes.find(o => evidence.includes(o.id));
 	const { validationErrors } = useHasInfluenceDiagramError();
 	if (!issue) return null;
@@ -66,7 +64,7 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 						</IssueCardMenu>
 					</IssueCardHeader>
 					<IssueCardExpandableContent />
-					<IssueCardStates disabledStateIds={fullyRestrictedStateIds}>
+					<IssueCardStates>
 						<div className='flex items-center gap-2'>
 							<IssueCardTableTrigger
 								label='Probabilities'

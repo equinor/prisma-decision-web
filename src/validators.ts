@@ -222,6 +222,15 @@ export const restrictionTableSchema = z.object({
 	restriction_entries: z.array(restrictionEntrySchema),
 });
 
+export const stakeholderMatrixEntrySchema = z.object({
+	stakeholder_matrix_id: z.guid(),
+	stakeholder_name: z.string().min(1, 'Stakeholder name is required'),
+	stakeholder_role: z.string().min(1, 'Stakeholder role is required'),
+	affected_by_the_decision: z.number().min(0).max(1),
+	affecting_the_decision: z.number().min(0).max(1),
+	project_id: z.guid(),
+});
+
 export const projectImportSchema = z.object({
 	projects: projectSchema,
 	objectives: z.array(objectiveSchema).optional(),
@@ -233,9 +242,14 @@ export const projectImportSchema = z.object({
 	restriction_tables: z.array(restrictionTableSchema).optional(),
 	board_nodes: z.array(whiteboardNode).optional(),
 	board_sheets: z.array(whiteboardSheet).optional(),
+	stakeholder_matrix_entries: z.array(stakeholderMatrixEntrySchema).optional(),
 });
 const metricScore = () =>
-	z.number().min(0, 'Value must be at least 0').max(100, 'Value must be 100 or less');
+	z
+		.number()
+		.int('Value must be a whole number')
+		.min(0, 'Value must be at least 0')
+		.max(5, 'Value must be 5 or less');
 
 export const DecisionQualityAssessmentSchema = z.object({
 	id: z.guid(),
@@ -295,12 +309,12 @@ export type ErrorHandlingState = {
 	showDecisionTree: boolean;
 };
 export const evaluationMetrics = [
-	{ key: 'appropriate_frame', label: 'Appropriate Frame', defaultValue: 50 },
-	{ key: 'trade_off_analysis', label: 'Trade-off Analysis', defaultValue: 50 },
-	{ key: 'doable_alternatives', label: 'Doable Alternatives', defaultValue: 50 },
-	{ key: 'information_reliability', label: 'Information Reliability', defaultValue: 50 },
-	{ key: 'reasoning_correctness', label: 'Reasoning Correctness', defaultValue: 50 },
-	{ key: 'commitment_to_action', label: 'Commitment to Action', defaultValue: 50 },
+	{ key: 'appropriate_frame', label: 'Appropriate Frame', defaultValue: 3 },
+	{ key: 'trade_off_analysis', label: 'Trade-off Analysis', defaultValue: 3 },
+	{ key: 'doable_alternatives', label: 'Doable Alternatives', defaultValue: 3 },
+	{ key: 'information_reliability', label: 'Information Reliability', defaultValue: 3 },
+	{ key: 'reasoning_correctness', label: 'Reasoning Correctness', defaultValue: 3 },
+	{ key: 'commitment_to_action', label: 'Commitment to Action', defaultValue: 3 },
 ] as const;
 
 export type Project = z.infer<typeof projectSchema>;
@@ -330,3 +344,4 @@ export type RestrictionEntry = z.infer<typeof restrictionEntrySchema>;
 export type RestrictionTable = z.infer<typeof restrictionTableSchema>;
 export type DiscretePolicy = z.infer<typeof discretePolicySchema>;
 export type PolicyTable = z.infer<typeof policyTableSchema>;
+export type StakeholderMatrixEntry = z.infer<typeof stakeholderMatrixEntrySchema>;

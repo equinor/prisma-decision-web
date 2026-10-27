@@ -24,7 +24,6 @@ import {
 } from '../../common/Cards/IssueCard';
 import { ArrowNode } from './Arrow/ArrowNode';
 import { ArrowTool } from './Arrow/ArrowTool';
-import { DraggableToolbar } from './DraggableToolbar/DraggableToolbar';
 import { FreehandNode } from './FreehandNode';
 import { FreehandTool } from './FreehandTool';
 import { ToolPanel } from './ModifyPanel/ModifyPanel';
@@ -34,6 +33,7 @@ import { TextNode } from './Text/TextNode';
 import { TextTool } from './Text/TextTool';
 import { activeToolAtom } from './activeToolAtom';
 import { useWhiteboard } from './useWhiteboard';
+import { WhiteboardToolbar } from './WhiteboardToolbar';
 
 const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 	const issues = useSelectedProjectIssues();
@@ -45,7 +45,7 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 			className={`overflow-hidden rounded-sm border-2 ${getDiagramIssueBorderColor(issue.type, selected)}`}
 			style={{ opacity: cardOpacity }}
 		>
-			<IssueCard issue={issue}>
+			<IssueCard issue={issue} className='w-72'>
 				<IssueCardHeader>
 					<IssueCardMenu>
 						<IssueCardEditMenuItem />
@@ -102,7 +102,7 @@ export const Whiteboard = () => {
 				snapGrid={[30, 30]}
 				panOnDrag={!isSelecting}
 				selectNodesOnDrag={isSelecting}
-				selectionMode={SelectionMode.Partial}
+				selectionMode={SelectionMode.Full}
 				elevateNodesOnSelect
 				connectionMode={ConnectionMode.Strict}
 				selectionOnDrag={true}
@@ -131,7 +131,7 @@ export const Whiteboard = () => {
 						patternClassName='opacity-20'
 					/>
 				)}
-				<DraggableToolbar />
+				<WhiteboardToolbar />
 				<ToolPanel />
 			</ReactFlow>
 		</div>
