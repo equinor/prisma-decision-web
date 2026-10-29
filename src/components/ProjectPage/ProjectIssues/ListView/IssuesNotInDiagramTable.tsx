@@ -7,7 +7,13 @@ import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { FactLabel, UnassignedLabel } from '../../../common/Cards/IssueTypeLabel';
 import { IssueRow } from './IssueRow';
 
-export const IssuesNotInDiagramTable = ({ issues: projectIssues }: { issues: Issue[] }) => {
+export const IssuesNotInDiagramTable = ({
+	issues: projectIssues,
+	highlightedIssueIds,
+}: {
+	issues: Issue[];
+	highlightedIssueIds?: ReadonlySet<string>;
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -77,7 +83,11 @@ export const IssuesNotInDiagramTable = ({ issues: projectIssues }: { issues: Iss
 						</Table.Head>
 						<Table.Body>
 							{issues.map(issue => (
-								<IssueRow key={issue.id} issue={issue} />
+								<IssueRow
+									key={issue.id}
+									issue={issue}
+									highlighted={highlightedIssueIds?.has(issue.id)}
+								/>
 							))}
 						</Table.Body>
 					</Table>
