@@ -1,4 +1,5 @@
-import { Checkbox, Icon } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react';
+import { Checkbox } from '@equinor/eds-core-react/next';
 import { useUpdateStrategy } from '../../../hooks/api/useUpdateStrategy';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import {

@@ -4,9 +4,9 @@ import {
 	Dialog,
 	DialogContent,
 	Icon,
-	TextField,
 	Tooltip,
 } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { close, edit } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';
