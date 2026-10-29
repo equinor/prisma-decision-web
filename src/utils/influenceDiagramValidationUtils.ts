@@ -4,6 +4,7 @@ import {
 	InfluenceNode as InfluenceNodeType,
 	Issue,
 	ProbabilityTable,
+	RestrictionEntry,
 	RestrictionTable,
 } from '../validators';
 import { hasInvalidProbabilitySum } from './getDiscreteProbabiltyRows';
@@ -142,12 +143,25 @@ const getIssueStateIds = (issue: Issue): string[] => {
 	return [];
 };
 
+export type TotalRestrictionViolation = {
+	edgeId: string;
+	parentStateId: string;
+	rule: 'uncertaintyParent' | 'missingGrandchildEdges';
+	missingGrandchildIssueIds: string[];
+};
+
+export type TotalRestrictionErrors = {
+	uncertaintyParentRestriction: string[];
+	missingGrandchildEdges: string[];
+	violations: TotalRestrictionViolation[];
+};
+
 export const validateTotalRestriction = (
 	nodes: Node<InfluenceNodeType>[],
 	issues: Issue[],
 	edges: InfluenceEdge[],
 	restrictionTables: RestrictionTable[],
-): { uncertaintyParentRestriction: string[]; missingGrandchildEdges: string[] } => {
+): TotalRestrictionErrors => {
 	const diagramNodes = getNodesInOrOnBoundary(nodes, issues);
 	const issuesById = new Map(issues.map(issue => [issue.id, issue]));
 	const nodesById = new Map(diagramNodes.map(node => [node.id, node]));
@@ -160,6 +174,7 @@ export const validateTotalRestriction = (
 	const edgePairs = new Set(diagramEdges.map(edge => `${edge.tail_id}:${edge.head_id}`));
 	const uncertaintyParentRestrictionIssueIds = new Set<string>();
 	const missingGrandchildEdgeIssueIds = new Set<string>();
+	const violations: TotalRestrictionViolation[] = [];
 
 	for (const node of diagramNodes) {
 		const targetIssue = issuesById.get(node.data.issue_id);
@@ -181,24 +196,33 @@ export const validateTotalRestriction = (
 			const restrictionTable = restrictionTablesByEdgeId.get(edge.id);
 			if (!parentIssue || !parentNode || !restrictionTable) continue;
 
-			const parentStateIds = getIssueStateIds(parentIssue);
-			const completelyRestricted = parentStateIds.some(parentStateId =>
-				childStateIds.every(childStateId =>
-					restrictionTable.restriction_entries.some(
-						entry =>
-							entry.parent_state_id === parentStateId &&
-							entry.child_state_id === childStateId &&
-							entry.restriction_value === 0,
+			const completelyRestrictedStateIds = getIssueStateIds(parentIssue).filter(
+				parentStateId =>
+					childStateIds.every(childStateId =>
+						restrictionTable.restriction_entries.some(
+							entry =>
+								entry.parent_state_id === parentStateId &&
+								entry.child_state_id === childStateId &&
+								entry.restriction_value === 0,
+						),
 					),
-				),
 			);
-			if (!completelyRestricted) continue;
+			if (!completelyRestrictedStateIds.length) continue;
 
 			if (hasUncertaintyChild) {
 				uncertaintyParentRestrictionIssueIds.add(targetIssue.id);
+				for (const parentStateId of completelyRestrictedStateIds) {
+					violations.push({
+						edgeId: edge.id,
+						parentStateId,
+						rule: 'uncertaintyParent',
+						missingGrandchildIssueIds: [],
+					});
+				}
 				continue;
 			}
 
+			const missingGrandchildIssueIds: string[] = [];
 			for (const grandchildEdge of outgoingEdges) {
 				if (edgePairs.has(`${parentNode.id}:${grandchildEdge.head_id}`)) continue;
 				const grandchildNode = nodesById.get(grandchildEdge.head_id);
@@ -208,7 +232,20 @@ export const validateTotalRestriction = (
 				) {
 					continue;
 				}
-				if (grandchildNode) missingGrandchildEdgeIssueIds.add(grandchildNode.data.issue_id);
+				if (grandchildNode) {
+					missingGrandchildEdgeIssueIds.add(grandchildNode.data.issue_id);
+					missingGrandchildIssueIds.push(grandchildNode.data.issue_id);
+				}
+			}
+			if (!missingGrandchildIssueIds.length) continue;
+
+			for (const parentStateId of completelyRestrictedStateIds) {
+				violations.push({
+					edgeId: edge.id,
+					parentStateId,
+					rule: 'missingGrandchildEdges',
+					missingGrandchildIssueIds,
+				});
 			}
 		}
 	}
@@ -216,5 +253,21 @@ export const validateTotalRestriction = (
 	return {
 		uncertaintyParentRestriction: [...uncertaintyParentRestrictionIssueIds],
 		missingGrandchildEdges: [...missingGrandchildEdgeIssueIds],
+		violations,
 	};
 };
+
+export const applyRestrictionEntry = (
+	restrictionTables: RestrictionTable[],
+	updatedEntry: RestrictionEntry,
+): RestrictionTable[] =>
+	restrictionTables.map(table =>
+		table.id === updatedEntry.restriction_table_id
+			? {
+					...table,
+					restriction_entries: table.restriction_entries.map(entry =>
+						entry.id === updatedEntry.id ? updatedEntry : entry,
+					),
+				}
+			: table,
+	);

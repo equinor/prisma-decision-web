@@ -34,6 +34,7 @@ export const useHasInfluenceDiagramError = () => {
 		ProbabilityTable: ValidateProbabilityTable(nodes, issues, data, edges, restrictionTables),
 		UncertaintyParentRestriction: restrictionErrors.uncertaintyParentRestriction,
 		MissingGrandchildEdges: restrictionErrors.missingGrandchildEdges,
+		TotalRestrictionEdges: [...new Set(restrictionErrors.violations.map(v => v.edgeId))],
 	};
 	const hasError = Object.values(validationErrors).some(value =>
 		Array.isArray(value) ? value.length > 0 : value,
