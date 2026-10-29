@@ -1,4 +1,5 @@
 import { Background, ConnectionMode, ReactFlow, SelectionMode } from '@xyflow/react';
+import { useState } from 'react';
 
 import { ConnectionLine } from './ConnectingLine';
 import { DecisionNode } from './DecisionNode';
@@ -6,7 +7,9 @@ import { InfluenceEdge } from './InfluenceEdge';
 import { UncertaintyNode } from './UncertaintyNode';
 import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
-import { InfluenceDiagramToolbar } from './InfluenceDiagramToolbar';
+import { InfluenceDiagramTool, InfluenceDiagramToolbar } from './InfluenceDiagramToolbar';
+import { useInfluenceDiagramView } from './useInfluenceDiagramView';
+import { ShapeNode } from './Shape/ShapeNode';
 
 const nodeTypes = {
 	decision: DecisionNode,
@@ -15,8 +18,15 @@ const nodeTypes = {
 };
 
 const edgeTypes = { 'issue-edge': InfluenceEdge };
+const shapeNodeTypes = {
+	decision: ShapeNode,
+	uncertainty: ShapeNode,
+	utility: ShapeNode,
+};
 
 export const InfluenceDiagram = () => {
+	const [view, setView] = useInfluenceDiagramView();
+	const [tool, setTool] = useState<InfluenceDiagramTool>('pan');
 	const {
 		nodes,
 		edges,
@@ -27,6 +37,7 @@ export const InfluenceDiagram = () => {
 		onEdgesChange,
 		onReconnect,
 		onReconnectStart,
+		onReconnectEnd,
 		onEdgeMouseEnter,
 		onEdgeMouseLeave,
 	} = useInfluenceDiagram();
@@ -52,12 +63,14 @@ export const InfluenceDiagram = () => {
 				nodesDraggable={false}
 				selectionKeyCode={['Control']}
 				onReconnect={onReconnect}
-				selectionOnDrag={true}
+				panOnDrag={tool === 'pan'}
+				selectionOnDrag={tool === 'selection'}
 				onNodesChange={onNodesChange}
 				onReconnectStart={onReconnectStart}
+				onReconnectEnd={onReconnectEnd}
 				onEdgeMouseEnter={onEdgeMouseEnter}
 				onEdgeMouseLeave={onEdgeMouseLeave}
-				nodeTypes={nodeTypes}
+				nodeTypes={view === 'shape' ? shapeNodeTypes : nodeTypes}
 				edgeTypes={edgeTypes}
 				connectionLineComponent={ConnectionLine}
 				onConnect={onConnect}
@@ -66,7 +79,12 @@ export const InfluenceDiagram = () => {
 				fitView
 			>
 				<Background />
-				<InfluenceDiagramToolbar />
+				<InfluenceDiagramToolbar
+					view={view}
+					onViewChange={setView}
+					tool={tool}
+					onToolChange={setTool}
+				/>
 			</ReactFlow>
 		</div>
 	);
