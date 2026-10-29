@@ -32,7 +32,7 @@
 		"@dagrejs/dagre": "^3.1.1",
 		"@ariakit/react": "^0.4.38",
 		"@dnd-kit/abstract": "^0.5.0",
-		"@dnd-kit/collision": "^0.5.0",
+		"@dnd-kit/collision": "^0.5.1",
 		"@dnd-kit/helpers": "^0.5.0",
 		"@dnd-kit/react": "^0.5.0",
 		"@equinor/eds-core-react": "3.0.0-beta.2",
