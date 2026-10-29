@@ -1,8 +1,9 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
 import { edit_text } from '@equinor/eds-icons';
 import { useHotkey } from '@tanstack/react-hotkeys';
 import { useAtom } from 'jotai';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
+import { ToolbarToolButton } from './Toolbar';
 
 export const ToggleFreehandMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
@@ -14,15 +15,14 @@ export const ToggleFreehandMode = () => {
 	useHotkey('5', onChange);
 
 	return (
-		<Button.Toggle
-			onChange={onChange}
-			selectedIndexes={checked ? [0] : []}
-			title='Freehand mode'
+		<ToolbarToolButton
+			icon
+			selected={checked}
+			shortcut='5'
+			tooltip='Freehand mode'
+			onClick={onChange}
 		>
-			<Button className='relative px-1.5!'>
-				<Icon data={edit_text} />
-				<p className='absolute right-0.5 -bottom-0.5 text-xs'>5</p>
-			</Button>
-		</Button.Toggle>
+			<Icon data={edit_text} />
+		</ToolbarToolButton>
 	);
 };

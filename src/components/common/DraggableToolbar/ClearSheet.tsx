@@ -1,9 +1,11 @@
-import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
+import { Button, Dialog, DialogContent } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
 import { delete_forever } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useDeleteWhiteboardNode } from '../../../hooks/api/useDeleteWhiteboardNode';
 import { useSelectedProjectWhiteboardNodes } from '../../../hooks/useSelectedProjectWhiteboardNodes';
 import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
+import { ToolbarButton } from './Toolbar';
 
 export const ClearSheet = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -22,16 +24,15 @@ export const ClearSheet = () => {
 
 	return (
 		<>
-			<Button
+			<ToolbarButton
+				icon
 				disabled={nodes.length === 0}
 				data-no-dnd
-				className='px-1.5!'
-				variant='outlined'
-				title='Clear sheet'
+				tooltip='Clear sheet'
 				onClick={() => setIsOpen(true)}
 			>
 				<Icon data={delete_forever} />
-			</Button>
+			</ToolbarButton>
 			{isOpen && (
 				<Dialog
 					open
