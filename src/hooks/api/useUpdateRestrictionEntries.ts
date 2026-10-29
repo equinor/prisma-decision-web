@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api';
 import { showErrorToast } from '../../components/ShowToast';
+import { applyRestrictionEntry } from '../../utils/influenceDiagramValidationUtils';
 import { RestrictionEntry, RestrictionTable } from '../../validators';
 
 export const useUpdateRestrictionEntries = () => {
@@ -11,8 +12,8 @@ export const useUpdateRestrictionEntries = () => {
 			const res = await apiClient.put('/restriction_entries', [entry]);
 			return res.data[0];
 		},
-		onMutate: (updatedEntry: RestrictionEntry) => {
-			queryClient.cancelQueries({ queryKey: ['restrictionTables'] });
+		onMutate: async (updatedEntry: RestrictionEntry) => {
+			await queryClient.cancelQueries({ queryKey: ['restrictionTables'] });
 			const previousTables = queryClient.getQueryData<RestrictionTable[]>([
 				'restrictionTables',
 			]);
@@ -20,16 +21,7 @@ export const useUpdateRestrictionEntries = () => {
 			if (previousTables) {
 				queryClient.setQueryData(
 					['restrictionTables'],
-					previousTables.map(table =>
-						table.id === updatedEntry.restriction_table_id
-							? {
-									...table,
-									restriction_entries: table.restriction_entries.map(entry =>
-										entry.id === updatedEntry.id ? updatedEntry : entry,
-									),
-								}
-							: table,
-					),
+					applyRestrictionEntry(previousTables, updatedEntry),
 				);
 			}
 

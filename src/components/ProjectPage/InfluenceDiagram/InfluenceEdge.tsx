@@ -17,8 +17,10 @@ import { DeleteEdgeDialog } from '../../common/DeleteEdgeDialog';
 export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<InfluenceEdgeData>>) => {
 	const path = useAnimatedInfluenceRoute(data?.route);
 	const {
-		validationErrors: { edgesInLoop },
+		validationErrors: { edgesInLoop, TotalRestrictionEdges },
 	} = useHasInfluenceDiagramError();
+	const hasWarning =
+		edgesInLoop.some(edge => edge.id === id) || TotalRestrictionEdges.includes(id);
 	const labelX = data?.route?.labelX ?? 0;
 	const labelY = data?.route?.labelY ?? 0;
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -81,12 +83,8 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 					>
 						<polyline
 							className={cn('arrowclosed', {
-								'fill-warning-resting! stroke-warning-resting!': edgesInLoop.find(
-									x => x.id === id,
-								),
-								'fill-primary-resting! stroke-primary-resting!': !edgesInLoop.find(
-									x => x.id === id,
-								),
+								'fill-warning-resting! stroke-warning-resting!': hasWarning,
+								'fill-primary-resting! stroke-primary-resting!': !hasWarning,
 							})}
 							strokeLinecap='round'
 							strokeLinejoin='round'
@@ -102,7 +100,7 @@ export const InfluenceEdge = ({ id, source, target, data }: EdgeProps<Edge<Influ
 				markerEnd={`url(#${id})`}
 				style={{ strokeDasharray: hasRestriction ? '12 8' : undefined }}
 				className={cn('stroke-primary-resting! stroke-4!', {
-					'stroke-warning-resting!': edgesInLoop.find(x => x.id === id),
+					'stroke-warning-resting!': hasWarning,
 				})}
 			/>
 			<EdgeLabelRenderer>

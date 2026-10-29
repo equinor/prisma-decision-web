@@ -21,6 +21,7 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 	const edges = useEdges();
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
+
 	if (!issue) return null;
 
 	return (
@@ -46,11 +47,15 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 				</IssueCard>
 			</InfluenceNodeShell>
 			{!hasTwoOrMoreParents && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>
-						Connect 2+ parent nodes to enable utility table and solver
-					</p>
+				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
+					{!hasTwoOrMoreParents && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>
+								Connect 2+ parent nodes to enable utility table and solver
+							</p>
+						</div>
+					)}
 				</div>
 			)}
 			{utilityTableOpen && (

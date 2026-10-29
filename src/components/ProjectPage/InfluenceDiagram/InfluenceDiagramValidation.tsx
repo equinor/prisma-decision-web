@@ -99,6 +99,18 @@ export const InfluenceDiagramValidation = () => {
 							fix='Add the outcome values that sum up to 1.'
 							isError={validationErrors.ProbabilityTable.length > 0}
 						/>
+						<ValidationRuleItem
+							label='Uncertainty Parent Restrictions'
+							warning='You cannot fully restrict a parent of an uncertainty.'
+							fix='Allow at least one state for each restricting parent state.'
+							isError={validationErrors.UncertaintyParentRestriction.length > 0}
+						/>
+						<ValidationRuleItem
+							label='Parent-to-Grandchild Edges'
+							warning='A fully restricted child has a non-utility grandchild without a direct edge from the restricting parent.'
+							fix='Connect the restricting parent directly to each immediate non-utility grandchild.'
+							isError={validationErrors.MissingGrandchildEdges.length > 0}
+						/>
 					</Accordion>
 				</Popover.Content>
 			</Popover>

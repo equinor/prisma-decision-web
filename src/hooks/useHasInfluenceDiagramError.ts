@@ -5,6 +5,7 @@ import {
 	hasOptionsMissing,
 	hasOutcomesMissing,
 	ValidateProbabilityTable,
+	validateTotalRestriction,
 } from '../utils/influenceDiagramValidationUtils';
 import { useGetProbabilityTables } from './api/useGetProbabilityTables';
 import { useSelectedProjectEdges } from './useSelectedProjectEdges';
@@ -19,6 +20,11 @@ export const useHasInfluenceDiagramError = () => {
 	const { edges } = useSelectedProjectEdges();
 	const { restrictionTables } = useSelectedProjectRestrictionTables();
 	const reactFlowEdges = edges.map(e => ({ id: e.id, source: e.tail_id, target: e.head_id }));
+	// Total restriction rules
+	// First rule: “You cannot fully restrict a parent of an uncertainty.”
+	// Second rule: “Missing a direct edge from the restricting parent to this grandchild.”
+	const restrictionErrors = validateTotalRestriction(nodes, issues, edges, restrictionTables);
+
 	const validationErrors = {
 		Issues: !hasIssues(nodes, issues),
 		Edges: hasMissingEdges(edges),
@@ -26,8 +32,10 @@ export const useHasInfluenceDiagramError = () => {
 		DecisionOptions: hasOptionsMissing(nodes, issues),
 		UncertaintyOutcomes: hasOutcomesMissing(nodes, issues),
 		ProbabilityTable: ValidateProbabilityTable(nodes, issues, data, edges, restrictionTables),
+		UncertaintyParentRestriction: restrictionErrors.uncertaintyParentRestriction,
+		MissingGrandchildEdges: restrictionErrors.missingGrandchildEdges,
+		TotalRestrictionEdges: [...new Set(restrictionErrors.violations.map(v => v.edgeId))],
 	};
-
 	const hasError = Object.values(validationErrors).some(value =>
 		Array.isArray(value) ? value.length > 0 : value,
 	);

@@ -68,16 +68,20 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 					</IssueCardStates>
 				</IssueCard>
 			</InfluenceNodeShell>
-			{hasMissingOutcomes && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>Has missing outcomes</p>
-				</div>
-			)}
-			{hasInvalidProbabilityTable && (
-				<div className='absolute -top-7 flex gap-1.5'>
-					<Icon className='fill-warning-resting' data={warning_outlined} />
-					<p className='text-warning-resting'>Has invalid probability table</p>
+			{(hasMissingOutcomes || hasInvalidProbabilityTable) && (
+				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
+					{hasMissingOutcomes && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>Has missing outcomes</p>
+						</div>
+					)}
+					{hasInvalidProbabilityTable && (
+						<div className='flex gap-1.5'>
+							<Icon className='fill-warning-resting' data={warning_outlined} />
+							<p className='text-warning-resting'>Has invalid probability table</p>
+						</div>
+					)}
 				</div>
 			)}
 			{probabilityTableOpen && (
