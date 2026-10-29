@@ -1,14 +1,22 @@
-import { Button, Icon, TextField, Autocomplete } from '@equinor/eds-core-react';
+import { Button, Icon, TextField } from '@equinor/eds-core-react/next';
 import { useFieldArray, useWatch } from 'react-hook-form';
-import { delete_to_trash } from '@equinor/eds-icons';
+import { add, delete_to_trash } from '@equinor/eds-icons';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
-import { ErrorMessage } from '@hookform/error-message';
-import { FormErrorMessage } from '../../../common/FormErrorMessage';
-import { useController } from 'react-hook-form';
 import { decisionTypes } from '../../../../validators';
+import { SegmentedSelector } from '../../../common/SegmentedSelector';
+
+const decisionTypeDescriptions = {
+	Policy: 'Already decided or taken as given. Not decided in this project.',
+	Focus: 'The main choice to be made in this project.',
+	Tactical: 'Supporting choices needed to implement the focus decision.',
+};
 
 export const DecisionFormSection = () => {
-	const { control, register } = useIssueFormContext();
+	const {
+		control,
+		register,
+		formState: { errors },
+	} = useIssueFormContext();
 	const {
 		fields: options,
 		append,
@@ -26,13 +34,7 @@ export const DecisionFormSection = () => {
 		name: 'project_id',
 	});
 
-	const {
-		field: {
-			onChange: onChangeDecisionType,
-			ref: decisionTypeRef,
-			value: selectedDecisionType,
-		},
-	} = useController({
+	const decisionType = useWatch({
 		control,
 		name: 'decision.type',
 	});
@@ -40,65 +42,54 @@ export const DecisionFormSection = () => {
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<h3 className='text-lg font-semibold'>Decision Details</h3>
-			<div>
-				<Autocomplete
-					label='Decision Type'
-					options={decisionTypes}
-					selectedOptions={[selectedDecisionType]}
-					hideClearButton
-					ref={decisionTypeRef}
-					onOptionsChange={({ selectedItems }) => {
-						if (selectedItems.length === 0) return;
-						onChangeDecisionType(selectedItems[0]);
-					}}
-				/>
-				<ErrorMessage as={FormErrorMessage} name='decision.type' />
-			</div>{' '}
+			<SegmentedSelector
+				label='Decision type'
+				{...register('decision.type')}
+				value={decisionType}
+				options={decisionTypes.map(value => ({ value, label: value }))}
+				description={decisionTypeDescriptions[decisionType]}
+			/>
 			<div className='grid w-full grid-cols-1 gap-4'>
 				{options.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
-						<div>
-							<TextField
-								placeholder={`Option ${index + 1}...`}
-								label={`Option ${index + 1}`}
-								{...register(`decision.options.${index}.name`)}
-								className='flex-1'
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name={`decision.options.${index}.name`}
-							/>
-						</div>
-						<div>
-							<TextField
-								label='Utility'
-								{...register(`decision.options.${index}.utility`, {
-									setValueAs: value => {
-										const num = parseFloat(value);
-										return isNaN(num) ? 0 : num;
-									},
-								})}
-								className='flex-1'
-								type='number'
-								step={0.01}
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name={`decision.options.${index}.utility`}
-							/>
-						</div>
-
+					<div
+						key={field.id}
+						className='grid grid-cols-[minmax(0,1fr)_minmax(4rem,8rem)_auto] gap-2'
+					>
+						<TextField
+							placeholder={`Option ${index + 1}...`}
+							label={`Option ${index + 1}`}
+							{...register(`decision.options.${index}.name`)}
+							invalid={!!errors.decision?.options?.[index]?.name}
+							helperMessage={errors.decision?.options?.[index]?.name?.message}
+						/>
+						<TextField
+							label='Utility'
+							{...register(`decision.options.${index}.utility`, {
+								setValueAs: value => {
+									const num = parseFloat(value);
+									return isNaN(num) ? 0 : num;
+								},
+							})}
+							type='number'
+							step='any'
+							invalid={!!errors.decision?.options?.[index]?.utility}
+							helperMessage={errors.decision?.options?.[index]?.utility?.message}
+						/>
 						<Button
-							variant='ghost_icon'
+							type='button'
+							variant='ghost'
+							icon
+							aria-label={`Remove Option ${index + 1}`}
 							onClick={() => remove(index)}
-							className='absolute top-3.5'
+							className='mt-5'
 						>
 							<Icon data={delete_to_trash} />
 						</Button>
 					</div>
 				))}
 				<Button
-					variant='outlined'
+					type='button'
+					variant='ghost'
 					onClick={() =>
 						append({
 							name: '',
@@ -111,6 +102,7 @@ export const DecisionFormSection = () => {
 					}
 					className='self-start'
 				>
+					<Icon data={add} size='sm' />
 					Add Option
 				</Button>
 			</div>

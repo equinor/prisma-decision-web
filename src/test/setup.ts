@@ -4,6 +4,7 @@ import { afterEach } from 'vitest';
 
 afterEach(cleanup);
 
+// jsdom does not implement the native top-layer APIs used by EDS.
 HTMLElement.prototype.showPopover = function () {
 	this.style.display = 'block';
 };

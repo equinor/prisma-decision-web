@@ -1,12 +1,15 @@
-import { Button, Icon, TextField, Switch } from '@equinor/eds-core-react';
-import { useFieldArray, useWatch } from 'react-hook-form';
-import { delete_to_trash } from '@equinor/eds-icons';
-import { ErrorMessage } from '@hookform/error-message';
+import { Button, Icon, TextField, Switch } from '@equinor/eds-core-react/next';
+import { useController, useFieldArray, useWatch } from 'react-hook-form';
+import { add, delete_to_trash } from '@equinor/eds-icons';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
-import { FormErrorMessage } from '../../../common/FormErrorMessage';
 
 export const UncertaintyFormSection = () => {
-	const { control, register } = useIssueFormContext();
+	const {
+		control,
+		register,
+		formState: { errors },
+	} = useIssueFormContext();
+	const { field: isKeyField } = useController({ control, name: 'uncertainty.is_key' });
 	const {
 		fields: outcomesArray,
 		append,
@@ -28,52 +31,57 @@ export const UncertaintyFormSection = () => {
 			<h3 className='text-lg font-semibold'>Uncertainty Details</h3>
 
 			<div>
-				<Switch label='Is Key' {...register('uncertainty.is_key')} />
-				<ErrorMessage as={FormErrorMessage} name='uncertainty.is_key' />
+				<Switch
+					label='Is Key'
+					name={isKeyField.name}
+					ref={isKeyField.ref}
+					onBlur={isKeyField.onBlur}
+					checked={isKeyField.value}
+					onChange={event => isKeyField.onChange(event.target.checked)}
+				/>
 			</div>
 
 			<div className='grid grid-cols-1 gap-4'>
 				{outcomesArray.map((field, index) => (
-					<div key={field.id} className='relative grid grid-cols-[1fr_8rem_auto] gap-2'>
-						<div>
-							<TextField
-								placeholder={`Outcome ${index + 1}...`}
-								label={`Outcome ${index + 1} Name`}
-								{...register(`uncertainty.outcomes.${index}.name`)}
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name={`uncertainty.outcomes.${index}.name`}
-							/>
-						</div>
-						<div>
-							<TextField
-								type='number'
-								label='Utility'
-								{...register(`uncertainty.outcomes.${index}.utility`, {
-									setValueAs: value => {
-										const num = parseFloat(value);
-										return isNaN(num) ? 0 : num;
-									},
-								})}
-								step={0.01}
-							/>
-							<ErrorMessage
-								as={FormErrorMessage}
-								name={`uncertainty.outcomes.${index}.utility`}
-							/>
-						</div>
+					<div
+						key={field.id}
+						className='grid grid-cols-[minmax(0,1fr)_minmax(4rem,8rem)_auto] gap-2'
+					>
+						<TextField
+							placeholder={`Outcome ${index + 1}...`}
+							label={`Outcome ${index + 1} Name`}
+							{...register(`uncertainty.outcomes.${index}.name`)}
+							invalid={!!errors.uncertainty?.outcomes?.[index]?.name}
+							helperMessage={errors.uncertainty?.outcomes?.[index]?.name?.message}
+						/>
+						<TextField
+							type='number'
+							label='Utility'
+							{...register(`uncertainty.outcomes.${index}.utility`, {
+								setValueAs: value => {
+									const num = parseFloat(value);
+									return isNaN(num) ? 0 : num;
+								},
+							})}
+							step='any'
+							invalid={!!errors.uncertainty?.outcomes?.[index]?.utility}
+							helperMessage={errors.uncertainty?.outcomes?.[index]?.utility?.message}
+						/>
 						<Button
-							variant='ghost_icon'
+							type='button'
+							variant='ghost'
+							icon
+							aria-label={`Remove Outcome ${index + 1}`}
 							onClick={() => remove(index)}
-							className='absolute top-3.5'
+							className='mt-5'
 						>
 							<Icon data={delete_to_trash} />
 						</Button>
 					</div>
 				))}
 				<Button
-					variant='outlined'
+					type='button'
+					variant='ghost'
 					onClick={() =>
 						append({
 							name: '',
@@ -86,9 +94,9 @@ export const UncertaintyFormSection = () => {
 					}
 					className='self-start'
 				>
+					<Icon data={add} size='sm' />
 					Add Outcome
 				</Button>
-				<ErrorMessage as={FormErrorMessage} name={'uncertainty.outcomes.sum'} />
 			</div>
 		</div>
 	);

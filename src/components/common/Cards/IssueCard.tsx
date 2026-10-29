@@ -8,7 +8,7 @@ import {
 	more_vertical,
 } from '@equinor/eds-icons';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
-import { createContext, use, useState } from 'react';
+import { useState } from 'react';
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { percentageIcon, utilityIcon } from '../../../icons';
 import { cn } from '../../../utils/cn';
@@ -19,6 +19,7 @@ import { EditIssueModal } from '../EditIssueModal';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
 import { IssueTypeLabel } from './IssueTypeLabel';
+import { IssueCardContext, useIssueCardContext } from './useIssueCardContext';
 
 type IssueCardProps = {
 	issue: Issue;
@@ -29,24 +30,6 @@ type IssueCardProps = {
 	selected?: boolean;
 	expandWidth?: boolean;
 	includeBorder?: boolean;
-};
-
-type IssueCardContextType = {
-	issue: Issue;
-	sortedStates: Option[] | Outcome[];
-	setEditOpen: (open: boolean) => void;
-	setDeleteOpen: (open: boolean) => void;
-	selectedState?: Option | Outcome;
-	onClickState?: (state: Option | Outcome) => void;
-};
-
-const IssueCardContext = createContext<IssueCardContextType | null>(null);
-const useIssueCardContext = () => {
-	const context = use(IssueCardContext);
-	if (!context) {
-		throw new Error('useIssueCardContext must be used within an IssueCardContext.Provider');
-	}
-	return context;
 };
 
 export const IssueCard = ({
