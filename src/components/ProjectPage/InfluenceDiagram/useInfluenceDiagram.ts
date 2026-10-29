@@ -88,6 +88,10 @@ export const useInfluenceDiagram = () => {
 		draggingEdge.current = edge;
 	};
 
+	const onReconnectEnd = () => {
+		draggingEdge.current = null;
+	};
+
 	const onEdgeMouseEnter: EdgeMouseHandler = (_, edge) => {
 		if (hoveredEdgeId.current === edge.id) return;
 		updateHoveredEdge(edge.id);
@@ -151,6 +155,7 @@ export const useInfluenceDiagram = () => {
 		onEdgesDelete,
 		onReconnect,
 		onReconnectStart,
+		onReconnectEnd,
 		onNodesChange,
 		onEdgesChange,
 		isValidConnection,
