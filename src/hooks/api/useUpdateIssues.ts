@@ -3,9 +3,12 @@ import { apiClient } from '../../api';
 import { Issue } from '../../validators';
 import { showErrorToast } from '../../components/ShowToast';
 
+export const issueMutationScope = { id: 'issues' };
+
 export const useUpdateIssues = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
+		scope: issueMutationScope,
 		mutationFn: async (issues: Issue[]) => {
 			await apiClient.put('/issues', issues);
 		},
@@ -22,14 +25,15 @@ export const useUpdateIssues = () => {
 	});
 };
 
-export const useUpdateIssuesOptimistic = () => {
+export const useUpdateIssuesOptimistic = (args?: { errorMessage?: string }) => {
 	const queryClient = useQueryClient();
 	return useMutation({
+		scope: issueMutationScope,
 		mutationFn: async (issues: Issue[]) => {
 			await apiClient.put('/issues', issues);
 		},
-		onMutate: issues => {
-			queryClient.cancelQueries({ queryKey: ['issues'] });
+		onMutate: async issues => {
+			await queryClient.cancelQueries({ queryKey: ['issues'] });
 			const previousIssues = queryClient.getQueryData<Issue[]>(['issues']);
 			const newIssues = previousIssues?.map(issue => {
 				const updatedIssue = issues.find(i => i.id === issue.id);
@@ -40,7 +44,8 @@ export const useUpdateIssuesOptimistic = () => {
 		},
 		onError: (_err, _issues, context) => {
 			queryClient.setQueryData(['issues'], context?.previousIssues);
-			showErrorToast('Failed to update issues');
+			queryClient.invalidateQueries({ queryKey: ['issues'] });
+			showErrorToast(args?.errorMessage ?? 'Failed to update issues');
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['decisionTree'] });

@@ -17,6 +17,8 @@ export type DecisionType = (typeof decisionTypes)[number];
 export const WhiteboardNodeTypes = ['Issue', 'Rectangle', 'Text', 'Arrow', 'Freehand'] as const;
 export type WhiteboardNodeType = (typeof WhiteboardNodeTypes)[number];
 
+export const boundaryLabels = { in: 'In', on: 'On', out: 'Out' } as const;
+
 export const BOTTOM_LAYER_Z_INDEX = 0;
 
 const requiredText = (message: string) =>

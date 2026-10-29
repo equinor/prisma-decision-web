@@ -8,7 +8,8 @@ import { useSelectedProjectIssues } from './useSelectedProjectIssues';
 import { canDndStartFrom } from '../utils/canDndStartFrom';
 
 export const useIssueDragAndDrop = () => {
-	const issues = groupByIssueType(useSelectedProjectIssues());
+	const savedIssues = useSelectedProjectIssues();
+	const issues = groupByIssueType(savedIssues);
 	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
 
 	const [tempIssues, setTempIssues] = useState<Record<

@@ -1,7 +1,7 @@
 import { TextArea, TextField } from '@equinor/eds-core-react/next';
 import { useWatch } from 'react-hook-form';
 import { useIssueFormContext } from '../../../../hooks/useIssueForm';
-import { issueTypes } from '../../../../validators';
+import { boundaryLabels, issueTypes } from '../../../../validators';
 import { SegmentedSelector } from '../../../common/SegmentedSelector';
 import { IssueTypeIcon } from '../../../common/IssueTypeIcon';
 
@@ -33,6 +33,11 @@ export const IssueFormSection = () => {
 		control,
 		name: ['type', 'boundary'],
 	});
+
+	const options = Object.entries(boundaryLabels).map(([value, label]) => ({
+		value,
+		label,
+	}));
 	return (
 		<div className='flex w-full flex-col gap-4'>
 			<TextField
@@ -71,11 +76,7 @@ export const IssueFormSection = () => {
 				label='Boundary'
 				{...register('boundary')}
 				value={boundary}
-				options={[
-					{ value: 'in', label: 'In' },
-					{ value: 'on', label: 'On' },
-					{ value: 'out', label: 'Out' },
-				]}
+				options={options}
 				description='Whether the issue is inside, on, or outside the scope of this decision.'
 			/>
 		</div>
