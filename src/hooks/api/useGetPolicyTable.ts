@@ -20,7 +20,7 @@ export const useGetPolicyTable = () => {
 	const projectId = selectedProject.id;
 	const { hasError: hasValidationError } = useHasInfluenceDiagramError();
 	const { data = defaultDiscretePolicies, ...rest } = useQuery({
-		queryKey: ['policyTable', projectId],
+		queryKey: ['policyTable', 'solution', projectId],
 		queryFn: async () => {
 			const optionIds = new Set(
 				issues.flatMap(issue =>
