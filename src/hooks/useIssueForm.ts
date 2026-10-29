@@ -9,9 +9,15 @@ import { Issue, IssueType, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { useUpdateIssue } from './api/useUpdateIssue';
+import { useUpdateIssuesOptimistic } from './api/useUpdateIssues';
 
 export const useIssueFormContext = () => useFormContext<Issue>();
-export const useIssueForm = ({ issue, issueType, onSuccess }: UseIssueFormArgs) => {
+export const useIssueForm = ({
+	issue,
+	issueType,
+	onSuccess,
+	optimistic = false,
+}: UseIssueFormArgs) => {
 	const selectedProject = useSelectedProject();
 	const defaultValues = useMemo(
 		() => ({ ...createIssueDraft(selectedProject.id), ...(issueType && { type: issueType }) }),
@@ -50,8 +56,13 @@ export const useIssueForm = ({ issue, issueType, onSuccess }: UseIssueFormArgs) 
 			if (issue) onSuccess?.(issue.id);
 		},
 	});
+	const { mutate: updateIssueOptimistic, isPending: isUpdatingOptimistic } =
+		useUpdateIssuesOptimistic({ errorMessage: 'Failed to update issue' });
 	const onSubmit = formMethods.handleSubmit(
 		async data => {
+			if (issue && optimistic) {
+				return updateIssueOptimistic([data], { onSuccess: () => onSuccess?.(issue.id) });
+			}
 			const mutationFn = issue ? updateIssue : createIssue;
 			if (issue) return await mutationFn(data);
 
@@ -79,7 +90,7 @@ export const useIssueForm = ({ issue, issueType, onSuccess }: UseIssueFormArgs) 
 	return {
 		...formMethods,
 		onSubmit,
-		isPending: isCreating || isUpdating,
+		isPending: isCreating || (optimistic ? isUpdatingOptimistic : isUpdating),
 	};
 };
 
@@ -87,4 +98,5 @@ type UseIssueFormArgs = {
 	issue?: Issue;
 	issueType?: IssueType;
 	onSuccess?: (id: string) => void;
+	optimistic?: boolean;
 };
