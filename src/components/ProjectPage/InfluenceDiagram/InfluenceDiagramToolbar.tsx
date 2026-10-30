@@ -11,6 +11,7 @@ import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 import { ChangeIssueType } from '../../common/DraggableToolbar/ChangeIssueType';
 import { DeleteMenu } from '../../common/DraggableToolbar/DeleteMenu';
 import { LayoutControls } from '../../common/DraggableToolbar/LayoutControls';
+import { ToggleNodeView } from '../../common/DraggableToolbar/ToggleNodeView';
 import {
 	ToolBar,
 	ToolbarDragDropProvider,
@@ -26,6 +27,7 @@ export const InfluenceDiagramToolbar = () => {
 			<ToolBar>
 				<ZoomControls />
 				<LayoutControls />
+				<ToggleNodeView />
 				<ToolbarSeparator />
 				<ToggleExpandAll />
 				<ToolbarSeparator />
