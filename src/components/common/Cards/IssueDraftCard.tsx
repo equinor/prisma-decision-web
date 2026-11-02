@@ -6,16 +6,20 @@ import { SubmitEvent } from 'react';
 import { useFormState, useWatch } from 'react-hook-form';
 import { useGetIssues } from '../../../hooks/api/useGetIssues';
 import { useIssueForm } from '../../../hooks/useIssueForm';
-import { IssueType } from '../../../validators';
+import { DecisionType, IssueType } from '../../../validators';
 import { SegmentedSelector } from '../SegmentedSelector';
 
 export const IssueDraftCard = ({
 	issueType = 'Unassigned',
+	decisionType,
+	isKey,
 	position,
 	onClose,
 	onCreated = onClose,
 }: {
 	issueType?: IssueType;
+	decisionType?: DecisionType;
+	isKey?: boolean;
 	position?: 'top' | 'bottom';
 	onClose: () => void;
 	onCreated?: () => void;
@@ -31,6 +35,8 @@ export const IssueDraftCard = ({
 		isPending,
 	} = useIssueForm({
 		issueType,
+		decisionType,
+		isKey,
 		onSuccess: onCreated,
 	});
 	const { errors, isValid, isDirty, isSubmitting } = useFormState({ control });

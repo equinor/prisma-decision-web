@@ -1,6 +1,6 @@
 import { useExpandCard } from '../../../hooks/useExpandCard';
 import { cn } from '../../../utils/cn';
-import { Issue, IssueType } from '../../../validators';
+import { Issue, IssueType, issueTypes } from '../../../validators';
 import { IssueTextField } from '../../ProjectPage/ProjectIssues/IssueTextField';
 import { DraggableIssueContainer } from '../DraggableIssueContainer';
 import {
@@ -16,14 +16,23 @@ export const IssueBoardCard = ({
 	issue,
 	index,
 	type,
+	group = type,
+	acceptedGroups = issueTypes,
 }: {
 	issue: Issue;
 	index: number;
 	type: IssueType;
+	group?: string;
+	acceptedGroups?: readonly string[];
 }) => {
 	const { expanded } = useExpandCard(issue.id);
 	return (
-		<DraggableIssueContainer issue={issue} index={index} type={type}>
+		<DraggableIssueContainer
+			issue={issue}
+			index={index}
+			type={group}
+			acceptedTypes={acceptedGroups}
+		>
 			<IssueCard issue={issue} className='gap-0'>
 				<IssueCardHeader editable>
 					<IssueCardMenu>

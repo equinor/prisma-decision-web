@@ -5,6 +5,7 @@ export const DraggableIssueContainer = ({
 	issue,
 	index,
 	type,
+	acceptedTypes = issueTypes,
 	children,
 	disabled = false,
 }: DraggableCardProps) => {
@@ -16,7 +17,7 @@ export const DraggableIssueContainer = ({
 			issue,
 			editing: disabled,
 		},
-		accept: [...issueTypes],
+		accept: [...acceptedTypes],
 		group: type,
 	});
 	return (
@@ -35,7 +36,8 @@ export const DraggableIssueContainer = ({
 type DraggableCardProps = {
 	issue: Issue;
 	index: number;
-	type: IssueType;
+	type: IssueType | string;
+	acceptedTypes?: readonly string[];
 	children: React.ReactNode;
 	disabled?: boolean;
 };

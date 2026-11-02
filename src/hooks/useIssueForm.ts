@@ -5,7 +5,7 @@ import { useSelectedProject } from '../components/ProjectPage/ProjectContext';
 import { createIssueDraft } from '../utils/createIssueDraft';
 import { getNextIssuePosition } from '../utils/getNextIssuePosition';
 import { sortByCreatedAt } from '../utils/sortByCreatedAt';
-import { Issue, IssueType, issueSchema } from '../validators';
+import { DecisionType, Issue, IssueType, issueSchema } from '../validators';
 import { useCreateIssue } from './api/useCreateIssue';
 import { useGetIssues } from './api/useGetIssues';
 import { useUpdateIssue } from './api/useUpdateIssue';
@@ -15,14 +15,27 @@ export const useIssueFormContext = () => useFormContext<Issue>();
 export const useIssueForm = ({
 	issue,
 	issueType,
+	decisionType,
+	isKey,
 	onSuccess,
 	optimistic = false,
 }: UseIssueFormArgs) => {
 	const selectedProject = useSelectedProject();
-	const defaultValues = useMemo(
-		() => ({ ...createIssueDraft(selectedProject.id), ...(issueType && { type: issueType }) }),
-		[selectedProject.id, issueType],
-	);
+	const defaultValues = useMemo<Issue>(() => {
+		const draft = createIssueDraft(selectedProject.id);
+		return {
+			...draft,
+			...(issueType && { type: issueType }),
+			decision: {
+				...draft.decision,
+				...(decisionType && { type: decisionType }),
+			},
+			uncertainty: {
+				...draft.uncertainty,
+				...(isKey !== undefined && { is_key: isKey }),
+			},
+		};
+	}, [selectedProject.id, issueType, decisionType, isKey]);
 	const sortedIssue = useMemo(() => {
 		if (!issue) return;
 		return {
@@ -97,6 +110,8 @@ export const useIssueForm = ({
 type UseIssueFormArgs = {
 	issue?: Issue;
 	issueType?: IssueType;
+	decisionType?: DecisionType;
+	isKey?: boolean;
 	onSuccess?: (id: string) => void;
 	optimistic?: boolean;
 };
