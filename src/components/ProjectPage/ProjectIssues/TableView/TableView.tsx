@@ -1,6 +1,9 @@
+import { KeyboardSensor, PointerSensor } from '@dnd-kit/dom';
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
+import { useState } from 'react';
 import { useIssueDragAndDrop } from '../../../../hooks/useIssueDragAndDrop';
+import { canDndStartFrom } from '../../../../utils/canDndStartFrom';
 import {
 	IssueCard,
 	IssueCardDeleteMenuItem,
@@ -13,13 +16,28 @@ import {
 } from '../../../common/Cards/IssueCard';
 import { BoardGrouping, boardColumns } from './boardColumns';
 import { IssueColumn } from './IssueColumn';
+import { BoardDraftLocation } from './IssueDraftControl';
 
-export const TableView = ({ grouping }: { grouping: BoardGrouping }) => {
+const sensors = [
+	PointerSensor.configure({
+		preventActivation: (event, source) => {
+			if (!canDndStartFrom(event.target)) return true;
+			if (event.target instanceof Element && event.target.closest('[data-card-action]'))
+				return false;
+			return PointerSensor.defaults.preventActivation?.(event, source) ?? false;
+		},
+	}),
+	KeyboardSensor,
+];
+
+export const TableView = ({ grouping = 'overview' }: { grouping?: BoardGrouping }) => {
+	const [activeDraft, setActiveDraft] = useState<BoardDraftLocation | null>(null);
 	const columns = boardColumns[grouping];
 	const accept = columns.map(column => column.id);
 	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop(columns);
 	return (
 		<DragDropProvider
+			sensors={sensors}
 			onBeforeDragStart={onBeforeDragStart}
 			onDragOver={onDragOver}
 			onDragEnd={onDragEnd}
@@ -34,6 +52,8 @@ export const TableView = ({ grouping }: { grouping: BoardGrouping }) => {
 								column={column}
 								accept={accept}
 								issues={issues[column.id]}
+								activeDraft={activeDraft}
+								setActiveDraft={setActiveDraft}
 							/>
 						))}
 					</div>

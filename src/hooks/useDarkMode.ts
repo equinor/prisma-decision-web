@@ -10,6 +10,7 @@ export default function useDarkMode() {
 
 	useEffect(() => {
 		document.documentElement.classList.toggle('dark', darkMode);
+		document.documentElement.dataset.colorScheme = darkMode ? 'dark' : 'light';
 		document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
 	}, [darkMode]);
 

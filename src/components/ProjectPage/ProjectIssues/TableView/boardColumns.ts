@@ -1,5 +1,6 @@
 import { getIssueColumnColor } from '../../../../utils/getIssueColumnColor';
 import { decisionTypes, Issue, issueTypes } from '../../../../validators';
+import type { BoardDraftLocation } from './IssueDraftControl';
 
 export const boardGroupings = [
 	{ value: 'overview', label: 'Overview' },
@@ -12,6 +13,8 @@ export type BoardColumn = {
 	id: string;
 	label: string;
 	className: string;
+	// Set when the column is exactly one issue type; enables quick-create in that column
+	issueType?: BoardDraftLocation['type'];
 	matches: (issue: Issue) => boolean;
 	assign: (issue: Issue) => Issue;
 };
@@ -34,6 +37,7 @@ export const boardColumns: Record<BoardGrouping, BoardColumn[]> = {
 			id: type,
 			label: type,
 			className: getIssueColumnColor(type),
+			issueType: type,
 			matches: issue => issue.type === type,
 			assign: issue => ({ ...issue, type }),
 		})),

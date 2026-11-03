@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import { cn } from '../../../../utils/cn';
 import { Issue } from '../../../../validators';
 import {
@@ -13,10 +14,22 @@ import {
 import { DraggableIssueContainer } from '../../../common/DraggableIssueContainer';
 import { DroppableIssueContainer } from '../../../common/DroppableIssueContainer';
 import { BoardColumn } from './boardColumns';
+import { BoardDraftLocation, IssueDraftControl } from './IssueDraftControl';
 
-export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) => {
+export const IssueColumn = ({
+	column,
+	accept,
+	issues = [],
+	activeDraft,
+	setActiveDraft,
+}: IssueColumnProps) => {
+	// Quick-create only exists for columns that map to an issue type
+	const issueType = column.issueType;
 	return (
-		<div className='flex min-w-64.25 basis-full flex-col gap-2'>
+		<section
+			aria-label={`${column.label} issues`}
+			className='flex min-w-79 basis-full flex-col gap-2'
+		>
 			<div className='flex items-center justify-between'>
 				<h3 className='font-medium'>{column.label}</h3>
 				<span className='bg-background-light w-8 rounded-full text-center text-sm'>
@@ -28,6 +41,14 @@ export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) =
 				accept={accept}
 				className={cn('flex h-full flex-col gap-2 rounded-sm p-2', column.className)}
 			>
+				{issueType && (
+					<IssueDraftControl
+						issueType={issueType}
+						position='top'
+						activeDraft={activeDraft}
+						setActiveDraft={setActiveDraft}
+					/>
+				)}
 				{issues.map((issue, index) => {
 					return (
 						<DraggableIssueContainer
@@ -38,7 +59,7 @@ export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) =
 							accept={accept}
 						>
 							<IssueCard issue={issue}>
-								<IssueCardHeader>
+								<IssueCardHeader editable>
 									<IssueCardMenu>
 										<IssueCardEditMenuItem />
 										<IssueCardDeleteMenuItem />
@@ -54,8 +75,16 @@ export const IssueColumn = ({ column, accept, issues = [] }: IssueColumnProps) =
 						</DraggableIssueContainer>
 					);
 				})}
+				{issueType && (
+					<IssueDraftControl
+						issueType={issueType}
+						position='bottom'
+						activeDraft={activeDraft}
+						setActiveDraft={setActiveDraft}
+					/>
+				)}
 			</DroppableIssueContainer>
-		</div>
+		</section>
 	);
 };
 
@@ -63,4 +92,6 @@ type IssueColumnProps = {
 	column: BoardColumn;
 	accept: string[];
 	issues: Issue[];
+	activeDraft: BoardDraftLocation | null;
+	setActiveDraft: Dispatch<SetStateAction<BoardDraftLocation | null>>;
 };

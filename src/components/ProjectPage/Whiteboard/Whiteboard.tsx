@@ -46,7 +46,7 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 			style={{ opacity: cardOpacity }}
 		>
 			<IssueCard issue={issue} className='w-72'>
-				<IssueCardHeader>
+				<IssueCardHeader editable>
 					<IssueCardMenu>
 						<IssueCardEditMenuItem />
 					</IssueCardMenu>

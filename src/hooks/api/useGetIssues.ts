@@ -15,7 +15,6 @@ export const useGetIssues = () => {
 			errorMessage: 'Failed to fetch issues',
 		},
 	});
-
 	return {
 		issues: data,
 		...rest,
