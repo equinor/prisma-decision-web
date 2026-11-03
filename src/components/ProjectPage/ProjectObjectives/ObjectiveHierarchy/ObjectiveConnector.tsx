@@ -64,7 +64,10 @@ export const ObjectiveConnector = ({
 					'group/connector absolute flex cursor-pointer touch-none',
 					sideClasses[side],
 					(side === 'left' || side === 'right') && topClassName,
-					{ 'pointer-events-none opacity-0': hidden },
+					// Only reachable once the card itself is hovered, so it doesn't block links in the gap
+					hidden
+						? 'pointer-events-none opacity-0'
+						: 'pointer-events-none group-hover/node:pointer-events-auto',
 				)}
 				onPointerDown={event => onPointerDown(event, () => setMenuOpen(true))}
 				onClick={event => event.stopPropagation()}

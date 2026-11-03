@@ -7,6 +7,7 @@ type ObjectiveLinkEdgesProps = {
 	// Links of this objective are emphasized and drawn on top, so its routes are easy to follow
 	emphasizedObjectiveId: string | null;
 	onSelectLink: (linkId: string) => void;
+	onHoverLink: (linkId: string | null) => void;
 };
 
 export const ObjectiveLinkEdges = ({
@@ -14,6 +15,7 @@ export const ObjectiveLinkEdges = ({
 	selectedLinkId,
 	emphasizedObjectiveId,
 	onSelectLink,
+	onHoverLink,
 }: ObjectiveLinkEdgesProps) => {
 	const isEmphasized = ({ link }: LinkGeometry) =>
 		link.parent_id === emphasizedObjectiveId || link.child_id === emphasizedObjectiveId;
@@ -47,6 +49,8 @@ export const ObjectiveLinkEdges = ({
 					<g
 						key={link.id}
 						className='group/edge'
+						onMouseEnter={() => onHoverLink(link.id)}
+						onMouseLeave={() => onHoverLink(null)}
 						onClick={event => {
 							event.stopPropagation();
 							onSelectLink(link.id);

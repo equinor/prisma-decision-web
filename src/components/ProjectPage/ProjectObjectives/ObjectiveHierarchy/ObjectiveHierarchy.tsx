@@ -85,6 +85,14 @@ export const ObjectiveHierarchy = () => {
 	const [openSections, setOpenSections] = useState({ content: false, connections: false });
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
 	const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
+	const [hoveredLinkId, setHoveredLinkId] = useState<string | null>(null);
+	// Short grace period so the pointer can travel from the arc onto its remove button
+	const linkHoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+	const hoverLink = (linkId: string | null) => {
+		clearTimeout(linkHoverTimer.current);
+		if (linkId) setHoveredLinkId(linkId);
+		else linkHoverTimer.current = setTimeout(() => setHoveredLinkId(null), 150);
+	};
 	const [connection, setConnection] = useState<PendingConnection | null>(null);
 	const [move, setMove] = useState<PendingMove | null>(null);
 	const [lastReclassification, setLastReclassification] = useState<Reclassification | null>(null);
@@ -497,7 +505,8 @@ export const ObjectiveHierarchy = () => {
 		return { d: buildBezierPath(from, to, toChild ? 1 : -1), to };
 	})();
 
-	const selectedLinkHandle = geometry.find(item => item.link.id === selectedLinkId)?.handle;
+	const removableLinkId = connection || move ? null : (hoveredLinkId ?? selectedLinkId);
+	const removableLinkHandle = geometry.find(item => item.link.id === removableLinkId)?.handle;
 
 	return (
 		<div
@@ -661,6 +670,7 @@ export const ObjectiveHierarchy = () => {
 						setExpandedId(null);
 						setSelectedLinkId(linkId);
 					}}
+					onHoverLink={hoverLink}
 				/>
 				{connectionPath && (
 					<svg className='pointer-events-none absolute inset-0 z-30 size-full overflow-visible'>
@@ -680,7 +690,7 @@ export const ObjectiveHierarchy = () => {
 						/>
 					</svg>
 				)}
-				{selectedLinkHandle && selectedLinkId && (
+				{removableLinkHandle && removableLinkId && (
 					<button
 						type='button'
 						aria-label='Remove link'
@@ -688,11 +698,14 @@ export const ObjectiveHierarchy = () => {
 						className='bg-background-default border-diagram-connector hover:bg-diagram-connector-hover absolute z-30 flex
 							size-6 -translate-1/2 cursor-pointer items-center justify-center rounded-full
 							border'
-						style={{ left: selectedLinkHandle[0], top: selectedLinkHandle[1] }}
+						style={{ left: removableLinkHandle[0], top: removableLinkHandle[1] }}
+						onMouseEnter={() => hoverLink(removableLinkId)}
+						onMouseLeave={() => hoverLink(null)}
 						onClick={event => {
 							event.stopPropagation();
-							removeLink(selectedLinkId);
+							removeLink(removableLinkId);
 							setSelectedLinkId(null);
+							setHoveredLinkId(null);
 						}}
 					>
 						<Icon data={close} size={16} className='fill-diagram-connector' />
