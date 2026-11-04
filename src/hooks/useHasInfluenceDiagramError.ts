@@ -4,6 +4,7 @@ import {
 	hasMissingEdges,
 	hasOptionsMissing,
 	hasOutcomesMissing,
+	TotalRestrictionViolation,
 	ValidateProbabilityTable,
 	validateTotalRestriction,
 } from '../utils/influenceDiagramValidationUtils';
@@ -20,10 +21,9 @@ export const useHasInfluenceDiagramError = () => {
 	const { edges } = useSelectedProjectEdges();
 	const { restrictionTables } = useSelectedProjectRestrictionTables();
 	const reactFlowEdges = edges.map(e => ({ id: e.id, source: e.tail_id, target: e.head_id }));
-	// Total restriction rules
-	// First rule: “You cannot fully restrict a parent of an uncertainty.”
-	// Second rule: “Missing a direct edge from the restricting parent to this grandchild.”
-	const restrictionErrors = validateTotalRestriction(nodes, issues, edges, restrictionTables);
+	const restrictionViolations = validateTotalRestriction(nodes, issues, edges, restrictionTables);
+	const byRule = (rule: TotalRestrictionViolation['rule']) =>
+		restrictionViolations.filter(violation => violation.rule === rule);
 
 	const validationErrors = {
 		Issues: !hasIssues(nodes, issues),
@@ -32,9 +32,15 @@ export const useHasInfluenceDiagramError = () => {
 		DecisionOptions: hasOptionsMissing(nodes, issues),
 		UncertaintyOutcomes: hasOutcomesMissing(nodes, issues),
 		ProbabilityTable: ValidateProbabilityTable(nodes, issues, data, edges, restrictionTables),
-		UncertaintyParentRestriction: restrictionErrors.uncertaintyParentRestriction,
-		MissingGrandchildEdges: restrictionErrors.missingGrandchildEdges,
-		TotalRestrictionEdges: [...new Set(restrictionErrors.violations.map(v => v.edgeId))],
+		// Fully restricted parents of an uncertainty (the child issue ids).
+		UncertaintyParentRestriction: [
+			...new Set(byRule('uncertaintyParent').map(v => v.targetIssueId)),
+		],
+		// Grandchildren lacking a direct edge from the restricting parent.
+		MissingGrandchildEdges: [
+			...new Set(byRule('missingGrandchildEdges').flatMap(v => v.missingGrandchildIssueIds)),
+		],
+		TotalRestrictionEdges: [...new Set(restrictionViolations.map(v => v.edgeId))],
 	};
 	const hasError = Object.values(validationErrors).some(value =>
 		Array.isArray(value) ? value.length > 0 : value,

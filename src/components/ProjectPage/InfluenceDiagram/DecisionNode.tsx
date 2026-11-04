@@ -67,11 +67,9 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 				<PolicyTable issue={issue} selected={selected} onClose={setPolicyTableOpen} />
 			)}
 			{hasMissingOptions && (
-				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
-					<div className='flex gap-1.5'>
-						<Icon className='fill-warning-resting' data={warning_outlined} />
-						<p className='text-warning-resting'>Has missing options</p>
-					</div>
+				<div className='absolute -top-7 flex  gap-1.5'>
+					<Icon className='fill-warning-resting' data={warning_outlined} />
+					<p className='text-warning-resting'>Has missing options</p>
 				</div>
 			)}
 		</div>

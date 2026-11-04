@@ -47,15 +47,11 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 				</IssueCard>
 			</InfluenceNodeShell>
 			{!hasTwoOrMoreParents && (
-				<div className='absolute bottom-full mb-1 flex flex-col gap-1'>
-					{!hasTwoOrMoreParents && (
-						<div className='flex gap-1.5'>
-							<Icon className='fill-warning-resting' data={warning_outlined} />
-							<p className='text-warning-resting'>
-								Connect 2+ parent nodes to enable utility table and solver
-							</p>
-						</div>
-					)}
+				<div className='absolute -top-7 flex gap-1.5'>
+					<Icon className='fill-warning-resting' data={warning_outlined} />
+					<p className='text-warning-resting'>
+						Connect 2+ parent nodes to enable utility table and solver
+					</p>
 				</div>
 			)}
 			{utilityTableOpen && (

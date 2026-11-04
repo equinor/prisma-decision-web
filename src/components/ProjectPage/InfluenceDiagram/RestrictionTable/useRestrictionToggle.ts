@@ -56,11 +56,18 @@ export const useRestrictionToggle = (
 			return `"${parentState}" fully restricts "${targetIssue.name}", but "${sourceIssue.name}" has no edge to ${formatNames(grandchildren)}. Add the edge or allow a state.`;
 		};
 		const findViolation = (tables: RestrictionTable[], parentStateId: string) =>
-			validateTotalRestriction(nodes, issues, edges, tables).violations.find(
+			validateTotalRestriction(nodes, issues, edges, tables).find(
 				violation =>
 					violation.edgeId === restrictionTable.edge_id &&
 					violation.parentStateId === parentStateId,
 			);
+		// Rows already violating (e.g. the required edge was removed later): one pass for all.
+		const currentViolations = validateTotalRestriction(
+			nodes,
+			issues,
+			edges,
+			restrictionTables,
+		).filter(violation => violation.edgeId === restrictionTable.edge_id);
 
 		const map = new Map<string, RestrictionToggleViolation>();
 		for (const entry of restrictionTable.restriction_entries) {
@@ -72,8 +79,9 @@ export const useRestrictionToggle = (
 				);
 				if (next) map.set(entry.id, { message: toMessage(next), blocksToggle: true });
 			} else {
-				// Is this row already violating (e.g. the required edge was removed later)?
-				const current = findViolation(restrictionTables, entry.parent_state_id);
+				const current = currentViolations.find(
+					violation => violation.parentStateId === entry.parent_state_id,
+				);
 				if (current) {
 					map.set(entry.id, { message: toMessage(current), blocksToggle: false });
 				}
