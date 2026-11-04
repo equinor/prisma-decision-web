@@ -2,12 +2,8 @@ import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
 import { info_circle, sheet_right_position } from '@equinor/eds-icons';
 import { useLocalStorage, useMediaQuery } from '@uidotdev/usehooks';
 import { useState } from 'react';
-import { useGetStakeholderMatrixes } from '../../../hooks/api/useGetStakeholderMatrixes';
-import { useUpdateStakeholderMatrix } from '../../../hooks/api/useUpdateStakeholderMatrix';
-import type { StakeholderMatrixEntry } from '../../../validators';
+import { useSelectedProjectStakeholders } from '../../../hooks/useSelectedProjectStakeholders';
 import { cn } from '../../../utils/cn';
-import { LoadingSpinner } from '../../common/LoadingSpinner';
-import { useSelectedProject } from '../ProjectContext';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { StakeholderGrid } from './StakeholderGrid';
 import { StakeholdersPanel } from './StakeholdersPanel';
@@ -29,19 +25,7 @@ export const StakeholderMatrix = ({ className }: StakeholderMatrixProps) => {
 	);
 	const isListOpen = storedListOpen ?? isWide;
 
-	const { data: stakeholderMatrices, isLoading } = useGetStakeholderMatrixes();
-	const projectId = useSelectedProject().id;
-	const stakeholders = stakeholderMatrices.filter(matrix => matrix.project_id === projectId);
-	const { mutate: updateStakeholder } = useUpdateStakeholderMatrix();
-
-	const handleStakeholderMove = (
-		id: string,
-		values: Pick<StakeholderMatrixEntry, 'affecting_the_decision' | 'affected_by_the_decision'>,
-	) => {
-		const stakeholder = stakeholders.find(current => current.stakeholder_matrix_id === id);
-		if (!stakeholder) return;
-		updateStakeholder({ ...stakeholder, ...values });
-	};
+	const { data: stakeholders } = useSelectedProjectStakeholders();
 
 	return (
 		<div className={cn('flex h-[calc(100dvh-144px)] min-h-0 w-full', className)}>
@@ -77,17 +61,11 @@ export const StakeholderMatrix = ({ className }: StakeholderMatrixProps) => {
 					)}
 				</header>
 				<div className='relative flex min-h-0 flex-1 flex-col py-4 pr-6 pl-4'>
-					<StakeholderGrid
-						stakeholders={stakeholders}
-						onStakeholderMove={handleStakeholderMove}
-					/>
-					{isLoading && <LoadingSpinner />}
+					<StakeholderGrid />
 				</div>
 			</div>
 			{isListOpen && (
 				<StakeholdersPanel
-					stakeholders={stakeholders}
-					isLoading={isLoading}
 					searchQuery={searchQuery}
 					onSearchChange={setSearchQuery}
 					onHide={() => setListOpen(false)}

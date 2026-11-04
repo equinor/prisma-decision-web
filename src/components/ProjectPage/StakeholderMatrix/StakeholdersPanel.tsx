@@ -1,26 +1,23 @@
 import { Button, Icon, TextField, Tooltip } from '@equinor/eds-core-react';
 import { search, sheet_right_position } from '@equinor/eds-icons';
-import type { StakeholderMatrixEntry } from '../../../validators';
+import { useSelectedProjectStakeholders } from '../../../hooks/useSelectedProjectStakeholders';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { DeleteStakeholderMatrixDialog } from './DeleteStakeholderMatrixDialog';
 import { EditStakeholderMatrix } from './EditStakeholderMatrix';
 import { getRegionKey, stakeholderListOrder, stakeholderRegions } from './stakeholderRegions';
 
 type StakeholdersPanelProps = {
-	stakeholders: StakeholderMatrixEntry[];
-	isLoading: boolean;
 	searchQuery: string;
 	onSearchChange: (value: string) => void;
 	onHide: () => void;
 };
 
 export const StakeholdersPanel = ({
-	stakeholders,
-	isLoading,
 	searchQuery,
 	onSearchChange,
 	onHide,
 }: StakeholdersPanelProps) => {
+	const { data: stakeholders, isLoading } = useSelectedProjectStakeholders();
 	const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
 	const filtered = stakeholders.filter(stakeholder =>
 		`${stakeholder.stakeholder_name} ${stakeholder.stakeholder_role}`
