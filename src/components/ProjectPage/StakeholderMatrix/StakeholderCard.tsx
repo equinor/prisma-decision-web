@@ -53,7 +53,7 @@ export const StakeholderCard = ({ stakeholder, zIndex, frontZIndex }: Stakeholde
 				<div
 					ref={handleRef}
 					className={cn(
-						'bg-background-default shadow-raised pointer-events-auto flex w-max touch-none items-center rounded-[3px] border-[0.5px] border-[#d4d4d4] select-none',
+						'dark:border-background-medium dark:bg-background-default pointer-events-auto flex w-max touch-none items-center rounded-[3px] border-[0.5px] border-(--eds-color-border-subtle) bg-(--eds-color-bg-surface) select-none',
 						isDragging ? 'cursor-grabbing' : 'cursor-grab',
 					)}
 					style={{
@@ -70,7 +70,7 @@ export const StakeholderCard = ({ stakeholder, zIndex, frontZIndex }: Stakeholde
 					/>
 					<span className='flex min-w-0 flex-col justify-center px-1.5 leading-4 font-medium whitespace-nowrap'>
 						<span className='truncate text-xs'>{stakeholder.stakeholder_name}</span>
-						<span className='text-text-tertiary truncate text-[10px]'>
+						<span className='dark:text-text-tertiary truncate text-[10px] text-(--eds-color-text-subtle)'>
 							{stakeholder.stakeholder_role}
 						</span>
 					</span>

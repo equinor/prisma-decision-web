@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Icon, Popover, TextField } from '@equinor/eds-core-react';
+import { CircularProgress, Popover, TextField } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { add, close } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';
@@ -31,7 +32,7 @@ export const CreateStakeholderMatrix = ({
 	return (
 		<>
 			<Button
-				variant='outlined'
+				variant='secondary'
 				ref={setAnchorEl}
 				aria-expanded={isOpen}
 				aria-haspopup='dialog'
@@ -86,7 +87,8 @@ export const CreateStakeholderMatrix = ({
 						</Button>
 						<Button
 							type='button'
-							variant='ghost_icon'
+							icon
+							variant='ghost'
 							className='absolute! top-2 right-2'
 							aria-label='Close'
 							onClick={closePopover}

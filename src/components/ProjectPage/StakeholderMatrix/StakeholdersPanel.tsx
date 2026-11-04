@@ -1,4 +1,5 @@
-import { Button, Icon, TextField, Tooltip } from '@equinor/eds-core-react';
+import { Tooltip } from '@equinor/eds-core-react';
+import { Button, Icon, TextField } from '@equinor/eds-core-react/next';
 import { search, sheet_right_position } from '@equinor/eds-icons';
 import { useSelectedProjectStakeholders } from '../../../hooks/useSelectedProjectStakeholders';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
@@ -26,15 +27,21 @@ export const StakeholdersPanel = ({
 	);
 
 	return (
-		<aside className='bg-background-default flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-[#d4d4d4]'>
-			<div className='flex items-center gap-2 pt-5 pr-3 pb-3 pl-4'>
+		<aside
+			aria-label='Stakeholders'
+			className='dark:border-background-medium dark:bg-background-default flex h-full w-80 shrink-0 flex-col overflow-hidden border-l border-(--eds-color-border-subtle) bg-(--eds-color-bg-surface)'
+		>
+			<div className='flex shrink-0 items-center gap-2 pt-5 pr-3 pb-3 pl-4'>
 				<h2 className='flex-1 text-base font-medium tracking-[0.2px]'>Stakeholders</h2>
 				<div className='flex items-center gap-1'>
 					<CreateStakeholderMatrix label='Add' />
 					<Tooltip title='Hide stakeholder list'>
 						<Button
-							variant='ghost_icon'
+							icon
+							variant='ghost'
+							className='size-8'
 							aria-label='Hide stakeholder list'
+							aria-pressed
 							onClick={onHide}
 						>
 							<Icon data={sheet_right_position} />
@@ -42,17 +49,18 @@ export const StakeholdersPanel = ({
 					</Tooltip>
 				</div>
 			</div>
-			<div className='h-px shrink-0 bg-[#d4d4d4]' />
+			<div className='dark:bg-background-medium h-px shrink-0 bg-(--eds-color-border-subtle)' />
 			<div className='shrink-0 px-3 py-4'>
 				<TextField
+					className='w-full [&>.header]:min-h-4.5'
 					label='Search stakeholders'
 					placeholder='Name or role'
-					inputIcon={<Icon data={search} />}
+					startAdornment={<Icon data={search} />}
 					value={searchQuery}
 					onChange={event => onSearchChange(event.target.value)}
 				/>
 			</div>
-			<div className='h-px shrink-0 bg-[#d4d4d4]' />
+			<div className='dark:bg-background-medium h-px shrink-0 bg-(--eds-color-border-subtle)' />
 			<div className='flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2'>
 				{stakeholderListOrder.map(regionKey => {
 					const region = stakeholderRegions[regionKey];
@@ -68,43 +76,43 @@ export const StakeholdersPanel = ({
 					if (group.length === 0) return null;
 
 					return (
-						<section key={regionKey}>
-							<div className='bg-background-light flex h-7 items-center gap-2 px-2'>
+						<section key={regionKey} className='shrink-0'>
+							<div className='dark:bg-background-light flex h-7 items-center gap-2 bg-(--eds-color-bg-canvas) px-2'>
 								<span
-									className='size-2.5 rounded-full'
+									className='size-2.5 shrink-0 rounded-full'
 									style={{ backgroundColor: region.accent }}
 								/>
-								<h3 className='flex-1 text-[10px] font-medium tracking-[1.1px] uppercase'>
+								<h3 className='flex-1 text-[10px] leading-4 font-medium tracking-[1.1px] uppercase'>
 									{region.label}
 								</h3>
-								<span className='text-text-tertiary text-[10px] font-medium'>
+								<span className='dark:text-text-tertiary text-[10px] leading-4 font-medium text-(--eds-color-text-subtle)'>
 									{group.length}
 								</span>
 							</div>
 							{group.map(stakeholder => (
 								<div
 									key={stakeholder.stakeholder_matrix_id}
-									className='hover:bg-background-light flex items-center gap-0.5 rounded-sm px-2 py-1.5'
+									className='dark:hover:bg-background-light flex h-20 items-center gap-0.5 rounded px-2 py-1.5 hover:bg-(--eds-color-bg-canvas)'
 								>
-									<div className='flex min-w-0 flex-1 flex-col gap-0.5 leading-4'>
-										<span className='truncate text-sm font-medium'>
+									<div className='flex h-17 min-w-0 flex-1 flex-col gap-0.5 leading-4'>
+										<span className='truncate text-sm leading-4 font-medium'>
 											{stakeholder.stakeholder_name}
 										</span>
-										<span className='text-text-tertiary truncate text-xs font-medium tracking-[0.2px]'>
+										<span className='dark:text-text-tertiary truncate text-xs font-medium tracking-[0.2px] text-(--eds-color-text-subtle)'>
 											{stakeholder.stakeholder_role}
 										</span>
-										<span className='flex gap-0.5 text-[10px] font-medium'>
-											<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
+										<span className='flex gap-0.5 text-xs font-medium whitespace-nowrap'>
+											<span className='dark:bg-background-medium inline-flex h-4.5 items-center rounded bg-(--eds-color-bg-fill-muted-default) px-1.5'>
 												Affecting:{' '}
 												{stakeholder.affecting_the_decision.toFixed(2)}
 											</span>
-											<span className='bg-background-medium rounded-sm px-1.5 py-0.5'>
+											<span className='dark:bg-background-medium inline-flex h-4.5 items-center rounded bg-(--eds-color-bg-fill-muted-default) px-1.5'>
 												Affected:{' '}
 												{stakeholder.affected_by_the_decision.toFixed(2)}
 											</span>
 										</span>
 									</div>
-									<div className='flex shrink-0'>
+									<div className='flex shrink-0 gap-0.5'>
 										<EditStakeholderMatrix stakeholder={stakeholder} />
 										<DeleteStakeholderMatrixDialog stakeholder={stakeholder} />
 									</div>
@@ -114,12 +122,12 @@ export const StakeholdersPanel = ({
 					);
 				})}
 				{!isLoading && stakeholders.length === 0 && (
-					<p className='text-text-tertiary px-3 py-8 text-center text-sm'>
+					<p className='dark:text-text-tertiary px-3 py-8 text-center text-sm text-(--eds-color-text-subtle)'>
 						Your stakeholder list will appear here.
 					</p>
 				)}
 				{!isLoading && stakeholders.length > 0 && filtered.length === 0 && (
-					<p className='text-text-tertiary px-3 py-8 text-center text-sm'>
+					<p className='dark:text-text-tertiary px-3 py-8 text-center text-sm text-(--eds-color-text-subtle)'>
 						No stakeholders match your search.
 					</p>
 				)}

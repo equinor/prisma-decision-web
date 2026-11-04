@@ -57,23 +57,23 @@ export const StakeholderGrid = () => {
 		>
 			<div className='relative flex min-h-0 flex-1 gap-2'>
 				{isLoading && <LoadingSpinner />}
-				<div className='text-text-tertiary flex shrink-0 flex-col items-center justify-between pb-[23px] text-xs font-medium whitespace-nowrap'>
+				<div className='dark:text-text-tertiary flex w-[50px] shrink-0 flex-col items-center justify-between pb-[23px] text-xs leading-4 font-medium whitespace-nowrap text-(--eds-color-text-subtle)'>
 					<span>High (1) ↑</span>
-					<span className='text-text-default rotate-180 text-sm [writing-mode:vertical-rl]'>
+					<span className='dark:text-text-default h-[210px] w-[18px] text-sm leading-4 text-(--eds-color-text-strong) [writing-mode:vertical-rl]'>
 						Affected by the decision
 					</span>
 					<span>Low (0)</span>
 				</div>
 				<div className='flex min-w-0 flex-1 flex-col gap-2'>
 					<div
-						className='relative min-h-0 flex-1 border border-[#aeaeae]'
+						className='dark:border-background-medium relative min-h-0 flex-1 border border-(--eds-color-border-medium)'
 						aria-label={`Stakeholder matrix with ${stakeholders.length} stakeholders`}
 					>
 						<div className='grid h-full w-full grid-cols-2 grid-rows-2'>
 							{quadrantOrder.map(key => (
 								<div
 									key={key}
-									className={`border-[rgba(111,111,111,0.7)] p-3 text-[10px] font-medium tracking-[1.1px] uppercase ${stakeholderRegions[key].quadrantClassName}`}
+									className={`dark:border-background-medium border-[rgba(111,111,111,0.7)] p-3 text-[10px] leading-4 font-medium tracking-[1.1px] uppercase ${stakeholderRegions[key].quadrantClassName}`}
 								>
 									{stakeholderRegions[key].label}
 								</div>
@@ -88,9 +88,11 @@ export const StakeholderGrid = () => {
 							/>
 						))}
 					</div>
-					<div className='text-text-tertiary flex items-start justify-between text-xs font-medium whitespace-nowrap'>
+					<div className='dark:text-text-tertiary flex items-start justify-between text-xs leading-4 font-medium whitespace-nowrap text-(--eds-color-text-subtle)'>
 						<span>Low (0)</span>
-						<span className='text-text-default text-sm'>Affecting the decision</span>
+						<span className='dark:text-text-default text-sm leading-4 text-(--eds-color-text-strong)'>
+							Affecting the decision
+						</span>
 						<span>High (1) →</span>
 					</div>
 				</div>

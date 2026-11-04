@@ -1,4 +1,5 @@
-import { Button, Icon, Tooltip } from '@equinor/eds-core-react';
+import { Tooltip } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { info_circle, sheet_right_position } from '@equinor/eds-icons';
 import { useLocalStorage, useMediaQuery } from '@uidotdev/usehooks';
 import { useState } from 'react';
@@ -28,19 +29,30 @@ export const StakeholderMatrix = ({ className }: StakeholderMatrixProps) => {
 	const { data: stakeholders } = useSelectedProjectStakeholders();
 
 	return (
-		<div className={cn('flex h-[calc(100dvh-144px)] min-h-0 w-full', className)}>
+		<div
+			className={cn(
+				'dark:bg-background-light dark:text-text-default absolute inset-0 flex min-h-0 min-w-0 overflow-hidden bg-(--eds-color-bg-surface) text-(--eds-color-text-strong)',
+				className,
+			)}
+		>
 			<div className='flex min-h-0 min-w-0 flex-1 flex-col'>
 				<header className='flex shrink-0 items-center justify-between gap-5 px-6 pt-6 pb-4'>
 					<div className='flex items-center gap-2'>
 						<h1 className='text-[32px] leading-10 font-bold whitespace-nowrap'>
 							Stakeholder Matrix
 						</h1>
-						<span className='bg-background-medium rounded-sm px-2 py-1.5 text-xs leading-4 font-medium whitespace-nowrap'>
+						<span className='dark:bg-background-medium flex h-[26px] min-w-[118px] shrink-0 items-center justify-center rounded bg-(--eds-color-bg-fill-muted-default) px-2 text-xs leading-4 font-medium whitespace-nowrap'>
 							{stakeholders.length}{' '}
 							{stakeholders.length === 1 ? 'stakeholder' : 'stakeholders'}
 						</span>
 						<Tooltip title={ABOUT_TEXT}>
-							<Button variant='ghost_icon' aria-label='About this view'>
+							<Button
+								icon
+								variant='ghost'
+								tone='neutral'
+								size='small'
+								aria-label='About this view'
+							>
 								<Icon data={info_circle} />
 							</Button>
 						</Tooltip>
@@ -50,8 +62,11 @@ export const StakeholderMatrix = ({ className }: StakeholderMatrixProps) => {
 							<CreateStakeholderMatrix />
 							<Tooltip title='Show stakeholder list'>
 								<Button
-									variant='ghost_icon'
+									icon
+									variant='ghost'
+									className='size-8'
 									aria-label='Show stakeholder list'
+									aria-pressed={false}
 									onClick={() => setListOpen(true)}
 								>
 									<Icon data={sheet_right_position} />
