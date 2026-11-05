@@ -21,6 +21,7 @@ export const UtilityNode = ({ id, data, selected }: NodeProps<ReactFlowInfluence
 	const edges = useEdges();
 	const hasTwoOrMoreParents = edges.filter(edge => edge.target === data.id).length >= 2;
 	const [utilityTableOpen, setUtilityTableOpen] = useState(false);
+
 	if (!issue) return null;
 
 	return (

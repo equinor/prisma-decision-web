@@ -4,6 +4,7 @@ import {
 	InfluenceNode as InfluenceNodeType,
 	Issue,
 	ProbabilityTable,
+	RestrictionEntry,
 	RestrictionTable,
 } from '../validators';
 import { hasInvalidProbabilitySum } from './getDiscreteProbabiltyRows';
@@ -135,3 +136,118 @@ export const hasOutcomesMissing = (nodes: Node<InfluenceNodeType>[], issues: Iss
 		})
 		.map(node => node.data.issue_id);
 };
+
+const getIssueStateIds = (issue: Issue): string[] => {
+	if (issue.type === 'Decision') return issue.decision.options.map(option => option.id);
+	if (issue.type === 'Uncertainty') return issue.uncertainty.outcomes.map(outcome => outcome.id);
+	return [];
+};
+
+export type TotalRestrictionViolation = {
+	edgeId: string;
+	targetIssueId: string;
+	parentStateId: string;
+	rule: 'uncertaintyParent' | 'missingGrandchildEdges';
+	missingGrandchildIssueIds: string[];
+};
+
+/**
+ * Total restriction rules, one violation per (edge, fully restricting parent state):
+ * - uncertaintyParent: a parent of an uncertainty cannot be fully restricted.
+ * - missingGrandchildEdges: a fully restricted child's non-utility grandchildren need a direct
+ *   edge from the restricting parent.
+ */
+export const validateTotalRestriction = (
+	nodes: Node<InfluenceNodeType>[],
+	issues: Issue[],
+	edges: InfluenceEdge[],
+	restrictionTables: RestrictionTable[],
+): TotalRestrictionViolation[] => {
+	const influnceDiagramNodes = getNodesInOrOnBoundary(nodes, issues);
+	const issuesById = new Map(issues.map(issue => [issue.id, issue]));
+	const nodesById = new Map(influnceDiagramNodes.map(node => [node.id, node]));
+	const diagramEdges = edges.filter(
+		edge => nodesById.has(edge.tail_id) && nodesById.has(edge.head_id),
+	);
+	const restrictionTablesByEdgeId = new Map(
+		restrictionTables.map(table => [table.edge_id, table]),
+	);
+	const edgePairs = new Set(diagramEdges.map(edge => `${edge.tail_id}:${edge.head_id}`));
+	const issueTypeOfNode = (nodeId: string) =>
+		issuesById.get(nodesById.get(nodeId)?.data.issue_id ?? '')?.type;
+	const violations: TotalRestrictionViolation[] = [];
+
+	for (const node of influnceDiagramNodes) {
+		const targetIssue = issuesById.get(node.data.issue_id);
+		if (!targetIssue) continue;
+
+		const childStateIds = getIssueStateIds(targetIssue);
+		if (!childStateIds.length) continue;
+
+		const incomingEdges = diagramEdges.filter(edge => edge.head_id === node.id);
+		const outgoingEdges = diagramEdges.filter(edge => edge.tail_id === node.id);
+		const hasUncertaintyChild = outgoingEdges.some(
+			edge => issueTypeOfNode(edge.head_id) === 'Uncertainty',
+		);
+
+		for (const edge of incomingEdges) {
+			const parentNode = nodesById.get(edge.tail_id);
+			const parentIssue = parentNode ? issuesById.get(parentNode.data.issue_id) : undefined;
+			const restrictionTable = restrictionTablesByEdgeId.get(edge.id);
+			if (!parentIssue || !parentNode || !restrictionTable) continue;
+
+			const fullyRestrictedStateIds = getIssueStateIds(parentIssue).filter(parentStateId =>
+				childStateIds.every(childStateId =>
+					restrictionTable.restriction_entries.some(
+						entry =>
+							entry.parent_state_id === parentStateId &&
+							entry.child_state_id === childStateId &&
+							entry.restriction_value === 0,
+					),
+				),
+			);
+			if (!fullyRestrictedStateIds.length) continue;
+
+			const missingGrandchildIssueIds = hasUncertaintyChild
+				? []
+				: outgoingEdges
+						.filter(
+							grandchildEdge =>
+								!edgePairs.has(`${parentNode.id}:${grandchildEdge.head_id}`) &&
+								issueTypeOfNode(grandchildEdge.head_id) !== undefined &&
+								issueTypeOfNode(grandchildEdge.head_id) !== 'Utility',
+						)
+						.map(
+							grandchildEdge => nodesById.get(grandchildEdge.head_id)!.data.issue_id,
+						);
+			if (!hasUncertaintyChild && !missingGrandchildIssueIds.length) continue;
+
+			for (const parentStateId of fullyRestrictedStateIds) {
+				violations.push({
+					edgeId: edge.id,
+					targetIssueId: targetIssue.id,
+					parentStateId,
+					rule: hasUncertaintyChild ? 'uncertaintyParent' : 'missingGrandchildEdges',
+					missingGrandchildIssueIds,
+				});
+			}
+		}
+	}
+
+	return violations;
+};
+
+export const applyRestrictionEntry = (
+	restrictionTables: RestrictionTable[],
+	updatedEntry: RestrictionEntry,
+): RestrictionTable[] =>
+	restrictionTables.map(table =>
+		table.id === updatedEntry.restriction_table_id
+			? {
+					...table,
+					restriction_entries: table.restriction_entries.map(entry =>
+						entry.id === updatedEntry.id ? updatedEntry : entry,
+					),
+				}
+			: table,
+	);
