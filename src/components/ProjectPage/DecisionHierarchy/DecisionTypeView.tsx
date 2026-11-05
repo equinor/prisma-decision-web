@@ -6,10 +6,10 @@ import {
 } from '@dnd-kit/react';
 import { useMeasure } from '@uidotdev/usehooks';
 import { useMemo, useState } from 'react';
-import { useUpdateIssuesOptimistic } from '../../../../hooks/api/useUpdateIssues';
-import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
-import { cn } from '../../../../utils/cn';
-import { DecisionType, Issue } from '../../../../validators';
+import { useUpdateIssuesOptimistic } from '../../../hooks/api/useUpdateIssues';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
+import { cn } from '../../../utils/cn';
+import { DecisionType, Issue } from '../../../validators';
 import { decisionChipClassName } from './DecisionChip';
 import { DecisionTier } from './DecisionTier';
 import { DecisionTierSheet } from './DecisionTierSheet';

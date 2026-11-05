@@ -1,8 +1,8 @@
 import { useDraggable } from '@dnd-kit/react';
 import { Ref, useState } from 'react';
-import { cn } from '../../../../utils/cn';
-import { Issue } from '../../../../validators';
-import { EditIssueModal } from '../../../common/EditIssueModal';
+import { cn } from '../../../utils/cn';
+import { Issue } from '../../../validators';
+import { EditIssueModal } from '../../common/EditIssueModal';
 
 export const DECISION_DRAG_TYPE = 'decision';
 

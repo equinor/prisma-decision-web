@@ -1,8 +1,8 @@
 import { useDroppable } from '@dnd-kit/react';
 import { useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { packDecisionTierRows } from '../../../../utils/packDecisionTierRows';
-import { cn } from '../../../../utils/cn';
-import { Issue } from '../../../../validators';
+import { packDecisionTierRows } from '../../../utils/packDecisionTierRows';
+import { cn } from '../../../utils/cn';
+import { Issue } from '../../../validators';
 import { DECISION_DRAG_TYPE, decisionChipClassName, DraggableDecisionChip } from './DecisionChip';
 import { DecisionTierConfig, tierShapeClassName } from './decisionTiers';
 

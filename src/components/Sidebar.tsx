@@ -4,6 +4,7 @@ import {
 	functions,
 	group,
 	info_circle,
+	layers,
 	measure,
 	share,
 	star_outlined,
@@ -82,6 +83,14 @@ export const SideBar = () => {
 						className='[&_svg]:fill-primary-resting border-b-0!'
 						icon={assignment_important}
 						to={`/project/${project.id}/issues`}
+					/>
+					<EdsSideBar.Link
+						active={window.location.pathname.includes('decision-hierarchy')}
+						label='Decision Hierarchy'
+						as={Link}
+						className='[&_svg]:fill-primary-resting border-b-0!'
+						icon={layers}
+						to={`/project/${project.id}/decision-hierarchy`}
 					/>
 					<EdsSideBar.Link
 						label='Strategies'

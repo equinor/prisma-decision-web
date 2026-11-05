@@ -3,6 +3,7 @@ import { HomePage } from './components/Homepage/HomePage';
 import { Layout } from './components/Layout';
 import { Assessments } from './components/ProjectPage/Assessments/Assessments';
 import { CompactTree } from './components/ProjectPage/CompactTree/CompactTree';
+import { DecisionHierarchy } from './components/ProjectPage/DecisionHierarchy/DecisionHierarchy';
 import { DecisionTree } from './components/ProjectPage/DecisionTree/DecisionTree';
 import { InfluenceDiagram } from './components/ProjectPage/InfluenceDiagram/InfluenceDiagram';
 import { ProjectDetails } from './components/ProjectPage/ProjectDetails/ProjectDetails';
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
 			<Route path='/project/:projectId/' element={<ProjectPage />}>
 				<Route index element={<ProjectDetails />} />
 				<Route path='issues' element={<ProjectIssues />} />
+				<Route path='decision-hierarchy' element={<DecisionHierarchy />} />
 				<Route path='objectives' element={<ProjectObjectives />} />
 				<Route path='influence-diagram' element={<InfluenceDiagram />} />
 				<Route path='whiteboard/:sheetId?' element={<Whiteboard />} />

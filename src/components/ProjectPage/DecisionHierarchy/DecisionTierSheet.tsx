@@ -1,8 +1,8 @@
 import { useDroppable } from '@dnd-kit/react';
 import { Button, Icon } from '@equinor/eds-core-react';
 import { close } from '@equinor/eds-icons';
-import { cn } from '../../../../utils/cn';
-import { Issue } from '../../../../validators';
+import { cn } from '../../../utils/cn';
+import { Issue } from '../../../validators';
 import { DECISION_DRAG_TYPE, DraggableDecisionChip } from './DecisionChip';
 import { DecisionTierConfig, tierSurfaceClassName } from './decisionTiers';
 

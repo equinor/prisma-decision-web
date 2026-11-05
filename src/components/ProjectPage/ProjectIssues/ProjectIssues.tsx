@@ -1,10 +1,9 @@
 import { Button, Icon } from '@equinor/eds-core-react/next';
-import { layers, view_column, view_list } from '@equinor/eds-icons';
+import { view_column, view_list } from '@equinor/eds-icons';
 import { useLocalStorage } from '@uidotdev/usehooks';
 import '@xyflow/react/dist/style.css';
 import { CreateIssues } from '../../common/CreateIssue';
 import { SegmentedControl } from '../../common/SegmentedControl';
-import { DecisionTypeView } from './DecisionTypeView/DecisionTypeView';
 import { ListView } from './ListView/ListView';
 import { BoardGrouping, boardGroupings } from './TableView/boardColumns';
 import { TableView } from './TableView/TableView';
@@ -23,9 +22,6 @@ export const ProjectIssues = () => {
 	if (issueView === 'table') {
 		issueViewElement = <TableView grouping={boardGrouping} />;
 		activeView = 1;
-	} else if (issueView === 'decisionType') {
-		issueViewElement = <DecisionTypeView />;
-		activeView = 2;
 	}
 
 	return (
@@ -63,15 +59,6 @@ export const ProjectIssues = () => {
 							onClick={() => setIssuesView('table')}
 						>
 							<Icon data={view_column} />
-						</Button>
-						<Button
-							icon
-							aria-label='Decision type view'
-							aria-pressed={activeView === 2}
-							variant={activeView === 2 ? 'primary' : 'secondary'}
-							onClick={() => setIssuesView('decisionType')}
-						>
-							<Icon data={layers} />
 						</Button>
 					</div>
 				</div>

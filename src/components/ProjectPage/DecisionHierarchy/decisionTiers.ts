@@ -1,4 +1,4 @@
-import { DecisionType } from '../../../../validators';
+import { DecisionType } from '../../../validators';
 
 export type DecisionTierConfig = {
 	type: DecisionType;
