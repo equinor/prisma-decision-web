@@ -5,6 +5,7 @@ import { CardContainer } from '../../../common/Cards/CardContainer';
 import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
 import { RestrictionToggleCell } from './RestrictionToggleCell';
 import { useRestrictionTable } from './useRestrictionTable';
+import { useRestrictionToggle } from './useRestrictionToggle';
 
 export const RestrictionTable = ({
 	restrictionTable,
@@ -15,6 +16,11 @@ export const RestrictionTable = ({
 }: RestrictionTableProps) => {
 	const { parents, parentRowSpans, rows, lookups, sourceStates, targetStates } =
 		useRestrictionTable(restrictionTable, sourceIssue, targetIssue);
+	const { toggleEntry, getViolationForEntry } = useRestrictionToggle(
+		restrictionTable,
+		sourceIssue,
+		targetIssue,
+	);
 
 	return (
 		<CardContainer
@@ -69,16 +75,21 @@ export const RestrictionTable = ({
 							);
 							if (!parentState) return null;
 
-							return targetStates.map(childState => (
-								<RestrictionToggleCell
-									key={childState.id}
-									entry={entries.find(
-										entry => entry.child_state_id === childState.id,
-									)}
-									parentState={parentState}
-									childState={childState}
-								/>
-							));
+							return targetStates.map(childState => {
+								const entry = entries.find(
+									entry => entry.child_state_id === childState.id,
+								);
+								return (
+									<RestrictionToggleCell
+										key={childState.id}
+										entry={entry}
+										parentState={parentState}
+										childState={childState}
+										onToggle={toggleEntry}
+										violation={entry && getViolationForEntry(entry.id)}
+									/>
+								);
+							});
 						}}
 					/>
 				)}
