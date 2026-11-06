@@ -7,30 +7,35 @@ import { TogglePanMode } from '../../common/DraggableToolbar/TogglePanMode';
 import { ToggleRectangleMode } from '../../common/DraggableToolbar/ToggleRectangleMode';
 import { ToggleSelectionMode } from '../../common/DraggableToolbar/ToggleSelectionMode';
 import { ToggleTextMode } from '../../common/DraggableToolbar/ToggleTextMode';
+import { DraggableToolbar } from '../../common/DraggableToolbar/DraggableToolbar';
 import {
-	ToolBar,
-	ToolbarDragDropProvider,
+	ToolbarGroup,
 	ToolbarSeparator,
+	ToolbarToolGroup,
 } from '../../common/DraggableToolbar/Toolbar';
 import { ZoomControls } from '../../common/DraggableToolbar/ZoomControls';
 
 export const WhiteboardToolbar = () => {
 	return (
-		<ToolbarDragDropProvider>
-			<ToolBar>
-				<ZoomControls />
-				<ToolbarSeparator />
-				<TogglePanMode />
-				<ToggleSelectionMode />
-				<ToggleRectangleMode />
-				<ToggleArrowMode />
-				<ToggleTextMode />
-				<ToggleFreehandMode />
+		<DraggableToolbar aria-label='Whiteboard toolbar'>
+			<ZoomControls />
+			<ToolbarSeparator />
+			<ToolbarGroup aria-label='Whiteboard tools'>
+				<ToolbarToolGroup aria-label='Tool modes'>
+					<TogglePanMode />
+					<ToggleSelectionMode />
+					<ToggleRectangleMode />
+					<ToggleArrowMode />
+					<ToggleTextMode />
+					<ToggleFreehandMode />
+				</ToolbarToolGroup>
 				<AddIssue />
-				<ToolbarSeparator />
+			</ToolbarGroup>
+			<ToolbarSeparator />
+			<ToolbarGroup aria-label='Sheet controls'>
 				<SheetPicker />
 				<ClearSheet />
-			</ToolBar>
-		</ToolbarDragDropProvider>
+			</ToolbarGroup>
+		</DraggableToolbar>
 	);
 };

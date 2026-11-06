@@ -1,8 +1,9 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
+import { checkbox_outline } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
 import { useHotkey } from '@tanstack/react-hotkeys';
-import { rectangleIcon } from '../../../icons';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
+import { ToolbarToolButton } from './Toolbar';
 
 export const ToggleRectangleMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
@@ -12,15 +13,14 @@ export const ToggleRectangleMode = () => {
 	};
 	useHotkey('2', onChange);
 	return (
-		<Button.Toggle
-			onChange={onChange}
-			selectedIndexes={checked ? [0] : []}
-			title='Rectangle mode'
+		<ToolbarToolButton
+			icon
+			selected={checked}
+			shortcut='2'
+			tooltip='Rectangle mode'
+			onClick={onChange}
 		>
-			<Button className='relative px-1.5!'>
-				<Icon data={rectangleIcon} />
-				<p className='absolute right-0.5 -bottom-0.5 text-xs'>2</p>
-			</Button>
-		</Button.Toggle>
+			<Icon data={checkbox_outline} />
+		</ToolbarToolButton>
 	);
 };

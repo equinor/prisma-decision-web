@@ -2,41 +2,42 @@ import { useNodes } from '@xyflow/react';
 import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { SolutionEvidenceResponse } from '../../../validators';
-import { CreateIssues } from '../../common/CreateIssue';
+import { CreateIssueToolbarButton } from '../../common/CreateIssueToolbarButton';
 import { EVMetrics } from '../../common/EVMetrics';
 import { useSelectedProject } from '../ProjectContext';
 import { ToggleExpandAll } from '../ToggleExpandAll';
+import { DraggableToolbar } from '../../common/DraggableToolbar/DraggableToolbar';
 import { ZoomControls } from '../../common/DraggableToolbar/ZoomControls';
-import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 import { ChangeIssueType } from '../../common/DraggableToolbar/ChangeIssueType';
 import { DeleteMenu } from '../../common/DraggableToolbar/DeleteMenu';
 import { LayoutControls } from '../../common/DraggableToolbar/LayoutControls';
-import {
-	ToolBar,
-	ToolbarDragDropProvider,
-	ToolbarSeparator,
-} from '../../common/DraggableToolbar/Toolbar';
+import { ToolbarGroup, ToolbarSeparator } from '../../common/DraggableToolbar/Toolbar';
 
 export const InfluenceDiagramToolbar = () => {
 	const nodes = useNodes<ReactFlowInfluenceNode>();
 	const selectedNodes = nodes.filter(node => node.selected);
 
 	return (
-		<ToolbarDragDropProvider>
-			<ToolBar>
+		<DraggableToolbar aria-label='Influence diagram toolbar'>
+			<ToolbarGroup aria-label='Viewport controls'>
 				<ZoomControls />
 				<LayoutControls />
-				<ToolbarSeparator />
-				<ToggleExpandAll />
-				<ToolbarSeparator />
+			</ToolbarGroup>
+			<ToolbarSeparator />
+			<ToolbarGroup aria-label='Diagram controls'>
+				<ToggleExpandAll toolbar />
+			</ToolbarGroup>
+			<ToolbarSeparator />
+			<ToolbarGroup aria-label='Issue actions'>
 				<DeleteMenu selectedNodes={selectedNodes} />
 				<ChangeIssueType />
-				<CreateIssues />
-				<InfluenceDiagramValidation />
-				<ToolbarSeparator />
+				<CreateIssueToolbarButton />
+			</ToolbarGroup>
+			<ToolbarSeparator />
+			<ToolbarGroup aria-label='Expected value metrics'>
 				<BarMetrics />
-			</ToolBar>
-		</ToolbarDragDropProvider>
+			</ToolbarGroup>
+		</DraggableToolbar>
 	);
 };
 

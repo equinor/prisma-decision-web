@@ -1,8 +1,9 @@
-import { Button, Icon } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
 import { useAtom } from 'jotai';
 import { useHotkey } from '@tanstack/react-hotkeys';
 import { arrowIcon } from '../../../icons';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
+import { ToolbarToolButton } from './Toolbar';
 
 export const ToggleArrowMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
@@ -12,11 +13,14 @@ export const ToggleArrowMode = () => {
 	};
 	useHotkey('3', onChange);
 	return (
-		<Button.Toggle onChange={onChange} selectedIndexes={checked ? [0] : []} title='Arrow mode'>
-			<Button className='relative px-1.5!'>
-				<Icon data={arrowIcon} />
-				<p className='absolute right-0.5 -bottom-0.5 text-xs'>3</p>
-			</Button>
-		</Button.Toggle>
+		<ToolbarToolButton
+			icon
+			selected={checked}
+			shortcut='3'
+			tooltip='Arrow mode'
+			onClick={onChange}
+		>
+			<Icon data={arrowIcon} />
+		</ToolbarToolButton>
 	);
 };
