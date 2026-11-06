@@ -1,7 +1,11 @@
 import { useReactFlow, useViewport } from '@xyflow/react';
 import { type PointerEvent, useMemo, useRef, useState } from 'react';
 import { useCreateWhiteboardNode } from '../../../hooks/api/useCreateWhiteboardNode ';
-import { createFreehandGeometry, type FreehandInputPoint } from './freehandPath';
+import {
+	createFreehandGeometry,
+	FREEHAND_BASE_STROKE_WIDTH,
+	type FreehandInputPoint,
+} from './freehandPath';
 import { whiteboardPreviewStrokeColor } from './selectionStyles';
 import { useWhiteboardWheelZoom } from './useWhiteboardWheelZoom';
 import useSelectedWhiteboardSheet from '../../../hooks/useSelectedWhiteboardSheet';
@@ -24,7 +28,7 @@ export const FreehandTool = () => {
 
 		return createFreehandGeometry(
 			points.map(([x, y]) => [x - bounds.left, y - bounds.top]),
-			{ size: 4 * zoom },
+			{ size: FREEHAND_BASE_STROKE_WIDTH * zoom },
 		);
 	}, [points, zoom]);
 
@@ -113,7 +117,14 @@ export const FreehandTool = () => {
 					viewBox={`0 0 ${preview.width} ${preview.height}`}
 					preserveAspectRatio='none'
 				>
-					<path d={preview.path} fill={whiteboardPreviewStrokeColor} strokeWidth={2} />
+					<path
+						d={preview.path}
+						fill='none'
+						stroke={whiteboardPreviewStrokeColor}
+						strokeWidth={MEDIUM_STROKE_WIDTH}
+						strokeLinecap='round'
+						strokeLinejoin='round'
+					/>
 				</svg>
 			)}
 		</div>
