@@ -10,18 +10,21 @@ import {
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 import { useDeleteWhiteboardNode } from '../../../hooks/api/useDeleteWhiteboardNode';
+import { useExpandCard } from '../../../hooks/useExpandCard';
 import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowWhiteboardNode } from '../../../types';
+import { cn } from '../../../utils/cn';
 import { getDiagramIssueBorderColor } from '../../../utils/getDiagramIssueBorderColor';
 import {
 	IssueCard,
 	IssueCardEditMenuItem,
-	IssueCardExpandableContent,
 	IssueCardExpandTrigger,
+	IssueCardStates,
 	IssueCardHeader,
 	IssueCardMenu,
-	IssueCardStates,
 } from '../../common/Cards/IssueCard';
+import { IssueTextField } from '../ProjectIssues/IssueTextField';
+import { activeToolAtom } from './activeToolAtom';
 import { ArrowNode } from './Arrow/ArrowNode';
 import { ArrowTool } from './Arrow/ArrowTool';
 import { FreehandNode } from './FreehandNode';
@@ -31,13 +34,13 @@ import { RectangleNode } from './Rectangle/RectangleNode';
 import { RectangleTool } from './Rectangle/RectangleTool';
 import { TextNode } from './Text/TextNode';
 import { TextTool } from './Text/TextTool';
-import { activeToolAtom } from './activeToolAtom';
 import { useWhiteboard } from './useWhiteboard';
 import { WhiteboardToolbar } from './WhiteboardToolbar';
 
 const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 	const issues = useSelectedProjectIssues();
 	const issue = issues.find(issue => issue.id === data.data);
+	const expanded = useExpandCard(issue?.id ?? '').expanded;
 	if (!issue) return null;
 	const cardOpacity = (data.opacity ?? 100) / 100;
 	return (
@@ -51,7 +54,20 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 						<IssueCardEditMenuItem />
 					</IssueCardMenu>
 				</IssueCardHeader>
-				<IssueCardExpandableContent />
+				<div className='pb-1'>
+					<div className='text-base leading-6 font-bold'>
+						<IssueTextField issue={issue} field='name' showHint variant='card' />
+					</div>
+					<div className='text-text-tertiary text-sm'>
+						<IssueTextField
+							issue={issue}
+							field='description'
+							className={cn('line-clamp-1', { 'line-clamp-none': expanded })}
+							showHint
+							variant='card'
+						/>
+					</div>
+				</div>
 				<IssueCardStates>
 					<IssueCardExpandTrigger />
 				</IssueCardStates>
