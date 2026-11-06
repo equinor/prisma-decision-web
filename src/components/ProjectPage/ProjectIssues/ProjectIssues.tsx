@@ -9,6 +9,7 @@ import { TableView } from './TableView/TableView';
 import { IssueBoardFocus, issueBoardFocuses } from './TableView/issueBoardFocus';
 import { ToggleExpandAll } from '../ToggleExpandAll';
 import { useSelectedProject } from '../ProjectContext';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 
 export const ProjectIssues = () => {
 	const [issueView, setIssuesView] = useLocalStorage('issuesView', 'list');
@@ -18,6 +19,7 @@ export const ProjectIssues = () => {
 	);
 	const selectedProject = useSelectedProject();
 	const isBoardView = issueView === 'table';
+	const issueIds = useSelectedProjectIssues().map(issue => issue.id);
 
 	return (
 		<div className='flex flex-col gap-4'>
@@ -27,7 +29,7 @@ export const ProjectIssues = () => {
 					<CreateIssueButton />
 					{isBoardView && (
 						<>
-							<ToggleExpandAll />
+							<ToggleExpandAll issueIds={issueIds} />
 							<div className='border-background-medium w-100 max-w-[40vw] rounded-sm border'>
 								<SegmentedSelector
 									label='Board focus'

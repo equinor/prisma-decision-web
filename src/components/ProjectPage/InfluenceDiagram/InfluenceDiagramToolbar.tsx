@@ -1,6 +1,8 @@
 import { useNodes } from '@xyflow/react';
 import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
+import { useSelectedProjectIssues } from '../../../hooks/useSelectedProjectIssues';
 import { ReactFlowInfluenceNode } from '../../../types';
+import { getNodesInOrOnBoundary } from '../../../utils/influenceDiagramValidationUtils';
 import { SolutionEvidenceResponse } from '../../../validators';
 import { CreateIssueToolbarButton } from '../../common/CreateIssueToolbarButton';
 import { EVMetrics } from '../../common/EVMetrics';
@@ -35,7 +37,11 @@ export const InfluenceDiagramToolbar = ({
 	onToolChange: (tool: InfluenceDiagramTool) => void;
 }) => {
 	const nodes = useNodes<ReactFlowInfluenceNode>();
+	const issues = useSelectedProjectIssues();
 	const selectedNodes = nodes.filter(node => node.selected);
+	const expandableIssueIds = getNodesInOrOnBoundary(nodes, issues)
+		.filter(node => node.type === 'decision' || node.type === 'uncertainty')
+		.map(node => node.data.issue_id);
 
 	return (
 		<DraggableToolbar aria-label='Influence diagram toolbar'>
@@ -73,7 +79,7 @@ export const InfluenceDiagramToolbar = ({
 			{view === 'card' && (
 				<>
 					<ToolbarGroup aria-label='Diagram controls'>
-						<ToggleExpandAll toolbar />
+						<ToggleExpandAll toolbar issueIds={expandableIssueIds} />
 					</ToolbarGroup>
 					<ToolbarSeparator />
 				</>
