@@ -46,9 +46,29 @@ export const IssueCard = ({
 	className,
 	...rest
 }: IssueCardProps) => {
+	const pointerInteraction = useIssueCardPointerInteraction();
+	return (
+		<IssueCardProvider issue={issue} onClickState={onClickState} selectedState={selectedState}>
+			<CardContainer
+				{...rest}
+				{...pointerInteraction}
+				className={cn('gap-0', className)}
+				issueType={issue.type}
+			>
+				{children}
+			</CardContainer>
+		</IssueCardProvider>
+	);
+};
+
+export const IssueCardProvider = ({
+	children,
+	issue,
+	onClickState,
+	selectedState,
+}: Pick<IssueCardProps, 'children' | 'issue' | 'onClickState' | 'selectedState'>) => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-	const pointerInteraction = useIssueCardPointerInteraction();
 	const sortedStates =
 		issue.type === 'Uncertainty'
 			? sortByCreatedAt(issue.uncertainty.outcomes)
@@ -59,14 +79,7 @@ export const IssueCard = ({
 		<IssueCardContext
 			value={{ issue, sortedStates, setEditOpen, setDeleteOpen, onClickState, selectedState }}
 		>
-			<CardContainer
-				{...rest}
-				{...pointerInteraction}
-				className={cn('gap-0', className)}
-				issueType={issue.type}
-			>
-				{children}
-			</CardContainer>
+			{children}
 			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
 			<DeleteIssueDialog
 				issue={issue}
