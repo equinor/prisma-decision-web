@@ -10,6 +10,7 @@ import { Issue, Project, issueSchema } from '../../../../validators';
 import { ProjectContext } from '../../ProjectContext';
 import { TableView } from './TableView';
 import { ListView } from '../ListView/ListView';
+import { IssueBoardFocus, moveIssueToBoardGroup } from './issueBoardFocus';
 
 vi.hoisted(() => {
 	vi.stubGlobal(
@@ -51,7 +52,7 @@ afterEach(() => {
 	vi.useRealTimers();
 });
 
-const renderBoard = () => {
+const renderBoard = (focus: IssueBoardFocus = 'Overview') => {
 	const queryClient = new QueryClient({
 		defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
 	});
@@ -61,7 +62,7 @@ const renderBoard = () => {
 			<Toaster />
 		</QueryClientProvider>
 	);
-	const view = render(contents(<TableView />));
+	const view = render(contents(<TableView focus={focus} />));
 	return {
 		...view,
 		queryClient,
@@ -70,10 +71,69 @@ const renderBoard = () => {
 		showProject: (next: Project) => {
 			// Project navigation leaves Issues before opening the next project's Board.
 			view.rerender(contents(null));
-			view.rerender(contents(<TableView />, next));
+			view.rerender(contents(<TableView focus={focus} />, next));
 		},
 	};
 };
+
+test('alternate column views only group their relevant issue classification', async () => {
+	const decision = { ...existingIssue(), name: 'Tactical decision' };
+	const uncertainty = {
+		...existingIssue(),
+		id: '00000000-0000-4000-8000-000000000020',
+		name: 'Key uncertainty',
+		type: 'Uncertainty' as const,
+	};
+	savedIssues = [decision, uncertainty];
+
+	const { showView, user } = renderBoard('Decisions');
+	await screen.findByText(decision.name);
+	expect(screen.getByRole('region', { name: 'Tactical issues' })).toContainElement(
+		screen.getByText(decision.name),
+	);
+	expect(screen.getByText(decision.name).closest('[data-dragging]')).not.toHaveAttribute(
+		'data-no-dnd',
+	);
+	expect(moveIssueToBoardGroup('Decisions', 'Focus', decision).decision.type).toBe('Focus');
+	expect(moveIssueToBoardGroup('Uncertainties', 'Not key', uncertainty).uncertainty.is_key).toBe(
+		false,
+	);
+	expect(screen.queryByText(uncertainty.name)).not.toBeInTheDocument();
+
+	await user.click(screen.getByRole('button', { name: 'Add issue at top of Focus' }));
+	let draftForm = screen.getByRole('form', { name: 'NEW DECISION' });
+	await user.type(within(draftForm).getByRole('textbox', { name: 'Name' }), 'Focus decision');
+	await user.type(
+		within(draftForm).getByRole('textbox', { name: 'Description' }),
+		'Created in the Focus column',
+	);
+	await user.click(within(draftForm).getByRole('button', { name: 'Add' }));
+	await screen.findByText('Focus decision');
+	expect(savedIssues.find(issue => issue.name === 'Focus decision')?.decision.type).toBe('Focus');
+
+	showView(<TableView focus='Uncertainties' />);
+	await screen.findByText(uncertainty.name);
+	expect(screen.getByRole('region', { name: 'Key issues' })).toContainElement(
+		screen.getByText(uncertainty.name),
+	);
+	expect(screen.queryByText(decision.name)).not.toBeInTheDocument();
+
+	await user.click(screen.getByRole('button', { name: 'Add issue at top of Not key' }));
+	draftForm = screen.getByRole('form', { name: 'NEW UNCERTAINTY' });
+	await user.type(
+		within(draftForm).getByRole('textbox', { name: 'Name' }),
+		'Not key uncertainty',
+	);
+	await user.type(
+		within(draftForm).getByRole('textbox', { name: 'Description' }),
+		'Created in the Not key column',
+	);
+	await user.click(within(draftForm).getByRole('button', { name: 'Add' }));
+	await screen.findByText('Not key uncertainty');
+	expect(
+		savedIssues.find(issue => issue.name === 'Not key uncertainty')?.uncertainty.is_key,
+	).toBe(false);
+});
 
 test('leaving for another project discards the draft instead of carrying it to the new project', async () => {
 	const { user, showProject } = renderBoard();
@@ -92,7 +152,7 @@ test('leaving for another project discards the draft instead of carrying it to t
 	expect(apiClient.post).not.toHaveBeenCalled();
 });
 
-test('every Board column has top and bottom Add controls and only one focused draft can open', async () => {
+test('empty Board columns have one Add control and only one focused draft can open', async () => {
 	const { user } = renderBoard();
 	await waitFor(() => expect(apiClient.get).toHaveBeenCalled());
 	for (const type of ['Unassigned', 'Decision', 'Uncertainty', 'Fact']) {
@@ -101,8 +161,8 @@ test('every Board column has top and bottom Add controls and only one focused dr
 			within(column).getByRole('button', { name: `Add issue at top of ${type}` }),
 		).toBeEnabled();
 		expect(
-			within(column).getByRole('button', { name: `Add issue at bottom of ${type}` }),
-		).toBeEnabled();
+			within(column).queryByRole('button', { name: `Add issue at bottom of ${type}` }),
+		).not.toBeInTheDocument();
 	}
 	expect(screen.queryByRole('region', { name: 'Utility issues' })).not.toBeInTheDocument();
 	await user.click(screen.getByRole('button', { name: 'Add issue at top of Decision' }));
@@ -115,7 +175,7 @@ test('every Board column has top and bottom Add controls and only one focused dr
 	expect(within(draftForm).getByRole('radiogroup', { name: 'Boundary' })).toBeInTheDocument();
 	expect(within(draftForm).getByRole('button', { name: 'Add' })).toBeDisabled();
 	const alternatives = screen.getAllByRole('button', { name: /^Add issue at/ });
-	expect(alternatives).toHaveLength(7);
+	expect(alternatives).toHaveLength(3);
 	for (const alternative of alternatives) expect(alternative).toBeDisabled();
 	await user.click(alternatives[0]);
 	expect(screen.getAllByRole('form')).toHaveLength(1);
@@ -302,7 +362,7 @@ test('pending creation cannot submit twice and a failure retains the entire draf
 			}),
 	);
 	const { user } = renderBoard();
-	await user.click(screen.getByRole('button', { name: 'Add issue at bottom of Uncertainty' }));
+	await user.click(screen.getByRole('button', { name: 'Add issue at top of Uncertainty' }));
 	const draftForm = screen.getByRole('form', { name: 'NEW UNCERTAINTY' });
 	await user.type(within(draftForm).getByRole('textbox', { name: 'Name' }), 'Oil price');
 	await user.type(

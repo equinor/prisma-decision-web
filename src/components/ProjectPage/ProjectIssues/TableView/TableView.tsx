@@ -4,7 +4,7 @@ import { DragDropProvider, DragOverlay } from '@dnd-kit/react';
 import { useState } from 'react';
 import { useIssueDragAndDrop } from '../../../../hooks/useIssueDragAndDrop';
 import { canDndStartFrom } from '../../../../utils/canDndStartFrom';
-import { issueTypes } from '../../../../validators';
+import { decisionTypes, issueTypes } from '../../../../validators';
 import {
 	IssueCard,
 	IssueCardDeleteMenuItem,
@@ -17,6 +17,7 @@ import {
 } from '../../../common/Cards/IssueCard';
 import { IssueColumn } from './IssueColumn';
 import { BoardDraftLocation } from './IssueDraftControl';
+import { IssueBoardFocus } from './issueBoardFocus';
 
 const sensors = [
 	PointerSensor.configure({
@@ -30,10 +31,41 @@ const sensors = [
 	KeyboardSensor,
 ];
 
-export const TableView = () => {
+export const TableView = ({ focus = 'Overview' }: { focus?: IssueBoardFocus }) => {
 	const [activeDraft, setActiveDraft] = useState<BoardDraftLocation | null>(null);
-
-	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop();
+	const { issues, onDragEnd, onDragOver, onBeforeDragStart } = useIssueDragAndDrop(focus);
+	const groupedColumns =
+		focus === 'Decisions'
+			? decisionTypes.map(type => ({
+					label: type,
+					issueType: 'Decision' as const,
+					decisionType: type,
+					isKey: undefined,
+					colorClassName: type === 'Focus' ? 'bg-yellow-300/25' : 'bg-gray-300/25',
+					issues: issues[type],
+				}))
+			: [
+					{
+						label: 'Key',
+						issueType: 'Uncertainty' as const,
+						decisionType: undefined,
+						isKey: true,
+						colorClassName: 'bg-green-300/25',
+						issues: issues.Key,
+					},
+					{
+						label: 'Not key',
+						issueType: 'Uncertainty' as const,
+						decisionType: undefined,
+						isKey: false,
+						colorClassName: 'bg-gray-300/25',
+						issues: issues['Not key'],
+					},
+				];
+	const acceptedColumnIds =
+		focus === 'Overview'
+			? issueTypes.filter(type => type !== 'Utility')
+			: groupedColumns.map(column => column.label);
 	return (
 		<DragDropProvider
 			sensors={sensors}
@@ -45,18 +77,35 @@ export const TableView = () => {
 			<div className='bg-background-default shadow-tile rounded-sm p-4'>
 				<div className='h-[calc(100vh-208px)] w-full overflow-auto'>
 					<div className='flex min-h-full flex-1 items-stretch gap-2'>
-						{issueTypes
-							.filter(type => type !== 'Utility')
-							.map(issueType => (
-								<IssueColumn
-									key={issueType}
-									issues={issues[issueType]}
-									issueType={issueType}
-									label={issueType}
-									activeDraft={activeDraft}
-									setActiveDraft={setActiveDraft}
-								/>
-							))}
+						{focus === 'Overview'
+							? issueTypes
+									.filter(type => type !== 'Utility')
+									.map(issueType => (
+										<IssueColumn
+											key={issueType}
+											issues={issues[issueType]}
+											issueType={issueType}
+											label={issueType}
+											acceptedColumnIds={acceptedColumnIds}
+											activeDraft={activeDraft}
+											setActiveDraft={setActiveDraft}
+										/>
+									))
+							: groupedColumns.map(column => (
+									<IssueColumn
+										key={column.label}
+										columnId={column.label}
+										label={column.label}
+										issueType={column.issueType}
+										decisionType={column.decisionType}
+										isKey={column.isKey}
+										colorClassName={column.colorClassName}
+										issues={column.issues}
+										acceptedColumnIds={acceptedColumnIds}
+										activeDraft={activeDraft}
+										setActiveDraft={setActiveDraft}
+									/>
+								))}
 					</div>
 				</div>
 			</div>
