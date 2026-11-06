@@ -1,13 +1,13 @@
-import { Tooltip } from '@equinor/eds-core-react';
-import { Button, Icon } from '@equinor/eds-core-react/next';
-import { info_circle, sheet_right_position } from '@equinor/eds-icons';
-import { useLocalStorage, useMediaQuery } from '@uidotdev/usehooks';
+import '@xyflow/react/dist/style.css';
 import { useState } from 'react';
-import { useSelectedProjectStakeholders } from '../../../hooks/useSelectedProjectStakeholders';
-import { cn } from '../../../utils/cn';
 import { CreateStakeholderMatrix } from './CreateStakeholderMatrix';
 import { StakeholderGrid } from './StakeholderGrid';
 import { StakeholdersPanel } from './StakeholdersPanel';
+import { Button, Icon, Tooltip } from '@equinor/eds-core-react/next';
+import { info_circle, sheet_right_position } from '@equinor/eds-icons';
+import { useLocalStorage, useMediaQuery } from '@uidotdev/usehooks';
+import { useSelectedProjectStakeholders } from '../../../hooks/useSelectedProjectStakeholders';
+import { cn } from '../../../utils/cn';
 
 type StakeholderMatrixProps = {
 	className?: string;
@@ -41,7 +41,7 @@ export const StakeholderMatrix = ({ className }: StakeholderMatrixProps) => {
 						<h1 className='text-[32px] leading-10 font-bold whitespace-nowrap'>
 							Stakeholder Matrix
 						</h1>
-						<span className='dark:bg-background-medium flex h-[26px] min-w-[118px] shrink-0 items-center justify-center rounded bg-(--eds-color-bg-fill-muted-default) px-2 text-xs leading-4 font-medium whitespace-nowrap'>
+						<span className='dark:bg-background-medium flex h-6.5 min-w-29.5 shrink-0 items-center justify-center rounded bg-(--eds-color-bg-fill-muted-default) px-2 text-xs leading-4 font-medium whitespace-nowrap'>
 							{stakeholders.length}{' '}
 							{stakeholders.length === 1 ? 'stakeholder' : 'stakeholders'}
 						</span>

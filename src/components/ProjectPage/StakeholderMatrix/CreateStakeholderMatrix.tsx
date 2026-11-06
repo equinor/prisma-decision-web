@@ -1,10 +1,10 @@
-import { CircularProgress, Popover, TextField } from '@equinor/eds-core-react';
-import { Button, Icon } from '@equinor/eds-core-react/next';
+import { Button, Icon, TextField } from '@equinor/eds-core-react/next';
 import { add, close } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';
 import { useStakeholderMatrixForm } from '../../../hooks/useStakeholderMatrixForm';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
+import { CircularProgress, Popover } from '@equinor/eds-core-react';
 
 type CreateStakeholderMatrixProps = {
 	/** Button text; the popover is anchored to this button. */

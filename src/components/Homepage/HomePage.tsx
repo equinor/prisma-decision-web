@@ -1,4 +1,4 @@
-import { Search } from '@equinor/eds-core-react';
+import { Search } from '@equinor/eds-core-react/next';
 import { useState } from 'react';
 import { useGetEdges } from '../../hooks/api/useGetEdges';
 import { useGetIssues } from '../../hooks/api/useGetIssues';
@@ -48,6 +48,7 @@ export const HomePage = () => {
 							placeholder='Search projects...'
 							value={searchTerm}
 							onChange={e => setSearchTerm(e.target.value)}
+							onClear={() => setSearchTerm('')}
 						/>
 						<div className='flex justify-between gap-2'>
 							<CreateProject />

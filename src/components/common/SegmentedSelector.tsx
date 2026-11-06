@@ -29,7 +29,7 @@ export const SegmentedSelector = <Value extends string>({
 				<div
 					className={cn(
 						'flex gap-0.5 rounded-sm max-[480px]:flex-wrap [&>.eds-tooltip-anchor]:min-w-0 [&>.eds-tooltip-anchor]:flex-1 max-[480px]:[&>.eds-tooltip-anchor]:basis-[calc(100%/3-2px)] [&>.eds-tooltip-anchor>.eds-radio]:w-full',
-						!compact && 'border-background-medium border p-0.5',
+						!compact && 'border-background-medium border',
 					)}
 				>
 					{options.map(option => (
