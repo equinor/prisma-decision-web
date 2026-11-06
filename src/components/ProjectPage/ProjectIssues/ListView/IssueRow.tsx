@@ -3,8 +3,8 @@ import { Button, Icon } from '@equinor/eds-core-react/next';
 import { delete_to_trash, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useIssueClassification } from '../../../../hooks/useIssueClassification';
 import { Issue } from '../../../../validators';
+import { useIssueClassification } from '../../../../hooks/useIssueClassification';
 import { BoundaryLabel } from '../../../common/Cards/BoundaryLabel';
 import { DecisionTypeLabel } from '../../../common/Cards/DecisionTypeLabel';
 import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
@@ -29,21 +29,19 @@ export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
 					<div className='flex items-center'>
 						<Button
 							variant='ghost'
-							size='small'
 							icon
 							aria-label={`Edit issue: ${issue.name}`}
 							onClick={() => setEditOpen(true)}
 						>
-							<Icon data={edit} />
+							<Icon data={edit} size='md' />
 						</Button>
 						<Button
 							variant='ghost'
-							size='small'
 							icon
 							aria-label={`Delete issue: ${issue.name}`}
 							onClick={() => setDeleteOpen(true)}
 						>
-							<Icon data={delete_to_trash} />
+							<Icon data={delete_to_trash} size='md' />
 						</Button>
 					</div>
 				</Table.Cell>
