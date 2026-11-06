@@ -136,7 +136,9 @@ test('Card view is the initial default and choosing Shape view survives remounti
 test('Scenario overrides and their EV effect are shared between Cards and Shape State triggers', async () => {
 	const user = userEvent.setup();
 	renderDiagram();
-	await user.click(await screen.findByRole('button', { name: 'Expand All' }));
+	const expandAll = await screen.findByRole('button', { name: 'Expand All' });
+	await waitFor(() => expect(expandAll).toBeEnabled());
+	await user.click(expandAll);
 	fireEvent.click(await screen.findByText('Existing option'));
 	fireEvent.click(screen.getByText('Existing outcome'));
 	await waitFor(() => {
