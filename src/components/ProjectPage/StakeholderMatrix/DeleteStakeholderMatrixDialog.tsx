@@ -1,4 +1,5 @@
-import { Button, Dialog, DialogContent, Icon, Tooltip } from '@equinor/eds-core-react';
+import { Dialog, DialogContent, Tooltip } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { delete_to_trash } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useDeleteStakeholderMatrix } from '../../../hooks/api/useDeleteStakeholderMatrix';
@@ -14,8 +15,10 @@ export const DeleteStakeholderMatrixDialog = ({
 		<>
 			<Tooltip title='Delete stakeholder'>
 				<Button
-					variant='ghost_icon'
-					color='danger'
+					icon
+					variant='ghost'
+					size='small'
+					tone='danger'
 					aria-label='Delete stakeholder'
 					onClick={() => setIsOpen(true)}
 				>
@@ -36,14 +39,14 @@ export const DeleteStakeholderMatrixDialog = ({
 							</p>
 							<div className='flex flex-col gap-2'>
 								<Button
-									variant='outlined'
+									variant='secondary'
 									disabled={isPending}
 									onClick={() => setIsOpen(false)}
 								>
 									Cancel
 								</Button>
 								<Button
-									color='danger'
+									tone='danger'
 									disabled={isPending}
 									onClick={() =>
 										deleteStakeholder(stakeholder, {

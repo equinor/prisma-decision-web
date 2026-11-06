@@ -1,12 +1,11 @@
 import {
-	Button,
 	CircularProgress,
 	Dialog,
 	DialogContent,
-	Icon,
 	TextField,
 	Tooltip,
 } from '@equinor/eds-core-react';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { close, edit } from '@equinor/eds-icons';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState } from 'react';
@@ -30,7 +29,9 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 		<>
 			<Tooltip title='Edit stakeholder'>
 				<Button
-					variant='ghost_icon'
+					icon
+					variant='ghost'
+					size='small'
 					aria-label='Edit stakeholder'
 					onClick={() => setIsOpen(true)}
 				>
@@ -52,7 +53,8 @@ export const EditStakeholderMatrix = ({ stakeholder }: EditStakeholderMatrixProp
 							</div>
 							<Button
 								type='button'
-								variant='ghost_icon'
+								icon
+								variant='ghost'
 								className='absolute! top-2 right-2'
 								aria-label='Close'
 								onClick={() => setIsOpen(false)}
