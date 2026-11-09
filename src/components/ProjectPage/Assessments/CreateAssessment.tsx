@@ -1,4 +1,5 @@
-import { Button, Icon, Popover, TextField, CircularProgress } from '@equinor/eds-core-react';
+import { Button, Icon, Popover, CircularProgress } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { ErrorMessage } from '@hookform/error-message';
 import { useState, useRef } from 'react';
 import { useAssessmentForm } from '../../../hooks/useAssessmentForm';

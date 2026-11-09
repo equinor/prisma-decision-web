@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Textarea, TextField } from '@equinor/eds-core-react';
+import { Button, CircularProgress } from '@equinor/eds-core-react';
+import { TextArea, TextField } from '@equinor/eds-core-react/next';
 import { useDecisionQualityAssessmentForm } from '../../../hooks/useDecisionQualityAssessmentForm';
 import { Assessment, evaluationMetrics } from '../../../validators';
 import { FormErrorMessage } from '../../common/FormErrorMessage';
@@ -50,7 +51,7 @@ export const DecisionQualityAssessmentForm = ({
 											return Number(value);
 										},
 									})}
-									meta='0-5'
+									indicator='0-5'
 								/>
 								<ErrorMessage as={FormErrorMessage} name={m.key} errors={errors} />
 							</div>
@@ -61,7 +62,7 @@ export const DecisionQualityAssessmentForm = ({
 
 			<div className='border-background-medium mt-4 border-t pt-4'>
 				<div className='flex flex-col gap-1'>
-					<Textarea
+					<TextArea
 						label='Comment (optional)'
 						placeholder='Add any notes about this evaluation...'
 						rows={2}

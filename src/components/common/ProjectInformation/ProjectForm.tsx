@@ -1,4 +1,5 @@
-import { DatePicker, Switch } from '@equinor/eds-core-react';
+import { DatePicker } from '@equinor/eds-core-react';
+import { Switch } from '@equinor/eds-core-react/next';
 import { ErrorMessage } from '@hookform/error-message';
 import { FormProvider, useController } from 'react-hook-form';
 import { useProjectForm } from '../../../hooks/useProjectForm';

@@ -4,10 +4,9 @@ import {
 	Dialog,
 	DialogContent,
 	Icon,
-	TextField,
-	Textarea,
 	Tooltip,
 } from '@equinor/eds-core-react';
+import { TextArea, TextField } from '@equinor/eds-core-react/next';
 import { close, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
@@ -67,7 +66,7 @@ export const EditStrategy = ({ strategy }: { strategy: Strategy }) => {
 									label='Name'
 								/>
 							</div>
-							<Textarea
+							<TextArea
 								{...formMethods.register('rationale')}
 								placeholder='Enter strategy rationale...'
 								label='Rationale'

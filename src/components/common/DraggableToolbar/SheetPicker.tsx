@@ -1,4 +1,5 @@
-import { Button, EdsProvider, Icon, Menu, TextField } from '@equinor/eds-core-react';
+import { Button, EdsProvider, Icon, Menu } from '@equinor/eds-core-react';
+import { TextField } from '@equinor/eds-core-react/next';
 import { add, check, close, delete_forever, edit } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';

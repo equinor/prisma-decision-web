@@ -1,4 +1,5 @@
-import { Autocomplete, Button, Icon, Search, Table } from '@equinor/eds-core-react';
+import { Button, Icon, Table } from '@equinor/eds-core-react';
+import { Autocomplete, Search } from '@equinor/eds-core-react/next';
 import { check_circle_outlined, delete_to_trash, lock } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useController } from 'react-hook-form';
@@ -94,7 +95,7 @@ const TeamMembersTable = ({
 	selectedUsers: UserWithRole[];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	errors: Record<string, any> | undefined;
-	handleRoleChange: (user: UserWithRole, role: RoleType) => void;
+	handleRoleChange: (user: UserWithRole, role: RoleType | undefined) => void;
 	onDeleteUser: (user: UserWithRole) => void;
 }) => (
 	<Table className='w-full table-fixed'>
@@ -117,17 +118,11 @@ const TeamMembersTable = ({
 					<Table.Cell>
 						<div>
 							<Autocomplete
-								options={roleTypes}
+								options={Array.from(roleTypes)}
 								label=''
 								placeholder={'Search for roles'}
-								onOptionsChange={({
-									selectedItems,
-								}: {
-									selectedItems: RoleType[];
-								}) => {
-									handleRoleChange(user, selectedItems[0]);
-								}}
-								selectedOptions={user.role ? [user.role] : []}
+								onValueChange={role => handleRoleChange(user, role)}
+								value={user.role}
 							/>
 						</div>
 						{user.role === undefined && (
@@ -179,7 +174,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 	};
 
 	// Update role for a user
-	const handleRoleChange = (user: UserWithRole, role: RoleType) => {
+	const handleRoleChange = (user: UserWithRole, role: RoleType | undefined) => {
 		setUser(selectedUsers.map(u => (u.user_id === user.user_id ? { ...u, role: role } : u)));
 		handleSubmit();
 	};
@@ -235,6 +230,7 @@ export const UserSection = ({ handleSubmit }: UserSectionProps) => {
 							setSearchTerm(nextSearch);
 							// Filtering will happen after debounce completes
 						}}
+						onClear={() => setSearchTerm('')}
 						aria-label='Search users'
 					/>
 
