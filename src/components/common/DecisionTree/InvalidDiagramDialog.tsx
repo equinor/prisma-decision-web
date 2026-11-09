@@ -1,17 +1,13 @@
 import { Button, Dialog, DialogContent, Icon } from '@equinor/eds-core-react';
 import { arrow_forward } from '@equinor/eds-icons';
-import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 export const InvalidDiagramDialog = () => {
 	const navigate = useNavigate();
 
-	const handleNavigateToValidation = useCallback(() => {
-		const validationPath = getInfluenceDiagramPath(window.location.pathname);
-		navigate(validationPath, {
-			state: { fromInvalidDiagramDialog: true },
-		});
-	}, [navigate]);
+	const handleNavigateToInfluenceDiagram = () => {
+		navigate(getInfluenceDiagramPath(window.location.pathname));
+	};
 
 	return (
 		<Dialog
@@ -25,11 +21,11 @@ export const InvalidDiagramDialog = () => {
 						<h2 className='text-2xl font-semibold'>Invalid influence diagram</h2>
 						<p className='text-text-tertiary'>
 							Your influence diagram is invalid. The decision tree cannot be
-							calculated. Open Validation to see how you can fix it.
+							calculated. Fix the errors in your influence diagram to continue.
 						</p>
 					</div>
 					<div className='flex flex-col gap-2'>
-						<Button variant='outlined' onClick={handleNavigateToValidation}>
+						<Button variant='outlined' onClick={handleNavigateToInfluenceDiagram}>
 							Go to influence diagram
 							<Icon data={arrow_forward} />
 						</Button>

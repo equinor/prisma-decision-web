@@ -1,8 +1,9 @@
-import { Button } from '@equinor/eds-core-react';
+import { Icon } from '@equinor/eds-core-react/next';
+import { pan_tool } from '@equinor/eds-icons';
 import { useAtom } from 'jotai';
 import { useHotkey } from '@tanstack/react-hotkeys';
 import { activeToolAtom } from '../../ProjectPage/Whiteboard/activeToolAtom';
-import { DragIcon } from '../DragIcon';
+import { ToolbarToolButton } from './Toolbar';
 
 export const TogglePanMode = () => {
 	const [activeToolbar, setActiveToolbar] = useAtom(activeToolAtom);
@@ -12,15 +13,14 @@ export const TogglePanMode = () => {
 	};
 	useHotkey('1', onChange);
 	return (
-		<Button.Toggle
-			onChange={onChange}
-			selectedIndexes={checked ? [0] : []}
-			title='Toggle pan mode'
+		<ToolbarToolButton
+			icon
+			selected={checked}
+			shortcut='1'
+			tooltip='Pan mode'
+			onClick={onChange}
 		>
-			<Button className='relative px-1.5!'>
-				<DragIcon />
-				<p className='absolute right-0.5 -bottom-0.5 text-xs'>1</p>
-			</Button>
-		</Button.Toggle>
+			<Icon data={pan_tool} />
+		</ToolbarToolButton>
 	);
 };
