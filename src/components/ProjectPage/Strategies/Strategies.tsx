@@ -30,25 +30,22 @@ export const Strategies = () => {
 	if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='grid w-full grid-cols-[1fr_auto] items-center justify-between gap-2'>
+			<div className='w-full'>
 				<h1 className='truncate text-3xl font-bold'>{selectedProject.name}</h1>
-				<CreateStrategy />
 			</div>
 			{selectedStrategies.length > 0 && <StrategyTable strategies={strategiesToCompare} />}
 			<div
 				className='bg-background-default shadow-tile flex w-full flex-col
             	items-start gap-4 rounded-sm p-4'
 			>
-				<div>
+				<div className='grid w-full items-center gap-4 text-start xl:grid-cols-[auto_1fr]'>
 					<div className='flex gap-2'>
 						<h2 className='text-2xl font-semibold'>Strategies</h2>
 						<span className='bg-background-light flex w-8 items-center justify-center rounded-full'>
 							{selectedStrategies.length ?? 0}
 						</span>
 					</div>
-					<p className='text-text-tertiary'>
-						Define and manage strategies for your decision optimization project
-					</p>
+					<CreateStrategy />
 				</div>
 				{selectedStrategies.map(strategy => {
 					return (
