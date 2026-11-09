@@ -1,44 +1,46 @@
 import { move } from '@dnd-kit/helpers';
 import { DragDropEventHandlers } from '@dnd-kit/react';
 import { useState } from 'react';
-import { groupByIssueType } from '../utils/groupByIssueType';
-import { IssueType, Issue } from '../validators';
+import {
+	groupIssuesForBoard,
+	IssueBoardFocus,
+	moveIssueToBoardGroup,
+} from '../components/ProjectPage/ProjectIssues/TableView/issueBoardFocus';
+import { Issue } from '../validators';
 import { useUpdateIssuesOptimistic } from './api/useUpdateIssues';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
 import { canDndStartFrom } from '../utils/canDndStartFrom';
 
-export const useIssueDragAndDrop = () => {
+export const useIssueDragAndDrop = (focus: IssueBoardFocus = 'Overview') => {
 	const savedIssues = useSelectedProjectIssues();
-	const issues = groupByIssueType(savedIssues);
+	const issues = groupIssuesForBoard(focus, savedIssues);
 	const { mutate: updateIssues } = useUpdateIssuesOptimistic();
 
-	const [tempIssues, setTempIssues] = useState<Record<
-		Exclude<IssueType, 'Utility'>,
-		Issue[]
-	> | null>(null);
+	const [tempIssues, setTempIssues] = useState<Record<string, Issue[]> | null>(null);
 	const localIssues = tempIssues ? tempIssues : issues;
 
 	const onDragOver: DragDropEventHandlers['onDragOver'] = event => {
-		if (event.operation?.target?.type === 'column' && event.operation.source) {
-			event.operation.source.data.issue.type = event.operation.target.id;
+		const source = event.operation.source;
+		const target = event.operation.target;
+		if (source && target) {
+			const targetGroup = String(target.type === 'column' ? target.id : target.type);
+			Object.assign(
+				source.data.issue,
+				moveIssueToBoardGroup(focus, targetGroup, source.data.issue),
+			);
 		}
-		if (event.operation?.target?.type !== 'column' && event.operation.source) {
-			event.operation.source.data.issue.type = event.operation?.target?.type;
-		}
-		const newTempIssues = tempIssues ? tempIssues : structuredClone(issues);
 
-		setTempIssues(move(newTempIssues, event));
+		setTempIssues(move(tempIssues ?? structuredClone(issues), event));
 	};
 
 	const onDragEnd: DragDropEventHandlers['onDragEnd'] = () => {
 		if (!tempIssues) return;
-		Object.keys(tempIssues).forEach(key => {
-			tempIssues[key as Exclude<IssueType, 'Utility'>].forEach((issue, index) => {
-				issue.type = key as IssueType;
-				issue.order = index + 1;
-			});
-		});
-		const updatedIssues = Object.values(tempIssues).flat();
+		const updatedIssues = Object.entries(tempIssues).flatMap(([group, groupIssues]) =>
+			groupIssues.map((issue, index) => ({
+				...moveIssueToBoardGroup(focus, group, issue),
+				order: index + 1,
+			})),
+		);
 		setTempIssues(null);
 		updateIssues(updatedIssues);
 	};

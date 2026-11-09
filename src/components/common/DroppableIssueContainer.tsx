@@ -4,13 +4,15 @@ import { issueTypes, IssueType } from '../../validators';
 
 export const DroppableIssueContainer = ({
 	issueType,
+	id = issueType,
+	acceptedTypes = issueTypes,
 	children,
 	className,
 }: DroppableIssueContainerProps) => {
 	const { ref } = useDroppable({
-		id: issueType,
+		id,
 		type: 'column',
-		accept: [...issueTypes],
+		accept: [...acceptedTypes],
 		collisionPriority: CollisionPriority.Low,
 	});
 	return (
@@ -21,6 +23,8 @@ export const DroppableIssueContainer = ({
 };
 type DroppableIssueContainerProps = {
 	issueType: IssueType;
+	id?: string;
+	acceptedTypes?: readonly string[];
 	children: React.ReactNode;
 	className?: string;
 };
