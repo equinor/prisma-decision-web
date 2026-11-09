@@ -70,10 +70,14 @@ export const InfluenceDiagramToolbar = ({
 				<LayoutControls />
 			</ToolbarGroup>
 			<ToolbarSeparator />
-			<ToolbarGroup aria-label='Diagram controls'>
-				<ToggleExpandAll toolbar />
-			</ToolbarGroup>
-			<ToolbarSeparator />
+			{view === 'card' && (
+				<>
+					<ToolbarGroup aria-label='Diagram controls'>
+						<ToggleExpandAll toolbar />
+					</ToolbarGroup>
+					<ToolbarSeparator />
+				</>
+			)}
 			<ToolbarToolGroup aria-label='Tool modes'>
 				<ToolbarToolButton
 					icon

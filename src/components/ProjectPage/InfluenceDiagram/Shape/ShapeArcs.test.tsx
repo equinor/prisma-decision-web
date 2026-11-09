@@ -329,7 +329,7 @@ test('Escape returns keyboard focus to Add arc and Tab continues through the nod
 	expect(edgeWrites()).toHaveLength(0);
 });
 
-test('Issue actions and Add arc dismiss each other without closing inline States or tables', async () => {
+test('Issue actions and Add arc dismiss State popovers and each other without closing inline tables', async () => {
 	const user = userEvent.setup();
 	renderInfluenceDiagram(queryClient, fixture.project);
 	const decision = await screen.findByTestId(`rf__node-${fixture.issues[0].node.id}`);
@@ -344,7 +344,7 @@ test('Issue actions and Add arc dismiss each other without closing inline States
 		await user.click(within(node).getByRole('button', { name }));
 		expect(await screen.findByRole(role, { name: overlayName })).toBeVisible();
 		await waitFor(() => expect(screen.queryAllByRole('menu')).toHaveLength(1));
-		expect(within(decision).getByRole('list')).toBeVisible();
+		expect(screen.queryByRole('dialog')).toBeNull();
 		expect(
 			within(uncertainty).getByRole('heading', { name: 'Oil price Probability Table' }),
 		).toBeVisible();
