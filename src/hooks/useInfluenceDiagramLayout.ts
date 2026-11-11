@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { ReactFlowInfluenceNode } from '../types';
 import { convertToInfluenceEdges } from '../utils/convertToInfluenceEdges';
 import { getInfluenceDiagramLayout } from '../utils/getInfluenceDiagramLayout';
+import { isIssueInInfluenceDiagram } from '../utils/isIssueInInfluenceDiagram';
 import { useSelectedProjectEdges } from './useSelectedProjectEdges';
 import { useSelectedProjectInfluenceNodes } from './useSelectedProjectInfluenceNodes';
 import { useSelectedProjectIssues } from './useSelectedProjectIssues';
@@ -21,13 +22,7 @@ export const useInfluenceDiagramLayout = () => {
 	const [layoutOptions] = useInfluenceDiagramSettings();
 
 	const filteredNodes = useMemo(() => {
-		const filteredIssues = issues.filter(issue => {
-			const inOrOnBoundary = issue.boundary === 'in' || issue.boundary === 'on';
-			if (issue.type === 'Decision') return inOrOnBoundary && issue.decision.type === 'Focus';
-			if (issue.type === 'Uncertainty') return inOrOnBoundary && issue.uncertainty.is_key;
-			if (issue.type === 'Utility') return inOrOnBoundary;
-			return false;
-		});
+		const filteredIssues = issues.filter(isIssueInInfluenceDiagram);
 		return nodes.filter(node => filteredIssues.some(issue => issue.id === node.data.issue_id));
 	}, [issues, nodes]);
 
