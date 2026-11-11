@@ -89,7 +89,7 @@ test('Shape menus support keyboard activation, replace each other, dismiss, and 
 	await user.keyboard('{Enter}');
 	const dialog = await screen.findByRole('dialog', { name: 'Edit Issue' });
 	expect(within(dialog).getByRole('textbox', { name: 'Issue name' })).toHaveValue('Drill well');
-	await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+	await user.click(within(dialog).getByRole('button', { name: 'Close' }));
 });
 
 test('Shape inspection includes non-empty descriptions and preserves body selection without opening an editor', async () => {
@@ -110,7 +110,7 @@ test('Shape inspection includes non-empty descriptions and preserves body select
 	expect(await screen.findByRole('menuitem', { name: 'Delete selected issues' })).toBeEnabled();
 });
 
-test('Edit opens the existing Issue dialog, cancellation preserves the Issue, and saving updates both views', async () => {
+test('Edit opens the Issue sheet, discarding preserves the Issue, and saving stays open while updating both views', async () => {
 	const user = userEvent.setup();
 	renderInfluenceDiagram(queryClient, fixture.project);
 	const openEditor = async () => {
@@ -122,7 +122,7 @@ test('Edit opens the existing Issue dialog, cancellation preserves the Issue, an
 	const canceled = await openEditor();
 	await user.clear(within(canceled).getByRole('textbox', { name: 'Issue name' }));
 	await user.type(within(canceled).getByRole('textbox', { name: 'Issue name' }), 'Discard me');
-	await user.click(within(canceled).getByRole('button', { name: 'Cancel' }));
+	await user.click(within(canceled).getByRole('button', { name: 'Discard changes' }));
 	expect(screen.queryByRole('dialog')).toBeNull();
 	expect(screen.getByText('Drill well')).toBeInTheDocument();
 	expect(fixture.requests.filter(request => request.method === 'put')).toHaveLength(0);
@@ -136,8 +136,12 @@ test('Edit opens the existing Issue dialog, cancellation preserves the Issue, an
 		within(dialog).getByRole('textbox', { name: 'Description' }),
 		'Updated project context.',
 	);
-	await user.click(within(dialog).getByRole('button', { name: 'Update Issue' }));
-	await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+	await user.click(within(dialog).getByRole('button', { name: 'Update decision' }));
+	await waitFor(() =>
+		expect(within(dialog).getByRole('button', { name: 'Update decision' })).toBeDisabled(),
+	);
+	expect(dialog).toBeVisible();
+	await user.click(within(dialog).getByRole('button', { name: 'Close' }));
 	expect(await screen.findByText('Develop well')).toBeInTheDocument();
 	expect(screen.getByText('Updated project context.')).toBeInTheDocument();
 	expect(fixture.requests.filter(request => request.method === 'put')).toEqual([
@@ -156,6 +160,28 @@ test('Edit opens the existing Issue dialog, cancellation preserves the Issue, an
 	expect(await screen.findByText('Develop well')).toBeInTheDocument();
 	expect(screen.queryByText('Drill well')).toBeNull();
 });
+
+test.each(['Shape view', 'Card view'])(
+	'%s keeps the diagram interactive without a scrim while editing any Issue type',
+	async view => {
+		const user = userEvent.setup();
+		renderInfluenceDiagram(queryClient, fixture.project);
+		await screen.findByTestId(`rf__node-${fixture.issues[0].node.id}`);
+		await user.click(screen.getByRole('radio', { name: view }));
+		for (const issue of fixture.issues) {
+			const node = await screen.findByTestId(`rf__node-${issue.node.id}`);
+			within(node).getByRole('button', { name: 'Issue actions' }).focus();
+			await user.keyboard('{Enter}');
+			await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+			const sheet = await screen.findByRole('dialog', { name: 'Edit Issue' });
+			expect(sheet).not.toHaveAttribute('aria-modal', 'true');
+			expect(document.querySelector('[data-backdrop]')).not.toBeInTheDocument();
+			await user.click(screen.getByRole('radio', { name: 'Selection mode' }));
+			expect(sheet).toBeInTheDocument();
+			await user.click(within(sheet).getByRole('button', { name: 'Close' }));
+		}
+	},
+);
 
 test('Delete uses the existing confirmation, cancellation preserves the Issue, and confirmation deletes it from both views', async () => {
 	const deletedIssueId = fixture.issues[0].id;
@@ -194,9 +220,13 @@ test('saving an Issue outside the decision boundary removes it from both diagram
 	await user.click(within(decision).getByRole('button', { name: 'Issue actions' }));
 	await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
 	const dialog = await screen.findByRole('dialog', { name: 'Edit Issue' });
-	await user.click(within(dialog).getByRole('radio', { name: 'Out' }));
-	await user.click(within(dialog).getByRole('button', { name: 'Update Issue' }));
-	await waitFor(() => expect(screen.queryByText('Drill well')).toBeNull());
+	await user.click(within(dialog).getByRole('button', { name: 'Boundary: In' }));
+	await user.click(screen.getByRole('menuitem', { name: 'Out' }));
+	await user.click(within(dialog).getByRole('button', { name: 'Update decision' }));
+	await waitFor(() =>
+		expect(screen.queryByTestId(`rf__node-${fixture.issues[0].node.id}`)).toBeNull(),
+	);
+	expect(dialog).not.toBeInTheDocument();
 	expect(fixture.requests).toContainEqual(
 		expect.objectContaining({
 			method: 'put',
@@ -206,7 +236,7 @@ test('saving an Issue outside the decision boundary removes it from both diagram
 	);
 	await user.click(screen.getByRole('radio', { name: 'Card view' }));
 	expect(await screen.findByText('Oil price')).toBeInTheDocument();
-	expect(screen.queryByText('Drill well')).toBeNull();
+	expect(screen.queryByTestId(`rf__node-${fixture.issues[0].node.id}`)).toBeNull();
 });
 
 test.each([
@@ -261,13 +291,19 @@ test.each([
 		await user.keyboard('{Enter}');
 		await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
 		const dialog = await screen.findByRole('dialog', { name: 'Edit Issue' });
-		await user.click(within(dialog).getByRole('radio', { name: 'Uncertainty' }));
-		const keySwitch = within(dialog).getByRole('switch', { name: 'Is Key' });
+		await user.click(within(dialog).getByRole('button', { name: 'Issue type: Decision' }));
+		await user.click(screen.getByRole('menuitem', { name: 'Uncertainty' }));
+		const keySwitch = within(dialog).getByRole('switch', { name: 'Is key' });
 		expect(keySwitch).toBeChecked();
 		if (!isKey) await user.click(keySwitch);
-		await user.click(within(dialog).getByRole('button', { name: 'Update Issue' }));
+		await user.click(within(dialog).getByRole('button', { name: 'Update uncertainty' }));
 
-		await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+		await waitFor(() =>
+			expect(
+				within(dialog).getByRole('button', { name: 'Update uncertainty' }),
+			).toBeDisabled(),
+		);
+		expect(dialog).toBeVisible();
 		expect(fixture.requests).toContainEqual(
 			expect.objectContaining({
 				method: 'put',
@@ -286,7 +322,7 @@ test.each([
 			expect(node.querySelector('.influence-shape-body > svg')).toBeInTheDocument();
 			expect(within(node).getByText(issue.name)).toBeInTheDocument();
 		} else {
-			await waitFor(() => expect(screen.queryByText(issue.name)).toBeNull());
+			await waitFor(() => expect(screen.queryByTestId(nodeId)).toBeNull());
 		}
 	},
 );
@@ -317,13 +353,15 @@ test.each(['put', 'delete'])(
 				within(dialog).getByRole('textbox', { name: 'Issue name' }),
 				'Unsaved name',
 			);
-			await user.click(within(dialog).getByRole('button', { name: 'Update Issue' }));
+			await user.click(within(dialog).getByRole('button', { name: 'Update decision' }));
 			expect(await screen.findByText('Failed to update issue')).toBeInTheDocument();
 			expect(screen.getByRole('dialog', { name: 'Edit Issue' })).toBeVisible();
-			await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+			await user.click(within(dialog).getByRole('button', { name: 'Discard changes' }));
 		} else {
 			await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
-			expect(await screen.findByText('Failed to delete issue')).toBeInTheDocument();
+			expect((await screen.findAllByText('Failed to delete issue')).length).toBeGreaterThan(
+				0,
+			);
 		}
 		expect(failedRequests).toEqual([
 			method === 'put' ? '/issues' : `/issues/${fixture.issues[0].id}`,
@@ -350,6 +388,6 @@ test.each([
 	await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
 	const dialog = await screen.findByRole('dialog', { name: 'Edit Issue' });
 	expect(within(dialog).getByRole('textbox', { name: 'Issue name' })).toHaveValue(name);
-	await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+	await user.click(within(dialog).getByRole('button', { name: 'Close' }));
 	await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 });

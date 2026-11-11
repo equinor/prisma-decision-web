@@ -17,7 +17,7 @@ import { cn } from '../../../utils/cn';
 import { sortByCreatedAt } from '../../../utils/sortByCreatedAt';
 import { Issue, Option, Outcome } from '../../../validators';
 import { DeleteIssueDialog } from '../DeleteIssueDialog';
-import { EditIssueModal } from '../EditIssueModal';
+import { EditIssueSheet } from '../EditIssueSheet/EditIssueSheet';
 import { IssueTypeIcon } from '../IssueTypeIcon';
 import { BoundaryLabel } from './BoundaryLabel';
 import { CardContainer } from './CardContainer';
@@ -68,6 +68,7 @@ export const IssueCardProvider = ({
 	selectedState,
 }: Pick<IssueCardProps, 'children' | 'issue' | 'onClickState' | 'selectedState'>) => {
 	const [editOpen, setEditOpen] = useState(false);
+	const [editDialog, setEditDialog] = useState(true);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const sortedStates =
 		issue.type === 'Uncertainty'
@@ -77,10 +78,25 @@ export const IssueCardProvider = ({
 				: [];
 	return (
 		<IssueCardContext
-			value={{ issue, sortedStates, setEditOpen, setDeleteOpen, onClickState, selectedState }}
+			value={{
+				issue,
+				sortedStates,
+				setEditOpen: (open, dialog = true) => {
+					setEditDialog(dialog);
+					setEditOpen(open);
+				},
+				setDeleteOpen,
+				onClickState,
+				selectedState,
+			}}
 		>
 			{children}
-			<EditIssueModal issue={issue} open={editOpen} onClose={() => setEditOpen(false)} />
+			<EditIssueSheet
+				issue={issue}
+				open={editOpen}
+				dialog={editDialog}
+				onClose={() => setEditOpen(false)}
+			/>
 			<DeleteIssueDialog
 				issue={issue}
 				open={deleteOpen}
@@ -119,12 +135,12 @@ export const IssueCardMenu = ({ children }: { children: React.ReactNode }) => {
 	);
 };
 
-export const IssueCardEditMenuItem = () => {
+export const IssueCardEditMenuItem = ({ dialog = true }: { dialog?: boolean }) => {
 	const { setEditOpen } = useIssueCardContext();
 	return (
-		<Menu.Item onClick={() => setEditOpen(true)}>
+		<Menu.Item onClick={() => setEditOpen(true, dialog)}>
 			<BetaIcon data={edit} size='md' className='size-5!' />
-			<p>Edit</p>
+			<span className=''>Edit</span>
 		</Menu.Item>
 	);
 };

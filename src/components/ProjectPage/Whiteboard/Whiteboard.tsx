@@ -50,7 +50,7 @@ const IssueNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNode>) => {
 			<IssueCard issue={issue} className='w-84'>
 				<IssueCardHeader editable>
 					<IssueCardMenu>
-						<IssueCardEditMenuItem />
+						<IssueCardEditMenuItem dialog={false} />
 					</IssueCardMenu>
 				</IssueCardHeader>
 				<div className='pb-1'>

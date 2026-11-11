@@ -39,7 +39,7 @@ export const ShapeNodeMenu = ({ issue }: { issue: Issue }) => {
 				className='nodrag nopan nowheel'
 				onClick={event => event.stopPropagation()}
 			>
-				<Menu.Item onClick={() => setEditOpen(true)}>
+				<Menu.Item onClick={() => setEditOpen(true, false)}>
 					<Icon data={edit} size='md' />
 					<span>Edit</span>
 				</Menu.Item>

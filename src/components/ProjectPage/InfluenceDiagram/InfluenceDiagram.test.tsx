@@ -293,6 +293,6 @@ test('returning to Card view retains the existing Issue editor and discards tran
 	await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
 	const dialog = await screen.findByRole('dialog', { name: 'Edit Issue' });
 	expect(within(dialog).getByRole('textbox', { name: 'Issue name' })).toHaveValue('Drill well');
-	await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+	await user.click(within(dialog).getByRole('button', { name: 'Close' }));
 	expect(screen.queryByRole('dialog', { name: 'Edit Issue' })).toBeNull();
 });

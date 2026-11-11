@@ -10,7 +10,7 @@ import { DecisionTypeLabel } from '../../../common/Cards/DecisionTypeLabel';
 import { IssueTypeLabel } from '../../../common/Cards/IssueTypeLabel';
 import { KeyLabel } from '../../../common/Cards/KeyLabel';
 import { DeleteIssueDialog } from '../../../common/DeleteIssueDialog';
-import { EditIssueModal } from '../../../common/EditIssueModal';
+import { EditIssueSheet } from '../../../common/EditIssueSheet/EditIssueSheet';
 import { IssueTextField } from '../IssueTextField';
 
 export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
@@ -78,7 +78,7 @@ export const IssueRow = ({ issue, highlighted }: IssueRowProps) => {
 			</Table.Row>
 			{createPortal(
 				<>
-					<EditIssueModal issue={issue} onClose={setEditOpen} open={editOpen} />
+					<EditIssueSheet issue={issue} onClose={setEditOpen} open={editOpen} />
 					<DeleteIssueDialog issue={issue} onClose={setDeleteOpen} open={deleteOpen} />
 				</>,
 				document.body,
