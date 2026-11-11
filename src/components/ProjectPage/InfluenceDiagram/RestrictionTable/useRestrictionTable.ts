@@ -1,7 +1,7 @@
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { Issue, RestrictionEntry, RestrictionTable } from '../../../../validators';
 import { ParentStateValue } from '../ProbabilityTable/utils';
-import { getDiscreteValueRows } from '../DiscreteValueTable/getDiscreteValueRows';
+import { getDiscreteValueRows } from '../ConditionalTable/getDiscreteValueRows';
 import { getIssueRestrictionStates } from './utils';
 
 export type DiscreteRestrictionEntry = RestrictionEntry & ParentStateValue;

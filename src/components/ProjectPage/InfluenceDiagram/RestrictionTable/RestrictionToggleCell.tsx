@@ -2,6 +2,7 @@ import { Icon, Tooltip } from '@equinor/eds-core-react';
 import { Switch } from '@equinor/eds-core-react/next';
 import { warning_outlined } from '@equinor/eds-icons';
 import { RestrictionEntry } from '../../../../validators';
+import { ConditionalTable } from '../ConditionalTable/ConditionalTable';
 import { RestrictionToggleContext, RestrictionToggleViolation } from './useRestrictionToggle';
 
 export const RestrictionToggleCell = ({
@@ -14,7 +15,7 @@ export const RestrictionToggleCell = ({
 	const isEnabled = entry?.restriction_value === 1;
 
 	return (
-		<td className='bg-background-default relative rounded-sm px-3 py-2 text-center'>
+		<ConditionalTable.ValueCell className='relative px-3 py-2'>
 			<Switch
 				label={`${parentState.name} allows ${childState.name}`}
 				aria-label={`${parentState.name} allows ${childState.name}`}
@@ -45,7 +46,7 @@ export const RestrictionToggleCell = ({
 					</span>
 				</Tooltip>
 			)}
-		</td>
+		</ConditionalTable.ValueCell>
 	);
 };
 

@@ -3,70 +3,65 @@ import { close } from '@equinor/eds-icons';
 import { sortByCreatedAt } from '../../../../utils/sortByCreatedAt';
 import { Issue } from '../../../../validators';
 import { CardContainer } from '../../../common/Cards/CardContainer';
-import { DiscreteValueTable } from '../DiscreteValueTable/DiscreteValueTable';
+import { ConditionalTable } from '../ConditionalTable/ConditionalTable';
 import { usePolicyTable } from './usePolicyTable';
 
-export const PolicyTable = ({ issue, selected, onClose, ref }: PolicyTableProps) => {
-	const { parents, parentRowSpans, rows, lookups } = usePolicyTable(issue);
-	const childOptions = sortByCreatedAt(issue.decision.options);
+export const PolicyTable = ({ issue, selected, onClose }: PolicyTableProps) => (
+	<CardContainer
+		issueType={issue.type}
+		selected={selected}
+		className='w-auto rounded-sm border-2 px-2 pt-1 pb-2'
+	>
+		<div className='flex flex-col'>
+			<div className='flex items-center gap-1 pt-1 pb-2 pl-2'>
+				<h6 className='mr-auto pr-2 leading-6 font-medium'>{`${issue.name} Policy Table`}</h6>
+				<Button variant='ghost_icon' onClick={() => onClose(false)}>
+					<Icon data={close} />
+				</Button>
+			</div>
+			<PolicyConditionalTable issue={issue} />
+		</div>
+	</CardContainer>
+);
+
+export const PolicyConditionalTable = ({ issue }: { issue: Issue }) => {
+	const { parents, rows, lookups } = usePolicyTable(issue);
+	const options = sortByCreatedAt(issue.decision.options);
 	if (!rows.length) {
 		return (
-			<div
-				ref={ref}
-				className='border-background-medium bg-background-default text-text-tertiary w-87.5 rounded-sm border border-dashed px-3 py-2 text-xs'
-			>
+			<p className='text-text-tertiary px-2 py-1 text-xs'>
 				No policy rows available for this decision.
-			</div>
+			</p>
 		);
 	}
-
 	return (
-		<CardContainer
-			ref={ref}
-			issueType={issue.type}
-			selected={selected}
-			includeBorder
-			className='w-auto rounded-sm px-2 pt-1 pb-2'
-		>
-			<div className='flex flex-col'>
-				<div className='flex items-center justify-between pt-1 pb-2 pl-2'>
-					<h6 className='leading-6 font-medium'>{`${issue.name} Policy Table`}</h6>
-					<Button variant='ghost_icon' onClick={() => onClose?.(false)}>
-						<Icon data={close} />
-					</Button>
-				</div>
-				<DiscreteValueTable
-					parents={parents}
-					parentRowSpans={parentRowSpans}
-					rows={rows}
-					lookups={lookups}
-					valueColumns={childOptions.map(option => ({
-						id: option.id,
-						label: option.name,
-						eyebrow: issue.name,
-					}))}
-					renderValueCells={values =>
-						childOptions.map(option => {
-							const value =
-								values.find(row => row.option_id === option.id)?.value ?? 0;
-							return (
-								<td
-									key={option.id}
-									className='bg-background-default rounded-sm px-2 py-1 text-center text-sm'
-								>
-									{value === 1 ? '1' : '0'}
-								</td>
-							);
-						})
-					}
-				/>
-			</div>
-		</CardContainer>
+		<ConditionalTable parents={parents} rows={rows} lookups={lookups}>
+			<ConditionalTable.Head>
+				{options.map(option => (
+					<ConditionalTable.Column key={option.id} eyebrow={issue.name}>
+						{option.name}
+					</ConditionalTable.Column>
+				))}
+			</ConditionalTable.Head>
+			<ConditionalTable.Body>
+				{rows.map(row => (
+					<ConditionalTable.Row key={row.rowKey}>
+						{options.map(option => (
+							<ConditionalTable.ValueCell key={option.id}>
+								{row.values.find(policy => policy.option_id === option.id)
+									?.value === 1
+									? '1'
+									: '0'}
+							</ConditionalTable.ValueCell>
+						))}
+					</ConditionalTable.Row>
+				))}
+			</ConditionalTable.Body>
+		</ConditionalTable>
 	);
 };
 
 type PolicyTableProps = {
-	ref?: React.Ref<HTMLDivElement>;
 	issue: Issue;
 	selected: boolean | undefined;
 	onClose: (value: boolean) => void;
