@@ -12,6 +12,19 @@ const router = express.Router();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const path = __dirname + '/';
 const port = 3000;
+const connectSources = [
+	"'self'",
+	'https://api-prisma-decision-api-prod.radix.equinor.com',
+	'https://api-prisma-decision-api-test.radix.equinor.com',
+	'https://api-prisma-decision-api-dev.radix.equinor.com',
+	'https://api-prisma-decision-api-public-public.radix.equinor.com',
+	'https://api-prisma-decision-api-prod.c3.radix.equinor.com',
+	'https://api-prisma-decision-api-test.c3.radix.equinor.com',
+	'https://api-prisma-decision-api-dev.c3.radix.equinor.com',
+	'https://api-prisma-decision-api-public-public.c3.radix.equinor.com',
+	'https://login.microsoftonline.com',
+	'http://localhost:7075/',
+];
 
 // Trust the first proxy (Radix/ingress) for accurate client IP detection
 app.set('trust proxy', 1);
@@ -38,7 +51,7 @@ router.get('/{*splat}', (req, res) => {
 		"style-src 'self' 'unsafe-inline' https://cdn.eds.equinor.com",
 		"font-src 'self' https://cdn.eds.equinor.com",
 		"img-src 'self' data: https:",
-		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com https://api-prisma-decision-api-public-public.radix.equinor.com http://localhost:7075/",
+		`connect-src ${connectSources.join(' ')}`,
 		"base-uri 'self'",
 		"form-action 'self'",
 	].join('; ');
