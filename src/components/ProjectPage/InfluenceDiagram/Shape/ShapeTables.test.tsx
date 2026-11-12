@@ -324,7 +324,33 @@ test('inline tables can coexist, stay open on outside click and Escape, and clos
 	expect(screen.queryByRole('heading', { name: 'Oil price Probability Table' })).toBeNull();
 });
 
-test('inline tables preserve expanded States and Card-selected Scenario overrides without altering Scenario EV', async () => {
+test.each([
+	[0, 'Policy table', 'Forced decision: Drill well'],
+	[1, 'Probability table', 'Hard evidence: Oil price'],
+] as const)(
+	'opening an inline table on Issue %s removes its hover State trigger until the table closes',
+	async (index, tableLabel, stateLabel) => {
+		const user = userEvent.setup();
+		renderInfluenceDiagram(queryClient, fixture.project);
+		const node = await screen.findByTestId(`rf__node-${fixture.issues[index].node.id}`);
+		const tableTrigger = within(node).getByRole('button', { name: tableLabel });
+		const stateTrigger = within(node).getByRole('button', { name: stateLabel });
+		await user.click(stateTrigger);
+		expect(screen.getByRole('dialog', { name: stateLabel })).toBeVisible();
+		await user.click(tableTrigger);
+		await user.hover(node);
+		expect(within(node).getByRole('heading', { name: /Table$/ })).toBeVisible();
+		expect(within(node).queryByRole('button', { name: stateLabel })).toBeNull();
+		expect(screen.queryByRole('dialog', { name: stateLabel })).toBeNull();
+		await user.click(tableTrigger);
+		expect(within(node).getByRole('button', { name: stateLabel })).toHaveAttribute(
+			'aria-expanded',
+			'false',
+		);
+	},
+);
+
+test('inline tables hide State triggers while preserving Card-selected Scenario overrides and Scenario EV', async () => {
 	localStorage.setItem('influenceDiagramView', JSON.stringify('card'));
 	fixture.issues[0].description = 'Decide whether to develop the well.';
 	fixture.issues[1].description = 'Market conditions for the project.';
@@ -355,26 +381,29 @@ test('inline tables preserve expanded States and Card-selected Scenario override
 		expect(within(node).getByRole('button', { name: stateLabel })).toHaveTextContent(
 			selectedState,
 		);
-		expect(within(within(node).getByRole('list')).getByText(selectedState)).toBeVisible();
+		expect(within(node).queryByRole('list')).toBeNull();
 		await user.click(within(node).getByRole('button', { name: triggerName }));
 		expect(within(node).getByRole('heading', { name: /Table$/ })).toBeVisible();
-		expect(within(within(node).getByRole('list')).getByText(selectedState)).toBeVisible();
+		expect(within(node).queryByRole('list')).toBeNull();
+		await user.hover(node);
+		expect(within(node).queryByRole('button', { name: stateLabel })).toBeNull();
+		expect(screen.getByText('20.00')).toBeVisible();
+		await user.click(within(node).getByRole('button', { name: triggerName }));
+		expect(within(node).queryByRole('heading', { name: /Table$/ })).toBeNull();
 		expect(within(node).getByRole('button', { name: stateLabel })).toBeVisible();
 		expect(within(node).getByRole('button', { name: stateLabel })).toHaveTextContent(
 			selectedState,
 		);
-		expect(screen.getByText('20.00')).toBeVisible();
 		const stateTrigger = within(node).getByRole('button', { name: stateLabel });
 		await user.click(stateTrigger);
-		expect(stateTrigger).toHaveAttribute('aria-expanded', 'false');
-		expect(within(node).queryByRole('list')).toBeNull();
-		expect(within(node).getByRole('heading', { name: /Table$/ })).toBeVisible();
-		await user.click(stateTrigger);
 		expect(stateTrigger).toHaveAttribute('aria-expanded', 'true');
-		expect(within(node).getByRole('list')).toBeVisible();
-		await user.click(within(node).getByRole('button', { name: triggerName }));
-		expect(within(node).queryByRole('heading', { name: /Table$/ })).toBeNull();
-		expect(within(node).getByRole('list')).toBeVisible();
+		expect(
+			within(screen.getByRole('dialog', { name: stateLabel })).getByText(selectedState),
+		).toBeVisible();
+		await user.click(stateTrigger);
+		expect(stateTrigger).toHaveAttribute('aria-expanded', 'false');
+		expect(screen.queryByRole('dialog')).toBeNull();
+		expect(within(node).queryByRole('list')).toBeNull();
 	}
 	await user.click(screen.getByRole('radio', { name: 'Card view' }));
 	fireEvent.click(await screen.findByText('Existing option'));
