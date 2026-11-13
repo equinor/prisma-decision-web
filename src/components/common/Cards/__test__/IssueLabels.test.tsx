@@ -26,7 +26,7 @@ vi.hoisted(() => {
 vi.mock('../../../../api', () => ({
 	apiClient: { put: vi.fn() },
 }));
-vi.mock('../../EditIssueModal', () => ({ EditIssueModal: () => null }));
+vi.mock('../../EditIssueSheet/EditIssueSheet', () => ({ EditIssueSheet: () => null }));
 vi.mock('../../DeleteIssueDialog', () => ({ DeleteIssueDialog: () => null }));
 
 beforeEach(() => {

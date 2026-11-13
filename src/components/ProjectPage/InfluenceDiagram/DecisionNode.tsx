@@ -50,7 +50,7 @@ export const DecisionNode = ({ id, data, selected }: NodeProps<ReactFlowInfluenc
 				>
 					<IssueCardHeader>
 						<IssueCardMenu>
-							<IssueCardEditMenuItem />
+							<IssueCardEditMenuItem dialog={false} />
 							<IssueCardDeleteMenuItem />
 							<IssueCardPolicyTableMenuItem
 								onClick={() => setPolicyTableOpen(true)}

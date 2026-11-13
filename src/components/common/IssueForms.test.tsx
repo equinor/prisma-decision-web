@@ -3,20 +3,40 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AxiosAdapter } from 'axios';
 import { ReactNode, useState } from 'react';
+import { Provider } from 'jotai';
 import { Toaster, toast } from 'sonner';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '../../api';
 import { existingIssue, project } from '../../test/issueFixtures';
-import { Issue } from '../../validators';
+import { DiscreteProbability, Issue } from '../../validators';
 import { ProjectContext } from '../ProjectPage/ProjectContext';
+import { IssueRow } from '../ProjectPage/ProjectIssues/ListView/IssueRow';
+import { IssueCard, IssueCardEditMenuItem, IssueCardMenu } from './Cards/IssueCard';
 import { CreateIssueButton } from './CreateIssueButton';
 import { CreateIssueToolbarButton } from './CreateIssueToolbarButton';
-import { EditIssueModal } from './EditIssueModal';
+import { EditIssueSheet } from './EditIssueSheet/EditIssueSheet';
+import { useInfluenceDiagramEvidence } from '../../hooks/useInfluenceDiagramEvidence';
+import { useSelectedProjectIssues } from '../../hooks/useSelectedProjectIssues';
 
 const createIssueButtons = [
 	{ label: 'regular button', CreateIssue: CreateIssueButton },
 	{ label: 'toolbar button', CreateIssue: CreateIssueToolbarButton },
 ];
+
+const ProjectIssueEditor = ({
+	issueId,
+	open,
+	onClose,
+}: {
+	issueId: string;
+	open: boolean;
+	onClose: (open: boolean) => void;
+}) => {
+	const issues = useSelectedProjectIssues();
+	const issue = issues.find(issue => issue.id === issueId);
+	if (!issue) return null;
+	return <EditIssueSheet issue={issue} open={open} onClose={onClose} />;
+};
 
 let savedIssues: Issue[];
 let savedRequests: { method: string; url: string | undefined }[];
@@ -26,23 +46,42 @@ const adapter: AxiosAdapter = async config => {
 		savedIssues.push(...JSON.parse(config.data));
 		savedRequests.push({ method: config.method, url: config.url });
 	}
+	if (config.method === 'delete') {
+		savedRequests.push({ method: config.method, url: config.url });
+	}
 	return {
 		config,
 		status: 200,
 		statusText: 'OK',
 		headers: {},
-		data: savedIssues,
+		data:
+			config.url === '/issues'
+				? Array.from(new Map(savedIssues.map(issue => [issue.id, issue])).values())
+				: [],
 	};
 };
 
-const renderForm = (children: ReactNode) => {
+const renderForm = (
+	children: ReactNode,
+	issues: Issue[] = [],
+	probabilities: DiscreteProbability[] = [],
+) => {
 	const queryClient = new QueryClient({
-		defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+		defaultOptions: {
+			queries: { retry: false, staleTime: Infinity },
+			mutations: { retry: false },
+		},
 	});
-	queryClient.setQueryData(['issues'], []);
+	queryClient.setQueryData(['issues'], issues);
+	for (const key of ['edges', 'nodes', 'probabilityTables', 'restrictionTables']) {
+		queryClient.setQueryData([key], []);
+	}
+	queryClient.setQueryData(['probabilityTables'], probabilities);
 	return render(
 		<QueryClientProvider client={queryClient}>
-			<ProjectContext value={project}>{children}</ProjectContext>
+			<Provider>
+				<ProjectContext value={project}>{children}</ProjectContext>
+			</Provider>
 		</QueryClientProvider>,
 	);
 };
@@ -56,32 +95,309 @@ beforeEach(() => {
 afterEach(() => toast.dismiss());
 
 describe('full issue forms', () => {
-	it.each(['Cancel', 'Close'])('discards unsaved Edit changes with %s', async closeLabel => {
+	it.each([true, false])(
+		'keeps Details when deletion is cancelled and unmounts after confirming deletion (dialog=%s)',
+		async dialog => {
+			const user = userEvent.setup();
+			const issue = existingIssue();
+			const ControlledEdit = () => {
+				const [open, setOpen] = useState(false);
+				const issues = useSelectedProjectIssues();
+				return (
+					<>
+						<button onClick={() => setOpen(true)}>Open Edit</button>
+						{issues.map(issue => (
+							<EditIssueSheet
+								key={issue.id}
+								issue={issue}
+								open={open}
+								dialog={dialog}
+								onClose={setOpen}
+							/>
+						))}
+					</>
+				);
+			};
+			renderForm(<ControlledEdit />, [issue]);
+			await user.click(screen.getByRole('button', { name: 'Open Edit' }));
+			await user.type(screen.getByRole('textbox', { name: 'Issue name' }), ' edited');
+			await user.click(screen.getByRole('button', { name: 'Delete decision' }));
+			await user.click(screen.getByRole('button', { name: 'Cancel' }));
+			expect(screen.getByRole('textbox', { name: 'Issue name' })).toHaveValue(
+				`${issue.name} edited`,
+			);
+			await user.click(screen.getByRole('button', { name: 'Delete decision' }));
+			await user.click(screen.getByRole('button', { name: 'Delete' }));
+			await waitFor(() =>
+				expect(
+					screen.queryByRole('dialog', { name: 'Edit Issue' }),
+				).not.toBeInTheDocument(),
+			);
+			await waitFor(() =>
+				expect(savedRequests).toEqual([{ method: 'delete', url: `/issues/${issue.id}` }]),
+			);
+		},
+	);
+
+	it('offers a disabled Utility table with its parent-edge explanation, but no tables for excluded Issues', async () => {
+		const issue = { ...existingIssue(), type: 'Utility' as const, boundary: 'in' as const };
+		const { unmount } = renderForm(<EditIssueSheet issue={issue} open onClose={vi.fn()} />, [
+			issue,
+		]);
+		expect(screen.getByRole('tab', { name: 'Utility table' })).toHaveAttribute(
+			'aria-disabled',
+			'true',
+		);
+		expect(
+			screen.getByText('Connect 2+ parent nodes to enable utility table and solver'),
+		).toBeInTheDocument();
+		unmount();
+		renderForm(
+			<EditIssueSheet issue={{ ...issue, boundary: 'out' }} open onClose={vi.fn()} />,
+			[issue],
+		);
+		expect(screen.queryByRole('tab', { name: /table/ })).not.toBeInTheDocument();
+	});
+
+	it('keeps the workspace interactive while the sheet is open', async () => {
 		const user = userEvent.setup();
 		const issue = existingIssue();
+		const Workspace = () => {
+			const [open, setOpen] = useState(false);
+			return (
+				<>
+					<button onClick={() => setOpen(true)}>Open Edit</button>
+					<button>Ordinary selection</button>
+					<EditIssueSheet issue={issue} open={open} dialog={false} onClose={setOpen} />
+				</>
+			);
+		};
+		renderForm(<Workspace />, [issue]);
+		await user.click(screen.getByRole('button', { name: 'Open Edit' }));
+		await user.type(screen.getByRole('textbox', { name: 'Issue name' }), ' unsaved');
+		await user.click(screen.getByRole('button', { name: 'Ordinary selection' }));
+		expect(screen.getByRole('button', { name: 'Ordinary selection' })).toHaveFocus();
+		expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-modal', 'true');
+		expect(document.body.style.overflow).not.toBe('hidden');
+		expect(document.querySelector('[data-backdrop]')).not.toBeInTheDocument();
+		expect(screen.getByRole('textbox', { name: 'Issue name' })).toHaveValue(
+			`${issue.name} unsaved`,
+		);
+	});
+
+	it.each(['card', 'list'] as const)(
+		'opens a modal sheet with a dismissible scrim from the %s view',
+		async view => {
+			const user = userEvent.setup();
+			const issue = existingIssue();
+			renderForm(
+				view === 'card' ? (
+					<IssueCard issue={issue}>
+						<IssueCardMenu>
+							<IssueCardEditMenuItem />
+						</IssueCardMenu>
+					</IssueCard>
+				) : (
+					<table>
+						<tbody>
+							<IssueRow issue={issue} />
+						</tbody>
+					</table>
+				),
+				[issue],
+			);
+			if (view === 'card') {
+				await user.click(screen.getByRole('button', { name: 'Issue actions' }));
+				await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+			} else {
+				await user.click(screen.getByRole('button', { name: /^Edit issue:/ }));
+			}
+			const sheet = screen.getByRole('dialog', { name: 'Edit Issue' });
+			await waitFor(() =>
+				expect([
+					document.body.style.overflow,
+					document.documentElement.style.overflowY,
+				]).toContain('hidden'),
+			);
+			const scrim = document.querySelector(`[data-backdrop="${sheet.id}"]`);
+			expect(scrim).toHaveClass('bg-black/40');
+			if (!(scrim instanceof HTMLElement)) throw new Error('Missing sheet scrim');
+			await user.type(screen.getByRole('textbox', { name: 'Issue name' }), ' unsaved');
+			await user.click(scrim);
+			await waitFor(() => expect(sheet).not.toBeInTheDocument());
+			expect(savedIssues).toHaveLength(0);
+			expect(document.querySelector('[data-backdrop]')).not.toBeInTheDocument();
+			expect(document.body.style.overflow).not.toBe('hidden');
+			expect(document.documentElement.style.overflowY).not.toBe('hidden');
+		},
+	);
+
+	it('keeps immediate evidence independent of Details, disallows unsaved States and clears a successfully deleted override', async () => {
+		const user = userEvent.setup();
+		const issue = existingIssue();
+		const Evidence = () => {
+			const { evidence } = useInfluenceDiagramEvidence();
+			return <output aria-label='Evidence'>{evidence.join(',')}</output>;
+		};
 		const ControlledEdit = () => {
 			const [open, setOpen] = useState(true);
 			return (
 				<>
-					<button onClick={() => setOpen(true)}>Open Edit</button>
-					<EditIssueModal issue={issue} open={open} onClose={setOpen} />
+					<button onClick={() => setOpen(true)}>Reopen</button>
+					<ProjectIssueEditor issueId={issue.id} open={open} onClose={setOpen} />
 				</>
 			);
 		};
-		renderForm(<ControlledEdit />);
-		await user.clear(screen.getByRole('textbox', { name: /issue name/i }));
-		await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Unsaved name');
-		await user.click(screen.getByRole('radio', { name: 'Fact' }));
-		await user.click(screen.getByRole('button', { name: closeLabel }));
-		expect(screen.queryByRole('dialog', { name: 'Edit Issue' })).not.toBeInTheDocument();
-		await user.click(screen.getByRole('button', { name: 'Open Edit' }));
-		expect(screen.getByRole('textbox', { name: /issue name/i })).toHaveValue(
-			' Existing issue ',
+		renderForm(
+			<>
+				<ControlledEdit />
+				<Evidence />
+			</>,
+			[issue],
 		);
-		expect(screen.getByRole('radio', { name: 'Decision' })).toBeChecked();
-		expect(screen.getByRole('radio', { name: 'Tactical' })).toBeChecked();
-		expect(savedIssues).toHaveLength(0);
+		const override = screen.getByRole('radio', { name: 'Override option 1' });
+		await user.click(override);
+		expect(screen.getByLabelText('Evidence')).toHaveTextContent(issue.decision.options[0].id);
+		expect(screen.getByRole('button', { name: 'Update decision' })).toBeDisabled();
+		await user.click(override);
+		expect(screen.getByLabelText('Evidence')).toBeEmptyDOMElement();
+		await user.click(override);
+		await user.type(screen.getByRole('textbox', { name: 'Issue name' }), ' discarded');
+		await user.click(screen.getByRole('button', { name: 'Discard changes' }));
+		expect(screen.getByLabelText('Evidence')).toHaveTextContent(issue.decision.options[0].id);
+		await user.click(screen.getByRole('button', { name: 'Reopen' }));
+		await user.click(screen.getByRole('button', { name: 'Add option' }));
+		expect(screen.getByRole('radio', { name: 'Override option 2' })).toBeDisabled();
+		await user.type(screen.getByRole('textbox', { name: 'Option 2 name' }), 'New option');
+		await user.click(screen.getByRole('button', { name: 'Update decision' }));
+		await waitFor(() =>
+			expect(screen.getByRole('radio', { name: 'Override option 2' })).toBeEnabled(),
+		);
+		await user.click(screen.getByRole('button', { name: 'Remove option 1' }));
+		expect(screen.getByLabelText('Evidence')).toHaveTextContent(issue.decision.options[0].id);
+		await user.click(screen.getByRole('button', { name: 'Update decision' }));
+		await waitFor(() => expect(screen.getByLabelText('Evidence')).toBeEmptyDOMElement());
+		await user.click(screen.getByRole('radio', { name: 'Override option 1' }));
+		await user.click(screen.getByRole('button', { name: 'Issue type: Decision' }));
+		await user.click(screen.getByRole('menuitem', { name: 'Uncertainty' }));
+		expect(screen.getByRole('radio', { name: 'Override outcome 1' })).toBeDisabled();
+		await user.click(screen.getByRole('button', { name: 'Update uncertainty' }));
+		await waitFor(() => expect(screen.getByLabelText('Evidence')).toBeEmptyDOMElement());
+		expect(screen.getByRole('radio', { name: 'Override outcome 1' })).toBeEnabled();
 	});
+
+	it('keeps dirty Details across tabs, disables table mutations, and stays open on Details after exclusion', async () => {
+		const user = userEvent.setup();
+		const issue = { ...existingIssue(), type: 'Uncertainty' as const, boundary: 'in' as const };
+		const probability = {
+			id: crypto.randomUUID(),
+			outcome_id: issue.uncertainty.outcomes[0].id,
+			uncertainty_id: issue.uncertainty.id,
+			project_id: project.id,
+			parent_option_ids: [],
+			parent_outcome_ids: [],
+			probability: 1,
+		};
+		renderForm(
+			<ProjectIssueEditor issueId={issue.id} open onClose={vi.fn()} />,
+			[issue],
+			[probability],
+		);
+		await user.click(screen.getByRole('tab', { name: 'Probability table' }));
+		expect(screen.getByRole('spinbutton')).toBeEnabled();
+		expect(screen.getByRole('spinbutton').closest('[inert]')).toBeNull();
+		expect(screen.getByRole('button', { name: 'Reset all' })).toBeInTheDocument();
+		await user.click(screen.getByRole('tab', { name: 'Details' }));
+		await user.type(screen.getByRole('textbox', { name: 'Issue name' }), ' edited');
+		await user.click(screen.getByRole('switch', { name: 'Is key' }));
+		expect(
+			screen.getByText(
+				'Only key uncertainties are shown in the influence diagram. Updating will remove this node.',
+			),
+		).toBeInTheDocument();
+		await user.click(screen.getByRole('tab', { name: 'Probability table' }));
+		expect(
+			screen.getByText('The table is disabled until your changes are saved'),
+		).toBeInTheDocument();
+		expect(screen.getByRole('spinbutton').closest('[inert]')).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: 'Reset all' }).closest('[inert]'),
+		).toBeInTheDocument();
+		await user.click(screen.getByRole('button', { name: 'Update uncertainty' }));
+		await waitFor(() =>
+			expect(
+				screen.queryByRole('tab', { name: 'Probability table' }),
+			).not.toBeInTheDocument(),
+		);
+		expect(screen.getByRole('textbox', { name: 'Issue name' })).toHaveValue(
+			`${issue.name} edited`,
+		);
+		expect(screen.getByRole('dialog')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Update uncertainty' })).toBeDisabled();
+	});
+
+	it('retains clean table selection after saving and warns about boundary exclusion on either tab', async () => {
+		const user = userEvent.setup();
+		const issue = { ...existingIssue(), type: 'Uncertainty' as const, boundary: 'in' as const };
+		renderForm(<ProjectIssueEditor issueId={issue.id} open onClose={vi.fn()} />, [issue]);
+		await user.click(screen.getByRole('button', { name: 'Boundary: In' }));
+		await user.click(screen.getByRole('menuitem', { name: 'Out' }));
+		await user.click(screen.getByRole('tab', { name: 'Probability table' }));
+		expect(
+			screen.getByText(
+				'Issues outside the boundary aren’t shown in the influence diagram. Updating will remove this node.',
+			),
+		).toBeInTheDocument();
+		await user.click(screen.getByRole('button', { name: 'Boundary: Out' }));
+		await user.click(screen.getByRole('menuitem', { name: 'On' }));
+		await user.click(screen.getByRole('button', { name: 'Update uncertainty' }));
+		await waitFor(() =>
+			expect(screen.getByRole('button', { name: 'Update uncertainty' })).toBeDisabled(),
+		);
+		expect(screen.getByRole('tab', { name: 'Probability table' })).toHaveAttribute(
+			'aria-selected',
+			'true',
+		);
+		expect(
+			screen.queryByText('The table is disabled until your changes are saved'),
+		).not.toBeInTheDocument();
+	});
+
+	it.each(['Discard changes', 'Escape'])(
+		'discards unsaved Edit changes with %s',
+		async closeLabel => {
+			const user = userEvent.setup();
+			const issue = existingIssue();
+			const ControlledEdit = () => {
+				const [open, setOpen] = useState(true);
+				return (
+					<>
+						<button onClick={() => setOpen(true)}>Open Edit</button>
+						<EditIssueSheet issue={issue} open={open} onClose={setOpen} />
+					</>
+				);
+			};
+			renderForm(<ControlledEdit />);
+			await user.clear(screen.getByRole('textbox', { name: /issue name/i }));
+			await user.type(screen.getByRole('textbox', { name: /issue name/i }), 'Unsaved name');
+			await user.click(screen.getByRole('button', { name: 'Issue type: Decision' }));
+			await user.click(screen.getByRole('menuitem', { name: 'Fact' }));
+			if (closeLabel === 'Escape') {
+				await user.click(screen.getByRole('textbox', { name: /issue name/i }));
+				await user.keyboard('{Escape}');
+			} else await user.click(screen.getByRole('button', { name: closeLabel }));
+			expect(screen.queryByRole('dialog', { name: 'Edit Issue' })).not.toBeInTheDocument();
+			await user.click(screen.getByRole('button', { name: 'Open Edit' }));
+			expect(screen.getByRole('textbox', { name: /issue name/i })).toHaveValue(
+				' Existing issue ',
+			);
+			expect(
+				screen.getByRole('button', { name: 'Issue type: Decision' }),
+			).toBeInTheDocument();
+			expect(screen.getByRole('radio', { name: 'Tactical' })).toBeChecked();
+			expect(savedIssues).toHaveLength(0);
+		},
+	);
 
 	it.each(['Unassigned', 'Decision', 'Uncertainty', 'Fact', 'Utility'] as const)(
 		'edits %s through the whole-issue API while preserving unedited values',
@@ -89,9 +405,9 @@ describe('full issue forms', () => {
 			const user = userEvent.setup();
 			const issue = { ...existingIssue(), type };
 			const onClose = vi.fn();
-			renderForm(<EditIssueModal issue={issue} open onClose={onClose} />);
-			expect(screen.getByRole('radio', { name: 'Out' })).toBeChecked();
-			await user.click(screen.getByRole('radio', { name: 'On' }));
+			renderForm(<EditIssueSheet issue={issue} open onClose={onClose} />);
+			await user.click(screen.getByRole('button', { name: 'Boundary: Out' }));
+			await user.click(screen.getByRole('menuitem', { name: 'On' }));
 			await user.clear(screen.getByRole('textbox', { name: /issue name/i }));
 			await user.type(screen.getByRole('textbox', { name: /issue name/i }), ' Updated name ');
 			await user.clear(screen.getByRole('textbox', { name: 'Description' }));
@@ -109,7 +425,10 @@ describe('full issue forms', () => {
 				description: ' First paragraph \n Second paragraph ',
 			});
 			expect(savedRequests).toEqual([{ method: 'put', url: '/issues' }]);
-			expect(onClose).toHaveBeenCalledWith(false);
+			expect(onClose).not.toHaveBeenCalled();
+			expect(
+				screen.getByRole('button', { name: `Update ${type.toLowerCase()}` }),
+			).toBeDisabled();
 		},
 	);
 
@@ -122,15 +441,17 @@ describe('full issue forms', () => {
 				mode === 'Create' ? (
 					<CreateIssueButton />
 				) : (
-					<EditIssueModal issue={issue} open onClose={vi.fn()} />
+					<EditIssueSheet issue={issue} open onClose={vi.fn()} />
 				),
 			);
 			if (mode === 'Create') {
 				await user.click(screen.getByRole('button', { name: 'Create Issue' }));
+			} else {
+				await user.type(screen.getByRole('textbox', { name: /issue name/i }), ' ');
 			}
 			await user.click(
 				screen.getByRole('button', {
-					name: mode === 'Create' ? 'Add Issue' : 'Update Issue',
+					name: mode === 'Create' ? 'Add Issue' : 'Update decision',
 				}),
 			);
 			expect(await screen.findByText('Issue name is required')).toHaveAttribute(
@@ -156,7 +477,7 @@ describe('full issue forms', () => {
 			const user = userEvent.setup();
 			const onClose = vi.fn();
 			const issue = existingIssue();
-			const submitLabel = mode === 'Create' ? 'Add Issue' : 'Update Issue';
+			const submitLabel = mode === 'Create' ? 'Add Issue' : 'Update decision';
 			apiClient.defaults.adapter = async config => {
 				if (config.method === 'post' || config.method === 'put') {
 					throw new Error('Network unavailable');
@@ -168,7 +489,7 @@ describe('full issue forms', () => {
 					{mode === 'Create' ? (
 						<CreateIssueButton />
 					) : (
-						<EditIssueModal issue={issue} open onClose={onClose} />
+						<EditIssueSheet issue={issue} open onClose={onClose} />
 					)}
 					<Toaster />
 				</>,
@@ -228,7 +549,7 @@ describe('full issue forms', () => {
 				mode === 'Create' ? (
 					<CreateIssueButton />
 				) : (
-					<EditIssueModal issue={existingIssue()} open onClose={onClose} />
+					<EditIssueSheet issue={existingIssue()} open onClose={onClose} />
 				),
 			);
 			if (mode === 'Create') {
@@ -243,7 +564,7 @@ describe('full issue forms', () => {
 			);
 			await user.keyboard('{Enter}');
 			await waitFor(() => expect(attempts).toBe(1));
-			const submitLabel = mode === 'Create' ? 'Add Issue' : 'Update Issue';
+			const submitLabel = mode === 'Create' ? 'Add Issue' : 'Update decision';
 			expect(screen.getByRole('button', { name: submitLabel })).toBeDisabled();
 			expect(screen.getByRole('textbox', { name: 'Description' })).toBeDisabled();
 			await user.keyboard('{Enter}{Enter}');
@@ -255,7 +576,10 @@ describe('full issue forms', () => {
 					).not.toBeInTheDocument(),
 				);
 			} else {
-				await waitFor(() => expect(onClose).toHaveBeenCalledWith(false));
+				await waitFor(() =>
+					expect(screen.getByRole('button', { name: submitLabel })).toBeDisabled(),
+				);
+				expect(onClose).not.toHaveBeenCalled();
 			}
 			expect(attempts).toBe(1);
 			expect(savedIssues).toHaveLength(1);
@@ -266,27 +590,33 @@ describe('full issue forms', () => {
 		const user = userEvent.setup();
 		const issue = existingIssue();
 		const onClose = vi.fn();
-		renderForm(<EditIssueModal issue={issue} open onClose={onClose} />);
+		renderForm(<EditIssueSheet issue={issue} open onClose={onClose} />);
 		const editor = within(screen.getByRole('dialog', { name: 'Edit Issue' }));
 		expect(editor.getByRole('textbox', { name: /issue name/i })).toHaveValue(
 			' Existing issue ',
 		);
-		expect(editor.getByRole('radio', { name: 'Out' })).toBeChecked();
+		expect(editor.getByRole('button', { name: 'Boundary: Out' })).toBeInTheDocument();
 		expect(editor.getByRole('radio', { name: 'Tactical' })).toBeChecked();
-		await user.click(editor.getByRole('radio', { name: 'Uncertainty' }));
-		expect(editor.getByRole('switch', { name: 'Is Key' })).toBeChecked();
-		expect(editor.getByRole('textbox', { name: 'Outcome 1 Name' })).toHaveValue(
+		const changeType = async (type: string, from: string) => {
+			await user.click(editor.getByRole('button', { name: `Issue type: ${from}` }));
+			await user.click(screen.getByRole('menuitem', { name: type }));
+		};
+		await changeType('Uncertainty', 'Decision');
+		expect(editor.getByRole('switch', { name: 'Is key' })).toBeChecked();
+		expect(editor.getByRole('textbox', { name: 'Outcome 1 name' })).toHaveValue(
 			'Existing outcome',
 		);
-		await user.click(editor.getByRole('radio', { name: 'Fact' }));
-		await user.click(editor.getByRole('radio', { name: 'Decision' }));
+		await changeType('Fact', 'Uncertainty');
+		await changeType('Decision', 'Fact');
 		expect(editor.getByRole('radio', { name: 'Tactical' })).toBeChecked();
-		expect(editor.getByRole('textbox', { name: 'Option 1' })).toHaveValue('Existing option');
-		await user.click(editor.getByRole('radio', { name: 'Utility' }));
-		await user.click(editor.getByRole('button', { name: 'Update Issue' }));
+		expect(editor.getByRole('textbox', { name: 'Option 1 name' })).toHaveValue(
+			'Existing option',
+		);
+		await changeType('Utility', 'Decision');
+		await user.click(editor.getByRole('button', { name: 'Update utility' }));
 		await waitFor(() => expect(savedIssues).toHaveLength(1));
 		expect(savedIssues[0]).toEqual({ ...issue, type: 'Utility' });
-		expect(onClose).toHaveBeenCalledWith(false);
+		expect(onClose).not.toHaveBeenCalled();
 	});
 
 	it.each(createIssueButtons)(

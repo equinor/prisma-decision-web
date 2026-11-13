@@ -56,7 +56,7 @@ export const DecisionTreeNode = ({
 					<IssueCard issue={issue} className='h-25' includeBorder selected={selected}>
 						<IssueCardHeader>
 							<IssueCardMenu>
-								<IssueCardEditMenuItem />
+								<IssueCardEditMenuItem dialog={false} />
 								<IssueCardDeleteMenuItem />
 							</IssueCardMenu>
 						</IssueCardHeader>

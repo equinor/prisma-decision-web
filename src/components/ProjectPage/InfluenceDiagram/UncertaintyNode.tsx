@@ -55,7 +55,7 @@ export const UncertaintyNode = ({ id, data, selected }: NodeProps<ReactFlowInflu
 				>
 					<IssueCardHeader>
 						<IssueCardMenu>
-							<IssueCardEditMenuItem />
+							<IssueCardEditMenuItem dialog={false} />
 							<IssueCardDeleteMenuItem />
 							<IssueCardProbabilityTableMenuItem
 								onClick={() => setProbabilityTableOpen(true)}

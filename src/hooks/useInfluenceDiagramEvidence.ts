@@ -20,10 +20,18 @@ export const useInfluenceDiagramEvidence = () => {
 			return newEvidence;
 		});
 	};
+	const clearEvidence = (issueId: string) => {
+		setEvidence(prev => {
+			const next = new Map(prev);
+			next.delete(issueId);
+			return next;
+		});
+	};
 
 	return {
 		evidence: Array.from(evidence.values()),
 		toggleEvidence,
+		clearEvidence,
 	};
 };
 export const influenceDiagramEvidence = atomFamily(

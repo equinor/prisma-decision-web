@@ -12,7 +12,7 @@ export const useIssueCardContext = () => {
 type IssueCardContextType = {
 	issue: Issue;
 	sortedStates: Option[] | Outcome[];
-	setEditOpen: (open: boolean) => void;
+	setEditOpen: (open: boolean, dialog?: boolean) => void;
 	setDeleteOpen: (open: boolean) => void;
 	selectedState?: Option | Outcome;
 	onClickState?: (state: Option | Outcome) => void;

@@ -24,7 +24,7 @@ vi.hoisted(() => {
 	if (!globalThis.PointerEvent) vi.stubGlobal('PointerEvent', class extends MouseEvent {});
 });
 vi.mock('../../../../api', () => ({ apiClient: { get: vi.fn(), put: vi.fn() } }));
-vi.mock('../../EditIssueModal', () => ({ EditIssueModal: () => null }));
+vi.mock('../../EditIssueSheet/EditIssueSheet', () => ({ EditIssueSheet: () => null }));
 vi.mock('../../DeleteIssueDialog', () => ({ DeleteIssueDialog: () => null }));
 
 beforeEach(() => {
