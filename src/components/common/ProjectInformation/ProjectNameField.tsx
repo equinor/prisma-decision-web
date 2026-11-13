@@ -1,5 +1,7 @@
 import { TextField } from '@equinor/eds-core-react/next';
 import { ErrorMessage } from '@hookform/error-message';
+import { useHotkey } from '@tanstack/react-hotkeys';
+import { useRef } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import { Project } from '../../../validators';
 import { FormErrorMessage } from '../FormErrorMessage';
@@ -14,6 +16,13 @@ export const ProjectNameField = ({ onBlur }: ProjectNameFieldProps) => {
 		formState: { errors },
 	} = useFormContext<Project>();
 	const { field } = useController({ name: 'name', control });
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useHotkey('Enter', () => inputRef.current?.blur(), {
+		target: inputRef,
+		enabled: !!onBlur,
+		ignoreInputs: false,
+	});
 
 	return (
 		<div className='w-full'>
@@ -21,6 +30,10 @@ export const ProjectNameField = ({ onBlur }: ProjectNameFieldProps) => {
 				label='Project Name'
 				placeholder='Enter project name...'
 				{...field}
+				ref={element => {
+					field.ref(element);
+					inputRef.current = element;
+				}}
 				onBlur={() => {
 					field.onBlur();
 					onBlur?.();
