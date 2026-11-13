@@ -1,7 +1,13 @@
 import { NodeProps, NodeResizer, useReactFlow } from '@xyflow/react';
+import { useMemo } from 'react';
 import { useUpdateWhiteboardNodes } from '../../../hooks/api/useUpdateWhiteboardNodes';
 import { ReactFlowWhiteboardNode } from '../../../types';
-import { FREEHAND_BASE_STROKE_WIDTH, scaleFreehandPath } from './freehandPath';
+import {
+	FREEHAND_BASE_STROKE_WIDTH,
+	getFreehandStrokePath,
+	isLegacyFreehandPath,
+	scaleFreehandPath,
+} from './freehandPath';
 import {
 	whiteboardNodeStrokeColor,
 	whiteboardNodeResizerHandleStyle,
@@ -15,6 +21,19 @@ export const FreehandNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNo
 	const resolvedWidth = Math.max(data.width ?? 1, 1);
 	const resolvedHeight = Math.max(data.height ?? 1, 1);
 	const strokeOpacity = (data.opacity ?? 100) / 100;
+	const strokeColor =
+		data.color === undefined || data.color === 'default'
+			? whiteboardNodeStrokeColor
+			: data.color;
+	let lineStyle: string | undefined;
+	if (data.stroke_style === 'Dashed') lineStyle = '16 16';
+	if (data.stroke_style === 'Dotted') lineStyle = '3 10';
+	const isFilledOutline = isLegacyFreehandPath(data.data) && !lineStyle;
+	const strokePath = useMemo(
+		() => (isFilledOutline ? data.data : getFreehandStrokePath(data.data)),
+		[data.data, isFilledOutline],
+	);
+	const strokeWidth = data.stroke_width ?? MEDIUM_STROKE_WIDTH;
 
 	return (
 		<>
@@ -54,7 +73,7 @@ export const FreehandNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNo
 				preserveAspectRatio='none'
 			>
 				<path
-					d={data.data}
+					d={strokePath}
 					fill='transparent'
 					stroke='transparent'
 					strokeWidth={18}
@@ -62,26 +81,21 @@ export const FreehandNode = ({ data, selected }: NodeProps<ReactFlowWhiteboardNo
 					pointerEvents='stroke'
 				/>
 				<path
-					d={data.data}
-					stroke={
-						data?.color && data.color === 'default'
-							? whiteboardNodeStrokeColor
-							: data.color
-					}
-					fill={
-						data?.color && data.color === 'default'
-							? whiteboardNodeStrokeColor
-							: data.color
-					}
+					d={strokePath}
+					stroke={strokeColor}
+					fill={isFilledOutline ? strokeColor : 'none'}
+					strokeDasharray={lineStyle}
 					opacity={strokeOpacity}
-					strokeWidth={Math.max(
-						(data.stroke_width ?? MEDIUM_STROKE_WIDTH) - FREEHAND_BASE_STROKE_WIDTH,
-						0,
-					)}
+					strokeWidth={
+						isFilledOutline
+							? Math.max(strokeWidth - FREEHAND_BASE_STROKE_WIDTH, 0)
+							: strokeWidth
+					}
+					strokeLinecap='round'
 					strokeLinejoin='round'
 					paintOrder='stroke fill'
 					vectorEffect='non-scaling-stroke'
-					pointerEvents='fill'
+					pointerEvents={isFilledOutline ? 'fill' : 'stroke'}
 				/>
 			</svg>
 		</>
