@@ -1,7 +1,7 @@
 import { useGetPolicyTable } from '../../../../hooks/api/useGetPolicyTable';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { Issue } from '../../../../validators';
-import { getDiscreteValueRows } from '../DiscreteValueTable/getDiscreteValueRows';
+import { getDiscreteValueRows } from '../ConditionalTable/getDiscreteValueRows';
 
 export const usePolicyTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();

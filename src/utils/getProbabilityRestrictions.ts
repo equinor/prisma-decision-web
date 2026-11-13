@@ -1,4 +1,4 @@
-import { Edge, RestrictionEntry, RestrictionTable } from '../validators';
+import { DiscreteProbability, Edge, RestrictionEntry, RestrictionTable } from '../validators';
 
 type ParentStateValue = {
 	parent_option_ids: string[];
@@ -41,3 +41,15 @@ export const getRestrictedOutcomeIds = (
 		),
 	);
 };
+
+export const getRestrictedProbabilityIds = (
+	probabilities: DiscreteProbability[],
+	restrictedEntries: RestrictionEntry[],
+): string[] =>
+	probabilities
+		.filter(
+			probability =>
+				getRestrictedOutcomeIds(probability, [probability.outcome_id], restrictedEntries)
+					.size > 0,
+		)
+		.map(probability => probability.id);

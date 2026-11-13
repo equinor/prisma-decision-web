@@ -2,11 +2,14 @@ import { useMemo } from 'react';
 import { useSelectedProjectEdges } from '../../../../hooks/useSelectedProjectEdges';
 import { useSelectedProjectIssues } from '../../../../hooks/useSelectedProjectIssues';
 import { useSelectedProjectRestrictionTables } from '../../../../hooks/useSelectedProjectRestrictionTables';
-import { getRestrictedEntriesForTargetNode } from '../../../../utils/getProbabilityRestrictions';
+import {
+	getRestrictedEntriesForTargetNode,
+	getRestrictedProbabilityIds,
+} from '../../../../utils/getProbabilityRestrictions';
 import { sortByCreatedAt } from '../../../../utils/sortByCreatedAt';
 import { Issue } from '../../../../validators';
 import { useGetProbabilityTables } from '../../../../hooks/api/useGetProbabilityTables';
-import { getDiscreteValueRows } from '../DiscreteValueTable/getDiscreteValueRows';
+import { getDiscreteValueRows } from '../ConditionalTable/getDiscreteValueRows';
 
 export const useProbablityTable = (issue: Issue) => {
 	const issues = useSelectedProjectIssues();
@@ -23,7 +26,7 @@ export const useProbablityTable = (issue: Issue) => {
 
 	return {
 		childOutcomes,
-		restrictedEntries,
+		restrictedCells: getRestrictedProbabilityIds(discreteProbabilities, restrictedEntries),
 		...getDiscreteValueRows(discreteProbabilities, issues),
 	};
 };
