@@ -24,11 +24,22 @@ export const useExpandCard = (id: string) => {
 	return { expanded, toggle };
 };
 
-export const useToggleAll = () => {
+export const useToggleAll = (ids: string[]) => {
 	const [expandedCards, setExpanded] = useAtom(expandedCardsAtom);
-	const toggleAll = (ids: string[]) => {
-		if (expandedCards.size === ids.length) return setExpanded(new Set());
-		if (expandedCards.size >= 0) return setExpanded(new Set([...expandedCards, ...ids]));
+	const allExpanded = ids.length > 0 && ids.every(id => expandedCards.has(id));
+	const toggleAll = () => {
+		setExpanded(prev => {
+			const shouldCollapse = ids.every(id => prev.has(id));
+			const next = new Set(prev);
+			for (const id of ids) {
+				if (shouldCollapse) {
+					next.delete(id);
+				} else {
+					next.add(id);
+				}
+			}
+			return next;
+		});
 	};
-	return { toggleAll, expandedCards };
+	return { toggleAll, allExpanded };
 };

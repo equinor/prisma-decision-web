@@ -16,7 +16,7 @@ export const ProjectNameField = ({ onBlur }: ProjectNameFieldProps) => {
 		formState: { errors },
 	} = useFormContext<Project>();
 	const { field } = useController({ name: 'name', control });
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
 	useHotkey('Enter', () => inputRef.current?.blur(), {
 		target: inputRef,

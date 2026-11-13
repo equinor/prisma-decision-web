@@ -356,7 +356,9 @@ test('inline tables hide State triggers while preserving Card-selected Scenario 
 	fixture.issues[1].description = 'Market conditions for the project.';
 	const user = userEvent.setup();
 	renderInfluenceDiagram(queryClient, fixture.project);
-	await user.click(await screen.findByRole('button', { name: 'Expand All' }));
+	const expandAll = await screen.findByRole('button', { name: 'Expand All' });
+	await waitFor(() => expect(expandAll).toBeEnabled());
+	await user.click(expandAll);
 	fireEvent.click(await screen.findByText('Existing option'));
 	fireEvent.click(screen.getByText('Existing outcome'));
 	await waitFor(() => expect(screen.getByText('20.00')).toBeVisible());
