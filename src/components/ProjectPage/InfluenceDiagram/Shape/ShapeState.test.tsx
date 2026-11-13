@@ -130,7 +130,7 @@ test('Hard evidence and Forced decisions share their States and Scenario EV with
 	expect(screen.getByText('Scenario EV')).toBeVisible();
 	expect(screen.getByText('20.00')).toBeVisible();
 	await user.click(screen.getByRole('radio', { name: 'Card view' }));
-	expect(await screen.findByRole('button', { name: 'Collapse All' })).toBeEnabled();
+	await user.click(await screen.findByRole('button', { name: 'Expand All' }));
 	expect(await screen.findByText('Existing option')).toBeVisible();
 	expect(screen.getByText('Existing outcome')).toBeVisible();
 	expect(screen.getByText('20.00')).toBeVisible();

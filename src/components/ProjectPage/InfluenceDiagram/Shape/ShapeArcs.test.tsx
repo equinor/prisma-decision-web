@@ -444,7 +444,9 @@ test('an Uncertainty arc updates Utility eligibility without clearing an existin
 	localStorage.setItem('influenceDiagramView', JSON.stringify('card'));
 	const user = userEvent.setup();
 	renderInfluenceDiagram(queryClient, fixture.project);
-	await user.click(await screen.findByRole('button', { name: 'Expand All' }));
+	const expandAll = await screen.findByRole('button', { name: 'Expand All' });
+	await waitFor(() => expect(expandAll).toBeEnabled());
+	await user.click(expandAll);
 	fireEvent.click(await screen.findByText('Existing outcome'));
 	await user.click(screen.getByRole('radio', { name: 'Shape view' }));
 	const uncertainty = await screen.findByTestId(`rf__node-${fixture.issues[1].node.id}`);
