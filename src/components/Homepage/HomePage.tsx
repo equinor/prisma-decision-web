@@ -11,6 +11,7 @@ import { useGetStrategies } from '../../hooks/api/useGetStrategies';
 import { isProd } from '../../utils/getEnvironment';
 import { CreateProject } from '../common/ProjectInformation/CreateProject';
 import { ImportProject } from '../common/ProjectInformation/ImportProject';
+import { QuickStart } from '../common/ProjectInformation/QuickStart';
 
 export const HomePage = () => {
 	const { projects } = useGetProjects();
@@ -51,6 +52,7 @@ export const HomePage = () => {
 							onClear={() => setSearchTerm('')}
 						/>
 						<div className='flex justify-between gap-2'>
+							<QuickStart />
 							<CreateProject />
 							{!isProd() && <ImportProject />}
 						</div>

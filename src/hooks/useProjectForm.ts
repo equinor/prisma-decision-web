@@ -4,17 +4,7 @@ import { useForm, useFormContext } from 'react-hook-form';
 import { Project, projectSchema } from '../validators';
 import { useCreateProject } from './api/useCreateProject';
 import { useUpdateProject } from './api/useUpdateProject';
-
-const getDefaultValues = (): Project => ({
-	name: '',
-	opportunity_statement: '',
-	public: false,
-	end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-	id: crypto.randomUUID(),
-	favorite: false,
-	parent_project_id: null,
-	users: [],
-});
+import { getDefaultProjectValues } from '../utils/projectDefaults';
 
 export const useProjectFormContext = () => useFormContext<Project>();
 export const useProjectForm = (project?: Project) => {
@@ -23,7 +13,7 @@ export const useProjectForm = (project?: Project) => {
 
 	const formDefaults = useMemo(() => {
 		// Use selectedProject if available, otherwise use fresh defaults
-		return project || getDefaultValues();
+		return project || getDefaultProjectValues();
 	}, [project]);
 
 	const formMethods = useForm({

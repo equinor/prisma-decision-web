@@ -22,6 +22,12 @@ export default defineConfig({
 	],
 	server: {
 		port: 5004,
+		proxy: {
+			'/ai-api': {
+				target: 'http://127.0.0.1:8000',
+				rewrite: path => path.replace(/^\/ai-api/, ''),
+			},
+		},
 	},
 	build: {
 		rollupOptions: {

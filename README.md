@@ -11,6 +11,7 @@ A decision quality assessment tool for Equinor that helps teams structure and ev
 - **Decision Quality Assessment** — Structured assessment forms for evaluating decision quality
 - **Project Import/Export and Duplication** — Import and export project data,also duplicates the project;
 - **Issue view** — Reorder issues with dnd-kit.
+- **AI Assistant** — Chat panel and project quick start that draft objectives, issues, strategies and the influence diagram for review before anything is saved
 - **Authentication** — Azure AD (MSAL) integration for Equinor SSO
 
 ## Related repos
@@ -68,6 +69,20 @@ npm run dev
 ```
 
 The application runs at `http://localhost:5004`
+
+### AI assistant
+
+The AI button in the top bar opens a chat panel, and the home page has a **Quick start** button that creates a project from a short interview. Both talk to the `prisma-decision-ai` service through `/ai-api/*`, which the Vite dev server proxies to `http://127.0.0.1:8000` (no CORS setup needed).
+
+Start the AI service in a separate terminal before `npm run dev`:
+
+```bash
+cd ../prisma-decision-ai
+uv sync
+uv run uvicorn src.api:app --host 127.0.0.1 --port 8000 --reload
+```
+
+The assistant proposes items as review cards. Nothing is saved until you approve; approved items are written through the regular Prisma API, so the backend must be running and you must be signed in. Chat messages need the AI service's Azure OpenAI configuration; credentials stay on that server.
 
 ### Other commands
 

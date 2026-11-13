@@ -72,7 +72,7 @@ export const BottomNavigation = () => {
 				</div>
 			)}
 			{!next.invisible && (
-				<div className='bg-background-default shadow-tile fixed! right-6 bottom-6 rounded-md p-2'>
+				<div className='bg-background-default shadow-tile fixed! right-[calc(1.5rem+var(--chat-panel-width,0rem))] bottom-6 rounded-md p-2 transition-[right] duration-300 ease-in-out'>
 					<Button variant='outlined' onClick={() => navigate(next.to)}>
 						{next.label}
 						<Icon data={arrow_forward} />

@@ -4,9 +4,15 @@ import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 import { useGetProjects } from '../hooks/api/useGetProjects';
 import useDarkMode from '../hooks/useDarkMode';
+import { AiIcon } from './common/AiIcon';
 import { MoonIcon } from './common/MoonIcon';
 
-export const TopBar = () => {
+type TopBarProps = {
+	chatOpen: boolean;
+	onToggleChat: () => void;
+};
+
+export const TopBar = ({ chatOpen, onToggleChat }: TopBarProps) => {
 	const { toggleDarkMode, darkMode } = useDarkMode();
 	const navigate = useNavigate();
 	const isFetching = useIsFetching();
@@ -17,7 +23,7 @@ export const TopBar = () => {
 	const selectedProject = projects.find(project => project.id === projectId);
 
 	return (
-		<EdsTopBar sticky={false} className='col-span-2 border-b-0! pl-3.5!'>
+		<EdsTopBar sticky={false} className='col-span-3 border-b-0! pl-3.5!'>
 			<EdsTopBar.Header className='flex! items-center! justify-center'>
 				<div
 					onClick={() => navigate('/')}
@@ -39,6 +45,15 @@ export const TopBar = () => {
 				)}
 			</EdsTopBar.Header>
 			<EdsTopBar.Actions className='flex items-center gap-4'>
+				<Button
+					variant='ghost_icon'
+					onClick={onToggleChat}
+					onMouseDown={e => e.stopPropagation()}
+					aria-label='AI assistant'
+					aria-pressed={chatOpen}
+				>
+					<AiIcon />
+				</Button>
 				<Button
 					variant='ghost_icon'
 					onClick={toggleDarkMode}

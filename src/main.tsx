@@ -15,6 +15,7 @@ const queryClient = new QueryClient({
 	},
 	queryCache: new QueryCache({
 		onError: (error, query) => {
+			if (query.meta?.hideErrorToast) return;
 			if (isAxiosError(error) && error.response?.status === 501) {
 				showErrorToast('Total restrictions not supported yet');
 			} else if (query.meta?.errorMessage) {
