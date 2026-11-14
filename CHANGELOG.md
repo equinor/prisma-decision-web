@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.2.0](https://github.com/equinor/prisma-decision-web/compare/v1.1.0...v1.2.0) (2026-11-13)
+
+
+### Features
+
+* add ability to add all issues to whiteboard ([#739](https://github.com/equinor/prisma-decision-web/issues/739)) ([08be410](https://github.com/equinor/prisma-decision-web/commit/08be41099a19ff25b2167582c354f7b0888ec0f4))
+* add editable table cell components ([#818](https://github.com/equinor/prisma-decision-web/issues/818)) ([51c2a08](https://github.com/equinor/prisma-decision-web/commit/51c2a0819c4cf154e0fae1f181814cfe962909ee))
+* add randomize button for probabilities in development mode ([#843](https://github.com/equinor/prisma-decision-web/issues/843)) ([3639cba](https://github.com/equinor/prisma-decision-web/commit/3639cbaa8b07e00248a8b69af44887cbf40e49bf))
+* adds clear all button to prob and utility tables ([#767](https://github.com/equinor/prisma-decision-web/issues/767)) ([5afd9d0](https://github.com/equinor/prisma-decision-web/commit/5afd9d0a60dafa2c4bc27bfa31cb2cad2dff4a19))
+* adds clear all button to the whiteboard ([#737](https://github.com/equinor/prisma-decision-web/issues/737)) ([6d61154](https://github.com/equinor/prisma-decision-web/commit/6d611543effa6b5e7c7861a90a58a4c53780df57))
+* adds shape view to the influence diagram ([#931](https://github.com/equinor/prisma-decision-web/issues/931)) ([f0b6c31](https://github.com/equinor/prisma-decision-web/commit/f0b6c317bfaf70f02e9f29379400513f71a6047e))
+* adds support for keyboard naviagtion in the add issue to whiteboard popover ([#747](https://github.com/equinor/prisma-decision-web/issues/747)) ([ec167d8](https://github.com/equinor/prisma-decision-web/commit/ec167d890157bca886ef7f15f9af5fb8f3a988ef))
+* adds the ability to delete all edges at once ([#789](https://github.com/equinor/prisma-decision-web/issues/789)) ([997150e](https://github.com/equinor/prisma-decision-web/commit/997150e3f8c7d5c58fac8506aef97bb56b0942d7))
+* align objective design with new design ([#915](https://github.com/equinor/prisma-decision-web/issues/915)) ([45a2c58](https://github.com/equinor/prisma-decision-web/commit/45a2c58786a262736c2510c5b2356a39cac4e266))
+* **assessments:** switch scoring scale from 0-100 to 0-5 ([#877](https://github.com/equinor/prisma-decision-web/issues/877)) ([0d8ae16](https://github.com/equinor/prisma-decision-web/commit/0d8ae162fef9d336b4f37610295239442fed5ec1))
+* change opportunity statment to rich text field ([#796](https://github.com/equinor/prisma-decision-web/issues/796)) ([14e88ef](https://github.com/equinor/prisma-decision-web/commit/14e88efdf7fd10122683cff167dbc60044fac1cb))
+* disabel state options when restricition table makes it impossible ([#752](https://github.com/equinor/prisma-decision-web/issues/752)) ([4877593](https://github.com/equinor/prisma-decision-web/commit/487759370198f942f633697f4141b7ae163208c9))
+* edit issue names and descriptions inline in List and Board ([#883](https://github.com/equinor/prisma-decision-web/issues/883)) ([a878e93](https://github.com/equinor/prisma-decision-web/commit/a878e937d0e6ce755e920ba6b3cc5a227bc99bb0))
+* **issues:** add focused board views for decisions and uncertainties ([#936](https://github.com/equinor/prisma-decision-web/issues/936)) ([ac7931c](https://github.com/equinor/prisma-decision-web/commit/ac7931c823bf0b25079b33804e0ad3167822ea48))
+* **issues:** edit classification inline in List and Board ([#880](https://github.com/equinor/prisma-decision-web/issues/880)) ([267b6a4](https://github.com/equinor/prisma-decision-web/commit/267b6a43de55ea57f679fc5db518b0d552cc5a5a))
+* **issues:** edit, add and remove Board options and outcomes inline ([#884](https://github.com/equinor/prisma-decision-web/issues/884)) ([05bed3a](https://github.com/equinor/prisma-decision-web/commit/05bed3aaae5bff9003dff83326df5f9e8e44a7a8))
+* **project objectives:** make objective table editable ([#819](https://github.com/equinor/prisma-decision-web/issues/819)) ([380fb85](https://github.com/equinor/prisma-decision-web/commit/380fb859862b31f926bc8d6fb45cc80e46d8a297))
+* **project-issues:** make issue rows inline editable ([#820](https://github.com/equinor/prisma-decision-web/issues/820)) ([6a83ff9](https://github.com/equinor/prisma-decision-web/commit/6a83ff9215df2601948b248f53cc453e3cf0f689))
+* quick-create issues from List view ([#881](https://github.com/equinor/prisma-decision-web/issues/881)) ([4b2dfb3](https://github.com/equinor/prisma-decision-web/commit/4b2dfb3fa9a32044d38d7e1595d5736c292bbe19))
+* quick-create issues in Board columns ([#882](https://github.com/equinor/prisma-decision-web/issues/882)) ([27fc6b8](https://github.com/equinor/prisma-decision-web/commit/27fc6b85868f2fee7d0b93bb0a9b417224abb939))
+* refactor and add toolbar to decision tree ([#791](https://github.com/equinor/prisma-decision-web/issues/791)) ([c30ad35](https://github.com/equinor/prisma-decision-web/commit/c30ad35c880e36cdf38ec4da3f0514cb4f21dd4e))
+* show all strategies by default ([#822](https://github.com/equinor/prisma-decision-web/issues/822)) ([32e3a83](https://github.com/equinor/prisma-decision-web/commit/32e3a83cb05551e2a346c5472947d142ff8f641f))
+* **strategies:** inline create strategy form in project page ([#911](https://github.com/equinor/prisma-decision-web/issues/911)) ([9253d90](https://github.com/equinor/prisma-decision-web/commit/9253d90297b595b830b55a104916a73a0b6f518d))
+* **toolbar:** update toolbars to the new design· ([#922](https://github.com/equinor/prisma-decision-web/issues/922)) ([5e95909](https://github.com/equinor/prisma-decision-web/commit/5e959097e2049ed230ccb620ea6eb2e3e8f4b8a5))
+
+
+### Bug Fixes
+
+* adds fixed width to issue cards in whiteboard ([#745](https://github.com/equinor/prisma-decision-web/issues/745)) ([ee0c2fd](https://github.com/equinor/prisma-decision-web/commit/ee0c2fd85d7343aecf6236b69fd9a953307600bb))
+* change default color in whiteboard to the same as issue types ([#736](https://github.com/equinor/prisma-decision-web/issues/736)) ([8964602](https://github.com/equinor/prisma-decision-web/commit/8964602199f8b4bc765096a3643091dcf8011740))
+* **color-picker:** make color selection clearer ([#912](https://github.com/equinor/prisma-decision-web/issues/912)) ([0926b47](https://github.com/equinor/prisma-decision-web/commit/0926b47d100a77152fb9d2861a08e1189f52957f))
+* decrease stroke with in whiteboard ([#746](https://github.com/equinor/prisma-decision-web/issues/746)) ([3474957](https://github.com/equinor/prisma-decision-web/commit/3474957771cee154660d5fcc2a5334b7dc2a79d6))
+* fixes only one node being updated when chaning stlye with multiple selected ([#744](https://github.com/equinor/prisma-decision-web/issues/744)) ([34e65fb](https://github.com/equinor/prisma-decision-web/commit/34e65fb3e459a77b68abb62f43c255df9e370984))
+* handle initial empty sheet better ([#799](https://github.com/equinor/prisma-decision-web/issues/799)) ([147c841](https://github.com/equinor/prisma-decision-web/commit/147c84159fb76eaca4d9dd27bbd539fa2097569b))
+* hide states for fact issues ([#824](https://github.com/equinor/prisma-decision-web/issues/824)) ([7767bc5](https://github.com/equinor/prisma-decision-web/commit/7767bc59631624b2442a811b98d11eeee0c00e98))
+* improve drag select in whiteboard ([#738](https://github.com/equinor/prisma-decision-web/issues/738)) ([a0b67a3](https://github.com/equinor/prisma-decision-web/commit/a0b67a3545911baeaadcd7c28abc749ac097cdee))
+* **influence-diagram:** delete edges via keyboard handler ([#857](https://github.com/equinor/prisma-decision-web/issues/857)) ([32c53ee](https://github.com/equinor/prisma-decision-web/commit/32c53ee8f15d27225dd442ee43d220a49d29efea))
+* **influence-diagram:** float Shape states and anchor edges ([#941](https://github.com/equinor/prisma-decision-web/issues/941)) ([015e0cc](https://github.com/equinor/prisma-decision-web/commit/015e0ccf312cec9a3f0527be47fea2a536602df9))
+* **influence-diagram:** tighten edge hit area and spacing ([#908](https://github.com/equinor/prisma-decision-web/issues/908)) ([6832960](https://github.com/equinor/prisma-decision-web/commit/68329602960f716abdd1a701092dfe68ab8d86ea))
+* **issues:** align shared cards and inline controls with Figma ([#886](https://github.com/equinor/prisma-decision-web/issues/886)) ([3fb0f0a](https://github.com/equinor/prisma-decision-web/commit/3fb0f0ae0079057a99bfad91fb8b6d4972ef5dd7))
+* **objective:** keep delete error handling on shared objectives cache ([#854](https://github.com/equinor/prisma-decision-web/issues/854)) ([5f41dfd](https://github.com/equinor/prisma-decision-web/commit/5f41dfd40291958eb3201da1acfe76827b9e5067))
+* **policytable:** scope policy table cache by solution ([42a29b9](https://github.com/equinor/prisma-decision-web/commit/42a29b975b86936f0c5e363c5d4154965e7aa8ba))
+* prevents board sheet race condition from happening ([#771](https://github.com/equinor/prisma-decision-web/issues/771)) ([087c1b9](https://github.com/equinor/prisma-decision-web/commit/087c1b9f99442cf7f25dffaf02be0784ac3b219e))
+* **project:** handle unavailable projects in [#917](https://github.com/equinor/prisma-decision-web/issues/917) ([#937](https://github.com/equinor/prisma-decision-web/issues/937)) ([4e00520](https://github.com/equinor/prisma-decision-web/commit/4e005204229943d49080c54562938c5a0bae8fd6))
+* refetch board nodes and sheets after duplicating a project ([8a5a88d](https://github.com/equinor/prisma-decision-web/commit/8a5a88d69a0a91954c06d6a5c699e46d84d4b880))
+* remove old influence diagram toolbar actions ([#790](https://github.com/equinor/prisma-decision-web/issues/790)) ([b717352](https://github.com/equinor/prisma-decision-web/commit/b71735210558573695a4439e7c1373d352127175))
+* **restriction-table:** allow deleting edge when no rows exist ([#856](https://github.com/equinor/prisma-decision-web/issues/856)) ([f342681](https://github.com/equinor/prisma-decision-web/commit/f342681cb965ae0b8c9e5c1cb202730f3b677013))
+* sort columns and rows in tables the same as in issues ([#768](https://github.com/equinor/prisma-decision-web/issues/768)) ([c3ff3f0](https://github.com/equinor/prisma-decision-web/commit/c3ff3f0782fcc3cde86d2064f873b17b23e1c8da))
+* **strategy-table:** fit decision state icons in issue cards ([#823](https://github.com/equinor/prisma-decision-web/issues/823)) ([f3db900](https://github.com/equinor/prisma-decision-web/commit/f3db900c47148b12e55bcae34cd61fcb1490bd13))
+* **toolbar:** fix dragging issues onto the whiteboard ([7036358](https://github.com/equinor/prisma-decision-web/commit/70363583a64fd9d29c402777ffa275de755bbf1a))
+
 ## [1.1.0](https://github.com/equinor/prisma-decision-web/compare/v1.0.0...v1.1.0) (2026-09-03)
 
 
