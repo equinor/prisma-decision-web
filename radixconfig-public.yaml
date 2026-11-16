@@ -11,6 +11,9 @@ spec:
         - name: design
           build:
             from: DESIGN
+        - name: ai
+          build:
+            from: AI
     components:
         - name: frontend
           src: .

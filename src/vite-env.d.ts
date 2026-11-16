@@ -5,6 +5,7 @@ interface ImportMetaEnv {
 	readonly VITE_APP_REDIRECT_URI: string;
 	readonly VITE_APP_PRISMA_API: string;
 	readonly VITE_APP_PRISMA_API_SCOPE: string;
+	readonly VITE_APP_PRISMA_AI_URL?: string;
 }
 interface ImportMeta {
 	readonly env: ImportMetaEnv;

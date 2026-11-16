@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { z } from 'zod';
 import { apiClient } from '../../api';
+import { AI_API_URL } from '../../aiApi';
 import { issueSchema } from '../../validators';
 import type { ChatItemToSave } from '../../utils/chatInterview';
 
@@ -59,7 +60,7 @@ export const saveChatDiagram = async (
 		const context = await loadChatDiagram(draft.project_id);
 		const plan = savePlan.parse(
 			(
-				await axios.post<unknown>('/ai-api/chat/diagram/save-plan', {
+				await axios.post<unknown>(`${AI_API_URL}/chat/diagram/save-plan`, {
 					project_id: draft.project_id,
 					original: draft.original,
 					item: draft.item,

@@ -11,6 +11,10 @@ export const authConfig = {
 		initialize: initializePublicAuth,
 		interceptor: publicInterceptor,
 	},
+	ai: {
+		initialize: initializePublicAuth,
+		interceptor: publicInterceptor,
+	},
 	research: {
 		initialize: initializePublicAuth,
 		interceptor: publicInterceptor,
