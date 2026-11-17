@@ -29,16 +29,17 @@
 		"push-tags": "git push origin --tags -f"
 	},
 	"dependencies": {
+		"@ariakit/react": "^0.4.38",
 		"@azure/msal-browser": "^5.25.0",
 		"@azure/msal-react": "^5.7.2",
 		"@dagrejs/dagre": "^3.1.1",
-		"@ariakit/react": "^0.4.38",
 		"@dnd-kit/abstract": "^0.5.0",
 		"@dnd-kit/collision": "^0.5.0",
 		"@dnd-kit/helpers": "^0.5.0",
 		"@dnd-kit/react": "^0.5.0",
 		"@equinor/eds-core-react": "3.0.0-beta.2",
 		"@equinor/eds-icons": "^1.6.0",
+		"@equinor/eds-tokens": "^3.0.0-beta.10",
 		"@hookform/error-message": "^2.0.1",
 		"@hookform/resolvers": "^5.9.1",
 		"@radix-ui/react-collapsible": "^1.1.21",
@@ -65,14 +66,13 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^7.0.1",
-		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.7",
-		"jsdom": "^30.1.2",
-		"vitest": "^5.0.3",
+		"@equinor/eds-cli": "^0.1.0",
 		"@hookform/devtools": "^4.4.0",
 		"@rolldown/plugin-babel": "^0.2.4",
 		"@tailwindcss/vite": "^4.3.3",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.7",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@vitejs/plugin-react": "^6.1.2",
@@ -81,6 +81,7 @@
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^5.2.0",
 		"eslint-plugin-react-refresh": "^0.5.7",
+		"jsdom": "^30.1.2",
 		"prettier": "^3.9.9",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"tailwindcss": "^4.3.3",
@@ -88,6 +89,7 @@
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.71.1",
 		"vite": "^8.3.4",
-		"vite-plugin-checker": "^0.14.5"
+		"vite-plugin-checker": "^0.14.5",
+		"vitest": "^5.0.3"
 	}
 }

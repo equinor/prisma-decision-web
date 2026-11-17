@@ -1,7 +1,30 @@
 import { expect, test } from 'vitest';
 import type { ChatDiagram } from './diagramInformation';
 import { getDefaultProjectValues } from './projectDefaults';
-import { getQuickStartRecords, type QuickStartResponse } from './quickStart';
+import { getApprovedItems, getQuickStartRecords, type QuickStartResponse } from './quickStart';
+
+test('the project setup panel only lists approved items', () => {
+	const { project, objectives, issues } = getApprovedItems({
+		project: {},
+		confirmed: {
+			project_information: JSON.stringify({
+				project_name: 'Event',
+				opportunity_statement: 'Plan the event.',
+				end_date: null,
+				public_project: false,
+			}),
+			'objectives.Profit': JSON.stringify({
+				name: 'Profit',
+				type: 'Fundamental',
+				description: 'Earn',
+			}),
+		},
+	});
+
+	expect(project?.project_name).toBe('Event');
+	expect(objectives.map(objective => objective.name)).toEqual(['Profit']);
+	expect(issues).toEqual([]);
+});
 
 test('the created project keeps the approved probability tables, not only the connections', () => {
 	const diagram: ChatDiagram = {

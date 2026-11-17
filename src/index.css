@@ -1,6 +1,7 @@
 @layer theme, base, eds-elements, eds-components, components, utilities;
 @import 'tailwindcss';
 @import '@equinor/eds-core-react/next/index.css';
+@import '@equinor/eds-tokens/next/css/variables.css';
 @plugin 'tailwindcss-animate';
 
 @font-face {

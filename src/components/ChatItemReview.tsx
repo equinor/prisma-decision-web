@@ -14,6 +14,7 @@ type ChatItemReviewProps = {
 	error?: Error | null;
 	approveLabel?: string;
 	hint?: string;
+	diagramShownElsewhere?: boolean;
 };
 
 const boundaryText = { in: 'In scope', on: 'On the boundary', out: 'Out of scope' };
@@ -39,6 +40,7 @@ export const ChatItemReview = ({
 		? 'Save diagram changes'
 		: `Save ${review.kind}`,
 	hint = 'Send any corrections before saving. Each item is saved only after you approve it.',
+	diagramShownElsewhere = false,
 }: ChatItemReviewProps) => (
 	<section
 		aria-label={`Review ${review.kind}`}
@@ -49,15 +51,23 @@ export const ChatItemReview = ({
 		</h3>
 		{review.kind === 'influence_diagram' ? (
 			<div className='flex flex-col gap-2'>
-				<p>Proposed connections (removed connections will no longer appear):</p>
-				<ul>
-					{review.item.edges.map((edge, index) => (
-						<li key={index}>
-							{edge.tail_issue_name} {'->'} {edge.head_issue_name}
-						</li>
-					))}
-				</ul>
-				{!review.item.edges.length && <p>No connections.</p>}
+				{diagramShownElsewhere ? (
+					<p>
+						The suggested connections are drawn in the influence diagram on the right.
+					</p>
+				) : (
+					<>
+						<p>Proposed connections (removed connections will no longer appear):</p>
+						<ul>
+							{review.item.edges.map((edge, index) => (
+								<li key={index}>
+									{edge.tail_issue_name} {'->'} {edge.head_issue_name}
+								</li>
+							))}
+						</ul>
+						{!review.item.edges.length && <p>No connections.</p>}
+					</>
+				)}
 				<p>Probabilities:</p>
 				<ul>
 					{review.item.discrete_probabilities.map((row, index) => (

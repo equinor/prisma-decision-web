@@ -23,7 +23,10 @@ const path = z.string().min(1);
 export const quickStartResponseSchema = z.object({
 	reply: z.string().trim().min(1),
 	// Python validates the full snapshot; the browser only returns it.
-	state: z.object({ project: z.unknown() }).catchall(z.unknown()),
+	// `confirmed` maps each approved item's path to its JSON.
+	state: z
+		.object({ project: z.unknown(), confirmed: z.record(z.string(), z.string()) })
+		.catchall(z.unknown()),
 	pending: z
 		.discriminatedUnion('kind', [
 			z.object({ kind: z.literal('project'), path, item: projectInformationSchema, note }),
@@ -71,6 +74,27 @@ export type QuickStartRecords = {
 	strategies: Extract<ChatItemToSave, { kind: 'strategy' }>[];
 	diagram: ChatDiagram;
 };
+
+export const getApprovedItems = ({ confirmed }: QuickStartResponse['state']) => {
+	const approved = <T extends z.ZodType>(prefix: string, schema: T) =>
+		Object.entries(confirmed)
+			.filter(([path]) => path.startsWith(prefix))
+			.map(([, json]) => schema.parse(JSON.parse(json)));
+	return {
+		project: approved('project_information', projectInformationSchema)[0],
+		objectives: approved('objectives.', objectiveInformationSchema),
+		issues: approved('issues.', issueInformationSchema),
+		strategies: approved('strategies.', strategyInformationSchema),
+		diagram: approved('influence_diagram', diagramInformationSchema)[0],
+	};
+};
+
+// Mirrors diagram_issues in prisma-decision-ai.
+export const isDiagramIssue = (issue: z.infer<typeof issueInformationSchema>) =>
+	issue.boundary === 'in' &&
+	(issue.type === 'Utility' ||
+		(issue.type === 'Decision' && issue.decision?.type === 'Focus') ||
+		(issue.type === 'Uncertainty' && !!issue.uncertainty?.is_key));
 
 // IDs are generated once, so retrying creation never makes duplicates.
 export const getQuickStartRecords = (
