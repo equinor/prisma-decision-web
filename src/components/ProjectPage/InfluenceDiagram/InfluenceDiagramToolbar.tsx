@@ -1,5 +1,6 @@
 import { useNodes } from '@xyflow/react';
 import { useInfluenceDiagramEvidence } from '../../../hooks/useInfluenceDiagramEvidence';
+import { useInfluenceDiagramNodeView } from '../../../hooks/useInfluenceDiagramNodeView';
 import { ReactFlowInfluenceNode } from '../../../types';
 import { SolutionEvidenceResponse } from '../../../validators';
 import { CreateIssues } from '../../common/CreateIssue';
@@ -11,6 +12,7 @@ import { InfluenceDiagramValidation } from './InfluenceDiagramValidation';
 import { ChangeIssueType } from '../../common/DraggableToolbar/ChangeIssueType';
 import { DeleteMenu } from '../../common/DraggableToolbar/DeleteMenu';
 import { LayoutControls } from '../../common/DraggableToolbar/LayoutControls';
+import { ResetLayout } from '../../common/DraggableToolbar/ResetLayout';
 import { ToggleNodeView } from '../../common/DraggableToolbar/ToggleNodeView';
 import {
 	ToolBar,
@@ -20,6 +22,7 @@ import {
 
 export const InfluenceDiagramToolbar = () => {
 	const nodes = useNodes<ReactFlowInfluenceNode>();
+	const [nodeView] = useInfluenceDiagramNodeView();
 	const selectedNodes = nodes.filter(node => node.selected);
 
 	return (
@@ -27,6 +30,7 @@ export const InfluenceDiagramToolbar = () => {
 			<ToolBar>
 				<ZoomControls />
 				<LayoutControls />
+				{nodeView === 'shape' && <ResetLayout />}
 				<ToggleNodeView />
 				<ToolbarSeparator />
 				<ToggleExpandAll />

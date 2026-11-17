@@ -45,7 +45,7 @@ test.each(issueTypes)('%s labels leave their background styling to the EDS tone'
 	const labels = container.querySelectorAll('.eds-chip');
 	expect(labels).toHaveLength(2);
 	for (const label of labels) {
-		expect(label).toHaveAttribute('data-color-appearance', issueTypeTones[type]);
+		expect(label).toHaveAttribute('data-tone', issueTypeTones[type]);
 		expect(label).toHaveAttribute('data-variant', 'default');
 		expect(label).not.toHaveClass('bg-(--eds-color-bg-canvas)!');
 	}

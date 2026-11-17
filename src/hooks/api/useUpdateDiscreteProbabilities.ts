@@ -12,13 +12,13 @@ export const useUpdateDiscreteProbabilities = () => {
 			return res.data[0];
 		},
 		onMutate: async newProb => {
-			await queryClient.cancelQueries({ queryKey: ['discreteProbabilities'] });
+			await queryClient.cancelQueries({ queryKey: ['probabilityTables'] });
 			const previousProbs = queryClient.getQueryData<DiscreteProbability[]>([
-				'discreteProbabilities',
+				'probabilityTables',
 			]);
 			if (previousProbs) {
 				queryClient.setQueryData(
-					['discreteProbabilities'],
+					['probabilityTables'],
 					previousProbs.map(p => (p.id === newProb.id ? newProb : p)),
 				);
 			}
@@ -27,7 +27,7 @@ export const useUpdateDiscreteProbabilities = () => {
 		onError: (_err, _newProb, context) => {
 			showErrorToast('Failed to update probabilities');
 			if (context?.previousProbs) {
-				queryClient.setQueryData(['discreteProbabilities'], context.previousProbs);
+				queryClient.setQueryData(['probabilityTables'], context.previousProbs);
 			}
 		},
 		onSuccess: () => {
@@ -48,13 +48,13 @@ export const useBulkUpdateDiscreteProbabilities = () => {
 		},
 
 		onMutate: async newProbs => {
-			await queryClient.cancelQueries({ queryKey: ['discreteProbabilities'] });
+			await queryClient.cancelQueries({ queryKey: ['probabilityTables'] });
 			const previousProbs = queryClient.getQueryData<DiscreteProbability[]>([
-				'discreteProbabilities',
+				'probabilityTables',
 			]);
 			if (previousProbs) {
 				queryClient.setQueryData(
-					['discreteProbabilities'],
+					['probabilityTables'],
 					previousProbs.map(p => {
 						const updatedProb = newProbs.find(np => np.id === p.id);
 						return updatedProb ? updatedProb : p;
@@ -66,7 +66,7 @@ export const useBulkUpdateDiscreteProbabilities = () => {
 		onError: (_err, _newProb, context) => {
 			showErrorToast('Failed to update probabilities');
 			if (context?.previousProbs) {
-				queryClient.setQueryData(['discreteProbabilities'], context.previousProbs);
+				queryClient.setQueryData(['probabilityTables'], context.previousProbs);
 			}
 		},
 		onSuccess: () => {

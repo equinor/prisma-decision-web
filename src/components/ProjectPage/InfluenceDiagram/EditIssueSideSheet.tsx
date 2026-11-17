@@ -63,7 +63,7 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 			data-no-dnd
 			style={{ width }}
 			className='nodrag nopan nowheel bg-background-default shadow-tile motion-safe:animate-sheet-open
-				absolute top-0 right-0 bottom-0 z-20 cursor-auto overflow-auto rounded-sm
+				absolute top-0 right-0 bottom-0 z-60 cursor-auto overflow-auto rounded-sm
 				motion-safe:transition-[width] motion-safe:duration-500
 				motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)]'
 		>
@@ -71,6 +71,7 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 			<div
 				key={issue.id}
 				className={cn('flex flex-col gap-4 p-6', {
+					'h-full': showTable && issue.type === 'Uncertainty',
 					'motion-safe:animate-sheet-content-change': hasSwitchedIssue,
 				})}
 			>
@@ -102,7 +103,12 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 					<EditIssueForm issue={issue} onClose={onClose} hideHeader />
 				</div>
 				{showTable && (
-					<div ref={measureTable} className={cn('w-max', viewSwitchClass)}>
+					<div
+						ref={measureTable}
+						className={cn('w-max', viewSwitchClass, {
+							'min-h-0 flex-1': issue.type === 'Uncertainty',
+						})}
+					>
 						{issue.type === 'Decision' && (
 							<PolicyTable issue={issue} selected={false} onClose={backToDetails} />
 						)}
@@ -111,6 +117,7 @@ export const EditIssueSideSheet = ({ issueId, onClose }: EditIssueSideSheetProps
 								issue={issue}
 								selected={false}
 								onClose={backToDetails}
+								embedded
 							/>
 						)}
 						{issue.type === 'Utility' && (

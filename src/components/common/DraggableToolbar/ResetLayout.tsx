@@ -12,6 +12,7 @@ export const ResetLayout = () => {
 		<Tooltip title='Reset to automatic layout'>
 			<Button
 				className='px-1.5!'
+				aria-label='Reset to automatic layout'
 				variant='outlined'
 				disabled={!hasCustomPositions}
 				onClick={() => setCustomPositions({})}

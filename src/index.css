@@ -1,5 +1,7 @@
-@layer theme, base, eds-elements, eds-components, components, utilities;
+@layer theme, base, eds-tokens-legacy, eds-tokens, eds-elements, eds-components, components, utilities;
 @import 'tailwindcss';
+/* Beta tokens (spacing, --eds-text-primary, …) that the EDS beta components and Figma reference */
+@import '@equinor/eds-tokens/next/css/variables.css';
 @import '@equinor/eds-core-react/next/index.css';
 @plugin 'tailwindcss-animate';
 

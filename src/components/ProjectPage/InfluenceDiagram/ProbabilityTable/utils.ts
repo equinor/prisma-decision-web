@@ -36,6 +36,12 @@ export const getParentLabel = (
 	return '—';
 };
 
+/** Get the option/outcome id for a specific parent from a discrete probability */
+export const getParentStateId = (dp: ParentStateValue, parent: ParentDescriptor): string => {
+	const ids = parent.kind === 'decision' ? dp.parent_option_ids : dp.parent_outcome_ids;
+	return ids.find(id => parent.states.some(state => state.id === id)) ?? '—';
+};
+
 /** Build a sort key that orders rows by parent states in tree order */
 export const buildSortKey = (
 	dp: ParentStateValue,
