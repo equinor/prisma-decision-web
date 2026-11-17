@@ -6,7 +6,8 @@ import {
 	combineNoisyMax,
 	getIncompleteRows,
 	NoisyMaxModel,
-	pullsDown,
+	compareToLeak,
+	makeBaseline,
 	startNoisyMax,
 } from './noisyMax';
 import { roundProbabilities } from './probabilityTableMath';
@@ -40,8 +41,9 @@ describe('Noisy-MAX', () => {
 	});
 	it('caps a row that would pull the outcome down', () => {
 		const down = [0.9, 0.1, 0];
-		expect(pullsDown([0.7, 0.2, 0.1], down)).toBe(true);
-		expect(pullsDown([0.7, 0.2, 0.1], [0.4, 0.4, 0.2])).toBe(false);
+		expect(compareToLeak([0.7, 0.2, 0.1], down)).toBe('lower');
+		expect(compareToLeak([0.7, 0.2, 0.1], [0.4, 0.4, 0.2])).toBe('ok');
+		expect(compareToLeak([0.22, 0.29, 0.49], [0.03, 0.93, 0.04])).toBe('mixed');
 		expect(roundProbabilities(combineNoisyMax([0.7, 0.2, 0.1], [down]))).toEqual([
 			0.7, 0.2, 0.1,
 		]);
@@ -69,6 +71,38 @@ describe('Noisy-MAX', () => {
 	});
 });
 
+describe('Noisy-OR', () => {
+	// With two outcomes Noisy-MAX is the leaky noisy-OR (Henrion's parameters, leak included):
+	// P(absent | causes) = (1 − leak) · Π (1 − p_i) / (1 − leak)
+	it('matches the leaky noisy-OR formula', () => {
+		const leak = 0.1;
+		const p = [0.6, 0.3];
+		const absent = (1 - leak) * ((1 - p[0]) / (1 - leak)) * ((1 - p[1]) / (1 - leak));
+		const result = combineNoisyMax(
+			[1 - leak, leak],
+			p.map(value => [1 - value, value]),
+		);
+		expect(result[0]).toBeCloseTo(absent, 10);
+		expect(result[1]).toBeCloseTo(1 - absent, 10);
+	});
+});
+
+describe('makeBaseline', () => {
+	it('swaps the leak and the new baseline row', () => {
+		const settings = {
+			enabled: true,
+			view: 'parameters' as const,
+			baselines: { drill: 'yes' },
+			leak: { low: 0.2, high: 0.8 },
+			rows: { drill: { no: { low: 0.9, high: 0.1 } } },
+		};
+		const next = makeBaseline(settings, model.parents[0], 'no');
+		expect(next.baselines.drill).toBe('no');
+		expect(next.leak).toEqual({ low: 0.9, high: 0.1 });
+		expect(next.rows.drill.yes).toEqual({ low: 0.2, high: 0.8 });
+	});
+});
+
 describe('startNoisyMax', () => {
 	const parents = model.parents;
 	const ids = ['low', 'medium', 'high'];
@@ -83,6 +117,20 @@ describe('startNoisyMax', () => {
 		expect(started.baselines).toEqual({ drill: 'yes', market: 'weak' });
 		expect(started.leak).toEqual({ low: 0.4, medium: 0.4, high: 0.2 });
 		expect(started.rows).toEqual({ market: { medium: { low: 0.1, medium: 0.1, high: 0.8 } } });
+	});
+	it('picks the state that keeps the outcome lowest as the baseline', () => {
+		const started = startNoisyMax(
+			undefined,
+			parents,
+			[
+				{ path: ['yes', 'weak'], values: [0.1, 0.2, 0.7] },
+				{ path: ['no', 'weak'], values: [0.6, 0.3, 0.1] },
+				{ path: ['no', 'medium'], values: [0.4, 0.4, 0.2] },
+			],
+			ids,
+		);
+		expect(started.baselines).toEqual({ drill: 'no', market: 'weak' });
+		expect(started.leak).toEqual({ low: 0.6, medium: 0.3, high: 0.1 });
 	});
 	it('keeps earlier parameters', () => {
 		const earlier = { ...startNoisyMax(undefined, parents, table, ids), enabled: false };

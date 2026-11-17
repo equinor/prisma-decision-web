@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ProbabilityCell, rebalanceRow } from './probabilityTableMath';
+import { fillLastEmpty, ProbabilityCell, rebalanceRow } from './probabilityTableMath';
 
 type Live = { rowKey: string; index: number; value: number };
 export type RowPreview = {
@@ -13,11 +13,13 @@ export type RowPreview = {
 const FLASH_MS = 1000;
 
 /**
- * Keep rows at 1 while typing. While a cell is being typed in, the other unlocked cells in its
- * row are shown rebalanced; on commit the rebalanced row is what gets saved. Cells the tool
- * changed stay highlighted for a moment so the user sees what moved.
+ * Changes the tool makes to a row while the user types in it. Always: the last empty cell gets
+ * the rest. With "Keep rows at 1" on: the other unlocked cells change in proportion instead.
+ * The change is previewed while typing and saved on commit; changed cells stay highlighted for
+ * a moment so the user sees what moved.
  */
-export const useLiveRebalance = (enabled: boolean) => {
+export const useLiveRebalance = (keepRowsAtOne: boolean) => {
+	const adjust = keepRowsAtOne ? rebalanceRow : fillLastEmpty;
 	const [live, setLive] = useState<Live | null>(null);
 	const [flash, setFlash] = useState<{ rowKey: string; indexes: number[] } | null>(null);
 	const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -25,8 +27,8 @@ export const useLiveRebalance = (enabled: boolean) => {
 
 	const preview = (rowKey: string, cells: ProbabilityCell[]): RowPreview => {
 		const stored = cells.map(cell => cell.value);
-		if (enabled && live?.rowKey === rowKey) {
-			const next = rebalanceRow(cells, live.index, live.value);
+		if (live?.rowKey === rowKey) {
+			const next = adjust(cells, live.index, live.value);
 			const adjusted = new Set(
 				next.flatMap((value, i) => (i !== live.index && value !== stored[i] ? [i] : [])),
 			);
@@ -44,14 +46,12 @@ export const useLiveRebalance = (enabled: boolean) => {
 	};
 
 	const draft = useCallback(
-		(rowKey: string, index: number, value: number | undefined) => {
-			if (!enabled) return;
+		(rowKey: string, index: number, value: number | undefined) =>
 			setLive(previous => {
 				if (value !== undefined) return { rowKey, index, value };
 				return previous?.rowKey === rowKey && previous.index === index ? null : previous;
-			});
-		},
-		[enabled],
+			}),
+		[],
 	);
 
 	/** Values to save for one row after the user commits a cell */
@@ -61,12 +61,13 @@ export const useLiveRebalance = (enabled: boolean) => {
 		index: number,
 		value: number,
 	): number[] => {
-		if (!enabled) return cells.map((cell, i) => (i === index ? value : cell.value));
-		const next = rebalanceRow(cells, index, value);
+		const next = adjust(cells, index, value);
 		const indexes = next.flatMap((v, i) => (i !== index && v !== cells[i].value ? [i] : []));
-		clearTimeout(timer.current);
-		setFlash({ rowKey, indexes });
-		timer.current = setTimeout(() => setFlash(null), FLASH_MS);
+		if (indexes.length) {
+			clearTimeout(timer.current);
+			setFlash({ rowKey, indexes });
+			timer.current = setTimeout(() => setFlash(null), FLASH_MS);
+		}
 		return next;
 	};
 

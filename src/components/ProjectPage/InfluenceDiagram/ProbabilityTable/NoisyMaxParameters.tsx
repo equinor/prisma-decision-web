@@ -5,13 +5,20 @@ import {
 	PopoverDisclosure,
 	PopoverProvider,
 } from '@ariakit/react';
-import { Button, Icon, Tooltip } from '@equinor/eds-core-react/next';
+import { Button, Icon } from '@equinor/eds-core-react/next';
 import { arrow_drop_down, check, warning_outlined } from '@equinor/eds-icons';
-import { Fragment } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { cn } from '../../../../utils/cn';
 import { ParentTypeIndicator } from '../../../common/ParentTypeIndicator';
 import { showErrorToast } from '../../../ShowToast';
-import { buildModel, getBaseline, getIncompleteRows, isDistribution, pullsDown } from './noisyMax';
+import {
+	buildModel,
+	compareToLeak,
+	getBaseline,
+	getIncompleteRows,
+	isDistribution,
+	makeBaseline,
+} from './noisyMax';
 import { OutcomeOrderList } from './OutcomeOrderList';
 import { ProbabilityInput, SumCell } from './ProbabilityTableCells';
 import { fixProbabilitySum, isRowValid, ProbabilityCell, toScale } from './probabilityTableMath';
@@ -75,63 +82,72 @@ export const NoisyMaxParameters = ({
 		});
 	};
 
-	const renderRow = (row: RowRef, label: string, warning?: string) => {
+	const renderRow = (row: RowRef, label: string, guidance?: ReactNode) => {
 		const key = rowKeyOf(row);
 		const cells = cellsOf(row);
 		const preview = live.preview(key, cells);
 		return (
-			<tr key={key}>
-				<td className='px-1 py-1'>
-					<div className='flex h-9 min-w-36 items-center gap-1.5 px-2 whitespace-nowrap'>
-						{label}
-						{warning && (
-							<Tooltip title={warning} placement='top'>
-								<span
-									tabIndex={0}
-									aria-label={warning}
-									className='flex text-(--eds-icon-on-default-warning)'
-								>
-									<Icon data={warning_outlined} size='sm' />
-								</span>
-							</Tooltip>
-						)}
-					</div>
-				</td>
-				{outcomes.map((outcome, index) => (
-					<td key={outcome.id} className='px-1 py-1'>
-						<ProbabilityInput
-							value={preview.values[index]}
-							label={`${label}, ${outcome.name}`}
-							disabled={false}
-							readOnly={false}
-							locked={false}
-							adjusted={preview.adjusted.has(index)}
-							onDraftChange={value => live.draft(key, index, value)}
-							onCommit={value => setRow(row, live.commit(key, cells, index, value))}
-							onContextMenu={() => {}}
+			<Fragment key={key}>
+				<tr>
+					<td className='px-1 py-1'>
+						<div className='flex h-9 min-w-36 items-center gap-1.5 px-2 whitespace-nowrap'>
+							{label}
+							{guidance && (
+								<Icon
+									data={warning_outlined}
+									size='sm'
+									className='text-(--eds-icon-on-default-warning)'
+								/>
+							)}
+						</div>
+					</td>
+					{outcomes.map((outcome, index) => (
+						<td key={outcome.id} className='px-1 py-1'>
+							<ProbabilityInput
+								value={preview.values[index]}
+								label={`${label}, ${outcome.name}`}
+								disabled={false}
+								readOnly={false}
+								locked={false}
+								adjusted={preview.adjusted.has(index)}
+								onDraftChange={value => live.draft(key, index, value)}
+								onCommit={value =>
+									setRow(row, live.commit(key, cells, index, value))
+								}
+								onContextMenu={() => {}}
+							/>
+						</td>
+					))}
+					<td className='px-1 py-1 text-center'>
+						<SumCell
+							sum={preview.sumCells.reduce((sum, cell) => sum + cell.value, 0)}
+							invalidCount={isRowValid(preview.sumCells) ? 0 : 1}
+							configurationCount={1}
+							outcomes={outcomes.map(outcome => ({
+								name: outcome.name,
+								available: true,
+							}))}
+							onFix={fix => {
+								const result = fixProbabilitySum(cells, fix);
+								if (result.error) return showErrorToast(result.error);
+								setRow(
+									row,
+									result.cells.map(cell => cell.value),
+								);
+							}}
 						/>
 					</td>
-				))}
-				<td className='px-1 py-1 text-center'>
-					<SumCell
-						sum={preview.sumCells.reduce((sum, cell) => sum + cell.value, 0)}
-						invalidCount={isRowValid(preview.sumCells) ? 0 : 1}
-						configurationCount={1}
-						outcomes={outcomes.map(outcome => ({
-							name: outcome.name,
-							available: true,
-						}))}
-						onFix={fix => {
-							const result = fixProbabilitySum(cells, fix);
-							if (result.error) return showErrorToast(result.error);
-							setRow(
-								row,
-								result.cells.map(cell => cell.value),
-							);
-						}}
-					/>
-				</td>
-			</tr>
+				</tr>
+				{guidance && (
+					<tr>
+						<td colSpan={outcomes.length + 2} className='px-3 pb-2'>
+							<div className='flex w-0 min-w-full flex-wrap items-center gap-x-2 gap-y-1 text-xs text-(--eds-text-on-default-warning)'>
+								{guidance}
+							</div>
+						</td>
+					</tr>
+				)}
+			</Fragment>
 		);
 	};
 
@@ -251,17 +267,51 @@ export const NoisyMaxParameters = ({
 										.filter(state => state.id !== baseline)
 										.map(state => {
 											const values = model.rows[parent.issueId]?.[state.id];
-											const warning =
+											const comparison =
 												values &&
 												isDistribution(values) &&
-												isDistribution(model.leak) &&
-												pullsDown(model.leak, values)
-													? `Puts more weight on low outcomes than the leak. Noisy-MAX assumes a parent can only push ${issueName} up, so this row is capped where it pulls down.`
-													: undefined;
+												isDistribution(model.leak)
+													? compareToLeak(model.leak, values)
+													: 'ok';
+											const guidance =
+												comparison === 'lower' ? (
+													<>
+														<span>
+															{state.name} keeps {issueName} lower
+															than the leak, so this row has no
+															effect: a parent can only push the
+															outcome up. The baseline should be the
+															state that pushes least.
+														</span>
+														<Button
+															variant='ghost'
+															size='small'
+															onClick={() =>
+																onChange(
+																	makeBaseline(
+																		settings,
+																		parent,
+																		state.id,
+																	),
+																)
+															}
+														>
+															Make {state.name} the baseline
+														</Button>
+													</>
+												) : comparison === 'mixed' ? (
+													<span>
+														{state.name} pushes {issueName} up for some
+														outcomes and down for others. Only the
+														upward part counts. If parents both raise
+														and lower {issueName}, Row by row may fit
+														better.
+													</span>
+												) : undefined;
 											return renderRow(
 												{ issueId: parent.issueId, stateId: state.id },
 												state.name,
-												warning,
+												guidance,
 											);
 										})}
 								</Fragment>

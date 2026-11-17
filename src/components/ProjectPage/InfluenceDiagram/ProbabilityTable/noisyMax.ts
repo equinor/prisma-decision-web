@@ -16,14 +16,25 @@ export const isDistribution = (values: number[]) =>
 	values.every(value => value >= 0) &&
 	isRowSumValid(values.reduce((a, b) => a + b, 0));
 
+export type LeakComparison = 'ok' | 'lower' | 'mixed';
+
 /**
- * True when a parameter row puts more weight on low outcomes than the leak does. Noisy-MAX
- * assumes a parent can only push the outcome up, so such a row is capped when combined.
+ * Noisy-MAX assumes a parent can only push the outcome up the scale. 'lower': the row sits
+ * lower on the scale than the leak everywhere, so it has no effect (usually a sign that this
+ * state should be the baseline). 'mixed': it pushes up at some levels and down at others; the
+ * downward part has no effect.
  */
-export const pullsDown = (leak: number[], row: number[]) => {
+export const compareToLeak = (leak: number[], row: number[]): LeakComparison => {
 	const leakCdf = cumulative(leak);
-	return cumulative(row).some((value, i) => value > leakCdf[i] + 1e-6);
+	const rowCdf = cumulative(row);
+	const down = rowCdf.some((value, i) => value > leakCdf[i] + 1e-6);
+	const up = rowCdf.some((value, i) => value < leakCdf[i] - 1e-6);
+	if (!down) return 'ok';
+	return up ? 'mixed' : 'lower';
 };
+
+/** Average position on the scale (0 = lowest outcome) */
+const expectedPosition = (values: number[]) => values.reduce((sum, value, i) => sum + value * i, 0);
 
 /**
  * Noisy-MAX with leak. Each active row is "this parent alone in this state, every other parent
@@ -141,10 +152,46 @@ export const startNoisyMax = (
 	parents: NoisyMaxParent[],
 	configurations: { path: string[]; values: number[] }[],
 	outcomeIds: string[],
+	/** Column indexes low → high */
+	order: number[] = outcomeIds.map((_, i) => i),
 ): NoisyMaxSettings => {
 	if (previous) return { ...previous, enabled: true };
+	const filled = configurations.filter(configuration =>
+		configuration.values.some(value => value !== 0),
+	);
+	// Baseline: the state that keeps the outcome lowest on the scale. States are compared only
+	// against each other with the other parents' states held the same, so their effect cancels
+	// out. Without enough values, the first state.
+	const pickBaseline = (parent: NoisyMaxParent, p: number) => {
+		const contexts = new Map<string, Map<string, number>>();
+		filled.forEach(({ path, values }) => {
+			const context = path.filter((_, i) => i !== p).join('|');
+			if (!contexts.has(context)) contexts.set(context, new Map());
+			contexts.get(context)!.set(path[p], expectedPosition(toScale(values, order)));
+		});
+		const scores = new Map<string, number[]>();
+		contexts.forEach(byState => {
+			if (byState.size < 2) return;
+			const mean = [...byState.values()].reduce((a, b) => a + b, 0) / byState.size;
+			byState.forEach((position, state) =>
+				scores.set(state, [...(scores.get(state) ?? []), position - mean]),
+			);
+		});
+		let best = parent.states[0]?.id ?? '';
+		let bestScore = Infinity;
+		parent.states.forEach(state => {
+			const list = scores.get(state.id);
+			if (!list) return;
+			const score = list.reduce((a, b) => a + b, 0) / list.length;
+			if (score < bestScore - 1e-9) {
+				best = state.id;
+				bestScore = score;
+			}
+		});
+		return best;
+	};
 	const baselines = Object.fromEntries(
-		parents.map(parent => [parent.issueId, parent.states[0]?.id ?? '']),
+		parents.map((parent, p) => [parent.issueId, pickBaseline(parent, p)]),
 	);
 	const find = (path: string[]) =>
 		configurations.find(
@@ -172,5 +219,28 @@ export const startNoisyMax = (
 		baselines,
 		leak: leak ? toRecord(outcomeIds, leak) : {},
 		rows,
+	};
+};
+
+/**
+ * Make a state the parent's baseline. The leak and that state's row swap places: the old leak
+ * becomes the row for the old baseline. Both describe "only this parent differs", so no values
+ * are lost. Other parents' rows are kept as they are.
+ */
+export const makeBaseline = (
+	settings: NoisyMaxSettings,
+	parent: NoisyMaxParent,
+	stateId: string,
+): NoisyMaxSettings => {
+	const previous = getBaseline(parent, settings.baselines);
+	const rows = settings.rows[parent.issueId] ?? {};
+	return {
+		...settings,
+		baselines: { ...settings.baselines, [parent.issueId]: stateId },
+		leak: rows[stateId] ?? {},
+		rows: {
+			...settings.rows,
+			[parent.issueId]: { ...rows, [previous]: settings.leak },
+		},
 	};
 };

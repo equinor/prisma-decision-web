@@ -134,7 +134,7 @@ export const rebalanceRow = (cells: ProbabilityCell[], index: number, value: num
 		othersSum > EPSILON ? (cell.value / othersSum) * target : target / others.length,
 	);
 	// Match the precision of the typed and locked values so the row still sums to exactly 1
-	const decimals = (v: number) => Number(v.toFixed(6)).toString().split('.')[1]?.length ?? 0;
+	const decimals = decimalsOf;
 	const fixed = [
 		value,
 		...cells
@@ -143,6 +143,30 @@ export const rebalanceRow = (cells: ProbabilityCell[], index: number, value: num
 	];
 	const rounded = roundProbabilities(next, Math.max(3, ...fixed.map(decimals)));
 	others.forEach(({ i }, k) => (values[i] = rounded[k]));
+	return values;
+};
+
+const decimalsOf = (value: number) =>
+	Number(value.toFixed(6)).toString().split('.')[1]?.length ?? 0;
+
+/**
+ * Default while typing: once only one empty cell is left in a row being filled in, it gets the
+ * rest, so there is one less cell to type per row. A 0 counts as empty. Rows that already sum
+ * to 1 are left alone, so a deliberate 0 is not overwritten when another cell is edited.
+ */
+export const fillLastEmpty = (cells: ProbabilityCell[], index: number, value: number): number[] => {
+	const values = cells.map((cell, i) => (i === index ? value : cell.value));
+	if (isRowValid(cells)) return values;
+	const empty = cells.flatMap((cell, i) =>
+		i !== index && !cell.disabled && !cell.locked && cell.value === 0 ? [i] : [],
+	);
+	if (empty.length !== 1) return values;
+	const others = values.filter((_, i) => i !== empty[0] && !cells[i].disabled);
+	const rest = 1 - others.reduce((sum, v) => sum + v, 0);
+	// More than 1 already: leave it to the sum warning
+	if (rest < -EPSILON) return values;
+	const decimals = Math.max(2, ...others.map(decimalsOf));
+	values[empty[0]] = Math.max(0, Number(rest.toFixed(decimals)));
 	return values;
 };
 

@@ -3,6 +3,7 @@ import {
 	defaultDefinition,
 	definitionsEqual,
 	definitionTypes,
+	fillLastEmpty,
 	fixProbabilitySum,
 	formatDefinition,
 	getDefinitionProbabilities,
@@ -480,5 +481,34 @@ describe('resolveScaleOrder', () => {
 	});
 	it('defaults to column order', () => {
 		expect(resolveScaleOrder(['a', 'b'])).toEqual([0, 1]);
+	});
+});
+
+describe('fillLastEmpty (default while typing)', () => {
+	it('gives the last empty cell the rest', () => {
+		expect(fillLastEmpty([cell(0.3), cell(0), cell(0)], 1, 0.4)).toEqual([0.3, 0.4, 0.3]);
+	});
+	it('fills whichever cell is the last empty one, not only the rightmost', () => {
+		expect(fillLastEmpty([cell(0), cell(0.5), cell(0)], 2, 0.2)).toEqual([0.3, 0.5, 0.2]);
+	});
+	it('waits while more than one cell is empty', () => {
+		expect(fillLastEmpty([cell(0), cell(0), cell(0)], 0, 0.3)).toEqual([0.3, 0, 0]);
+	});
+	it('does nothing when typing in the last empty cell itself', () => {
+		expect(fillLastEmpty([cell(0.3), cell(0.4), cell(0)], 2, 0.2)).toEqual([0.3, 0.4, 0.2]);
+	});
+	it('leaves rows that already sum to 1 alone, so a deliberate 0 stays', () => {
+		expect(fillLastEmpty([cell(0.5), cell(0.5), cell(0)], 0, 0.4)).toEqual([0.4, 0.5, 0]);
+	});
+	it('skips locked and restricted cells', () => {
+		expect(
+			fillLastEmpty([cell(0.2), cell(0, true), cell(0, false, true), cell(0)], 0, 0.3),
+		).toEqual([0.3, 0, 0, 0.7]);
+	});
+	it('leaves it to the sum warning when the others are already over 1', () => {
+		expect(fillLastEmpty([cell(0.8), cell(0), cell(0)], 1, 0.5)).toEqual([0.8, 0.5, 0]);
+	});
+	it('matches the precision of the typed values', () => {
+		expect(fillLastEmpty([cell(0.125), cell(0), cell(0)], 1, 0.3)).toEqual([0.125, 0.3, 0.575]);
 	});
 });

@@ -427,6 +427,7 @@ export const ProbabilityTable = ({
 					values: configuration.cells.map(cell => cell.value),
 				})),
 				outcomeIds,
+				order,
 			),
 		);
 	};
@@ -594,7 +595,7 @@ export const ProbabilityTable = ({
 									value: 'noisy',
 									label: 'Noisy-MAX',
 									tooltip:
-										'Each parent can push the outcome up on its own. Every row is calculated from a few parameters.',
+										'Each parent can push the outcome up on its own. Every row is calculated from a few parameters. With two outcomes this is the noisy-OR model.',
 								},
 							]}
 							onChange={event => setFillMode(event.target.value as 'row' | 'noisy')}
