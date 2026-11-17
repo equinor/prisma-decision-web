@@ -38,7 +38,7 @@ router.get('/{*splat}', (req, res) => {
 		"style-src 'self' 'unsafe-inline' https://cdn.eds.equinor.com",
 		"font-src 'self' https://cdn.eds.equinor.com",
 		"img-src 'self' data: https:",
-		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com https://api-prisma-decision-api-public-public.radix.equinor.com https://api-prisma-decision-ai-prod.radix.equinor.com https://api-prisma-decision-ai-test.radix.equinor.com https://api-prisma-decision-ai-dev.radix.equinor.com http://localhost:7075/",
+		"connect-src 'self' https://api-prisma-decision-api-prod.radix.equinor.com https://api-prisma-decision-api-test.radix.equinor.com https://api-prisma-decision-api-dev.radix.equinor.com https://login.microsoftonline.com https://api-prisma-decision-api-public-public.radix.equinor.com https://api-prisma-decision-ai-prod.c3.radix.equinor.com https://api-prisma-decision-ai-test.c3.radix.equinor.com https://api-prisma-decision-ai-dev.c3.radix.equinor.com http://localhost:7075/",
 		"base-uri 'self'",
 		"form-action 'self'",
 	].join('; ');
