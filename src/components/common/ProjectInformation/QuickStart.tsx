@@ -148,7 +148,7 @@ const QuickStartWindow = ({ onClose }: { onClose: () => void }) => {
 		onClose();
 	};
 
-	const hasPanel = !!response && Object.keys(response.state.confirmed).length > 0;
+	const hasPanel = !!response;
 
 	return (
 		<Dialog

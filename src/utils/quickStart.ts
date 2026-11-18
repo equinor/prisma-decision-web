@@ -54,6 +54,17 @@ export const quickStartResponseSchema = z.object({
 		strategies: z.number().int(),
 		influence_connections: z.number().int(),
 	}),
+	// Every item found so far, including drafts that still miss details.
+	items: z.array(
+		z.object({
+			path,
+			// Values known so far; fields not given yet are null.
+			value: z.record(z.string(), z.unknown()),
+			status: z.enum(['missing', 'review', 'approved']),
+			missing: z.array(z.string()),
+			current: z.boolean(),
+		}),
+	),
 	complete: z.boolean(),
 });
 
@@ -67,6 +78,7 @@ const quickStartResultSchema = z.object({
 
 export type QuickStartResponse = z.infer<typeof quickStartResponseSchema>;
 export type QuickStartReview = NonNullable<QuickStartResponse['pending']>;
+export type QuickStartItem = QuickStartResponse['items'][number];
 export type QuickStartRecords = {
 	project: Project;
 	objectives: Objective[];
