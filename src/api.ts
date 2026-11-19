@@ -12,8 +12,8 @@ export const authConfig = {
 		interceptor: publicInterceptor,
 	},
 	ai: {
-		initialize: initializePublicAuth,
-		interceptor: publicInterceptor,
+		initialize: initializeMsalAuth,
+		interceptor: msalInterceptor,
 	},
 	research: {
 		initialize: initializePublicAuth,
