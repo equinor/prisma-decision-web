@@ -66,26 +66,26 @@ export const ChatItemReview = ({
 							))}
 						</ul>
 						{!review.item.edges.length && <p>No connections.</p>}
+						<p>Probabilities:</p>
+						<ul>
+							{review.item.discrete_probabilities.map((row, index) => (
+								<li key={index}>
+									{row.uncertainty_name} / {row.outcome_name}: {row.probability}
+									{whenStates(row.parent_states)}
+								</li>
+							))}
+						</ul>
+						<p>Utility values:</p>
+						<ul>
+							{review.item.discrete_utilities.map((row, index) => (
+								<li key={index}>
+									{row.utility_name}: {row.utility_value}
+									{whenStates(row.parent_states)}
+								</li>
+							))}
+						</ul>
 					</>
 				)}
-				<p>Probabilities:</p>
-				<ul>
-					{review.item.discrete_probabilities.map((row, index) => (
-						<li key={index}>
-							{row.uncertainty_name} / {row.outcome_name}: {row.probability}
-							{whenStates(row.parent_states)}
-						</li>
-					))}
-				</ul>
-				<p>Utility values:</p>
-				<ul>
-					{review.item.discrete_utilities.map((row, index) => (
-						<li key={index}>
-							{row.utility_name}: {row.utility_value}
-							{whenStates(row.parent_states)}
-						</li>
-					))}
-				</ul>
 			</div>
 		) : (
 			<dl className='flex flex-col gap-2'>
@@ -155,7 +155,7 @@ export const ChatItemReview = ({
 				)}
 			</dl>
 		)}
-		{review.note && <p>{review.note}</p>}
+		{review.note && <p className='whitespace-pre-wrap'>{review.note}</p>}
 		{saved ? (
 			<p role='status'>
 				Saved. Continue to get the next question; this will not save it again.

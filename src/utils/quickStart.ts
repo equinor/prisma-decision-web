@@ -44,9 +44,18 @@ export const quickStartResponseSchema = z.object({
 				item: diagramInformationSchema,
 				note,
 			}),
+			z.object({
+				kind: z.literal('probability_table'),
+				path,
+				item: z.object({
+					name: z.string(),
+					rows: diagramInformationSchema.shape.discrete_probabilities,
+				}),
+				note,
+			}),
 		])
 		.nullable(),
-	shortcut: z.object({ label: z.string().min(1), message: z.string().min(1) }).nullable(),
+	shortcuts: z.array(z.object({ label: z.string().min(1), message: z.string().min(1) })),
 	progress: z.object({
 		project_information: z.boolean(),
 		objectives: z.number().int(),
@@ -97,7 +106,9 @@ export const getApprovedItems = ({ confirmed }: QuickStartResponse['state']) => 
 		objectives: approved('objectives.', objectiveInformationSchema),
 		issues: approved('issues.', issueInformationSchema),
 		strategies: approved('strategies.', strategyInformationSchema),
-		diagram: approved('influence_diagram', diagramInformationSchema)[0],
+		diagram: confirmed.influence_diagram
+			? diagramInformationSchema.parse(JSON.parse(confirmed.influence_diagram))
+			: undefined,
 	};
 };
 

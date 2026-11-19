@@ -20,7 +20,7 @@ import { QuickStartPanel } from './QuickStartPanel';
 type Message = { id: number; role: 'user' | 'assistant'; text: string };
 
 const reviewHint =
-	'Describe any corrections in the chat. Nothing is created until you click Create project at the end.';
+	'If something is wrong, describe the corrections in the chat and I will fix it. Nothing is created until you click Create project at the end.';
 
 export const QuickStart = () => {
 	const [open, setOpen] = useState(false);
@@ -246,16 +246,19 @@ const QuickStartWindow = ({ onClose }: { onClose: () => void }) => {
 									onApprove={approve}
 								/>
 							)}
-							{response?.shortcut && !response.pending && !isSending && (
-								<Button
-									className='self-start'
-									variant='outlined'
-									onClick={() => sendMessage(response.shortcut?.message)}
-									disabled={isBusy || hasUnsentInput}
-								>
-									{response.shortcut.label}
-								</Button>
-							)}
+							{!response?.pending &&
+								!isSending &&
+								response?.shortcuts.map(shortcut => (
+									<Button
+										key={shortcut.label}
+										className='self-start'
+										variant='outlined'
+										onClick={() => sendMessage(shortcut.message)}
+										disabled={isBusy || hasUnsentInput}
+									>
+										{shortcut.label}
+									</Button>
+								))}
 							{resultInvalid && (
 								<p role='alert' className='text-sm'>
 									The collected information is incomplete, so the project cannot
@@ -332,7 +335,7 @@ const PendingReview = ({
 	hasUnsentInput: boolean;
 	onApprove: () => void;
 }) => {
-	if (review.kind !== 'project')
+	if (review.kind !== 'project' && review.kind !== 'probability_table')
 		return (
 			<ChatItemReview
 				review={review}
@@ -346,32 +349,81 @@ const PendingReview = ({
 		);
 	return (
 		<section
-			aria-label='Review project'
+			aria-label={review.kind === 'project' ? 'Review project' : 'Review probabilities'}
 			className='border-background-medium flex flex-col gap-3 rounded border p-3 text-sm'
 		>
-			<h3 className='font-medium'>Review your project information</h3>
-			<dl className='flex flex-col gap-2'>
-				<ReviewField label='Name'>{review.item.project_name}</ReviewField>
-				<ReviewField label='Opportunity statement'>
-					{review.item.opportunity_statement}
-				</ReviewField>
-				<ReviewField label='End date'>
-					{review.item.end_date
-						? format(parseISO(review.item.end_date), 'MM/dd/yyyy (d MMMM yyyy)')
-						: 'Not given (default: 30 days from when Quick start was opened)'}
-				</ReviewField>
-				<ReviewField label='Visibility'>
-					{review.item.public_project
-						? 'Public (visible to other users)'
-						: 'Private (default unless you ask for public)'}
-				</ReviewField>
-			</dl>
-			{review.note && <p>{review.note}</p>}
+			{review.kind === 'project' ? (
+				<>
+					<h3 className='font-medium'>Review your project information</h3>
+					<dl className='flex flex-col gap-2'>
+						<ReviewField label='Name'>{review.item.project_name}</ReviewField>
+						<ReviewField label='Opportunity statement'>
+							{review.item.opportunity_statement}
+						</ReviewField>
+						<ReviewField label='End date'>
+							{review.item.end_date
+								? format(parseISO(review.item.end_date), 'MM/dd/yyyy (d MMMM yyyy)')
+								: 'Not given (default: 30 days from when Quick start was opened)'}
+						</ReviewField>
+						<ReviewField label='Visibility'>
+							{review.item.public_project
+								? 'Public (visible to other users)'
+								: 'Private (default unless you ask for public)'}
+						</ReviewField>
+					</dl>
+				</>
+			) : (
+				<>
+					<h3 className='font-medium'>Review the probabilities for {review.item.name}</h3>
+					<ProbabilityTable rows={review.item.rows} />
+				</>
+			)}
+			{review.note && <p className='whitespace-pre-wrap'>{review.note}</p>}
 			<p>{reviewHint}</p>
 			{hasUnsentInput && <p>Send or clear your message first.</p>}
 			<Button className='self-start' onClick={onApprove} disabled={busy || hasUnsentInput}>
 				{busy ? 'Please wait...' : 'Looks right'}
 			</Button>
 		</section>
+	);
+};
+
+const ProbabilityTable = ({
+	rows,
+}: {
+	rows: Extract<QuickStartReview, { kind: 'probability_table' }>['item']['rows'];
+}) => {
+	const when = (row: (typeof rows)[number]) =>
+		row.parent_states.map(s => `${s.issue_name} = ${s.state_name}`).join(', ');
+	const outcomes = [...new Set(rows.map(row => row.outcome_name))];
+	const combinations = [...new Set(rows.map(when))];
+	return (
+		<table className='text-left'>
+			<thead>
+				<tr>
+					<th>When</th>
+					{outcomes.map(outcome => (
+						<th key={outcome}>{outcome}</th>
+					))}
+				</tr>
+			</thead>
+			<tbody>
+				{combinations.map(combination => (
+					<tr key={combination}>
+						<td>{combination || 'Always'}</td>
+						{outcomes.map(outcome => {
+							const row = rows.find(
+								r => when(r) === combination && r.outcome_name === outcome,
+							);
+							return (
+								<td key={outcome}>
+									{row && `${Math.round(row.probability * 100)}%`}
+								</td>
+							);
+						})}
+					</tr>
+				))}
+			</tbody>
+		</table>
 	);
 };
