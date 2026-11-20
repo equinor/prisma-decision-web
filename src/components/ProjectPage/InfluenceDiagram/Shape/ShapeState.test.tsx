@@ -55,7 +55,9 @@ test('a Forced decision selects and clears an Option using the shared Scenario E
 	const trigger = within(decision).getByRole('button', { name: 'Forced decision: Drill well' });
 	expect(trigger).toHaveTextContent('1 state');
 	await user.click(trigger);
-	const states = within(decision).getByRole('list');
+	const popover = screen.getByRole('dialog', { name: 'Forced decision: Drill well' });
+	expect(popover.closest('[popover]')).toHaveAttribute('popover', 'manual');
+	const states = within(popover).getByRole('list');
 	await user.click(within(states).getByText('Existing option'));
 	expect(trigger).toHaveTextContent('Existing option');
 	expect(trigger).toHaveAttribute('aria-expanded', 'true');
@@ -96,9 +98,17 @@ test('Hard evidence and Forced decisions share their States and Scenario EV with
 		within(utility).queryByRole('button', { name: /Forced decision|Hard evidence/ }),
 	).toBeNull();
 	await user.click(within(decision).getByRole('button', { name: 'Forced decision: Drill well' }));
-	await user.click(within(decision).getByRole('listitem'));
+	await user.click(
+		within(screen.getByRole('dialog', { name: 'Forced decision: Drill well' })).getByRole(
+			'listitem',
+		),
+	);
 	await user.click(within(uncertainty).getByRole('button', { name: 'Hard evidence: Oil price' }));
-	await user.click(within(uncertainty).getByRole('listitem'));
+	await user.click(
+		within(screen.getByRole('dialog', { name: 'Hard evidence: Oil price' })).getByRole(
+			'listitem',
+		),
+	);
 	await waitFor(() =>
 		expect(fixture.requests).toContainEqual(
 			expect.objectContaining({
@@ -134,7 +144,14 @@ test('Hard evidence and Forced decisions share their States and Scenario EV with
 	);
 	expect(screen.getByText('20.00')).toBeVisible();
 	const shapeDecision = screen.getByTestId(`rf__node-${fixture.issues[0].node.id}`);
-	await user.click(within(shapeDecision).getByRole('listitem'));
+	await user.click(
+		within(shapeDecision).getByRole('button', { name: 'Forced decision: Drill well' }),
+	);
+	await user.click(
+		within(screen.getByRole('dialog', { name: 'Forced decision: Drill well' })).getByRole(
+			'listitem',
+		),
+	);
 	expect(await screen.findByText('Select states')).toBeVisible();
 	await user.click(screen.getByRole('radio', { name: 'Card view' }));
 	expect(screen.getByText('Select states')).toBeVisible();
@@ -232,7 +249,9 @@ test.each(['Decision', 'Uncertainty'] as const)(
 		const node = await screen.findByTestId(`rf__node-${source.node.id}`);
 		const trigger = within(node).getByRole('button', { name: `${label}: ${source.name}` });
 		await user.click(trigger);
-		const picker = within(node).getByRole('list');
+		const picker = within(
+			screen.getByRole('dialog', { name: `${label}: ${source.name}` }),
+		).getByRole('list');
 		expect(
 			within(picker)
 				.getAllByRole('listitem')
@@ -254,7 +273,7 @@ test.each(['Decision', 'Uncertainty'] as const)(
 	},
 );
 
-test('State triggers toggle inline rows with the keyboard; outside interactions, menus, and Escape do not collapse them', async () => {
+test('State popovers support keyboard opening, Escape, outside dismissal, and do not expand Cards', async () => {
 	const user = userEvent.setup();
 	renderInfluenceDiagram(queryClient, fixture.project);
 	const decision = await screen.findByTestId(`rf__node-${fixture.issues[0].node.id}`);
@@ -263,34 +282,36 @@ test('State triggers toggle inline rows with the keyboard; outside interactions,
 	await user.hover(decision);
 	trigger.focus();
 	await user.keyboard('{Enter}');
-	const states = within(decision).getByRole('list');
+	const states = within(
+		screen.getByRole('dialog', { name: 'Forced decision: Drill well' }),
+	).getByRole('list');
 	expect(states).toBeVisible();
-	expect(trigger).toHaveFocus();
 	await user.keyboard('{Escape}');
-	expect(states).toBeVisible();
-	expect(trigger).toHaveFocus();
+	expect(screen.queryByRole('dialog')).toBeNull();
+	await waitFor(() => expect(trigger).toHaveFocus());
 	await user.keyboard(' ');
-	expect(within(decision).queryByRole('list')).toBeNull();
-	await user.keyboard('{Enter}');
-	await user.click(within(decision).getByRole('listitem'));
+	await user.click(
+		within(screen.getByRole('dialog', { name: 'Forced decision: Drill well' })).getByRole(
+			'listitem',
+		),
+	);
 	expect(trigger).toHaveTextContent('Existing option');
 
 	await user.click(within(decision).getByRole('button', { name: 'Issue actions' }));
 	expect(await screen.findByRole('menu', { name: 'Issue actions: Drill well' })).toBeVisible();
-	expect(within(decision).getByRole('list')).toBeVisible();
+	expect(screen.queryByRole('dialog')).toBeNull();
 	await user.click(within(uncertainty).getByRole('button', { name: 'Hard evidence: Oil price' }));
-	expect(within(uncertainty).getByRole('list')).toBeVisible();
-	expect(within(decision).getByRole('list')).toBeVisible();
+	expect(screen.getByRole('dialog', { name: 'Hard evidence: Oil price' })).toBeVisible();
+	expect(screen.queryByRole('dialog', { name: 'Forced decision: Drill well' })).toBeNull();
 	expect(screen.queryByRole('menu')).toBeNull();
 	await user.click(screen.getByRole('radio', { name: 'Selection mode' }));
-	await user.keyboard('{Escape}');
-	expect(within(uncertainty).getByRole('list')).toBeVisible();
-	expect(within(decision).getByRole('list')).toBeVisible();
+	expect(screen.queryByRole('dialog')).toBeNull();
 	expect(trigger).toHaveTextContent('Existing option');
 	await user.click(screen.getByRole('radio', { name: 'Card view' }));
-	expect(screen.getAllByRole('list')).toHaveLength(2);
+	expect(screen.queryByRole('list')).toBeNull();
 	await user.click(screen.getByRole('radio', { name: 'Shape view' }));
-	expect(screen.getAllByRole('list')).toHaveLength(2);
+	expect(screen.queryByRole('dialog')).toBeNull();
+	expect(screen.queryByRole('list')).toBeNull();
 	expect(
 		await screen.findByRole('button', { name: 'Forced decision: Drill well' }),
 	).toHaveTextContent('Existing option');
@@ -379,7 +400,11 @@ test.each([
 				);
 			}
 			for (const [index, state] of states.entries()) {
-				const row = within(within(node).getByRole('list')).getByText(state.name);
+				const stateContainer =
+					view === 'Shape'
+						? screen.getByRole('dialog', { name: `${label}: ${issue.name}` })
+						: node;
+				const row = within(within(stateContainer).getByRole('list')).getByText(state.name);
 				fireEvent.click(row);
 				if (index === 0) {
 					expect(screen.getByText('Select states')).toBeVisible();
@@ -450,7 +475,13 @@ test.each(['Shape', 'Card'])(
 		} else {
 			await user.click(screen.getByRole('button', { name: 'Expand All' }));
 		}
-		fireEvent.click(within(node).getByRole('listitem'));
+		fireEvent.click(
+			within(
+				view === 'Shape'
+					? screen.getByRole('dialog', { name: 'Hard evidence: Oil price' })
+					: node,
+			).getByRole('listitem'),
+		);
 		expect(await screen.findByText('20.00')).toBeVisible();
 		const arc = screen.getByRole('group', {
 			name: `Edge from ${parent.node.id} to ${child.node.id}`,
@@ -474,7 +505,16 @@ test.each(['Shape', 'Card'])(
 			),
 		);
 		await user.click(actions);
-		const selected = within(node).getByRole('listitem');
+		if (view === 'Shape') {
+			await user.click(
+				within(node).getByRole('button', { name: 'Hard evidence: Oil price' }),
+			);
+		}
+		const selected = within(
+			view === 'Shape'
+				? screen.getByRole('dialog', { name: 'Hard evidence: Oil price' })
+				: node,
+		).getByRole('listitem');
 		expect(selected).toHaveClass('outline-2');
 		expect(selected).not.toHaveClass('opacity-50');
 		fireEvent.click(selected);

@@ -1,21 +1,13 @@
-import { useExpandCard } from '../../../../hooks/useExpandCard';
-import { cn } from '../../../../utils/cn';
 import { Issue } from '../../../../validators';
 import { ShapeNodeState } from './ShapeNodeState';
 
 export const ShapeNodeDetails = ({ issue, tableOpen }: { issue: Issue; tableOpen: boolean }) => {
-	const { expanded } = useExpandCard(issue.id);
+	if (tableOpen) return null;
+
 	return (
-		<div
-			className={cn(
-				'[&_ul]:bg-background-default [&_ul]:shadow-tile flex w-max flex-col items-center [&_ul]:mt-2 [&_ul]:w-87.5 [&_ul]:p-2',
-				expanded || tableOpen
-					? 'relative'
-					: 'pointer-events-none absolute top-full left-1/2 -translate-x-1/2',
-			)}
-		>
+		<div className='pointer-events-none absolute top-full left-1/2 flex w-max -translate-x-1/2 flex-col items-center'>
 			<ShapeNodeState />
-			{!expanded && !tableOpen && issue.description?.trim() && (
+			{issue.description?.trim() && (
 				<div className='influence-shape-description nodrag nopan nowheel w-80 pt-2'>
 					<div
 						role='note'

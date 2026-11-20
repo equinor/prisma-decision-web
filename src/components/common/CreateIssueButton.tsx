@@ -3,7 +3,7 @@ import { Button, Icon } from '@equinor/eds-core-react/next';
 import { add } from '@equinor/eds-icons';
 import { useRef, useState } from 'react';
 import { useIssueForm } from '../../hooks/useIssueForm';
-import { CreateIssueForm } from './CreateIssueForm';
+import { CreateIssueForm } from './CreateIssueForm/CreateIssueForm';
 
 export const CreateIssueButton = () => {
 	const [isOpen, setIsOpen] = useState(false);

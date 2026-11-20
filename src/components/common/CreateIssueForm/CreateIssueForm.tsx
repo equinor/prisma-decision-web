@@ -2,10 +2,10 @@ import { CircularProgress } from '@equinor/eds-core-react';
 import { Button, Icon } from '@equinor/eds-core-react/next';
 import { close } from '@equinor/eds-icons';
 import { FormProvider, useWatch } from 'react-hook-form';
-import type { useIssueForm } from '../../hooks/useIssueForm';
-import { DecisionFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/DecisionFormSection';
-import { IssueFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/IssueFormSection';
-import { UncertaintyFormSection } from '../ProjectPage/ProjectIssues/IssueFormSections/UncertaintyFormSection';
+import type { useIssueForm } from '../../../hooks/useIssueForm';
+import { IssueForm } from '../IssueForm/IssueForm';
+import { CreateDecisionForm } from './CreateDecisionForm';
+import { CreateUncertaintyForm } from './CreateUncertaintyForm';
 
 type CreateIssueFormProps = {
 	formMethods: ReturnType<typeof useIssueForm>;
@@ -42,9 +42,14 @@ export const CreateIssueForm = ({ formMethods, onClose }: CreateIssueFormProps) 
 					<Icon data={close} />
 				</Button>
 				<fieldset disabled={isPending} className='flex w-full flex-col gap-4'>
-					<IssueFormSection />
-					{selectedType === 'Decision' && <DecisionFormSection />}
-					{selectedType === 'Uncertainty' && <UncertaintyFormSection />}
+					<IssueForm>
+						<IssueForm.Name />
+						<IssueForm.Description />
+						<IssueForm.Type />
+						<IssueForm.Boundary />
+						{selectedType === 'Decision' && <CreateDecisionForm />}
+						{selectedType === 'Uncertainty' && <CreateUncertaintyForm />}
+					</IssueForm>
 				</fieldset>
 				<Button
 					className='md:self-end'

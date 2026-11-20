@@ -9,6 +9,7 @@ import { UtilityNode } from './UtilityNode';
 import { useInfluenceDiagram } from './useInfluenceDiagram';
 import { InfluenceDiagramTool, InfluenceDiagramToolbar } from './InfluenceDiagramToolbar';
 import { useInfluenceDiagramView } from './useInfluenceDiagramView';
+import { ShapeEdge } from './Shape/ShapeEdge';
 import { ShapeNode } from './Shape/ShapeNode';
 
 const nodeTypes = {
@@ -18,6 +19,7 @@ const nodeTypes = {
 };
 
 const edgeTypes = { 'issue-edge': InfluenceEdge };
+const shapeEdgeTypes = { 'issue-edge': ShapeEdge };
 const shapeNodeTypes = {
 	decision: ShapeNode,
 	uncertainty: ShapeNode,
@@ -71,7 +73,7 @@ export const InfluenceDiagram = () => {
 				onEdgeMouseEnter={onEdgeMouseEnter}
 				onEdgeMouseLeave={onEdgeMouseLeave}
 				nodeTypes={view === 'shape' ? shapeNodeTypes : nodeTypes}
-				edgeTypes={edgeTypes}
+				edgeTypes={view === 'shape' ? shapeEdgeTypes : edgeTypes}
 				connectionLineComponent={ConnectionLine}
 				onConnect={onConnect}
 				isValidConnection={isValidConnection}

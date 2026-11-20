@@ -2,7 +2,7 @@ import { Icon } from '@equinor/eds-core-react/next';
 import { add } from '@equinor/eds-icons';
 import { useState } from 'react';
 import { useIssueForm } from '../../hooks/useIssueForm';
-import { CreateIssueForm } from './CreateIssueForm';
+import { CreateIssueForm } from './CreateIssueForm/CreateIssueForm';
 import { ToolbarPopoverButton } from './DraggableToolbar/Toolbar';
 
 export const CreateIssueToolbarButton = () => {
