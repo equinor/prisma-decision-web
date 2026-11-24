@@ -300,6 +300,7 @@ export const ChatPanel = ({ open, onClose }: ChatPanelProps) => {
 						state: activeInterview.state,
 						action: 'confirm',
 						path: itemToSave.path,
+						current_section: currentSection,
 					},
 				},
 				{
