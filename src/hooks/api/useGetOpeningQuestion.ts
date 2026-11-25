@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { z } from 'zod';
-import { AI_API_URL } from '../../aiApi';
+import { aiClient } from '../../aiApi';
 
 export const useGetOpeningQuestion = (assistant: 'chat' | 'quick-start', enabled: boolean) =>
 	useQuery({
 		queryKey: [assistant, 'opening-question'],
 		queryFn: async ({ signal }) => {
-			const response = await axios.get<unknown>(`${AI_API_URL}/${assistant}/opening-question`, {
+			const response = await aiClient.get<unknown>(`/${assistant}/opening-question`, {
 				signal,
 				timeout: 10000,
 			});

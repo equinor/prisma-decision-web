@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { z } from 'zod';
-import { AI_API_URL } from '../../aiApi';
+import { aiClient } from '../../aiApi';
 import {
 	chatInterviewResponseSchema,
 	getChatStrategyContext,
@@ -102,10 +102,10 @@ export const useSendChatMessage = () =>
 			const startOnPage = !interview && request.current_section !== undefined;
 			const endpoint =
 				interview || startOnPage
-					? `${AI_API_URL}/chat/interview`
+					? '/chat/interview'
 					: next_step
-						? `${AI_API_URL}/chat/next-step`
-						: `${AI_API_URL}/chat/messages`;
+						? '/chat/next-step'
+						: '/chat/messages';
 			const existing_strategies = request.existing_strategies
 				? {
 						strategies: getChatStrategyContext(
@@ -139,7 +139,7 @@ export const useSendChatMessage = () =>
 							},
 						}
 					: { ...request, existing_strategies };
-			const response = await axios.post<unknown>(endpoint, payload, {
+			const response = await aiClient.post<unknown>(endpoint, payload, {
 				timeout: 120000,
 			});
 			return chatReplySchema.parse(response.data);

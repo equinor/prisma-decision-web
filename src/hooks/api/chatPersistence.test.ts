@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { afterEach, expect, test, vi } from 'vitest';
 import { apiClient } from '../../api';
+import { aiClient } from '../../aiApi';
 import { createIssueDraft } from '../../utils/createIssueDraft';
 import {
 	getChatItemToSave,
@@ -144,7 +144,10 @@ test('diagram persistence removes/adds connections, updates generated tables and
 			item,
 			original,
 		};
-		vi.spyOn(axios, 'post').mockImplementation((async (_url: string, body: ChatRequestBody) => {
+		vi.spyOn(aiClient, 'post').mockImplementation((async (
+			_url: string,
+			body: ChatRequestBody,
+		) => {
 			expect(body.project_id).toBe(projectId);
 			const operations = body.context.edges.some(
 				(edge: { id: string }) => edge.id === oldEdge.id,
